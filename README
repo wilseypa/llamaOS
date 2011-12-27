@@ -1,0 +1,49 @@
+
+This project (llamaOS: Low-LAtency Minimal Appliance Operating System) is
+studying the use of robust, retargetable virtual guest appliances for high
+performance execution of parallel applications in virtualizable Beowulf
+clusters.  This work currently targets operation on a Xen type 1 hypervisor,
+however, the concepts will generalize to other hypervisors.
+
+Our goal is to provide a modern software engineering environment that is easily
+used by applications developed in a standard C/C++ GNU Unix-based platform.  As
+such, llamaOS contains a partial port of the standard GNU C/C++ libraries
+including glibc-2.14.1 and various components of gcc-4.6.2 (C++ exception
+handling, C++ memory management, STL, etc).
+
+The llamaOS environment provides sparse system level services.  The goal is to
+develop a solution with minimal operating system overhead to allow lowest
+latency application execution.  For now, each node appliance supports only
+single threaded application execution.  Multiple threads of application
+execution on a single node can be implemented with multiple instances of
+llamaOS.  Hence, system overhead can be contained within interrupt services that
+execute on demand in reaction to system events.
+
+The llamaOS environment provides a unique interaction with the standard
+paravirtualization components provided by the Xen hypervisor.  In particular,
+virtual memory is natively mapped through hypercalls and a lightweight
+low-latency networking interface bypasses the dom0 TCP/IP stack.  Ethernet
+frames are transported from hardware to llamaOS and back again by way of
+hypercalls and shared memory pages.  Plans to provide high performance I/O
+support is underway.  Active Messages, MPI, infiniband over ethernet are all
+examples of what is being studied.
+
+Future development could entail modifications to the underlying hypervisor as
+well.  Application specific scheduling and memory management algorithms can
+potentially reduce system overhead even further.  Upper level monitoring logic
+could also reduce system overhead by utilizing the live migration features of
+the hypervisor to avoid CPU and I/O bottlenecks.
+
+This project is designed to contribute a larger study that investigates the use
+of off-the-shelf virtualized Beowulf clusters for fine-grained parallel
+processing without requiring expensive, high-performance networking hardware.
+Our primary studies are with parallel discrete event driven simulation (PDES)
+that uses the Time Warp mechanism.  Our ultimate goal is to explore techniques
+for deploying virtualized Beowulf clusters that are shared across an
+organization by a collection of users that may have widely varying computational
+and messaging requirements.
+
+Please feel free to use and/or contribute to this work.  If you have questions,
+ask.  We will try to answer your questions.  This work has been fun for us and
+we hope you will find it interesting/useful.  We welcome suggestions and
+comments at wilseypa@gmail.com.  Thank you.
