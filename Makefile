@@ -1,15 +1,26 @@
 
-MAKE_SOURCES = Makefile common.mk rules.mk
-
 include common.mk
 
-.PHONY: all
-all: llamaOS
+MAKE_SOURCES = \
+  Makefile \
+  common.mk \
+  custom.mk \
+  rules
 
-# all: ewarped-xen $(BINDIR)/domain_config check test doc
+SYSLIBS = \
+  glibc \
+  unwind \
+  supc++ \
+  stdc++
+
+VMMLIBS = \
+  xen
+
+.PHONY: all
+all: syslibs vmmlibs
 
 .PHONY: clean
-clean: 
+clean:
 	@echo removing: $(OBJDIR)
 	@rm -rf $(OBJDIR)
 	@echo removing: $(BINDIR)
@@ -17,29 +28,19 @@ clean:
 	@echo removing: $(LIBDIR)
 	@rm -rf $(LIBDIR)
 
-.PHONY: llamaOS
-llamaOS: glibc unwind supc++ stdc++
-	@echo building llamaOS...
+.PHONY: syslibs
+syslibs:
+	@$(MAKE) $(SYSLIBS)
 
-.PHONY: glibc
-glibc:
-	@$(MAKE) -f glibc.mk
+.PHONY: vmmlibs
+vmmlibs:
+	@$(MAKE) $(VMMLIBS)
 
-.PHONY: unwind
-unwind:
-	@$(MAKE) -f unwind.mk
+.PHONY: $(SYSLIBS)
+$(SYSLIBS):
+	@$(MAKE) -f $@.mk
 
-.PHONY: supc++
-supc++:
-	@$(MAKE) -f supc++.mk
+.PHONY: $(VMMLIBS)
+$(VMMLIBS):
+	@$(MAKE) -f $@.mk
 
-.PHONY: stdc++
-stdc++:
-	@$(MAKE) -f stdc++.mk
-
-include rules.mk
-
-# include auto-generated dependencies
-ifneq ($(MAKECMDGOALS),clean)
--include $(DEPENDS)
-endif

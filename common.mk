@@ -3,7 +3,10 @@
 MAKEFLAGS = --silent
 
 # compiler tools
--include tools.mk
+AR = ar
+CC = gcc
+LD = ld
+
 
 # assembler/compiler/linker options
 ASMFLAGS =
@@ -15,3 +18,6 @@ LDFLAGS = -nostdlib
 BINDIR = bin
 LIBDIR = lib
 OBJDIR = obj
+
+# possible project specific overrides of make variables
+-include custom.mk
