@@ -1,20 +1,20 @@
 
-$(OBJDIR)/%.o : %.S
+$(OBJDIR)/%.o : %.S $(MAKE_SOURCES)
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo compiling: $<
 	@$(CC) -c $(ASMFLAGS) -o $@ $<
 
-$(OBJDIR)/%.o : %.c
+$(OBJDIR)/%.o : %.c $(MAKE_SOURCES)
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo compiling: $<
 	@$(CC) -c $(CFLAGS) -o $@ $<
 
-$(OBJDIR)/%.o : %.cc
+$(OBJDIR)/%.o : %.cc $(MAKE_SOURCES)
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo compiling: $<
 	@$(CC) -c $(CPPFLAGS) -o $@ $<
 
-$(OBJDIR)/%.o : %.cpp
+$(OBJDIR)/%.o : %.cpp $(MAKE_SOURCES)
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo compiling: $<
 	@$(CC) -c $(CPPFLAGS) -o $@ $<

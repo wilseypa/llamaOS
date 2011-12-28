@@ -1,6 +1,6 @@
 
 # make parameters
-# MAKEFLAGS += -s
+MAKEFLAGS = --silent
 
 # compiler tools
 -include tools.mk

@@ -1,4 +1,6 @@
 
+MAKE_SOURCES = glibc.mk common.mk rules.mk
+
 include common.mk
 
 CFLAGS += -include glibc/include/libc-symbols.h -include stdbool.h \
@@ -26,7 +28,7 @@ CFLAGS += $(INCLUDES:%=-I %)
 
 VPATH = glibc
 
-C_SOURCES = \
+SOURCES = \
   ctype/ctype-info.c \
   ctype/ctype.c \
   ctype/ctype_l.c \
@@ -311,7 +313,7 @@ C_SOURCES = \
   wctype/wctrans.c
 
 BINARY  = glibc.a
-OBJECTS = $(C_SOURCES:%.c=$(OBJDIR)/%.o)
+OBJECTS = $(SOURCES:%.c=$(OBJDIR)/%.o)
 DEPENDS = $(OBJECTS:%.o=%.d)
 
 $(LIBDIR)/$(BINARY) : $(OBJECTS)
