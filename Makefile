@@ -18,7 +18,7 @@ clean:
 	@rm -rf $(LIBDIR)
 
 .PHONY: llamaOS
-llamaOS: glibc unwind
+llamaOS: glibc unwind supc++ stdc++
 	@echo building llamaOS...
 
 .PHONY: glibc
@@ -28,6 +28,14 @@ glibc:
 .PHONY: unwind
 unwind:
 	@$(MAKE) -f unwind.mk
+
+.PHONY: supc++
+supc++:
+	@$(MAKE) -f supc++.mk
+
+.PHONY: stdc++
+stdc++:
+	@$(MAKE) -f stdc++.mk
 
 include rules.mk
 
