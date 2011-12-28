@@ -3,11 +3,8 @@
 # MAKEFLAGS += -s
 
 # compiler tools
-AR = ar
-CC = /opt/gcc-4.6.2/bin/gcc
-LD = ld
+-include tools.mk
 
-# -fno-exceptions -fno-rtti
 # assembler/compiler/linker options
 ASMFLAGS =
 CFLAGS = -m64 -g -O1 -std=gnu99 -fgnu89-inline -nostdinc
