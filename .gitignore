@@ -1,6 +1,7 @@
 
 # Generated binaries and dependency files #
 ###########################################
+bin/
 lib/
 obj/
 

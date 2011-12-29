@@ -28,14 +28,31 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
+#include <cstdarg>
+#include <cstdio>
+
 #include <llamaos/xen/Hypercall.h>
 
 namespace llamaos {
 
-int trace_write (const char *str)
+int trace (const char *format, ...)
 {
-   xen::Hypercall::console_io (str);
-   return 0;
+   // prep variable arguments
+   va_list arg;
+   va_start (arg, format);
+
+   // copy formatted output to buffer
+   char buffer [256] = { '\0' };
+   int count = vsnprintf (buffer, sizeof(buffer)-1, format, arg);
+
+   // term variable arguments
+   va_end (arg);
+
+   // write buffer to system output/log
+   xen::Hypercall::console_io (buffer);
+
+   // return the number characters written
+   return count;
 }
 
 }

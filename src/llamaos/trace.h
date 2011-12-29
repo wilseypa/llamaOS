@@ -35,8 +35,6 @@ namespace llamaos {
 
 int trace (const char *format, ...);
 
-int trace_write (const char *str);
-
 }
 
 #endif  //  llamaos_trace_h_
