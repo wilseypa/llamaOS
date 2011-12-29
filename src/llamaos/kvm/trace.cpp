@@ -31,8 +31,6 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <cstdarg>
 #include <cstdio>
 
-#include <llamaos/xen/Hypercall.h>
-
 namespace llamaos {
 
 int trace (const char *format, ...)
@@ -49,7 +47,6 @@ int trace (const char *format, ...)
    va_end (arg);
 
    // write buffer to system output/log
-//   xen::Hypercall::console_io (buffer);
 
    // return the number characters written
    return count;

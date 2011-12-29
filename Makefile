@@ -1,24 +1,23 @@
 
 # include common makefile variables
 include common.mk
-
-# list of makefiles that should cause a total rebuild
-MAKE_SOURCES = \
-  Makefile \
-  common.mk \
-  custom.mk \
-  rules
+MAKEFILE_SOURCES += Makefile
 
 # list of system libraries ported to llamaOS
 SYSLIBS = \
-  glibc \
-  unwind \
+  stdc++ \
   supc++ \
-  stdc++
+  unwind \
+  glibc
+
+SYSLIB_LINKS = $(SYSLIBS:%=$(LIBDIR)/%.a)
+export SYSLIB_LINKS
 
 # list of compatible hypervisor interfaces
 VMMLIBS = \
-  xen
+  xen \
+  hvm \
+  kvm
 
 # list of standard llamaOS apps
 APPS = \

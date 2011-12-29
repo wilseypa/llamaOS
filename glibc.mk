@@ -1,28 +1,8 @@
 
 include common.mk
+MAKEFILE_SOURCES += glibc.mk
 
-CFLAGS += -include glibc/include/libc-symbols.h -include stdbool.h \
-          -DHAVE_MREMAP=0 -D'LOCALEDIR=""' -D'GCONV_PATH=""' -D'GCONV_DIR=""' -D'LOCALE_ALIAS_PATH=""'
-
-INCLUDES = \
-  glibc/include \
-  glibc/sysdeps/llamaos \
-  glibc/sysdeps/llamaos/elf \
-  glibc/sysdeps/x86_64 \
-  glibc/sysdeps/x86_64/fpu \
-  glibc/sysdeps/ieee754/ldbl-128 \
-  glibc/sysdeps/ieee754 \
-  glibc/sysdeps/generic \
-  glibc/elf \
-  glibc/iconv \
-  glibc/libio \
-  glibc/stdlib \
-  glibc/string \
-  glibc/wcsmbs \
-  glibc \
-  gcc/include
-
-CFLAGS += $(INCLUDES:%=-I %)
+CFLAGS += -DHAVE_MREMAP=0 -D'LOCALEDIR=""' -D'GCONV_PATH=""' -D'GCONV_DIR=""' -D'LOCALE_ALIAS_PATH=""'
 
 VPATH = glibc
 
@@ -314,7 +294,7 @@ BINARY  = glibc.a
 OBJECTS = $(SOURCES:%.c=$(OBJDIR)/%.o)
 DEPENDS = $(OBJECTS:%.o=%.d)
 
-$(LIBDIR)/$(BINARY) : $(OBJECTS)
+$(LIBDIR)/$(BINARY): $(OBJECTS)
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
 	@$(AR) r $@ $(OBJECTS)

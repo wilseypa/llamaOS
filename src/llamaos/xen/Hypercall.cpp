@@ -132,7 +132,8 @@ bool Hypercall::console_io (const char *str)
 {
    if (0 != HYPERVISOR_console_io (CONSOLEIO_write, strlen (str), const_cast<char *>(str)))
    {
-      trace ("HYPERVISOR_console_io (%s) FAILED\n", str);
+      // probably nothing can be done here since trace would just recall console_io
+      // trace ("HYPERVISOR_console_io (%s) FAILED\n", str);
       return false;
    }
 

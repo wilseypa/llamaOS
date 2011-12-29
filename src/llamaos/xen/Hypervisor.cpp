@@ -76,11 +76,19 @@ static bool verify_magic (const start_info_t *start_info)
    return false;
 }
 
+#include <xen/sched.h>
+// include the hypercall macros from mini-os
+typedef struct { unsigned long pte; } pte_t;
+extern char hypercall_page [__PAGE_SIZE];
+#include <llamaos/xen/hypercall-x86_64.h>
+
 extern "C"
 void guest_entry (start_info_t *start_info)
 {
    if (verify_magic (start_info))
    {
+      HYPERVISOR_console_io (CONSOLEIO_write, 11, "booting...\n");
+
       trace ("starting ucguest...\n");
 
       trace ("\n=== start_info ===\n");
@@ -101,9 +109,10 @@ void guest_entry (start_info_t *start_info)
       trace ("  first_p2m_pfn: %x\n", start_info->first_p2m_pfn);
       trace ("  nr_p2m_frames: %x\n", start_info->nr_p2m_frames);
 
+   for (;;);
+
       try
       {
-
          // ucguest::Hypervisor hypervisor (start_info);
          // throw std::runtime_error ("default error");
       }

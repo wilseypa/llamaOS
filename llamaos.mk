@@ -1,30 +1,16 @@
 
 include common.mk
+MAKEFILE_SOURCES += llamaos.mk
 
-CPPFLAGS += -include glibc/include/libc-symbols.h \
-            -Wall -Wextra -Weffc++
- 
 INCLUDES = \
-  glibc/include \
-  glibc/sysdeps/llamaos \
-  glibc/sysdeps/x86_64 \
-  glibc/sysdeps/generic \
-  glibc/libio \
-  glibc \
-  gcc/include \
-  gcc/libstdc++-v3/include/c_global \
-  gcc/libstdc++-v3/include/std \
-  gcc/libstdc++-v3/include \
-  gcc/libstdc++-v3/libsupc++ \
-  xen/include \
   src
 
-CPPFLAGS += $(INCLUDES:%=-I %)
+CPPFLAGS += -Wall -Wextra -Weffc++ \
+             $(INCLUDES:%=-I %)
 
 VPATH = src
 
-SOURCES = \
-  llamaos/trace.cpp
+SOURCES =
 
 BINARY = llamaos.a
 OBJECTS = $(SOURCES:%.cpp=$(OBJDIR)/%.o)

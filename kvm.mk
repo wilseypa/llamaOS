@@ -1,23 +1,19 @@
 
 include common.mk
-MAKEFILE_SOURCES += xen.mk
+MAKEFILE_SOURCES += kvm.mk
 
 INCLUDES = \
-  xen/include \
   src
 
 CPPFLAGS += -Wall -Wextra -Weffc++ \
-             $(INCLUDES:%=-I %) \
-            -D__XEN_INTERFACE_VERSION__=0x00030205
+             $(INCLUDES:%=-I %)
 
-VPATH = src/llamaos/xen
+VPATH = src/llamaos/kvm
 
 SOURCES = \
-  Hypercall.cpp \
-  Hypervisor.cpp \
   trace.cpp
 
-BINARY = xen.a
+BINARY = kvm.a
 OBJECTS = $(SOURCES:%.cpp=$(OBJDIR)/%.o)
 DEPENDS = $(OBJECTS:%.o=%.d)
 
