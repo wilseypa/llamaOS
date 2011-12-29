@@ -1,0 +1,4 @@
+
+# list of custom llamaOS apps (be sure to use "+=" here)
+APPS += \
+  example_app 

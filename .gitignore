@@ -7,5 +7,5 @@ obj/
 
 # User make files #
 ###################
-tools.mk
-
+custom.mk
+apps.mk
