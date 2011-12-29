@@ -62,6 +62,7 @@ SOURCES = \
   libio/iogetdelim.c \
   libio/iogetline.c \
   libio/iopadn.c \
+  libio/ioputs.c \
   libio/ioseekoff.c \
   libio/iovsprintf.c \
   libio/iovsscanf.c \

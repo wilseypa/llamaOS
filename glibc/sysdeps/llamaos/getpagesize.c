@@ -23,7 +23,7 @@
 int
 __getpagesize ()
 {
-   // !BAM find a way to share ucguest/Config.h info
+   // !BAM find a way to share llamaos/config.h info
    return 0x1000;
 }
 

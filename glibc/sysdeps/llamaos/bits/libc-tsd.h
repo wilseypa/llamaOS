@@ -17,8 +17,8 @@
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
 
-#ifndef _UCGUEST_BITS_LIBC_TSD_H
-#define _UCGUEST_BITS_LIBC_TSD_H 1
+#ifndef _LLAMAOS_BITS_LIBC_TSD_H
+#define _LLAMAOS_BITS_LIBC_TSD_H 1
 
 /* This file defines the following macros for accessing a small fixed
    set of thread-specific `void *' data used only internally by libc.

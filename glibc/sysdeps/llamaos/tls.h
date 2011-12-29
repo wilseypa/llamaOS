@@ -1,6 +1,6 @@
 
-#ifndef ucguest_tls_h
-#define ucguest_tls_h
+#ifndef llamaos_tls_h
+#define llamaos_tls_h
 
 #include_next <tls.h>
 
@@ -12,4 +12,4 @@ typedef struct
 
 #define TLS_TCB_AT_TP 1
 
-#endif  //  ucguest_tls_h
+#endif  //  llamaos_tls_h

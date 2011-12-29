@@ -71,7 +71,7 @@ public:
     */
    static bool mmu_update (const mmu_update_t *req, unsigned int count);
 
-   // UCGUEST UNSUPPORTED CALLS
+   // llamaOS UNSUPPORTED CALLS
    //   __HYPERVISOR_set_gdt               2
    //   __HYPERVISOR_stack_switch          3
 
@@ -84,7 +84,7 @@ public:
     */
    static bool set_callbacks (uint64_t event_address, uint64_t failsafe_address);
 
-   // UCGUEST UNSUPPORTED CALLS
+   // llamaOS UNSUPPORTED CALLS
    //   __HYPERVISOR_fpu_taskswitch        5
    //   __HYPERVISOR_sched_op_compat       6 /* compat since 0x00030101 */
    //   __HYPERVISOR_platform_op           7
@@ -103,7 +103,7 @@ public:
     */
    static bool update_va_mapping (uint64_t pseudo_page, uint64_t machine_page);
 
-   // UCGUEST UNSUPPORTED CALLS
+   // llamaOS UNSUPPORTED CALLS
    //   __HYPERVISOR_set_timer_op         15
    //   __HYPERVISOR_event_channel_op_compat 16 /* compat since 0x00030202 */
 
@@ -124,7 +124,7 @@ public:
     */
    static bool console_io (const char *string);
 
-   // UCGUEST UNSUPPORTED CALLS
+   // llamaOS UNSUPPORTED CALLS
    //   __HYPERVISOR_physdev_op_compat    19 /* compat since 0x00030202 */
 
    /**
@@ -133,7 +133,7 @@ public:
     */
    static bool grant_table_op ();
 
-   // UCGUEST UNSUPPORTED CALLS
+   // llamaOS UNSUPPORTED CALLS
    //   __HYPERVISOR_vm_assist            21
    //   __HYPERVISOR_update_va_mapping_otherdomain 22
    //   __HYPERVISOR_iret                 23 /* x86 only */
@@ -163,7 +163,7 @@ public:
     */
    static bool sched_op_shutdown (unsigned int reason = 0);
 
-   // UCGUEST UNSUPPORTED CALLS
+   // llamaOS UNSUPPORTED CALLS
    //   __HYPERVISOR_callback_op          30
    //   __HYPERVISOR_xenoprof_op          31
 
@@ -173,7 +173,7 @@ public:
     */
    static bool event_channel_op ();
 
-   // UCGUEST UNSUPPORTED CALLS
+   // llamaOS UNSUPPORTED CALLS
    //   __HYPERVISOR_physdev_op           33
    //   __HYPERVISOR_hvm_op               34
    //   __HYPERVISOR_sysctl               35
