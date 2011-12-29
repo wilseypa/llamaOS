@@ -1,12 +1,9 @@
 
-# MAKEFILES = xen.mk common.mk rules.mk
-
 include common.mk
 
 CPPFLAGS += -include glibc/include/libc-symbols.h \
             -Wall -Wextra -Weffc++ \
             -D__XEN_INTERFACE_VERSION__=0x00030205
-
 
 INCLUDES = \
   glibc/include \

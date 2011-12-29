@@ -19,5 +19,7 @@ BINDIR = bin
 LIBDIR = lib
 OBJDIR = obj
 
+VPATH = src
+
 # possible project specific overrides of make variables
 -include custom.mk

@@ -56,12 +56,12 @@ OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 SUCH DAMAGE.
 */
 
-#include <xen/include/public/features.h>
+#include <xen/features.h>
 
-#include <ucguest/config.h>
+#include <llamaos/config.h>
 
 .section __xen_guest
-   .ascii  "GUEST_OS=ucguest"
+   .ascii  "GUEST_OS=llamaOS"
    .ascii  ",XEN_VER=xen-3.0"
    .ascii  ",VIRT_BASE=0x0"
    .ascii  ",ELF_PADDR_OFFSET=0x0"
