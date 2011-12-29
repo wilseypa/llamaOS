@@ -7,7 +7,6 @@ AR = ar
 CC = gcc
 LD = ld
 
-
 # assembler/compiler/linker options
 ASMFLAGS =
 CFLAGS = -m64 -g -O1 -std=gnu99 -fgnu89-inline -nostdinc
@@ -18,8 +17,6 @@ LDFLAGS = -nostdlib
 BINDIR = bin
 LIBDIR = lib
 OBJDIR = obj
-
-VPATH = src
 
 # possible project specific overrides of make variables
 -include custom.mk

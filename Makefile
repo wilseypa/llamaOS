@@ -22,7 +22,7 @@ VMMLIBS = \
 
 # list of standard llamaOS apps
 APPS = \
-  hello-xen
+  hello
 
 # include list of custom llamaOS apps
 -include apps.mk
@@ -65,4 +65,4 @@ apps:
 
 .PHONY: $(APPS)
 $(APPS):
-	@$(MAKE) -f $@.mk
+	@$(MAKE) -f $@.mk VMM=xen

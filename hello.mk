@@ -30,7 +30,7 @@ OBJECTS = $(SOURCES:%.cpp=$(OBJDIR)/%.o)
 DEPENDS = $(OBJECTS:%.o=%.d)
 
 # the entry object must be the first object listed here or the guest will crash!
-$(BINDIR)/hello-xen : $(OBJDIR)/llamaos/xen/Entry.o $(OBJECTS) $(LIBDIR)/llamaos.a $(LIBDIR)/xen.a $(LIBDIR)/stdc++.a $(LIBDIR)/supc++.a $(LIBDIR)/unwind.a $(LIBDIR)/glibc.a
+$(BINDIR)/hello-$(VMM): $(OBJDIR)/llamaos/$(VMM)/Entry.o $(OBJECTS) $(LIBDIR)/$(VMM).a $(LIBDIR)/llamaos.a $(LIBDIR)/stdc++.a $(LIBDIR)/supc++.a $(LIBDIR)/unwind.a $(LIBDIR)/glibc.a
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
 	@$(LD) $(LDFLAGS) -T x86_64.lds -o $@ $^

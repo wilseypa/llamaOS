@@ -1,6 +1,4 @@
 
-MAKE_SOURCES = glibc.mk common.mk rules.mk
-
 include common.mk
 
 CFLAGS += -include glibc/include/libc-symbols.h -include stdbool.h \
