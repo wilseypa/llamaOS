@@ -120,10 +120,16 @@ void guest_entry (start_info_t *start_info)
          trace ("%s\n\n", VERSION_TEXT);
          trace_start_info (start_info);
 
-         pfn_to_mfn_map = reinterpret_cast<uint64_t *>(start_info->mfn_list);
-         pfn_to_mfn_map_size = start_info->nr_pages;
+         // the Memory class needs this to translate page frames
+         pseudo_to_machine_page_init (address_to_pointer<uint64_t> (start_info->mfn_list),
+                                      start_info->nr_pages);
 
+         // map the virtual address space
          Memory memory (start_info->pt_base, start_info->nr_pages);
+
+         int *x = new int [10];
+         trace ("x = %p\n", x);
+
          Hypervisor hypervisor (start_info);
 
          // start the application

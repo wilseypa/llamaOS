@@ -31,26 +31,27 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <cstdint>
 #include <cstdio>
 
+#include <stdexcept>
+#include <sstream>
+
 #include <xen/xen.h>
 
 #include <llamaos/xen/Hypercall.h>
 #include <llamaos/xen/Memory.h>
 #include <llamaos/trace.h>
 
-uint64_t *mfn_to_pfn_map = reinterpret_cast <uint64_t *>(MACH2PHYS_VIRT_START);
-uint64_t mfn_to_pfn_map_size = MACH2PHYS_NR_ENTRIES;
+static const uint64_t *const mfn_to_pfn_map = reinterpret_cast <uint64_t *>(MACH2PHYS_VIRT_START);
+static const uint64_t mfn_to_pfn_map_size = MACH2PHYS_NR_ENTRIES;
 
 // assigned by start logic
-uint64_t *pfn_to_mfn_map = 0;
-uint64_t pfn_to_mfn_map_size = 0;
+static const uint64_t *pfn_to_mfn_map = nullptr;
+static uint64_t pfn_to_mfn_map_size = 0;
+
+using namespace std;
 
 namespace llamaos {
 namespace xen {
 
-/**
- * @brief Convert a machine page frame to a pseudo page frame.
- *
- */
 uint64_t machine_to_pseudo_page (uint64_t page)
 {
    if (page < mfn_to_pfn_map_size)
@@ -58,14 +59,23 @@ uint64_t machine_to_pseudo_page (uint64_t page)
       return mfn_to_pfn_map [page];
    }
 
-   // throw exception
-   return 0UL;
+   stringstream ss;
+   ss << "machine_to_pseudo_page: invalid page index (" << page << ")";
+   throw runtime_error (ss.str ());
 }
 
-/**
- * @brief Convert a pseudo page frame to a machine page frame.
- *
- */
+void pseudo_to_machine_page_init (uint64_t *map, uint64_t map_size)
+{
+   if (   (nullptr != pfn_to_mfn_map)
+       || (0 != pfn_to_mfn_map_size))
+   {
+      throw runtime_error ("duplicate call to pseudo_to_machine_page_init()");
+   }
+
+   pfn_to_mfn_map = map;
+   pfn_to_mfn_map_size = map_size;
+}
+
 uint64_t pseudo_to_machine_page (uint64_t page)
 {
    if (page < pfn_to_mfn_map_size)
@@ -73,8 +83,9 @@ uint64_t pseudo_to_machine_page (uint64_t page)
       return pfn_to_mfn_map [page];
    }
 
-   // throw exception
-   return 0UL;
+   stringstream ss;
+   ss << "pseudo_to_machine_page: invalid page index (" << page << ")";
+   throw runtime_error (ss.str ());
 }
 
 } }
@@ -149,11 +160,10 @@ static uint64_t get_start_page (const PML4 &pml4)
 
             start_page += 512UL;
          }
-      }      
+      }
    }
 
-   // !BAM throw exception
-   return 0UL;
+   throw runtime_error ("failed to find start_page in get_start_page()");
 }
 
 static void initialize_table (const PML4 &pml4, uint64_t psuedo_page)
@@ -183,7 +193,7 @@ static uint64_t get_start_address (const PML4 &pml4, uint64_t start_page, uint64
    // install tables in the 512kb padding
    uint64_t table_page = start_page - 128;
 
-   trace ("get_start_address (start_page = %lx, end_page = %lx, table_page = %lx)\n", start_page, end_page, table_page);
+//   trace ("get_start_address (start_page = %lx, end_page = %lx, table_page = %lx)\n", start_page, end_page, table_page);
 
    // loop over pages, mapping PDP, PD & PT along the way
    for (uint64_t i = start_page; i < end_page; i++)
@@ -192,7 +202,7 @@ static uint64_t get_start_address (const PML4 &pml4, uint64_t start_page, uint64
 
       if (pml4e.empty ())
       {
-         trace ("create PDP at PML4 [%lx]\n", pml4e.index);
+//         trace ("create PDP at PML4 [%lx]\n", pml4e.index);
          initialize_table (pml4, table_page);
          update_entry (virtual_to_machine (pml4.get_entry_address (pml4e.index)), table_page++);
       }
@@ -202,7 +212,7 @@ static uint64_t get_start_address (const PML4 &pml4, uint64_t start_page, uint64
 
       if (pdpe.empty ())
       {
-         trace ("create PD at PDP [%lx]\n", pdpe.index);
+//         trace ("create PD at PDP [%lx]\n", pdpe.index);
          initialize_table (pml4, table_page);
          update_entry (virtual_to_machine (pdp.get_entry_address (pdpe.index)), table_page++);
       }
@@ -212,7 +222,7 @@ static uint64_t get_start_address (const PML4 &pml4, uint64_t start_page, uint64
 
       if (pde.empty ())
       {
-         trace ("create PT at PD [%lx]\n", pde.index);
+//         trace ("create PT at PD [%lx]\n", pde.index);
          initialize_table (pml4, table_page);
          update_entry (virtual_to_machine (pd.get_entry_address (pde.index)), table_page++);
       }
@@ -456,20 +466,43 @@ PML4E PML4::get_entry (uint64_t address) const
    return (*this) [index];
 }
 
+static Memory *instance = nullptr;
+
+Memory *Memory::get_instance ()
+{
+   if (nullptr == instance)
+   {
+      throw runtime_error ("invalid Memory::get_instance()");
+   }
+
+   return instance;
+}
+
+static uint64_t enforce_singlton (uint64_t CR3)
+{
+   if (nullptr != instance)
+   {
+      throw runtime_error ("duplicate Memory objects created");
+   }
+
+   return CR3;
+}
+
 Memory::Memory (uint64_t CR3, uint64_t total_pages)
-   :  pml4(CR3),
+   :  pml4(enforce_singlton(CR3)),
       start_page(get_start_page (pml4)),
       end_page(total_pages),
       start_address(get_start_address (pml4, start_page, end_page)),
       end_address(pseudo_to_virtual (page_to_address(end_page)))
 {
-   trace ("Memory start page: %lx\n", start_page);
-   trace ("Memory   end page: %lx\n", end_page);
+   trace ("=== Memory ===\n");
+   trace ("  start page: %lx\n", start_page);
+   trace ("    end page: %lx\n", end_page);
 
-   trace ("Memory start address: %lx\n", start_address);
-   trace ("Memory   end address: %lx\n", end_address);
+   trace ("  start address: %lx\n", start_address);
+   trace ("    end address: %lx\n", end_address);
 
-   trace ("testing memory...\n");
+   trace ("  testing...\n");
    uint64_t *first = address_to_pointer<uint64_t>(start_address);
    uint64_t *last = address_to_pointer<uint64_t>(end_address);
 
@@ -492,10 +525,48 @@ Memory::Memory (uint64_t CR3, uint64_t total_pages)
       first++;
    }
 
-   trace ("testing memory...done\n");
+   trace ("  testing...done\n\n");
+
+   // save pointer for static access
+   instance = this;
 }
 
 Memory::~Memory ()
 {
 
+}
+
+/* sbrk.c expects this.  */
+void *__curbrk = 0;
+
+extern "C"
+int __brk (void *addr)
+{
+   trace ("glibc calling brk (%lx)\n", addr);
+   if (nullptr == instance)
+   {
+      trace ("calling __brk before Memory created\n");
+      return -1;
+   }
+
+   if (0 == addr)
+   {
+      if (0 == __curbrk)
+      {
+         __curbrk = address_to_pointer<void>(instance->start_address);
+      }
+
+      trace ("  __curbrk (%lx)\n", __curbrk);
+      return 0;
+   }
+   else if (   (pointer_to_address (addr) > instance->start_address)
+            && (pointer_to_address (addr) < instance->end_address))
+   {
+      __curbrk = addr;
+      trace ("  __curbrk (%lx)\n", __curbrk);
+      return 0;
+   }
+
+   trace ("  returning (-1)\n");
+   return -1;
 }

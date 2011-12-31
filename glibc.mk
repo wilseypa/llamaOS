@@ -235,7 +235,6 @@ SOURCES = \
   sysdeps/llamaos/posix/sysconf.c \
   sysdeps/llamaos/abort.c \
   sysdeps/llamaos/assert.c \
-  sysdeps/llamaos/brk.c \
   sysdeps/llamaos/errlist.c \
   sysdeps/llamaos/errno.c \
   sysdeps/llamaos/getpagesize.c \
@@ -290,6 +289,9 @@ SOURCES = \
   wctype/wcfuncs_l.c \
   wctype/wctype.c \
   wctype/wctrans.c
+
+# VMM logic should support these
+#  sysdeps/llamaos/brk.c \
 
 BINARY  = glibc.a
 OBJECTS = $(SOURCES:%.c=$(OBJDIR)/%.o)

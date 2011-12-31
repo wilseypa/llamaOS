@@ -76,12 +76,12 @@ SUCH DAMAGE.
 _start:
    cld                                  /* Clears the direction flag (DF) in the rFLAGS register to zero. */
    movq stack_start(%rip), %rsp         /* Setup the runtime stack position */
-   andq $(~(__STACK_SIZE-1)), %rsp      /* Align stack pointer */
+   andq $(~(LLAMAOS_STACK_SIZE-1)), %rsp      /* Align stack pointer */
    movq %rsi, %rdi                      /* Pass the start_info pointer to start_kernel */
    call guest_entry                     /* call the main kernel function */
 
 stack_start:
-   .quad RUNTIME_STACK+(2*__STACK_SIZE)
+   .quad RUNTIME_STACK+(2*LLAMAOS_STACK_SIZE)
 
    /* Unpleasant -- the PTE that maps this page is actually overwritten */
    /* to map the real shared-info page! :-)                             */

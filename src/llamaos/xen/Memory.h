@@ -100,6 +100,12 @@ inline uint64_t pointer_to_address (T *pointer)
 uint64_t machine_to_pseudo_page (uint64_t page);
 
 /**
+ * @brief Initialize the pseudo page frame to a machine page frame map.
+ *
+ */
+void pseudo_to_machine_page_init (uint64_t *map, uint64_t map_size);
+
+/**
  * @brief Convert a pseudo page frame to a machine page frame.
  *
  */
@@ -719,6 +725,9 @@ private:
 class Memory
 {
 public:
+
+   static Memory *get_instance ();
+
    /**
     * @brief Constructor.
     *
@@ -734,30 +743,18 @@ public:
     */
    virtual ~Memory ();
 
-   /**
-    * @brief Get virtual start adddress of heap.
-    *
-    */
-   uint64_t _start_address () const { return start_address; }
-
-   /**
-    * @brief Get virtual end adddress of heap.
-    *
-    */
-   uint64_t _end_address () const { return end_address; }
-
-private:
-   Memory ();
-   Memory (const Memory &);
-   Memory &operator= (const Memory &);
-
-   PML4 pml4;
+   const PML4 pml4;
 
    const uint64_t start_page;
    const uint64_t end_page;
 
    const uint64_t start_address;
    const uint64_t end_address;
+
+private:
+   Memory ();
+   Memory (const Memory &);
+   Memory &operator= (const Memory &);
 
 };
 

@@ -9,7 +9,7 @@ ASMFLAGS += $(INCLUDES:%=-I %)
 CPPFLAGS += -Wall -Wextra -Weffc++ \
              $(INCLUDES:%=-I %)
 
-VPATH = src/llamaos/apps/hello
+VPATH = src:src/llamaos/apps/hello
 
 SOURCES = \
   main.cpp
