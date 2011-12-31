@@ -30,11 +30,17 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 #include <cstdio>
 
+#include <llamaos/trace.h>
+
 using namespace std;
+using namespace llamaos;
 
 // simple guest instance should just output text to console
 int main ()
 {
+   trace ("application main ()...\n");
+   trace (" fprintf() = %d\n", fprintf (stdout, "hello world\n"));
    printf ("hello\n");
+   fflush(stdout);
    return 0;
 }

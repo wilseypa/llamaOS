@@ -41,7 +41,6 @@ SOURCES = \
   io/isatty.c \
   io/open.c \
   io/read.c \
-  io/write.c \
   io/xstat.c \
   io/xstat64.c \
   libio/filedoalloc.c \
@@ -104,7 +103,6 @@ SOURCES = \
   malloc/morecore.c \
   misc/init-misc.c \
   misc/lseek.c \
-  misc/madvise.c \
   misc/mmap.c \
   misc/mmap64.c \
   misc/mprotect.c \
@@ -291,6 +289,8 @@ SOURCES = \
   wctype/wctrans.c
 
 # VMM logic should support these
+#  io/write.c \
+#  misc/madvise.c \
 #  sysdeps/llamaos/brk.c \
 
 BINARY  = glibc.a

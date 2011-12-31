@@ -570,3 +570,55 @@ int __brk (void *addr)
    trace ("  returning (-1)\n");
    return -1;
 }
+
+extern "C"
+int madvise (__ptr_t addr, size_t len, int advice)
+{
+   trace ("glibc calling madvise (%lx, %d, %d)\n", addr, len, advice);
+   return 0;
+}
+
+/* Write NBYTES of BUF to FD.  Return the number written, or -1.  */
+extern "C"
+ssize_t __write (int fd, const void *buf, size_t nbytes)
+{
+  trace ("glibc calling __write (%d, %lx, %d)\n  ", fd, buf, nbytes);
+
+  for (size_t i = 0; i < nbytes; i++)
+  {
+     trace ("%c", ((const char *)buf) [i]);
+  }
+
+  trace ("\n");
+  return nbytes;
+
+  if (nbytes == 0)
+    return 0;
+  if (fd < 0)
+    {
+//      __set_errno (EBADF);
+      return -1;
+    }
+  if (buf == NULL)
+    {
+//      __set_errno (EINVAL);
+      return -1;
+    }
+
+//  __set_errno (ENOSYS);
+  return -1;
+}
+
+extern "C"
+ssize_t write (int fd, const void *buf, size_t nbytes)
+{
+  trace ("glibc calling write (%d, %lx, %d)\n", fd, buf, nbytes);
+
+  for (size_t i = 0; i < nbytes; i++)
+  {
+     trace ("%c", ((const char *)buf) [i]);
+  }
+
+  trace ("\n");
+  return nbytes;
+}
