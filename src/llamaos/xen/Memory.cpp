@@ -622,3 +622,19 @@ ssize_t write (int fd, const void *buf, size_t nbytes)
   trace ("\n");
   return nbytes;
 }
+
+extern "C"
+ssize_t
+__libc_writev (int fd, const struct iovec *vector, int count)
+{
+  trace ("glibc calling __libc_writev (%d, %lx, %d)\n", fd, vector, count);
+  return -1;
+}
+
+extern "C"
+ssize_t
+writev (int fd, const struct iovec *vector, int count)
+{
+  trace ("glibc calling writev (%d, %lx, %d)\n", fd, vector, count);
+  return -1;
+}

@@ -39,7 +39,9 @@ SOURCES = \
   io/fxstat64.c \
   io/getcwd.c \
   io/isatty.c \
+  io/lseek64.c \
   io/open.c \
+  io/poll.c \
   io/read.c \
   io/xstat.c \
   io/xstat64.c \
@@ -48,12 +50,25 @@ SOURCES = \
   libio/fileops.c \
   libio/fputc.c \
   libio/fseek.c \
+  libio/fseeko.c \
+  libio/fseeko64.c \
   libio/ftello.c \
+  libio/ftello64.c \
   libio/genops.c \
+  libio/getc.c \
+  libio/getc_u.c \
+  libio/getchar.c \
+  libio/getchar_u.c \
+  libio/getwc.c \
+  libio/getwc_u.c \
+  libio/getwchar.c \
+  libio/getwchar_u.c \
   libio/iofclose.c \
+  libio/iofdopen.c \
   libio/iofgets.c \
   libio/iofflush.c \
   libio/iofopen.c \
+  libio/iofopen64.c \
   libio/iofputs.c \
   libio/iofread.c \
   libio/iofwide.c \
@@ -63,9 +78,20 @@ SOURCES = \
   libio/iopadn.c \
   libio/ioputs.c \
   libio/ioseekoff.c \
+  libio/iosetvbuf.c \
+  libio/ioungetc.c \
+  libio/ioungetwc.c \
   libio/iovsprintf.c \
   libio/iovsscanf.c \
   libio/iowpadn.c \
+  libio/putc.c \
+  libio/putc_u.c \
+  libio/putchar.c \
+  libio/putchar_u.c \
+  libio/putwc.c \
+  libio/putwc_u.c \
+  libio/putwchar.c \
+  libio/putwchar_u.c \
   libio/stdfiles.c \
   libio/stdio.c \
   libio/strops.c \
@@ -291,6 +317,7 @@ SOURCES = \
 # VMM logic should support these
 #  io/write.c \
 #  misc/madvise.c \
+#  misc/writev.c \
 #  sysdeps/llamaos/brk.c \
 
 BINARY  = glibc.a

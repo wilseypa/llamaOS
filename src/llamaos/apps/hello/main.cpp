@@ -30,6 +30,8 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 #include <cstdio>
 
+#include <iostream>
+
 #include <llamaos/trace.h>
 
 using namespace std;
@@ -39,8 +41,12 @@ using namespace llamaos;
 int main ()
 {
    trace ("application main ()...\n");
-   trace (" fprintf() = %d\n", fprintf (stdout, "hello world\n"));
-   printf ("hello\n");
+
+   printf ("hello from printf\n");
    fflush(stdout);
+
+   cout << "hello from cout" << endl;
+//   cout.flush ();
+
    return 0;
 }

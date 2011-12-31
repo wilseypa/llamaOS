@@ -31,6 +31,7 @@ SYSLIB_INCLUDES = \
   glibc/string \
   glibc/wcsmbs \
   glibc \
+  gcc/libstdc++-v3/include/backward \
   gcc/libstdc++-v3/include/c_global \
   gcc/libstdc++-v3/include/std \
   gcc/libstdc++-v3/include \
