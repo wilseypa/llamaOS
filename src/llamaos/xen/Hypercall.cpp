@@ -31,6 +31,10 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <cstdint>
 #include <cstring>
 
+#ifndef __XEN_INTERFACE_VERSION__
+#error __XEN_INTERFACE_VERSION__ not defined!!!
+#endif
+
 #include <xen/xen.h>
 #include <xen/sched.h>
 #include <xen/version.h>
@@ -41,7 +45,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 // include the hypercall macros from mini-os
 typedef struct { unsigned long pte; } pte_t;
-extern char hypercall_page [__PAGE_SIZE];
+extern char hypercall_page [LLAMAOS_PAGE_SIZE];
 #include <llamaos/xen/hypercall-x86_64.h>
 
 using namespace llamaos;
@@ -58,22 +62,13 @@ bool Hypercall::set_trap_table (const trap_info_t *table)
    return true;
 }
 
-bool Hypercall::mmu_update (const mmu_update_t &req)
+bool Hypercall::mmu_update (uint64_t ptr, uint64_t val)
 {
-   int success_count = 0;
+   mmu_update_t req;
+   req.ptr = ptr;
+   req.val = val;
 
-   if (0 != HYPERVISOR_mmu_update(const_cast<mmu_update_t *>(&req), 1, &success_count, DOMID_SELF))
-   {
-      trace ("HYPERVISOR_mmu_update (ptr: %lx, val: %lx) FAILED\n", req.ptr, req.val);
-      return false;
-   }
-   else if (1 != success_count)
-   {
-      trace ("HYPERVISOR_mmu_update () FAILED: invalid success_count (%d != 1)\n", success_count);
-      return false;
-   }
-
-   return true;
+   return mmu_update (&req, 1);
 }
 
 bool Hypercall::mmu_update (const mmu_update_t *req, unsigned int count)

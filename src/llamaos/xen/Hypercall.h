@@ -57,10 +57,11 @@ public:
    /**
     * @brief
     *
-    * @param req
+    * @param ptr Machine address of PTE.
+    * @param val New contents of PTE.
     *
     */
-   static bool mmu_update (const mmu_update_t &req);
+   static bool mmu_update (uint64_t ptr, uint64_t val);
 
    /**
     * @brief

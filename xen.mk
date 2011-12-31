@@ -15,6 +15,7 @@ VPATH = src/llamaos/xen
 SOURCES = \
   Hypercall.cpp \
   Hypervisor.cpp \
+  Memory.cpp \
   trace.cpp
 
 BINARY = xen.a

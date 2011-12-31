@@ -31,34 +31,60 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #ifndef llamaos_config_h_
 #define llamaos_config_h_
 
-#define __STACK_SIZE     0x2000
-#define __IRQ_STACK_SIZE 0x2000
+#define __STR(x) #x
+#define STR(x) __STR(x)
 
-#define __PAGE_SIZE      0x1000
+// llamaOS version
+#define LLAMAOS_VERSION_MAJOR 0
+#define LLAMAOS_VERSION_MINOR 1
+#define LLAMAOS_VERSION_TEXT  "llamaOS-v" STR(LLAMAOS_VERSION_MAJOR) "." STR(LLAMAOS_VERSION_MINOR)
+
+#define LLAMAOS_STACK_SIZE     0x2000
+#define LLAMAOS_IRQ_STACK_SIZE 0x2000
+
+#define LLAMAOS_PAGE_SIZE      0x1000
 
 #ifdef __cplusplus
 
 namespace llamaos {
 
 /**
+ * @brief llamaOS major version number.
+ *
+ */
+static const unsigned int VERSION_MAJOR = LLAMAOS_VERSION_MAJOR;
+
+/**
+ * @brief llamaOS minor version number.
+ *
+ */
+static const unsigned int VERSION_MINOR = LLAMAOS_VERSION_MINOR;
+
+/**
+ * @brief llamaOS version text.
+ *
+ */
+static const char VERSION_TEXT[] = LLAMAOS_VERSION_TEXT;
+
+/**
  * @brief General system stack size.
  *
  */
 // be sure to make this a power-of-2 number
-static const unsigned long STACK_SIZE = __STACK_SIZE;
+static const unsigned long STACK_SIZE = LLAMAOS_STACK_SIZE;
 
 /**
  * @brief Interrupt context stack size.
  *
  */
 // be sure to make this a power-of-2 number
-static const unsigned long IRQ_STACK_SIZE = __IRQ_STACK_SIZE;
+static const unsigned long IRQ_STACK_SIZE = LLAMAOS_IRQ_STACK_SIZE;
 
 /**
  * @brief System memory page size.
  *
  */
-static const unsigned long PAGE_SIZE = __PAGE_SIZE;
+static const unsigned long PAGE_SIZE = LLAMAOS_PAGE_SIZE;
 
 }
 

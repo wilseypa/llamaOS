@@ -40,6 +40,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <llamaos/config.h>
 #include <llamaos/xen/Hypercall.h>
 #include <llamaos/xen/Hypervisor.h>
+#include <llamaos/xen/Memory.h>
 #include <llamaos/trace.h>
 
 using namespace std;
@@ -79,7 +80,7 @@ static bool verify_magic (const start_info_t *start_info)
 
 static void trace_start_info (const start_info_t *start_info)
 {
-   trace ("\n=== start_info ===\n");
+   trace ("=== start_info ===\n");
    trace ("  magic: %s\n", start_info->magic);
    trace ("  nr_pages: %x\n", start_info->nr_pages);
    trace ("  shared_info: %x\n", start_info->shared_info);
@@ -96,9 +97,14 @@ static void trace_start_info (const start_info_t *start_info)
    trace ("  cmd_line: %s\n", start_info->cmd_line);
    trace ("  first_p2m_pfn: %x\n", start_info->first_p2m_pfn);
    trace ("  nr_p2m_frames: %x\n", start_info->nr_p2m_frames);
+   trace ("\n");
 }
 
 extern int main ();
+
+// from xen/Memory.cpp
+extern uint64_t *pfn_to_mfn_map;
+extern uint64_t pfn_to_mfn_map_size;
 
 extern "C"
 void guest_entry (start_info_t *start_info)
@@ -107,9 +113,18 @@ void guest_entry (start_info_t *start_info)
    {
       try
       {
-         trace ("starting llamaOS...\n");
+         trace ("\n\n\n***************************\n");
+         trace (      "****  starting llamaOS  ***\n");
+         trace (      "***************************\n\n\n");
 
-         llamaos::Hypervisor hypervisor (start_info);
+         trace ("%s\n\n", VERSION_TEXT);
+         trace_start_info (start_info);
+
+         pfn_to_mfn_map = reinterpret_cast<uint64_t *>(start_info->mfn_list);
+         pfn_to_mfn_map_size = start_info->nr_pages;
+
+         Memory memory (start_info->pt_base, start_info->nr_pages);
+         Hypervisor hypervisor (start_info);
 
          // start the application
          main ();
