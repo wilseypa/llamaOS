@@ -102,9 +102,8 @@ static void trace_start_info (const start_info_t *start_info)
 
 extern int main ();
 
-// from xen/Memory.cpp
-extern uint64_t *pfn_to_mfn_map;
-extern uint64_t pfn_to_mfn_map_size;
+#include <xen/io/console.h>
+extern void llamaos_init_console (xencons_interface *cons_interface, uint32_t evtchn);
 
 extern "C"
 void guest_entry (start_info_t *start_info)
@@ -127,6 +126,9 @@ void guest_entry (start_info_t *start_info)
          // map the virtual address space
          Memory memory (start_info->pt_base, start_info->nr_pages);
 
+         llamaos_init_console (address_to_pointer<xencons_interface> (pseudo_to_virtual (page_to_address (machine_to_pseudo_page (start_info->console.domU.mfn)))),
+                               start_info->console.domU.evtchn);
+
          int *x = new int [10];
          trace ("x = %p\n", x);
 
@@ -146,6 +148,7 @@ void guest_entry (start_info_t *start_info)
          trace ("*** unknown exception ***\n");
       }
 
+      for (;;);
       Hypercall::sched_op_shutdown ();
    }
    // else

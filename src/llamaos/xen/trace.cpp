@@ -28,10 +28,66 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
+#include <cstdint>
 #include <cstdarg>
 #include <cstdio>
+#include <cstring>
+
+#include <xen/event_channel.h>
+#include <xen/io/console.h>
 
 #include <llamaos/xen/Hypercall.h>
+
+#define mb()  __asm__ __volatile__ ( "mfence" : : : "memory")
+#define rmb() __asm__ __volatile__ ( "lfence" : : : "memory")
+#define wmb() __asm__ __volatile__ ( "" : : : "memory")
+
+static xencons_interface *interface = nullptr;
+static uint32_t event_channel = 0;
+
+void llamaos_init_console (xencons_interface *cons_interface, uint32_t evtchn)
+{
+   interface = cons_interface;
+   event_channel = evtchn;
+}
+
+static void console_write (const char *s)
+{
+   if (nullptr != interface)
+   {
+      const char *data = s;
+      unsigned len = strlen (s);
+
+      unsigned sent = 0;
+
+      XENCONS_RING_IDX cons, prod;
+
+      cons = interface->out_cons;
+      prod = interface->out_prod;
+      mb();
+
+      while ((sent < len) && ((prod - cons) < sizeof(interface->out)))
+      {
+         while ((prod - cons) > sizeof(interface->out))
+         {
+            llamaos::xen::Hypercall::sched_op_yield ();
+            mb();
+         }
+
+         if (data [sent] == '\n')
+         {
+            interface->out[MASK_XENCONS_IDX(prod++, interface->out)] = '\r';
+         }
+
+         interface->out[MASK_XENCONS_IDX(prod++, interface->out)] = data[sent++];
+      }
+
+      wmb();
+      interface->out_prod = prod;
+
+      llamaos::xen::Hypercall::event_channel_send (event_channel);
+   }
+}
 
 namespace llamaos {
 
@@ -50,6 +106,8 @@ int trace (const char *format, ...)
 
    // write buffer to system output/log
    xen::Hypercall::console_io (buffer);
+
+   console_write (buffer);
 
    // return the number characters written
    return count;

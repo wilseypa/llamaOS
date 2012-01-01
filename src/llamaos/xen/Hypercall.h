@@ -34,6 +34,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <cstdint>
 
 #include <xen/xen.h>
+#include <xen/event_channel.h>
 
 namespace llamaos {
 namespace xen {
@@ -172,7 +173,7 @@ public:
     * @brief Event channel operations.
     *
     */
-   static bool event_channel_op ();
+   static bool event_channel_send (evtchn_port_t port);
 
    // llamaOS UNSUPPORTED CALLS
    //   __HYPERVISOR_physdev_op           33

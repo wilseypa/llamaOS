@@ -176,7 +176,16 @@ bool Hypercall::sched_op_shutdown (unsigned int reason)
    return true;
 }
 
-bool Hypercall::event_channel_op ()
+bool Hypercall::event_channel_send (evtchn_port_t port)
 {
+   evtchn_send_t op;
+   op.port = port;
+
+   if (0 != HYPERVISOR_event_channel_op (EVTCHNOP_send, &op))
+   {
+      trace ("HYPERVISOR_event_channel_op (EVTCHNOP_send, port: %u) FAILED\n", port);
+      return false;
+   }
+
    return true;
 }

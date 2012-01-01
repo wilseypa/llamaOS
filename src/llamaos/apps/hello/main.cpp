@@ -45,7 +45,7 @@ int main ()
    printf ("hello from printf\n");
    fflush(stdout);
 
-   cout << "hello from cout" << endl;
+//   cout << "hello from cout" << endl;
 //   cout.flush ();
 
    return 0;
