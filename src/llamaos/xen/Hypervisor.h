@@ -31,7 +31,10 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #ifndef llamaos_xen_hypervisor_h_
 #define llamaos_xen_hypervisor_h_
 
+#include <llamaos/xen/Memory.h>
+
 namespace llamaos {
+namespace xen {
 
 /**
  * @brief Hypervisor class.
@@ -41,7 +44,13 @@ class Hypervisor
 {
 public:
    /**
-    * @brief Constructor.
+    * @brief Allow public access to singleton Hypervisor object.
+    *
+    */
+   static Hypervisor *get_instance ();
+
+   /**
+    * @brief Only public constructor (throws if called more than once).
     *
     */
    Hypervisor (const start_info_t *start_info);
@@ -58,10 +67,19 @@ public:
     */
    const start_info_t start_info;
 
+   /**
+    * @brief System memory object.
+    *
+    */
+   Memory memory;
+
 private:
+   Hypervisor ();
+   Hypervisor (const Hypervisor &);
+   Hypervisor &operator= (const Hypervisor &);
 
 };
 
-}
+} }
 
 #endif  // llamaos_xen_hypervisor_h_

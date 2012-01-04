@@ -78,8 +78,14 @@ static bool verify_magic (const start_info_t *start_info)
    return false;
 }
 
-static void trace_start_info (const start_info_t *start_info)
+static void trace_startup (const start_info_t *start_info)
 {
+   trace ("\n\n\n********************************\n");
+   trace (      "****  starting llamaOS (Xen) ***\n");
+   trace (      "********************************\n\n\n");
+
+   trace ("%s\n\n", VERSION_TEXT);
+
    trace ("=== start_info ===\n");
    trace ("  magic: %s\n", start_info->magic);
    trace ("  nr_pages: %x\n", start_info->nr_pages);
@@ -110,29 +116,15 @@ void guest_entry (start_info_t *start_info)
 {
    if (verify_magic (start_info))
    {
+      trace_startup (start_info);
+
       try
       {
-         trace ("\n\n\n***************************\n");
-         trace (      "****  starting llamaOS  ***\n");
-         trace (      "***************************\n\n\n");
-
-         trace ("%s\n\n", VERSION_TEXT);
-         trace_start_info (start_info);
-
-         // the Memory class needs this to translate page frames
-         pseudo_to_machine_page_init (address_to_pointer<uint64_t> (start_info->mfn_list),
-                                      start_info->nr_pages);
-
-         // map the virtual address space
-         Memory memory (start_info->pt_base, start_info->nr_pages);
-
-         llamaos_init_console (address_to_pointer<xencons_interface> (pseudo_to_virtual (page_to_address (machine_to_pseudo_page (start_info->console.domU.mfn)))),
-                               start_info->console.domU.evtchn);
-
-         int *x = new int [10];
-         trace ("x = %p\n", x);
-
+         // create the one and only hypervisor object
          Hypervisor hypervisor (start_info);
+
+//         llamaos_init_console (address_to_pointer<xencons_interface> (pseudo_to_virtual (page_to_address (machine_to_pseudo_page (start_info->console.domU.mfn)))),
+//                               start_info->console.domU.evtchn);
 
          // start the application
          main ();
@@ -155,13 +147,41 @@ void guest_entry (start_info_t *start_info)
    // something terrible is wrong and nothing can be done about it!
 }
 
+static Hypervisor *instance = nullptr;
+
+static const start_info_t enforce_single_instance (const start_info_t *start_info)
+{
+   if (nullptr != instance)
+   {
+      throw runtime_error ("duplicate Hypervisor objects created");
+   }
+
+   if (nullptr != start_info)
+   {
+      throw runtime_error ("invalid start_info pointer");
+   }
+
+   return *start_info;
+}
+
+Hypervisor *Hypervisor::get_instance ()
+{
+   if (nullptr == instance)
+   {
+      throw runtime_error ("invalid Hypervisor instance");
+   }
+
+   return instance;
+}
+
 Hypervisor::Hypervisor (const start_info_t *start_info)
-   :  start_info(*start_info)
+   :  start_info(enforce_single_instance(start_info)),
+      memory(start_info->pt_base, start_info->nr_pages, start_info->mfn_list)
 {
    
 }
 
 Hypervisor::~Hypervisor ()
 {
-   
+
 }
