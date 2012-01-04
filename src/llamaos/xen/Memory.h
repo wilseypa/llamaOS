@@ -38,6 +38,38 @@ namespace xen {
 namespace memory {
 
 /**
+ * @brief Convert address to pointer.
+ *
+ * @param address Address to convert.
+ *
+ */
+template <typename T>
+inline T *to_pointer (uint64_t address)
+{
+   return reinterpret_cast<T *>(address);
+}
+
+/**
+ * @brief Convert pointer to address.
+ *
+ * @param pointer Pointer to convert.
+ *
+ */
+template <typename T>
+inline uint64_t to_address (T *pointer)
+{
+   return reinterpret_cast<uint64_t>(pointer);
+}
+
+/**
+ * @brief Convert a machine address to a virtual address.
+ *
+ * @param address Address to convert.
+ *
+ */
+uint64_t machine_to_virtual (uint64_t address);
+
+/**
  * @brief Utility class to convert page frame number to/from the machine/pseudo address space.
  * 
  */
@@ -75,38 +107,6 @@ private:
 
 };
 
-/**
- * @brief Convert address to pointer.
- *
- * @param address Address to convert.
- *
- */
-template <typename T>
-inline T *to_pointer (uint64_t address)
-{
-   return reinterpret_cast<T *>(address);
-}
-
-/**
- * @brief Convert pointer to address.
- *
- * @param pointer Pointer to convert.
- *
- */
-template <typename T>
-inline uint64_t to_address (T *pointer)
-{
-   return reinterpret_cast<uint64_t>(pointer);
-}
-
-/**
- * @brief Convert a machine address to a virtual address.
- *
- * @param address Address to convert.
- *
- */
-inline uint64_t machine_to_virtual (uint64_t address);
-
 }
 
 /**
@@ -116,6 +116,15 @@ inline uint64_t machine_to_virtual (uint64_t address);
 class Memory
 {
 public:
+
+   /**
+    * @brief Implementation for glibc export function __brk.
+    *
+    * @param address
+    * @param __curbrk
+    * 
+    */
+   void *brk (void *address);
 
    /**
     * @brief Address of page tables.
@@ -147,6 +156,8 @@ private:
 
    const uint64_t start_virtual_address;
    const uint64_t end_virtual_address;
+
+   void *curbrk;
 
    // allow access to the private constructor
    friend class Hypervisor;

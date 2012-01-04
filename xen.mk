@@ -13,6 +13,7 @@ CPPFLAGS += -Wall -Wextra -Weffc++ \
 VPATH = src/llamaos/xen
 
 SOURCES = \
+  glibc_export.cpp \
   Hypercall.cpp \
   Hypervisor.cpp \
   Memory.cpp \

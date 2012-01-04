@@ -17,21 +17,38 @@
    02111-1307 USA.  */
 
 #include <errno.h>
-#include <unistd.h>
+
+// define function pointer
+typedef void *(*llamaos_brk_t) (void *);
+
+// function pointer variable
+static llamaos_brk_t llamaos_brk = 0;
+
+// function called by llamaos to register pointer
+int register_llamaos_brk (llamaos_brk_t brk)
+{
+   llamaos_brk = brk;
+}
 
 /* sbrk.c expects this.  */
-void *__curbrk;
+void *__curbrk = 0;
 
-/* Set the end of the process's data space to ADDR.
-   Return 0 if successful, -1 if not.  */
-int
-__brk (addr)
-     void *addr;
+int __brk (void *addr)
 {
-  __set_errno (ENOSYS);
-  return -1;
-}
-stub_warning (brk)
+   if (0 == llamaos_brk)
+   {
+      __set_errno (ENOSYS);
+      return -1;
+   }
 
+   __curbrk = llamaos_brk (addr);
+
+   if (__curbrk < addr)
+   {
+      __set_errno (ENOMEM);
+      return -1;
+   }
+
+   return 0;
+}
 weak_alias (__brk, brk)
-#include <stub-tag.h>
