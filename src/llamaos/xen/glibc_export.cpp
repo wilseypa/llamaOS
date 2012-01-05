@@ -119,6 +119,50 @@ namespace {
    static int registered_libc_fatal = register_llamaos_libc_fatal (llamaos_libc_fatal);
 }
 
+/**
+ * @brief ssize_t __libc_write (int fd, const void *buf, size_t nbytes)
+ *
+ */
+static char libc_write_buffer [256];
+extern "C"
+ssize_t llamaos_libc_write (int fd, const void *buf, size_t nbytes)
+{
+   if (1 == fd)
+   {
+      unsigned int i = 0;
+
+      while (   (i < nbytes)
+             && (i < 256))
+      {
+         libc_write_buffer [i] = ((const char *)buf) [i];
+      }
+
+      libc_write_buffer [i] = '\0';
+      return trace (libc_write_buffer);
+   }
+
+   return 0;
+}
+
+typedef ssize_t (*llamaos_libc_write_t) (int, const void *, size_t);
+extern "C" int register_llamaos_libc_write (llamaos_libc_write_t);
+
+namespace {
+   static int registered_libc_write = register_llamaos_libc_write (llamaos_libc_write);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 extern "C"
 int madvise (__ptr_t addr, size_t len, int advice)
 {
