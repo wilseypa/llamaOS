@@ -123,25 +123,19 @@ namespace {
  * @brief ssize_t __libc_write (int fd, const void *buf, size_t nbytes)
  *
  */
-static char libc_write_buffer [256];
 extern "C"
 ssize_t llamaos_libc_write (int fd, const void *buf, size_t nbytes)
 {
-   if (1 == fd)
+   trace ("glibc calling llamaos_libc_write (fd: %d, buf: ", fd);
+
+   for (unsigned int i = 0; i < nbytes; i++)
    {
-      unsigned int i = 0;
-
-      while (   (i < nbytes)
-             && (i < 256))
-      {
-         libc_write_buffer [i] = ((const char *)buf) [i];
-      }
-
-      libc_write_buffer [i] = '\0';
-      return trace (libc_write_buffer);
+      trace ("%c", static_cast<const char *>(buf) [i]);
    }
 
-   return 0;
+   trace (", nbytes: %d)\n", nbytes);
+
+   return nbytes;
 }
 
 typedef ssize_t (*llamaos_libc_write_t) (int, const void *, size_t);
@@ -151,21 +145,20 @@ namespace {
    static int registered_libc_write = register_llamaos_libc_write (llamaos_libc_write);
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
+/**
+ * @brief int madvise (__ptr_t addr, size_t len, int advice)
+ *
+ */
 extern "C"
-int madvise (__ptr_t addr, size_t len, int advice)
+int llamaos_madvise (__ptr_t addr, size_t len, int advice)
 {
    trace ("glibc calling madvise (%lx, %d, %d)\n", addr, len, advice);
    return 0;
+}
+
+typedef int (*llamaos_madvise_t) (__ptr_t, size_t, int);
+extern "C" int register_llamaos_madvise (llamaos_madvise_t);
+
+namespace {
+   static int registered_madvise = register_llamaos_madvise (llamaos_madvise);
 }

@@ -265,7 +265,9 @@ SOURCES = \
   sysdeps/llamaos/getpagesize.c \
   sysdeps/llamaos/init-first.c \
   sysdeps/llamaos/libc_fatal.c \
+  sysdeps/llamaos/madvise.c \
   sysdeps/llamaos/write.c \
+  sysdeps/llamaos/writev.c \
   sysdeps/wordsize-64/strtol.c \
   sysdeps/wordsize-64/strtol_l.c \
   sysdeps/wordsize-64/strtoul.c \
@@ -315,10 +317,6 @@ SOURCES = \
   wctype/wcfuncs_l.c \
   wctype/wctype.c \
   wctype/wctrans.c
-
-# VMM logic should support these
-#  misc/madvise.c \
-#  misc/writev.c \
 
 BINARY  = glibc.a
 OBJECTS = $(SOURCES:%.c=$(OBJDIR)/%.o)
