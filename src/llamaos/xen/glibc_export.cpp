@@ -34,14 +34,40 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <sstream>
 
 #include <xen/xen.h>
+#include <xen/sched.h>
 
+#include <llamaos/xen/Hypercall.h>
 #include <llamaos/xen/Hypervisor.h>
 #include <llamaos/xen/Memory.h>
+#include <llamaos/config.h>
 #include <llamaos/trace.h>
 
 using namespace llamaos;
 using namespace llamaos::xen;
 
+/**
+ * @brief void abort (void)
+ *
+ */
+extern "C"
+void llamaos_abort (void)
+{
+   trace ("glibc calling abort ()\n");
+
+   Hypercall::sched_op_shutdown (SHUTDOWN_crash);
+}
+
+typedef void (*llamaos_abort_t) (void);
+extern "C" int register_llamaos_abort (llamaos_abort_t);
+
+namespace {
+   static int registered_abort = register_llamaos_abort (llamaos_abort);
+}
+
+/**
+ * @brief int __brk (void *addr)
+ *
+ */
 extern "C"
 void *llamaos_brk (void *addr)
 {
@@ -54,7 +80,43 @@ typedef void *(*llamaos_brk_t) (void *);
 extern "C" int register_llamaos_brk (llamaos_brk_t);
 
 namespace {
-   int brk_registered = register_llamaos_brk (llamaos_brk);
+   static int registered_brk = register_llamaos_brk (llamaos_brk);
+}
+
+/**
+ * @brief int __getpagesize (void)
+ *
+ */
+extern "C"
+int llamaos_getpagesize (void)
+{
+   trace ("glibc calling getpagesize ()\n");
+
+   return LLAMAOS_PAGE_SIZE;
+}
+
+typedef int (*llamaos_getpagesize_t) (void);
+extern "C" int register_llamaos_getpagesize (llamaos_getpagesize_t);
+
+namespace {
+   static int registered_getpagesize = register_llamaos_getpagesize (llamaos_getpagesize);
+}
+
+/**
+ * @brief void __libc_fatal (const char *message)
+ *
+ */
+extern "C"
+void llamaos_libc_fatal (const char *message)
+{
+   trace ("glibc calling __libc_fatal (%s)\n", message);
+}
+
+typedef void (*llamaos_libc_fatal_t) (const char *);
+extern "C" int register_llamaos_libc_fatal (llamaos_libc_fatal_t);
+
+namespace {
+   static int registered_libc_fatal = register_llamaos_libc_fatal (llamaos_libc_fatal);
 }
 
 extern "C"
