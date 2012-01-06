@@ -80,9 +80,9 @@ static bool verify_magic (const start_info_t *start_info)
 
 static void trace_startup (const start_info_t *start_info)
 {
-   trace ("\n\n\n********************************\n");
-   trace (      "****  starting llamaOS (Xen) ***\n");
-   trace (      "********************************\n\n\n");
+   trace ("\n\n\n*********************************\n");
+   trace (      "****  starting llamaOS (Xen)  ***\n");
+   trace (      "*********************************\n\n\n");
 
    trace ("%s\n\n", VERSION_TEXT);
 
@@ -108,6 +108,7 @@ static void trace_startup (const start_info_t *start_info)
 
 extern int main ();
 
+using namespace llamaos::xen::memory;
 #include <xen/io/console.h>
 extern void llamaos_init_console (xencons_interface *cons_interface, uint32_t evtchn);
 
@@ -120,11 +121,12 @@ void guest_entry (start_info_t *start_info)
 
       try
       {
-         // create the one and only hypervisor object
-         Hypervisor hypervisor (start_info);
+         llamaos_init_console (to_pointer<xencons_interface> ((to_pointer<uint64_t>(MACH2PHYS_VIRT_START))[start_info->console.domU.mfn] << 12),
+                               start_info->console.domU.evtchn);
 
-//         llamaos_init_console (address_to_pointer<xencons_interface> (pseudo_to_virtual (page_to_address (machine_to_pseudo_page (start_info->console.domU.mfn)))),
-//                               start_info->console.domU.evtchn);
+         // create the one and only hypervisor object
+         trace ("Creating Hypervisor...\n");
+         Hypervisor hypervisor (start_info);
 
          // start the application
          main ();
@@ -156,7 +158,7 @@ static const start_info_t enforce_single_instance (const start_info_t *start_inf
       throw runtime_error ("duplicate Hypervisor objects created");
    }
 
-   if (nullptr != start_info)
+   if (nullptr == start_info)
    {
       throw runtime_error ("invalid start_info pointer");
    }
@@ -178,7 +180,7 @@ Hypervisor::Hypervisor (const start_info_t *start_info)
    :  start_info(enforce_single_instance(start_info)),
       memory(start_info->pt_base, start_info->nr_pages, start_info->mfn_list)
 {
-   
+   trace ("Hypervisor created.\n");
 }
 
 Hypervisor::~Hypervisor ()

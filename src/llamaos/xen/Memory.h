@@ -102,8 +102,8 @@ private:
    Page_converter (const Page_converter &);
    Page_converter &operator= (const Page_converter &);
 
-   const uint64_t *const table;
-   const uint64_t size;
+   const uint64_t *table;
+   uint64_t size;
 
 };
 
@@ -148,7 +148,7 @@ private:
    Memory ();
    ~Memory ();
    Memory (const Memory &);
-   Memory (uint64_t CR3_virtual_address, uint64_t total_pages, uint64_t table_virtual_address);
+   Memory (uint64_t CR3_virtual_address, uint64_t total_pages, uint64_t pseudo_converter_virtual_address);
    Memory &operator= (const Memory &);
 
    const uint64_t start_pseudo_page;

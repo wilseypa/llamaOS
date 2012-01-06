@@ -78,7 +78,13 @@ bool Hypercall::mmu_update (const mmu_update_t *req, unsigned int count)
 
    if (0 != HYPERVISOR_mmu_update(const_cast<mmu_update_t *>(req), request_count, &success_count, DOMID_SELF))
    {
-      trace ("HYPERVISOR_mmu_update (req: %lx, count: %d) FAILED\n", req, request_count);
+      trace ("HYPERVISOR_mmu_update (count: %d) FAILED\n", request_count);
+
+      for (unsigned int i = 0; i < count; i++)
+      {
+         trace ("   [%u] ptr: %lx, val: %lx\n", i, req [i].ptr, req [i].val);
+      }
+
       return false;
    }
    else if (success_count != request_count)

@@ -43,7 +43,9 @@ namespace llamaos {
 namespace xen {
 namespace memory {
 
-static Page_converter machine_converter (to_pointer<uint64_t>(MACH2PHYS_VIRT_START), MACH2PHYS_NR_ENTRIES);
+// !BAM For whatever reason, this constructor will not run. The compiler says nothing and the object will exist
+//      with zero for the data fields.
+//static Page_converter machine_converter (to_pointer<uint64_t>(MACH2PHYS_VIRT_START), MACH2PHYS_NR_ENTRIES);
 
 static uint64_t address_to_page (uint64_t address)
 {
@@ -59,6 +61,9 @@ static uint64_t machine_to_pseudo (uint64_t address)
 {
    uint64_t offset = address & 0xFFF;
    uint64_t page = address_to_page (address);
+
+   // for now create a local object each time. Static object above does not work.
+   Page_converter machine_converter (to_pointer<uint64_t>(MACH2PHYS_VIRT_START), MACH2PHYS_NR_ENTRIES);
 
    return ((page_to_address (machine_converter [page])) | offset);
 }
@@ -495,19 +500,18 @@ static uint64_t find_start_page (uint64_t CR3_virtual_address)
    PML4 pml4 (CR3_virtual_address);
 
    // loop over top level entries
-   for (uint64_t i = pml4.get_index (CR3_virtual_address); i < 512UL; i++)
+   for (uint64_t i = pml4.get_index (pseudo_to_virtual (page_to_address (start_pseudo_page))); i < 512UL; i++)
    {
       if (pml4 [i].empty ())
       {
          // stopped on a 256T boundary
          return start_pseudo_page;
       }
-
       // Page-Directory-Pointer
       PDP pdp (pml4 [i]);
 
       // loop over next level entries
-      for (uint64_t j = pdp.get_index (CR3_virtual_address); j < 512UL; j++)
+      for (uint64_t j = pdp.get_index (pseudo_to_virtual (page_to_address (start_pseudo_page))); j < 512UL; j++)
       {
          if (pdp [j].empty ())
          {
@@ -519,16 +523,29 @@ static uint64_t find_start_page (uint64_t CR3_virtual_address)
          PD pd (pdp [j]);
 
          // loop over next level entries
-         for (uint64_t k = pd.get_index (CR3_virtual_address); k < 512UL; k++)
+         for (uint64_t k = pd.get_index (pseudo_to_virtual (page_to_address (start_pseudo_page))); k < 512UL; k++)
          {
             if (pd [k].empty ())
             {
-               // stopped on a 1G boundary
+               // stopped on a 2G boundary
                return start_pseudo_page;
             }
 
-            // imcrease to skip over these entries
-            start_pseudo_page += 512UL;
+            // Page-Directory
+            PT pt (pd [k]);
+
+            // loop over next level entries
+            for (uint64_t l = pt.get_index (pseudo_to_virtual (page_to_address (start_pseudo_page))); l < 512UL; l++)
+            {
+               if (pt [l].empty ())
+               {
+                  // stopped on a 4K boundary
+                  return start_pseudo_page;
+               }
+
+               // increase to skip over this entry
+               start_pseudo_page++;
+            }
          }
       }
    }
@@ -540,6 +557,11 @@ static void create_table_entry (uint64_t CR3_virtual_address,
                                 uint64_t table_virtual_address,
                                 uint64_t table_machine_address)
 {
+   trace ("create_table_entry (CR3_virtual_address: %lx, table_virtual_address: %lx, table_machine_address: %lx)\n",
+            CR3_virtual_address,
+            table_virtual_address,
+            table_machine_address);
+
    // verify this page is already mapped
    PML4 pml4 (CR3_virtual_address);
    PML4E pml4e (pml4.get_entry (table_virtual_address));
@@ -583,12 +605,18 @@ static void create_table_entry (uint64_t CR3_virtual_address,
 
 static void update_table_entry (uint64_t entry_machine_address, uint64_t page_machine_address)
 {
+   trace ("update_table_entry (entry_machine_address: %lx, page_machine_address: %lx)\n",
+          entry_machine_address, page_machine_address);
+
    Hypercall::mmu_update (entry_machine_address,
                           page_machine_address | Entry::A | Entry::US | Entry::RW | Entry::P);
 }
 
 static uint64_t find_start_address (uint64_t CR3_virtual_address, uint64_t start_pseudo_page, uint64_t end_pseudo_page, const Page_converter &pseudo_converter)
 {
+   trace ("starting find_start_address...\n");
+   trace ("  CR3_virtual_address: %lx, start_pseudo_page: %lx, end_pseudo_page: %lx\n", CR3_virtual_address, start_pseudo_page, end_pseudo_page);
+
    // begin installing new tables in the reserved 512kb padding
    uint64_t table_pseudo_page = start_pseudo_page - 128;
 
@@ -599,7 +627,6 @@ static uint64_t find_start_address (uint64_t CR3_virtual_address, uint64_t start
    {
       // address at this page number
       uint64_t virtual_address = pseudo_to_virtual (page_to_address (i));
-
       PML4E pml4e (pml4.get_entry (virtual_address));
 
       if (pml4e.empty ())
@@ -672,69 +699,27 @@ uint64_t Page_converter::operator[] (uint64_t page) const
    {
       std::stringstream ss;
       ss << "Page_converter[]: invalid page index (" << page << ")";
+
       throw std::runtime_error (ss.str ());
    }
 
    return table [page];
 }
 
-Memory::Memory (uint64_t CR3_virtual_address, uint64_t total_pages, uint64_t table_virtual_address)
+Memory::Memory (uint64_t CR3_virtual_address, uint64_t total_pages, uint64_t pseudo_converter_virtual_address)
    :  CR3_virtual_address(CR3_virtual_address),
       total_pages(total_pages),
-      pseudo_converter(to_pointer<uint64_t> (table_virtual_address), total_pages),
+      pseudo_converter(to_pointer<uint64_t> (pseudo_converter_virtual_address), total_pages),
       start_pseudo_page(find_start_page (CR3_virtual_address)),
       end_pseudo_page(total_pages),
       start_virtual_address(find_start_address (CR3_virtual_address, start_pseudo_page, end_pseudo_page, pseudo_converter)),
       end_virtual_address(pseudo_to_virtual (page_to_address(end_pseudo_page))),
       curbrk(to_pointer<void>(start_virtual_address))
 {
-
+   trace ("Hypervisor Memory created.\n");
 }
 
 Memory::~Memory ()
 {
 
-}
-
-void *Memory::brk (void *address)
-{
-   if (   (to_address (address) > start_virtual_address)
-       && (to_address (address) < end_virtual_address))
-   {
-      curbrk = address;
-      trace ("  __curbrk (%lx)\n", curbrk);
-   }
-
-   return curbrk;
-}
-
-/* Write NBYTES of BUF to FD.  Return the number written, or -1.  */
-extern "C"
-ssize_t __write (int fd, const void *buf, size_t nbytes)
-{
-  trace ("glibc calling __write (%d, %lx, %d)\n  ", fd, buf, nbytes);
-
-  for (size_t i = 0; i < nbytes; i++)
-  {
-     trace ("%c", ((const char *)buf) [i]);
-  }
-
-  trace ("\n");
-  return nbytes;
-
-  if (nbytes == 0)
-    return 0;
-  if (fd < 0)
-    {
-//      __set_errno (EBADF);
-      return -1;
-    }
-  if (buf == NULL)
-    {
-//      __set_errno (EINVAL);
-      return -1;
-    }
-
-//  __set_errno (ENOSYS);
-  return -1;
 }
