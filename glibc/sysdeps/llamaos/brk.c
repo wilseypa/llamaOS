@@ -51,6 +51,12 @@ int __brk (void *addr)
       // call llamaos_brk
       __curbrk = llamaos_brk (addr);
 
+      // !BAM why must this be here? The linux version doesn;t have it?
+//      if (   (0 == addr)
+//          && (0 != __curbrk))
+//      {
+//         return 0;
+//      }
       // error if requested memory is not available
       if (__curbrk < addr)
       {

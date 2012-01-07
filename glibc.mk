@@ -148,6 +148,7 @@ SOURCES = \
   stdio-common/itoa-digits.c \
   stdio-common/itoa-udigits.c \
   stdio-common/itowa-digits.c \
+  stdio-common/printf.c \
   stdio-common/printf_fp.c \
   stdio-common/printf_fphex.c \
   stdio-common/printf-parsemb.c \

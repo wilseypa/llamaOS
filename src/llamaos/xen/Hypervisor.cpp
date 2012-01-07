@@ -112,6 +112,8 @@ using namespace llamaos::xen::memory;
 #include <xen/io/console.h>
 extern void llamaos_init_console (xencons_interface *cons_interface, uint32_t evtchn);
 
+void register_glibc_exports ();
+
 extern "C"
 void guest_entry (start_info_t *start_info)
 {
@@ -121,6 +123,7 @@ void guest_entry (start_info_t *start_info)
 
       try
       {
+         register_glibc_exports ();
          llamaos_init_console (to_pointer<xencons_interface> ((to_pointer<uint64_t>(MACH2PHYS_VIRT_START))[start_info->console.domU.mfn] << 12),
                                start_info->console.domU.evtchn);
 
@@ -180,6 +183,7 @@ Hypervisor::Hypervisor (const start_info_t *start_info)
    :  start_info(enforce_single_instance(start_info)),
       memory(start_info->pt_base, start_info->nr_pages, start_info->mfn_list)
 {
+   instance = this;
    trace ("Hypervisor created.\n");
 }
 

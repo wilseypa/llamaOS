@@ -157,7 +157,7 @@ private:
    const uint64_t start_virtual_address;
    const uint64_t end_virtual_address;
 
-   void *curbrk;
+   void *program_break;
 
    // allow access to the private constructor
    friend class Hypervisor;

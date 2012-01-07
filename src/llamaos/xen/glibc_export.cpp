@@ -60,10 +60,6 @@ void llamaos_abort (void)
 typedef void (*llamaos_abort_t) (void);
 extern "C" int register_llamaos_abort (llamaos_abort_t);
 
-namespace {
-   static int registered_abort = register_llamaos_abort (llamaos_abort);
-}
-
 /**
  * @brief int __brk (void *addr)
  *
@@ -78,10 +74,6 @@ void *llamaos_brk (void *addr)
 
 typedef void *(*llamaos_brk_t) (void *);
 extern "C" int register_llamaos_brk (llamaos_brk_t);
-
-namespace {
-   static int registered_brk = register_llamaos_brk (llamaos_brk);
-}
 
 /**
  * @brief int __getpagesize (void)
@@ -98,10 +90,6 @@ int llamaos_getpagesize (void)
 typedef int (*llamaos_getpagesize_t) (void);
 extern "C" int register_llamaos_getpagesize (llamaos_getpagesize_t);
 
-namespace {
-   static int registered_getpagesize = register_llamaos_getpagesize (llamaos_getpagesize);
-}
-
 /**
  * @brief void __libc_fatal (const char *message)
  *
@@ -114,10 +102,6 @@ void llamaos_libc_fatal (const char *message)
 
 typedef void (*llamaos_libc_fatal_t) (const char *);
 extern "C" int register_llamaos_libc_fatal (llamaos_libc_fatal_t);
-
-namespace {
-   static int registered_libc_fatal = register_llamaos_libc_fatal (llamaos_libc_fatal);
-}
 
 /**
  * @brief ssize_t __libc_write (int fd, const void *buf, size_t nbytes)
@@ -141,10 +125,6 @@ ssize_t llamaos_libc_write (int fd, const void *buf, size_t nbytes)
 typedef ssize_t (*llamaos_libc_write_t) (int, const void *, size_t);
 extern "C" int register_llamaos_libc_write (llamaos_libc_write_t);
 
-namespace {
-   static int registered_libc_write = register_llamaos_libc_write (llamaos_libc_write);
-}
-
 /**
  * @brief int madvise (__ptr_t addr, size_t len, int advice)
  *
@@ -159,6 +139,16 @@ int llamaos_madvise (__ptr_t addr, size_t len, int advice)
 typedef int (*llamaos_madvise_t) (__ptr_t, size_t, int);
 extern "C" int register_llamaos_madvise (llamaos_madvise_t);
 
-namespace {
-   static int registered_madvise = register_llamaos_madvise (llamaos_madvise);
+/**
+ * @brief Initialize the glibc exports.
+ *
+ */
+void register_glibc_exports ()
+{
+   register_llamaos_abort (llamaos_abort);
+   register_llamaos_brk (llamaos_brk);
+   register_llamaos_getpagesize (llamaos_getpagesize);
+   register_llamaos_libc_fatal (llamaos_libc_fatal);
+   register_llamaos_libc_write (llamaos_libc_write);
+   register_llamaos_madvise (llamaos_madvise);
 }

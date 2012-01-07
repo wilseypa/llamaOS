@@ -705,7 +705,7 @@ Memory::Memory (uint64_t CR3_virtual_address, uint64_t total_pages, uint64_t pse
       end_pseudo_page(total_pages),
       start_virtual_address(find_start_address (CR3_virtual_address, start_pseudo_page, end_pseudo_page, pseudo_converter)),
       end_virtual_address(pseudo_to_virtual (page_to_address(end_pseudo_page))),
-      curbrk(to_pointer<void>(start_virtual_address))
+      program_break(to_pointer<void>(start_virtual_address))
 {
    trace ("Hypervisor Memory created.\n");
 }
@@ -713,4 +713,15 @@ Memory::Memory (uint64_t CR3_virtual_address, uint64_t total_pages, uint64_t pse
 Memory::~Memory ()
 {
 
+}
+
+void *Memory::brk (void *address)
+{
+   if (   (to_address (address) >= start_virtual_address)
+       && (to_address (address) < end_virtual_address))
+   {
+      program_break = address;
+   }
+
+   return program_break;
 }
