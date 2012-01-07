@@ -28,39 +28,28 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <cstdio>
+#include <errno.h>
+#include <sys/poll.h>
 
-#include <iostream>
+// define function pointer
+typedef int (*llamaos_poll_t) (struct pollfd *, nfds_t, int);
 
-#include <llamaos/trace.h>
+// function pointer variable
+static llamaos_poll_t llamaos_poll = 0;
 
-using namespace std;
-using namespace llamaos;
-
-static int func (int y)
+// function called by llamaos to register pointer
+int register_llamaos_poll (llamaos_poll_t poll)
 {
-   return y;
+   llamaos_poll = poll;
 }
 
-static int x = 1;
-static int y = func (2);
-static int z = 3;
-
-// simple guest instance should just output text to console
-int main ()
+int poll (struct pollfd *fds, nfds_t nfds, int timeout)
 {
-   trace ("application main ()...\n");
+   if (0 != llamaos_poll)
+   {
+      return llamaos_poll (fds, nfds, timeout);
+   }
 
-   printf ("printf %d\n", x);
-   fflush(stdout);
-   fprintf (stdout, "x: %d, y: %d, z: %d\n", x, y, z);
-
-   fprintf (stdout, "hello from printf\n");
-   fflush(stdout);
-
-   cout << "hello from cout" << endl;
-//   cout.flush ();
-for (;;);
-
-   return 0;
+   __set_errno (ENOSYS);
+   return -1;
 }

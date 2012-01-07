@@ -38,10 +38,7 @@ SOURCES = \
   io/fxstat.c \
   io/fxstat64.c \
   io/isatty.c \
-  io/lseek64.c \
   io/open.c \
-  io/poll.c \
-  io/read.c \
   io/xstat.c \
   io/xstat64.c \
   libio/filedoalloc.c \
@@ -265,8 +262,11 @@ SOURCES = \
   sysdeps/llamaos/getpagesize.c \
   sysdeps/llamaos/init-first.c \
   sysdeps/llamaos/libc_fatal.c \
+  sysdeps/llamaos/lseek64.c \
   sysdeps/llamaos/madvise.c \
   sysdeps/llamaos/pathconf.c \
+  sysdeps/llamaos/poll.c \
+  sysdeps/llamaos/read.c \
   sysdeps/llamaos/write.c \
   sysdeps/llamaos/writev.c \
   sysdeps/wordsize-64/strtol.c \

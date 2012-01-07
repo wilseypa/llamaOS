@@ -28,39 +28,49 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <cstdio>
+#include <errno.h>
+#include <unistd.h>
+#include <sys/types.h>
 
-#include <iostream>
+// define function pointer
+typedef off64_t (*llamaos_lseek64_t) (int, off64_t, int);
 
-#include <llamaos/trace.h>
+// function pointer variable
+static llamaos_lseek64_t llamaos_lseek64 = 0;
 
-using namespace std;
-using namespace llamaos;
-
-static int func (int y)
+// function called by llamaos to register pointer
+int register_llamaos_lseek64 (llamaos_lseek64_t lseek64)
 {
-   return y;
+   llamaos_lseek64 = lseek64;
 }
 
-static int x = 1;
-static int y = func (2);
-static int z = 3;
-
-// simple guest instance should just output text to console
-int main ()
+off64_t __libc_lseek64 (int fd, off64_t offset, int whence)
 {
-   trace ("application main ()...\n");
+   if (fd < 0)
+   {
+      __set_errno (EBADF);
+      return -1;
+   }
 
-   printf ("printf %d\n", x);
-   fflush(stdout);
-   fprintf (stdout, "x: %d, y: %d, z: %d\n", x, y, z);
+   switch (whence)
+   {
+   case SEEK_SET:
+   case SEEK_CUR:
+   case SEEK_END:
+      break;
 
-   fprintf (stdout, "hello from printf\n");
-   fflush(stdout);
+   default:
+      __set_errno (EINVAL);
+      return -1;
+   }
 
-   cout << "hello from cout" << endl;
-//   cout.flush ();
-for (;;);
+   if (0 != llamaos_lseek64)
+   {
+      return llamaos_lseek64 (fd, offset, whence);
+   }
 
-   return 0;
+   __set_errno (ENOSYS);
+   return -1;
 }
+weak_alias (__libc_lseek64, __lseek64)
+weak_alias (__libc_lseek64, lseek64)

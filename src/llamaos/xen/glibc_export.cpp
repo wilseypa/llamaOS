@@ -29,6 +29,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 */
 
 #include <cstdio>
+#include <sys/poll.h>
 
 #include <stdexcept>
 #include <sstream>
@@ -178,6 +179,48 @@ typedef long int (*llamaos_pathconf_t) (const char *, int);
 extern "C" int register_llamaos_pathconf (llamaos_pathconf_t);
 
 /**
+ * @brief off64_t __libc_lseek64 (int fd, off64_t offset, int whence)
+ *
+ */
+off64_t llamaos_lseek64 (int fd, off64_t offset, int whence)
+{
+   trace ("glibc calling llamaos_lseek64 (%d, %lu, %d)\n", fd, offset, whence);
+
+   return 0;
+}
+
+typedef off64_t (*llamaos_lseek64_t) (int, off64_t, int);
+extern "C" int register_llamaos_lseek64 (llamaos_lseek64_t);
+
+/**
+ * @brief int poll (struct pollfd *fds, nfds_t nfds, int timeout)
+ *
+ */
+int llamaos_poll (struct pollfd *fds, nfds_t nfds, int timeout)
+{
+   trace ("glibc calling llamaos_poll (%lx, %lx, %d)\n", fds, nfds, timeout);
+
+   return 0;
+}
+
+typedef int (*llamaos_poll_t) (struct pollfd *, nfds_t, int);
+extern "C" int register_llamaos_poll (llamaos_poll_t);
+
+/**
+ * @brief ssize_t __libc_read (int fd, void *buf, size_t nbytes)
+ *
+ */
+ssize_t llamaos_read (int fd, void *buf, size_t nbytes)
+{
+   trace ("glibc calling read (%d, %lx, %lx)\n", fd, buf, nbytes);
+
+   return -1;
+}
+
+typedef ssize_t (*llamaos_read_t) (int, void *, size_t);
+extern "C" int register_llamaos_read (llamaos_read_t);
+
+/**
  * @brief Initialize the glibc exports.
  *
  */
@@ -191,4 +234,7 @@ void register_glibc_exports ()
    register_llamaos_madvise (llamaos_madvise);
    register_llamaos_getcwd (llamaos_getcwd);
    register_llamaos_pathconf (llamaos_pathconf);
+   register_llamaos_lseek64 (llamaos_lseek64);
+   register_llamaos_poll (llamaos_poll);
+   register_llamaos_read (llamaos_read);
 }

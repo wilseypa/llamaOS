@@ -28,39 +28,52 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <cstdio>
+#include <errno.h>
+#include <unistd.h>
+#include <stddef.h>
 
-#include <iostream>
+// define function pointer
+typedef ssize_t (*llamaos_read_t) (int, void *, size_t);
 
-#include <llamaos/trace.h>
+// function pointer variable
+static llamaos_read_t llamaos_read = 0;
 
-using namespace std;
-using namespace llamaos;
-
-static int func (int y)
+// function called by llamaos to register pointer
+int register_llamaos_read (llamaos_read_t read)
 {
-   return y;
+   llamaos_read = read;
 }
 
-static int x = 1;
-static int y = func (2);
-static int z = 3;
-
-// simple guest instance should just output text to console
-int main ()
+ssize_t __libc_read (int fd, void *buf, size_t nbytes)
 {
-   trace ("application main ()...\n");
+   if (nbytes == 0)
+   {
+      return 0;
+   }
 
-   printf ("printf %d\n", x);
-   fflush(stdout);
-   fprintf (stdout, "x: %d, y: %d, z: %d\n", x, y, z);
+   if (fd < 0)
+   {
+      __set_errno (EBADF);
+      return -1;
+   }
 
-   fprintf (stdout, "hello from printf\n");
-   fflush(stdout);
+   if (buf == NULL)
+   {
+      __set_errno (EINVAL);
+      return -1;
+   }
 
-   cout << "hello from cout" << endl;
-//   cout.flush ();
-for (;;);
+   if (0 != llamaos_read)
+   {
+      return llamaos_read (fd, buf, nbytes);
+   }
 
-   return 0;
+   __set_errno (ENOSYS);
+  return -1;
 }
+
+libc_hidden_def (__libc_read)
+
+weak_alias (__libc_read, __read)
+libc_hidden_weak (__read)
+weak_alias (__libc_read, read)
