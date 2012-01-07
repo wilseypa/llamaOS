@@ -37,7 +37,6 @@ SOURCES = \
   io/close.c \
   io/fxstat.c \
   io/fxstat64.c \
-  io/getcwd.c \
   io/isatty.c \
   io/lseek64.c \
   io/open.c \
@@ -141,7 +140,6 @@ SOURCES = \
   posix/geteuid.c \
   posix/getgid.c \
   posix/getuid.c \
-  posix/pathconf.c \
   stdio-common/_itoa.c \
   stdio-common/fprintf.c \
   stdio-common/fxprintf.c \
@@ -263,10 +261,12 @@ SOURCES = \
   sysdeps/llamaos/brk.c \
   sysdeps/llamaos/errlist.c \
   sysdeps/llamaos/errno.c \
+  sysdeps/llamaos/getcwd.c \
   sysdeps/llamaos/getpagesize.c \
   sysdeps/llamaos/init-first.c \
   sysdeps/llamaos/libc_fatal.c \
   sysdeps/llamaos/madvise.c \
+  sysdeps/llamaos/pathconf.c \
   sysdeps/llamaos/write.c \
   sysdeps/llamaos/writev.c \
   sysdeps/wordsize-64/strtol.c \

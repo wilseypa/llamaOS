@@ -29,41 +29,29 @@ either expressed or implied, of the copyright holder(s) or contributors.
 */
 
 #include <errno.h>
+#include <unistd.h>
+#include <stddef.h>
 
 // define function pointer
-typedef void *(*llamaos_brk_t) (void *);
+typedef char *(*llamaos_getcwd_t) (char *, size_t);
 
 // function pointer variable
-static llamaos_brk_t llamaos_brk = 0;
+static llamaos_getcwd_t llamaos_getcwd = 0;
 
 // function called by llamaos to register pointer
-int register_llamaos_brk (llamaos_brk_t brk)
+int register_llamaos_getcwd (llamaos_getcwd_t getcwd)
 {
-   llamaos_brk = brk;
+   llamaos_getcwd = getcwd;
 }
 
-void *__curbrk = 0;
-
-int __brk (void *addr)
+char * __getcwd (char *buf, size_t size)
 {
-   if (0 != llamaos_brk)
+   if (0 != llamaos_getcwd)
    {
-      // call llamaos_brk
-      __curbrk = llamaos_brk (addr);
-
-      // error if requested memory is not available
-      if (__curbrk < addr)
-      {
-         __set_errno (ENOMEM);
-         return -1;
-      }
-
-      return 0;
+      return llamaos_getcwd (buf, size);
    }
 
-   // error if llamaos_brk is not registered
    __set_errno (ENOSYS);
-   return -1;
+   return NULL;
 }
-
-weak_alias (__brk, brk)
+weak_alias (__getcwd, getcwd)

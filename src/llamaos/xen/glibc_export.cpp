@@ -140,6 +140,44 @@ typedef int (*llamaos_madvise_t) (__ptr_t, size_t, int);
 extern "C" int register_llamaos_madvise (llamaos_madvise_t);
 
 /**
+ * @brief char * __getcwd (char *buf, size_t size)
+ *
+ */
+extern "C"
+char *llamaos_getcwd (char *buf, size_t size)
+{
+   trace ("glibc calling llamaos_getcwd (%lx, %d)\n", buf, size);
+
+   if (size >= 2)
+   {
+      buf [0] = '/';
+      buf [1] = '\0';
+
+      return buf;
+   }
+
+   return 0;
+}
+
+typedef char *(*llamaos_getcwd_t) (char *, size_t);
+extern "C" int register_llamaos_getcwd (llamaos_getcwd_t);
+
+/**
+ * @brief long int __pathconf (const char *path, int name)
+ *
+ */
+extern "C"
+long int llamaos_pathconf (const char *path, int name)
+{
+   trace ("glibc calling llamaos_pathconf (%lx, %d)\n", path, name);
+
+   return 0;
+}
+
+typedef long int (*llamaos_pathconf_t) (const char *, int);
+extern "C" int register_llamaos_pathconf (llamaos_pathconf_t);
+
+/**
  * @brief Initialize the glibc exports.
  *
  */
@@ -151,4 +189,6 @@ void register_glibc_exports ()
    register_llamaos_libc_fatal (llamaos_libc_fatal);
    register_llamaos_libc_write (llamaos_libc_write);
    register_llamaos_madvise (llamaos_madvise);
+   register_llamaos_getcwd (llamaos_getcwd);
+   register_llamaos_pathconf (llamaos_pathconf);
 }
