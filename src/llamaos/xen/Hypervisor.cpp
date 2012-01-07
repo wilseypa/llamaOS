@@ -107,7 +107,7 @@ static void trace_startup (const start_info_t *start_info)
    trace ("\n");
 }
 
-extern int main ();
+extern int main (int, char*[]);
 
 using namespace llamaos::xen::memory;
 #include <xen/io/console.h>
@@ -136,7 +136,10 @@ void guest_entry (start_info_t *start_info)
          ios_base::Init ios_base_init;
 
          // start the application
-         main ();
+         char * argv [1];
+         char *program_name = const_cast<char *>("hello-xen");
+         argv [0] = program_name;
+         main (1, argv);
 
          trace ("ending llamaOS...\n");
       }

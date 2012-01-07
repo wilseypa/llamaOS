@@ -47,9 +47,14 @@ static int y = func (2);
 static int z = 3;
 
 // simple guest instance should just output text to console
-int main ()
+int main (int argc, char *argv [])
 {
-   trace ("application main ()...\n");
+   trace ("application main (%d,", argc);
+   for (int i = 0; i < argc; i++)
+   {
+      trace (" %s", argv [i]);
+   }
+   trace (")\n");
 
    printf ("printf %d\n", x);
    fflush(stdout);
