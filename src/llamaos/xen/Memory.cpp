@@ -311,7 +311,7 @@ public:
 
    PTE operator[] (uint64_t index) const
    {
-      return PTE (parent.machine_address + index, table [index]);
+      return PTE (parent.address () + (index * sizeof(uint64_t)), table [index]);
    }
 
    uint64_t get_index (uint64_t address) const
@@ -322,7 +322,7 @@ public:
    PTE get_entry (uint64_t address) const
    {
       uint64_t index = get_index (address);
-      return PTE (parent.machine_address + index, table [index]);
+      return PTE (parent.address () + (index * sizeof(uint64_t)), table [index]);
    }
 
 private:
@@ -352,7 +352,7 @@ public:
 
    PDE operator[] (uint64_t index) const
    {
-      return PDE (parent.machine_address + index, table [index]);
+      return PDE (parent.address () + (index * sizeof(uint64_t)), table [index]);
    }
 
    uint64_t get_index (uint64_t address) const
@@ -363,7 +363,7 @@ public:
    PDE get_entry (uint64_t address) const
    {
       uint64_t index = get_index (address);
-      return PDE (parent.machine_address + index, table [index]);
+      return PDE (parent.address () + (index * sizeof(uint64_t)), table [index]);
    }
 
 private:
@@ -393,7 +393,7 @@ public:
 
    PDPE operator[] (uint64_t index) const
    {
-      return PDPE (parent.machine_address + index, table [index]);
+      return PDPE (parent.address () + (index * sizeof(uint64_t)), table [index]);
    }
 
    uint64_t get_index (uint64_t address) const
@@ -404,7 +404,7 @@ public:
    PDPE get_entry (uint64_t address) const
    {
       uint64_t index = get_index (address);
-      return PDPE (parent.machine_address + index, table [index]);
+      return PDPE (parent.address () + (index * sizeof(uint64_t)), table [index]);
    }
 
 private:
@@ -421,8 +421,7 @@ class PML4
 {
 public:
    PML4 (uint64_t virtual_address)
-      :  machine_address (0UL),
-         table(to_pointer<uint64_t>(virtual_address))
+      :  table(to_pointer<uint64_t>(virtual_address))
    {
 
    }
@@ -434,7 +433,7 @@ public:
 
    PML4E operator[] (uint64_t index) const
    {
-      return PML4E (machine_address + index, table [index]);
+      return PML4E (0UL, table [index]);
    }
 
    uint64_t get_index (uint64_t address) const
@@ -445,7 +444,7 @@ public:
    PML4E get_entry (uint64_t address) const
    {
       uint64_t index = get_index (address);
-      return PML4E (machine_address + index, table [index]);
+      return PML4E (0UL, table [index]);
    }
 
 private:
@@ -453,7 +452,6 @@ private:
    PML4 (const PML4 &);
    PML4 &operator= (const PML4 &);
 
-   const uint64_t machine_address;
    const uint64_t *const table;
 
 };
@@ -507,6 +505,7 @@ static uint64_t find_start_page (uint64_t CR3_virtual_address)
          // stopped on a 256T boundary
          return start_pseudo_page;
       }
+
       // Page-Directory-Pointer
       PDP pdp (pml4 [i]);
 
@@ -557,11 +556,6 @@ static void create_table_entry (uint64_t CR3_virtual_address,
                                 uint64_t table_virtual_address,
                                 uint64_t table_machine_address)
 {
-   trace ("create_table_entry (CR3_virtual_address: %lx, table_virtual_address: %lx, table_machine_address: %lx)\n",
-            CR3_virtual_address,
-            table_virtual_address,
-            table_machine_address);
-
    // verify this page is already mapped
    PML4 pml4 (CR3_virtual_address);
    PML4E pml4e (pml4.get_entry (table_virtual_address));
@@ -605,18 +599,15 @@ static void create_table_entry (uint64_t CR3_virtual_address,
 
 static void update_table_entry (uint64_t entry_machine_address, uint64_t page_machine_address)
 {
-   trace ("update_table_entry (entry_machine_address: %lx, page_machine_address: %lx)\n",
-          entry_machine_address, page_machine_address);
-
    Hypercall::mmu_update (entry_machine_address,
                           page_machine_address | Entry::A | Entry::US | Entry::RW | Entry::P);
 }
 
-static uint64_t find_start_address (uint64_t CR3_virtual_address, uint64_t start_pseudo_page, uint64_t end_pseudo_page, const Page_converter &pseudo_converter)
+static uint64_t find_start_address (uint64_t CR3_virtual_address,
+                                    uint64_t start_pseudo_page,
+                                    uint64_t end_pseudo_page,
+                                    const Page_converter &pseudo_converter)
 {
-   trace ("starting find_start_address...\n");
-   trace ("  CR3_virtual_address: %lx, start_pseudo_page: %lx, end_pseudo_page: %lx\n", CR3_virtual_address, start_pseudo_page, end_pseudo_page);
-
    // begin installing new tables in the reserved 512kb padding
    uint64_t table_pseudo_page = start_pseudo_page - 128;
 
