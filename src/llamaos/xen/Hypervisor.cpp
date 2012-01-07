@@ -31,6 +31,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <cstdint>
 #include <cstring>
 
+#include <ios>
 #include <stdexcept>
 
 #include <xen/xen.h>
@@ -130,6 +131,9 @@ void guest_entry (start_info_t *start_info)
          // create the one and only hypervisor object
          trace ("Creating Hypervisor...\n");
          Hypervisor hypervisor (start_info);
+
+         // initialize libstdc++
+         ios_base::Init ios_base_init;
 
          // start the application
          main ();
