@@ -115,6 +115,9 @@ extern void llamaos_init_console (xencons_interface *cons_interface, uint32_t ev
 
 void register_glibc_exports ();
 
+typedef void (*func_ptr) (void);
+extern func_ptr __CTOR_LIST__[];
+
 extern "C"
 void guest_entry (start_info_t *start_info)
 {
@@ -136,9 +139,21 @@ void guest_entry (start_info_t *start_info)
          ios_base::Init ios_base_init;
 
          // start the application
-         char * argv [1];
+         int argc = 1;
+         char * argv [2];
+         char * envp [1];
          char *program_name = const_cast<char *>("hello-xen");
          argv [0] = program_name;
+         argv [1] = 0;
+         envp [0] = 0;
+ 
+         uint64_t ctor_size = reinterpret_cast<uint64_t>(__CTOR_LIST__[0]);
+         trace ("__CTOR_LIST__[0]: %lx\n", ctor_size);
+         for (uint64_t i = ctor_size; i >= 1; i--)
+         {
+            __CTOR_LIST__[i] ();
+         }
+
          main (1, argv);
 
          trace ("ending llamaOS...\n");

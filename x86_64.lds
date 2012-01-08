@@ -6,6 +6,14 @@ SECTIONS
    . = 0x0;
    _text = .;
    .text : { *(.text) }
+  .ctors : {
+        __CTOR_LIST__ = .;
+        QUAD((__CTOR_END__ - __CTOR_LIST__) / 8 - 2)
+        *(.ctors)
+        CONSTRUCTORS
+        QUAD(0)
+        __CTOR_END__ = .;
+        }
    .data : { *(.data) }
    .bss : { *(.bss) }
 }
