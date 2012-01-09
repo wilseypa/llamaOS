@@ -17,6 +17,7 @@ SOURCES = \
   Hypercall.cpp \
   Hypervisor.cpp \
   Memory.cpp \
+  start.cpp \
   trace.cpp
 
 BINARY = xen.a

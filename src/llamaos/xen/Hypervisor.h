@@ -31,6 +31,10 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #ifndef llamaos_xen_hypervisor_h_
 #define llamaos_xen_hypervisor_h_
 
+#include <cstdint>
+
+#include <xen/xen.h>
+
 #include <llamaos/xen/Memory.h>
 
 namespace llamaos {
