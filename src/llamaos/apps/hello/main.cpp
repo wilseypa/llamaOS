@@ -64,8 +64,7 @@ int main (int argc, char *argv [])
    fflush(stdout);
 
    cout << "hello from cout" << endl;
-//   cout.flush ();
-for (;;);
+   cout.flush ();
 
    return 0;
 }

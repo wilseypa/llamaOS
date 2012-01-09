@@ -43,9 +43,7 @@ namespace llamaos {
 namespace xen {
 namespace memory {
 
-// !BAM For whatever reason, this constructor will not run. The compiler says nothing and the object will exist
-//      with zero for the data fields.
-//static Page_converter machine_converter (to_pointer<uint64_t>(MACH2PHYS_VIRT_START), MACH2PHYS_NR_ENTRIES);
+static Page_converter machine_converter (to_pointer<uint64_t>(MACH2PHYS_VIRT_START), MACH2PHYS_NR_ENTRIES);
 
 static uint64_t address_to_page (uint64_t address)
 {
@@ -61,9 +59,6 @@ static uint64_t machine_to_pseudo (uint64_t address)
 {
    uint64_t offset = address & 0xFFF;
    uint64_t page = address_to_page (address);
-
-   // for now create a local object each time. Static object above does not work.
-   Page_converter machine_converter (to_pointer<uint64_t>(MACH2PHYS_VIRT_START), MACH2PHYS_NR_ENTRIES);
 
    return ((page_to_address (machine_converter [page])) | offset);
 }

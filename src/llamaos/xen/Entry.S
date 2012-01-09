@@ -88,9 +88,10 @@ stack_start:
    /* to map the real shared-info page! :-)                             */
    .org 0x1000
 shared_info:
-   .org 0x2000
 
+   .org 0x2000
 hypercall_page:
+
    .org 0x3000
 
 /* Offsets into shared_info_t. */

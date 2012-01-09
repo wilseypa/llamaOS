@@ -117,6 +117,22 @@ void register_glibc_exports ();
 
 typedef void (*func_ptr) (void);
 extern func_ptr __CTOR_LIST__[];
+extern func_ptr __DTOR_LIST__[];
+
+class Test_class
+{
+public:
+   Test_class () { trace ("Test_class constructor\n"); }
+   ~Test_class () { trace ("Test_class destructor\n"); }
+};
+
+static Test_class test_class;
+static void bar () __attribute__ ((destructor));
+
+static void bar ()
+{
+   trace ("calling bar ()\n");
+}
 
 extern "C"
 void guest_entry (start_info_t *start_info)
@@ -131,6 +147,13 @@ void guest_entry (start_info_t *start_info)
          llamaos_init_console (to_pointer<xencons_interface> ((to_pointer<uint64_t>(MACH2PHYS_VIRT_START))[start_info->console.domU.mfn] << 12),
                                start_info->console.domU.evtchn);
 
+         uint64_t ctor_size = reinterpret_cast<uint64_t>(__CTOR_LIST__[0]);
+         trace ("__CTOR_LIST__[0]: %lx\n", ctor_size);
+         for (uint64_t i = ctor_size; i >= 1; i--)
+         {
+            __CTOR_LIST__[i] ();
+         }
+
          // create the one and only hypervisor object
          trace ("Creating Hypervisor...\n");
          Hypervisor hypervisor (start_info);
@@ -144,16 +167,16 @@ void guest_entry (start_info_t *start_info)
          argv [0] = program_name;
          argv [1] = 0;
  
-         uint64_t ctor_size = reinterpret_cast<uint64_t>(__CTOR_LIST__[0]);
-         trace ("__CTOR_LIST__[0]: %lx\n", ctor_size);
-         for (uint64_t i = ctor_size; i >= 1; i--)
-         {
-            __CTOR_LIST__[i] ();
-         }
-
          main (1, argv);
 
          trace ("ending llamaOS...\n");
+
+         uint64_t dtor_size = reinterpret_cast<uint64_t>(__DTOR_LIST__[0]);
+         trace ("__DTOR_LIST__[0]: %lx\n", dtor_size);
+         for (uint64_t i = dtor_size; i >= 1; i--)
+         {
+            __DTOR_LIST__[i] ();
+         }
       }
       catch (const std::runtime_error &e)
       {
