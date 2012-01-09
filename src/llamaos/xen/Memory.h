@@ -33,6 +33,8 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 #include <cstdint>
 
+extern char _text;
+
 namespace llamaos {
 namespace xen {
 namespace memory {
@@ -68,6 +70,12 @@ inline uint64_t to_address (T *pointer)
  *
  */
 uint64_t machine_to_virtual (uint64_t address);
+
+template <typename T>
+inline T *pseudo_to_virtual (T *pointer)
+{
+   return to_pointer<T> (to_address (pointer) + to_address(&_text));
+}
 
 /**
  * @brief Utility class to convert page frame number to/from the machine/pseudo address space.

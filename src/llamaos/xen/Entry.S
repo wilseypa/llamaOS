@@ -68,6 +68,7 @@ SUCH DAMAGE.
    .ascii  ",HYPERCALL_PAGE=0x2"
    .ascii  ",LOADER=generic"
    .byte   0
+
 .text
 
 #define ENTRY(X) .globl X ; X :

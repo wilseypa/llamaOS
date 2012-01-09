@@ -139,13 +139,10 @@ void guest_entry (start_info_t *start_info)
          ios_base::Init ios_base_init;
 
          // start the application
-         int argc = 1;
          char * argv [2];
-         char * envp [1];
          char *program_name = const_cast<char *>("hello-xen");
          argv [0] = program_name;
          argv [1] = 0;
-         envp [0] = 0;
  
          uint64_t ctor_size = reinterpret_cast<uint64_t>(__CTOR_LIST__[0]);
          trace ("__CTOR_LIST__[0]: %lx\n", ctor_size);
