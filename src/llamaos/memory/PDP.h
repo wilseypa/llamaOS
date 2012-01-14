@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2011, William Magato
+Copyright (c) 2012, William Magato
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,53 +28,58 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <stdexcept>
+#ifndef llamaos_memory_pdp_h_
+#define llamaos_memory_pdp_h_
+
+#include <cstdint>
 
 #include <llamaos/memory/memory.h>
-#include <llamaos/xen/Hypervisor.h>
-#include <llamaos/trace.h>
+#include <llamaos/memory/PDPE.h>
 
-using namespace std;
-using namespace llamaos;
-using namespace llamaos::memory;
-using namespace llamaos::xen;
+namespace llamaos {
+namespace memory {
 
-static Hypervisor *instance = nullptr;
-
-static const start_info_t enforce_single_instance (const start_info_t *start_info)
+class PDP
 {
-   if (nullptr != instance)
+public:
+   PDP (PML4E parent)
+      :  parent(parent),
+         table(machine_address_to_virtual_pointer<uint64_t>(parent.address ()))
    {
-      throw runtime_error ("duplicate Hypervisor objects created");
+
    }
 
-   if (nullptr == start_info)
+   ~PDP ()
    {
-      throw runtime_error ("invalid start_info pointer");
+
    }
 
-   return *start_info;
-}
-
-Hypervisor *Hypervisor::get_instance ()
-{
-   if (nullptr == instance)
+   PDPE operator[] (uint64_t index) const
    {
-      throw runtime_error ("invalid Hypervisor instance");
+      return PDPE (parent.address () + (index * sizeof(uint64_t)), table [index]);
    }
 
-   return instance;
-}
+   uint64_t get_index (uint64_t address) const
+   {
+      return (address & 0x7FC0000000) >> 30;
+   }
 
-Hypervisor::Hypervisor (const start_info_t *start_info)
-   :  start_info(enforce_single_instance(start_info)),
-      console(machine_page_to_virtual_pointer<xencons_interface>(start_info->console.domU.mfn), start_info->console.domU.evtchn)
-{
-   instance = this;
-   trace ("Hypervisor created.\n");
-}
+   PDPE get_entry (uint64_t address) const
+   {
+      uint64_t index = get_index (address);
+      return PDPE (parent.address () + (index * sizeof(uint64_t)), table [index]);
+   }
 
-Hypervisor::~Hypervisor ()
-{
+private:
+   PDP ();
+   PDP (const PDP &);
+   PDP &operator= (const PDP &);
 
-}
+   const PML4E parent;
+   const uint64_t *const table;
+
+};
+
+} }
+
+#endif  // llamaos_memory_pdp_h_

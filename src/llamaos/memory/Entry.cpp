@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2011, William Magato
+Copyright (c) 2012, William Magato
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,53 +28,14 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <stdexcept>
+#include <llamaos/memory/Entry.h>
 
-#include <llamaos/memory/memory.h>
-#include <llamaos/xen/Hypervisor.h>
-#include <llamaos/trace.h>
-
-using namespace std;
-using namespace llamaos;
 using namespace llamaos::memory;
-using namespace llamaos::xen;
 
-static Hypervisor *instance = nullptr;
-
-static const start_info_t enforce_single_instance (const start_info_t *start_info)
-{
-   if (nullptr != instance)
-   {
-      throw runtime_error ("duplicate Hypervisor objects created");
-   }
-
-   if (nullptr == start_info)
-   {
-      throw runtime_error ("invalid start_info pointer");
-   }
-
-   return *start_info;
-}
-
-Hypervisor *Hypervisor::get_instance ()
-{
-   if (nullptr == instance)
-   {
-      throw runtime_error ("invalid Hypervisor instance");
-   }
-
-   return instance;
-}
-
-Hypervisor::Hypervisor (const start_info_t *start_info)
-   :  start_info(enforce_single_instance(start_info)),
-      console(machine_page_to_virtual_pointer<xencons_interface>(start_info->console.domU.mfn), start_info->console.domU.evtchn)
-{
-   instance = this;
-   trace ("Hypervisor created.\n");
-}
-
-Hypervisor::~Hypervisor ()
-{
-
-}
+const uint64_t Entry::P   = 0x01UL;
+const uint64_t Entry::RW  = 0x02UL;
+const uint64_t Entry::US  = 0x04UL;
+const uint64_t Entry::PWT = 0x08UL;
+const uint64_t Entry::PCD = 0x10UL;
+const uint64_t Entry::A   = 0x20UL;
+const uint64_t Entry::ADDR_MASK = 0xffffffffff000UL;

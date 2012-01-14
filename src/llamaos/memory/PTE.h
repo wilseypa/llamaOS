@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2011, William Magato
+Copyright (c) 2012, William Magato
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,53 +28,42 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <stdexcept>
+#ifndef llamaos_memory_pte_h_
+#define llamaos_memory_pte_h_
 
-#include <llamaos/memory/memory.h>
-#include <llamaos/xen/Hypervisor.h>
-#include <llamaos/trace.h>
+#include <cstdint>
 
-using namespace std;
-using namespace llamaos;
-using namespace llamaos::memory;
-using namespace llamaos::xen;
+#include <llamaos/memory/Entry.h>
 
-static Hypervisor *instance = nullptr;
+namespace llamaos {
+namespace memory {
 
-static const start_info_t enforce_single_instance (const start_info_t *start_info)
+class PTE : public Entry
 {
-   if (nullptr != instance)
+public:
+   PTE (uint64_t machine_address, uint64_t value)
+      :  Entry(machine_address, value)
    {
-      throw runtime_error ("duplicate Hypervisor objects created");
+
    }
 
-   if (nullptr == start_info)
+   PTE (const PTE &entry)
+      :  Entry(entry.machine_address, entry.value)
    {
-      throw runtime_error ("invalid start_info pointer");
+
    }
 
-   return *start_info;
-}
-
-Hypervisor *Hypervisor::get_instance ()
-{
-   if (nullptr == instance)
+   ~PTE ()
    {
-      throw runtime_error ("invalid Hypervisor instance");
+
    }
 
-   return instance;
-}
+private:
+   PTE ();
+   PTE &operator= (const PTE &);
 
-Hypervisor::Hypervisor (const start_info_t *start_info)
-   :  start_info(enforce_single_instance(start_info)),
-      console(machine_page_to_virtual_pointer<xencons_interface>(start_info->console.domU.mfn), start_info->console.domU.evtchn)
-{
-   instance = this;
-   trace ("Hypervisor created.\n");
-}
+};
 
-Hypervisor::~Hypervisor ()
-{
+} }
 
-}
+#endif  // llamaos_memory_pte_h_

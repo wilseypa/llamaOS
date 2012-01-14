@@ -37,10 +37,10 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <xen/xen.h>
 #include <xen/sched.h>
 
+#include <llamaos/memory/memory.h>
 #include <llamaos/xen/Console.h>
 #include <llamaos/xen/Hypercall.h>
 #include <llamaos/xen/Hypervisor.h>
-#include <llamaos/xen/Memory.h>
 #include <llamaos/config.h>
 #include <llamaos/trace.h>
 
@@ -71,7 +71,7 @@ void *llamaos_brk (void *addr)
 {
    trace ("glibc calling brk (%lx)\n", addr);
 
-   return Hypervisor::get_instance ()->memory.brk (addr);
+   return memory::set_program_break (addr);
 }
 
 typedef void *(*llamaos_brk_t) (void *);

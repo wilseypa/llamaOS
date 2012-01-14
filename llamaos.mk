@@ -8,9 +8,9 @@ INCLUDES = \
 CPPFLAGS += -Wall -Wextra -Weffc++ \
              $(INCLUDES:%=-I %)
 
-VPATH = src
+VPATH = src/llamaos
 
-SOURCES =
+SOURCES = 
 
 BINARY = llamaos.a
 OBJECTS = $(SOURCES:%.cpp=$(OBJDIR)/%.o)

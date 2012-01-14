@@ -38,6 +38,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <xen/features.h>
 #include <xen/version.h>
 
+#include <llamaos/memory/memory.h>
 #include <llamaos/xen/Hypercall.h>
 #include <llamaos/xen/Hypervisor.h>
 #include <llamaos/config.h>
@@ -46,6 +47,17 @@ either expressed or implied, of the copyright holder(s) or contributors.
 using namespace std;
 using namespace llamaos;
 using namespace llamaos::xen;
+
+namespace llamaos {
+namespace memory {
+
+// needs initialized by startup logic
+extern uint64_t *machine_table;
+extern uint64_t  machine_table_size;
+extern uint64_t *pseudo_table;
+extern uint64_t  pseudo_table_size;
+
+} }
 
 // runtime stack memory
 char RUNTIME_STACK [2 * llamaos::STACK_SIZE];
@@ -123,10 +135,18 @@ void start (start_info_t *start_info)
    {
       trace_startup (start_info);
 
+      // initialize memory management
+      memory::machine_table = memory::address_to_pointer<uint64_t>(MACH2PHYS_VIRT_START);
+      memory::machine_table_size = MACH2PHYS_NR_ENTRIES;
+      memory::pseudo_table = memory::address_to_pointer<uint64_t> (start_info->mfn_list);
+      memory::pseudo_table_size = start_info->nr_pages;
+      memory::initialize (start_info->pt_base, start_info->nr_pages);
+
+      // register callbacks to the glibc library
+      register_glibc_exports ();
+
       try
       {
-         register_glibc_exports ();
-
          uint64_t ctor_size = reinterpret_cast<uint64_t>(__CTOR_LIST__[0]);
          trace ("__CTOR_LIST__[0]: %lx\n", ctor_size);
          for (uint64_t i = ctor_size; i >= 1; i--)

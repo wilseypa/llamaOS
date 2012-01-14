@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2011, William Magato
+Copyright (c) 2012, William Magato
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,53 +28,59 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <stdexcept>
+#ifndef llamaos_memory_pt_h_
+#define llamaos_memory_pt_h_
+
+#include <cstdint>
 
 #include <llamaos/memory/memory.h>
-#include <llamaos/xen/Hypervisor.h>
-#include <llamaos/trace.h>
+#include <llamaos/memory/PTE.h>
 
-using namespace std;
-using namespace llamaos;
-using namespace llamaos::memory;
-using namespace llamaos::xen;
+namespace llamaos {
+namespace memory {
 
-static Hypervisor *instance = nullptr;
-
-static const start_info_t enforce_single_instance (const start_info_t *start_info)
+class PT
 {
-   if (nullptr != instance)
+public:
+   PT (PDE parent)
+      :  parent(parent),
+         table(machine_address_to_virtual_pointer<uint64_t>(parent.address ()))
    {
-      throw runtime_error ("duplicate Hypervisor objects created");
+
    }
 
-   if (nullptr == start_info)
+   ~PT ()
    {
-      throw runtime_error ("invalid start_info pointer");
+
    }
 
-   return *start_info;
-}
-
-Hypervisor *Hypervisor::get_instance ()
-{
-   if (nullptr == instance)
+   PTE operator[] (uint64_t index) const
    {
-      throw runtime_error ("invalid Hypervisor instance");
+      return PTE (parent.address () + (index * sizeof(uint64_t)), table [index]);
    }
 
-   return instance;
-}
+   uint64_t get_index (uint64_t address) const
+   {
+      return (address & 0x1FF000) >> 12;
+   }
 
-Hypervisor::Hypervisor (const start_info_t *start_info)
-   :  start_info(enforce_single_instance(start_info)),
-      console(machine_page_to_virtual_pointer<xencons_interface>(start_info->console.domU.mfn), start_info->console.domU.evtchn)
-{
-   instance = this;
-   trace ("Hypervisor created.\n");
-}
+   PTE get_entry (uint64_t address) const
+   {
+      uint64_t index = get_index (address);
+      return PTE (parent.address () + (index * sizeof(uint64_t)), table [index]);
+   }
 
-Hypervisor::~Hypervisor ()
-{
+private:
+   PT ();
+   PT (const PT &);
+   PT &operator= (const PT &);
 
-}
+   const PDE parent;
+   const uint64_t *const table;
+
+};
+
+} }
+
+#endif  // llamaos_memory_pt_h_
+

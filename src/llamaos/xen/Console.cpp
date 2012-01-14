@@ -73,7 +73,7 @@ void Console::write (char data) const
    wmb();
 
    // increment index
-   interface->out_prod++;// = prod;
+   interface->out_prod++;
 }
 
 void Console::write (const char *data, unsigned int length) const

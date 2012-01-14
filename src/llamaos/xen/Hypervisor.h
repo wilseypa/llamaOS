@@ -36,7 +36,6 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <xen/xen.h>
 
 #include <llamaos/xen/Console.h>
-#include <llamaos/xen/Memory.h>
 
 namespace llamaos {
 namespace xen {
@@ -71,12 +70,6 @@ public:
     *
     */
    const start_info_t start_info;
-
-   /**
-    * @brief System memory object.
-    *
-    */
-   Memory memory;
 
    /**
     * @brief Systme console.

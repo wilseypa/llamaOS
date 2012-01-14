@@ -10,16 +10,19 @@ CPPFLAGS += -Wall -Wextra -Weffc++ \
              $(INCLUDES:%=-I %) \
             -D__XEN_INTERFACE_VERSION__=0x00030205
 
-VPATH = src/llamaos/xen
+VPATH = src/llamaos
 
 SOURCES = \
-  Console.cpp \
-  glibc_export.cpp \
-  Hypercall.cpp \
-  Hypervisor.cpp \
-  Memory.cpp \
-  start.cpp \
-  trace.cpp
+  memory/Entry.cpp \
+  memory/memory.cpp \
+  xen/Console.cpp \
+  xen/glibc_export.cpp \
+  xen/Hypercall.cpp \
+  xen/Hypervisor.cpp \
+  xen/memory.cpp \
+  xen/start.cpp \
+  xen/trace.cpp
+#  xen/Memory.cpp \
 #  Xenstore.cpp
 
 BINARY = xen.a

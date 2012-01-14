@@ -28,6 +28,8 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
+#error DO NOT INCLUDE
+
 #ifndef llamaos_xen_memory_h_
 #define llamaos_xen_memory_h_
 
