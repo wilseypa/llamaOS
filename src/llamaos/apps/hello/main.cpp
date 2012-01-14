@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2011, William Magato
+Copyright (c) 2012, William Magato
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -37,15 +37,6 @@ either expressed or implied, of the copyright holder(s) or contributors.
 using namespace std;
 using namespace llamaos;
 
-static int func (int y)
-{
-   return y;
-}
-
-static int x = 1;
-static int y = func (2);
-static int z = 3;
-
 // simple guest instance should just output text to console
 int main (int argc, char *argv [])
 {
@@ -56,14 +47,7 @@ int main (int argc, char *argv [])
    }
    trace (")\n");
 
-   printf ("printf %d\n", x);
-   fflush(stdout);
-   fprintf (stdout, "x: %d, y: %d, z: %d\n", x, y, z);
-
-   fprintf (stdout, "hello from printf\n");
-   fflush(stdout);
-
-   cout << "hello from cout" << endl;
+   cout << endl << "hello llamaOS" << endl;
    cout.flush ();
 
    return 0;

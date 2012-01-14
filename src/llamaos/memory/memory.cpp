@@ -87,18 +87,10 @@ static void *program_break = nullptr;
  */
 static uint64_t find_start_page (uint64_t CR3_virtual_address)
 {
-trace ("find_start_page: %lx\n", CR3_virtual_address);
-   uint64_t start_pseudo_page = address_to_page (virtual_to_pseudo (0));//CR3_virtual_address));
-
-   uint64_t *table = address_to_pointer<uint64_t>(CR3_virtual_address);
-   trace ("table [0]: %lx\n", table [0]);
+   uint64_t start_pseudo_page = address_to_page (virtual_to_pseudo (CR3_virtual_address));
 
    // Page-Map Level-4, root of page table hierarchy
    PML4 pml4 (CR3_virtual_address);
-
-trace ("start_pseudo_page: %lx\n", start_pseudo_page);
-trace ("start_pseudo_address: %lx\n", page_to_address (start_pseudo_page));
-trace ("start_virtual_address: %lx\n", pseudo_to_virtual (page_to_address (start_pseudo_page)));
 
    // loop over top level entries
    for (uint64_t i = pml4.get_index (pseudo_to_virtual (page_to_address (start_pseudo_page))); i < 512UL; i++)
@@ -152,7 +144,7 @@ trace ("start_virtual_address: %lx\n", pseudo_to_virtual (page_to_address (start
       }
    }
 
-   trace ("Memory: failed to find start_page");
+   trace ("Memory: failed to find start_page\n");
    return 0UL;
 }
 

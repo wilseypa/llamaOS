@@ -47,6 +47,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <llamaos/memory/PML4.h>
 
 #include <llamaos/xen/Hypercall.h>
+#include <llamaos/config.h>
 #include <llamaos/trace.h>
 
 namespace llamaos {
@@ -91,7 +92,7 @@ void create_table_entry (uint64_t CR3_virtual_address,
 
    if (pml4e.empty ())
    {
-      trace ("calling create_table_entry() on unmapped page");
+      trace ("calling create_table_entry() on unmapped page\n");
       return;
    }
 
@@ -100,7 +101,7 @@ void create_table_entry (uint64_t CR3_virtual_address,
 
    if (pdpe.empty ())
    {
-      trace ("calling create_table_entry() on unmapped page");
+      trace ("calling create_table_entry() on unmapped page\n");
       return;
    }
 
@@ -109,7 +110,7 @@ void create_table_entry (uint64_t CR3_virtual_address,
 
    if (pde.empty ())
    {
-      trace ("calling create_table_entry() on unmapped page");
+      trace ("calling create_table_entry() on unmapped page\n");
       return;
    }
 
@@ -118,13 +119,13 @@ void create_table_entry (uint64_t CR3_virtual_address,
 
    if (pte.empty ())
    {
-      trace ("calling create_table_entry() on unmapped page");
+      trace ("calling create_table_entry() on unmapped page\n");
       return;
    }
 
    // clear the contents of this page
    uint64_t *table = address_to_pointer<uint64_t> (table_virtual_address);
-   memset (table, 0, 0x1000);
+   memset (table, 0, PAGE_SIZE);
 
    // update the mmu to clear the RW flag
    xen::Hypercall::mmu_update (pte.machine_address, table_machine_address | Entry::A | Entry::US | Entry::P);
