@@ -68,7 +68,8 @@ Hypervisor *Hypervisor::get_instance ()
 
 Hypervisor::Hypervisor (const start_info_t *start_info)
    :  start_info(enforce_single_instance(start_info)),
-      console(machine_page_to_virtual_pointer<xencons_interface>(start_info->console.domU.mfn), start_info->console.domU.evtchn)
+      console(machine_page_to_virtual_pointer<xencons_interface>(start_info->console.domU.mfn), start_info->console.domU.evtchn),
+      xenstore(machine_page_to_virtual_pointer<xenstore_domain_interface>(start_info->store_mfn), start_info->store_evtchn)
 {
    instance = this;
    trace ("Hypervisor created.\n");

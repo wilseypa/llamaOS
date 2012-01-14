@@ -48,7 +48,6 @@ Console::~Console ()
 
 }
 
-#include <llamaos/trace.h>
 void Console::write (char data) const
 {
    // ensure write is processed

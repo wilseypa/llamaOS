@@ -52,9 +52,17 @@ public:
    /**
     * @brief Constructor.
     *
-    * @param start_info
+    * @param interface  Xenstore share page
+    * @param port       Xenstore event channel port
+    * 
     */
    Xenstore (xenstore_domain_interface *interface, evtchn_port_t port);
+
+   /**
+    * @brief Destructor.
+    *
+    */
+   virtual ~Xenstore ();
 
    /**
     * @brief Read information from the Xenstore.
@@ -67,8 +75,12 @@ public:
    std::string read (const std::string &key) const;
 
 private:
-//   bool write_request (const char *message, int length) const;
-//   bool read_response (char *message, int length) const;
+   Xenstore ();
+   Xenstore (const Xenstore &);
+   Xenstore &operator= (const Xenstore &);
+
+   void write_request (const std::string &key) const;
+   std::string read_response () const;
 
    xenstore_domain_interface *const interface;
    const evtchn_port_t port;

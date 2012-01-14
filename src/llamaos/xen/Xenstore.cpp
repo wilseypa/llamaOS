@@ -52,43 +52,55 @@ THE SOFTWARE.
 */
 
 #include <cstring>
+#include <stdlib.h>
 
 #include <stdexcept>
 
 #include <llamaos/xen/Hypercall.h>
 #include <llamaos/xen/Xenstore.h>
-#include <stdlib.h>
 
 using namespace std;
 using namespace llamaos::xen;
 
-extern char _text;
-
-static uint32_t req_id = 0;
-
 #define mb()  __asm__ __volatile__ ( "mfence" : : : "memory")
-#define rmb() __asm__ __volatile__ ( "lfence" : : : "memory")
 #define wmb() __asm__ __volatile__ ( "" : : : "memory")
 
-#define NOTIFY() \
-   do {\
-      Hypercall::event_channel_send(port);\
-   } while(0)
+#if 0
+namespace xenstore {
 
-#define IGNORE(n) \
-   do {\
-      char buffer[XENSTORE_RING_SIZE];\
-      read_response(buffer, n);\
-   } while(0)
+void write (xenstore_domain_interface *interface, char data)
+{
+   // ensure write is processed
+   mb();
 
-static void write_request (xenstore_domain_interface *interface,
-                           const char *request,
-                           unsigned int request_length)
+   // check for space in the ring
+   if ((interface->req_prod - interface->req_cons) >= sizeof(interface->req))
+   {
+      // tell dom0 to consume some data
+      Hypercall::event_channel_send (port);
+
+      // yield cpu to dom0
+      llamaos::xen::Hypercall::sched_op_yield ();
+      mb();
+   }
+
+   // get current index into ring and write data
+   XENSTORE_RING_IDX index = MASK_XENSTORE_IDX(interface->req_prod, interface->req);
+   interface->req [index] = data;
+
+   // ensure write is processed
+   wmb();
+
+   // increment index
+   interface->req_prod++;
+}
+
+static void write (xenstore_domain_interface *interface, const char *data, unsigned int length)
 {
    /* Check that the message will fit */
-   if (request_length > XENSTORE_RING_SIZE)
+   if (length > XENSTORE_RING_SIZE)
    {
-      throw runtime_error ("Xenstore write_request: message too long");
+      throw runtime_error ("Xenstore write: message too long");
    }
 
    unsigned int i = interface->req_prod;
@@ -115,11 +127,17 @@ static void write_request (xenstore_domain_interface *interface,
    interface->req_prod = i;
 }
 
-static void write_request (xenstore_domain_interface *interface,
-                           const struct xsd_sockmsg &sockmsg)
+static void write (xenstore_domain_interface *interface,
+                   const struct xsd_sockmsg &sockmsg)
 {
    write_request (interface, reinterpret_cast<const char *>(&sockmsg), sizeof(struct xsd_sockmsg));
 }
+
+}
+
+
+
+
 
 static void write_request (xenstore_domain_interface *interface, const string &message)
 {
@@ -129,7 +147,7 @@ static void write_request (xenstore_domain_interface *interface, const string &m
 static void read_response (xenstore_domain_interface *interface,
                            struct xsd_sockmsg &sockmsg)
 {
-   char *message = &sockmsg;
+   char *message = static_cast<char *>(&sockmsg);
 
    unsigned int i = interface->rsp_cons;
    unsigned int j = 0;
@@ -152,6 +170,11 @@ static void read_response (xenstore_domain_interface *interface,
 
    interface->rsp_cons = i;
 }
+#endif
+
+
+
+static uint32_t xenstore_req_id = 1;
 
 Xenstore::Xenstore (xenstore_domain_interface *interface, evtchn_port_t port)
    :  interface(interface),
@@ -160,105 +183,53 @@ Xenstore::Xenstore (xenstore_domain_interface *interface, evtchn_port_t port)
 
 }
 
+Xenstore::~Xenstore ()
+{
+
+}
+
+void Xenstore::write_request (const std::string &key) const
+{
+   struct xsd_sockmsg msg;
+
+   msg.type = XS_READ;
+   msg.req_id = xenstore_req_id;
+   msg.tx_id = 0;
+   msg.len = key.size () + 1;
+
+}
+
+string Xenstore::read_response () const
+{
+   return "";
+}
+
 string Xenstore::read (const string &key) const
 {
-   int key_length = strlen (key.c_str ());
+   // write request to Xenstore
+   write_request (key);
 
-   struct xsd_sockmsg msg;
-   msg.type = XS_READ;
-   msg.req_id = req_id;
-   msg.tx_id = 0;
-   msg.len = key_length + 1;
+   // alert Xenstore of our message
+   Hypercall::event_channel_send (port);
 
-   write_request (interface, msg);
-   write_request (interface, key);
+   // reasponse from Xenstore
+   return read_response ();
+#if 0
 
-//   write_request ((const char*)&msg, sizeof(msg));
-//   write_request (key, key_length + 1);
+   write_request (msg, key);
 
    /* Notify the back end */
-   NOTIFY();
+   Hypercall::event_channel_send (port);
 
-   read_response ((char*)&msg, sizeof(msg));
+   return read_response ();
 
-   if (msg.req_id != req_id++)
-   {
-      IGNORE(msg.len);
-      return false;
-   }
+//   msg = read_response ();
 
-   /* If we have enough space in the buffer */
-   if (length >= msg.len)
-   {
-      read_response (value, msg.len);
-      return true;
-   }
+//   if (msg.req_id != req_id++)
+//   {
+//      throw runtime_error ("Xenstore read: returned invalid request id");
+//   }
 
-   /* Truncate */
-   read_response (value, length);
-   IGNORE(msg.len - length);
-   return false;
-}
-
-#if 0
-/* Write a request to the back end */
-bool Xenstore::write_request (const char *message, int length) const
-{
-   /* Check that the message will fit */
-   if (length > XENSTORE_RING_SIZE)
-   {
-      return false;
-   }
-
-   int i;
-
-   for(i = domain_interface->req_prod; length > 0; i++, length--)
-   {
-      /* Wait for the back end to clear enough space in the buffer */
-      XENSTORE_RING_IDX data;
-
-      do
-      {
-         data = i - domain_interface->req_cons;
-         mb();
-      } while (data >= sizeof(domain_interface->req));
-
-      /* Copy the byte */
-      int ring_index = MASK_XENSTORE_IDX(i);
-      domain_interface->req[ring_index] = *message;
-      message++;
-   }
-
-   /* Ensure that the data really is in the ring before continuing */
-   wmb();
-   domain_interface->req_prod = i;
-
-   return true;
-}
-
-/* Read a response from the response ring */
-bool Xenstore::read_response (char *message, int length) const
-{
-   int i;
-
-   for(i = domain_interface->rsp_cons; length > 0; i++, length--)
-   {
-      /* Wait for the back end put data in the buffer */
-      XENSTORE_RING_IDX data;
-
-      do
-      {
-         data = domain_interface->rsp_prod - i;
-         mb();
-      } while (data == 0);
-
-      /* Copy the byte */
-      int ring_index = MASK_XENSTORE_IDX(i);
-      *message = domain_interface->rsp[ring_index];
-      message++;
-   }
-
-   domain_interface->rsp_cons = i;
-   return true;
-}
+//   return read_response (msg.len);
 #endif
+}

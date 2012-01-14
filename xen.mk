@@ -21,9 +21,8 @@ SOURCES = \
   xen/Hypervisor.cpp \
   xen/memory.cpp \
   xen/start.cpp \
-  xen/trace.cpp
-#  xen/Memory.cpp \
-#  Xenstore.cpp
+  xen/trace.cpp \
+  xen/Xenstore.cpp
 
 BINARY = xen.a
 OBJECTS = $(SOURCES:%.cpp=$(OBJDIR)/%.o)
