@@ -13,12 +13,14 @@ CPPFLAGS += -Wall -Wextra -Weffc++ \
 VPATH = src/llamaos/xen
 
 SOURCES = \
+  Console.cpp \
   glibc_export.cpp \
   Hypercall.cpp \
   Hypervisor.cpp \
   Memory.cpp \
   start.cpp \
   trace.cpp
+#  Xenstore.cpp
 
 BINARY = xen.a
 OBJECTS = $(SOURCES:%.cpp=$(OBJDIR)/%.o)

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2011, William Magato
+Copyright (c) 2012, William Magato
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,69 +28,67 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#ifndef llamaos_xen_hypervisor_h_
-#define llamaos_xen_hypervisor_h_
-
-#include <cstdint>
-
-#include <xen/xen.h>
-
 #include <llamaos/xen/Console.h>
-#include <llamaos/xen/Memory.h>
+#include <llamaos/xen/Hypercall.h>
 
-namespace llamaos {
-namespace xen {
+using namespace llamaos::xen;
 
-/**
- * @brief Hypervisor class.
- *
- */
-class Hypervisor
+#define mb()  __asm__ __volatile__ ( "mfence" : : : "memory")
+#define wmb() __asm__ __volatile__ ( "" : : : "memory")
+
+Console::Console (xencons_interface *interface, evtchn_port_t port)
+   :  interface(interface),
+      port(port)
 {
-public:
-   /**
-    * @brief Allow public access to singleton Hypervisor object.
-    *
-    */
-   static Hypervisor *get_instance ();
 
-   /**
-    * @brief Only public constructor (throws if called more than once).
-    *
-    */
-   Hypervisor (const start_info_t *start_info);
+}
 
-   /**
-    * @brief Destructor.
-    *
-    */
-   virtual ~Hypervisor ();
+Console::~Console ()
+{
 
-   /**
-    * @brief Xen start_info structure.
-    *
-    */
-   const start_info_t start_info;
+}
 
-   /**
-    * @brief System memory object.
-    *
-    */
-   Memory memory;
+#include <llamaos/trace.h>
+void Console::write (char data) const
+{
+   // ensure write is processed
+   mb();
 
-   /**
-    * @brief Systme console.
-    *
-    */
-   Console console;
+   // check for space in the ring
+   if ((interface->out_prod - interface->out_cons) >= sizeof(interface->out))
+   {
+      // tell dom0 to consume some data
+      Hypercall::event_channel_send (port);
 
-private:
-   Hypervisor ();
-   Hypervisor (const Hypervisor &);
-   Hypervisor &operator= (const Hypervisor &);
+      // yield cpu to dom0
+      llamaos::xen::Hypercall::sched_op_yield ();
+      mb();
+   }
 
-};
+   // get current index into ring and write data
+   XENCONS_RING_IDX index = MASK_XENCONS_IDX(interface->out_prod, interface->out);
+   interface->out [index] = data;
 
-} }
+   // ensure write is processed
+   wmb();
 
-#endif  // llamaos_xen_hypervisor_h_
+   // increment index
+   interface->out_prod++;// = prod;
+}
+
+void Console::write (const char *data, unsigned int length) const
+{
+   // loop over entire data array
+   for (unsigned int i = 0; i < length; i++)
+   {
+      // console needs a CR when only an LF is seen
+      if ('\n' == data [i])
+      {
+         write ('\r');
+      }
+
+      this->write (data [i]);
+   }
+
+   Hypercall::event_channel_send (port);
+}

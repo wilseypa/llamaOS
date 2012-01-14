@@ -37,6 +37,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <xen/xen.h>
 #include <xen/sched.h>
 
+#include <llamaos/xen/Console.h>
 #include <llamaos/xen/Hypercall.h>
 #include <llamaos/xen/Hypervisor.h>
 #include <llamaos/xen/Memory.h>
@@ -119,6 +120,8 @@ ssize_t llamaos_libc_write (int fd, const void *buf, size_t nbytes)
    }
 
    trace (", nbytes: %d)\n", nbytes);
+
+   Hypervisor::get_instance ()->console.write (static_cast<const char *>(buf), nbytes);
 
    return nbytes;
 }

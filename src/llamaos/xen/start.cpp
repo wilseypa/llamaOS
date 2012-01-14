@@ -108,30 +108,13 @@ static void trace_startup (const start_info_t *start_info)
 
 extern int main (int, char*[]);
 
-using namespace llamaos::xen::memory;
-#include <xen/io/console.h>
-extern void llamaos_init_console (xencons_interface *cons_interface, uint32_t evtchn);
-
 void register_glibc_exports ();
 
 typedef void (*func_ptr) (void);
 extern func_ptr __CTOR_LIST__[];
 extern func_ptr __DTOR_LIST__[];
 
-class Test_class
-{
-public:
-   Test_class () { trace ("Test_class constructor\n"); }
-   ~Test_class () { trace ("Test_class destructor\n"); }
-};
-
-static Test_class test_class;
-static void bar () __attribute__ ((destructor));
-
-static void bar ()
-{
-   trace ("calling bar ()\n");
-}
+static const char *program_name = "llamaOS";
 
 extern "C"
 void start (start_info_t *start_info)
@@ -143,8 +126,6 @@ void start (start_info_t *start_info)
       try
       {
          register_glibc_exports ();
-         llamaos_init_console (to_pointer<xencons_interface> ((to_pointer<uint64_t>(MACH2PHYS_VIRT_START))[start_info->console.domU.mfn] << 12),
-                               start_info->console.domU.evtchn);
 
          uint64_t ctor_size = reinterpret_cast<uint64_t>(__CTOR_LIST__[0]);
          trace ("__CTOR_LIST__[0]: %lx\n", ctor_size);
@@ -161,11 +142,9 @@ void start (start_info_t *start_info)
          ios_base::Init ios_base_init;
 
          // start the application
-         char * argv [2];
-         char *program_name = const_cast<char *>("hello-xen");
-         argv [0] = program_name;
+         char *argv [2];
+         argv [0] = const_cast<char *>(program_name);
          argv [1] = 0;
-
          main (1, argv);
 
          trace ("ending llamaOS...\n");

@@ -31,11 +31,13 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <stdexcept>
 
 #include <llamaos/xen/Hypervisor.h>
+#include <llamaos/xen/Memory.h>
 #include <llamaos/trace.h>
 
 using namespace std;
 using namespace llamaos;
 using namespace llamaos::xen;
+using namespace llamaos::xen::memory;
 
 static Hypervisor *instance = nullptr;
 
@@ -66,7 +68,9 @@ Hypervisor *Hypervisor::get_instance ()
 
 Hypervisor::Hypervisor (const start_info_t *start_info)
    :  start_info(enforce_single_instance(start_info)),
-      memory(start_info->pt_base, start_info->nr_pages, start_info->mfn_list)
+      memory(start_info->pt_base, start_info->nr_pages, start_info->mfn_list),
+//      console(to_pointer<xencons_interface> ((to_pointer<uint64_t>(MACH2PHYS_VIRT_START))[start_info->console.domU.mfn] << 12), start_info->console.domU.evtchn)
+      console(to_pointer<xencons_interface> (machine_to_virtual (start_info->console.domU.mfn << 12)), start_info->console.domU.evtchn)
 {
    instance = this;
    trace ("Hypervisor created.\n");

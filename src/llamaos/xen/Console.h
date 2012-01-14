@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2011, William Magato
+Copyright (c) 2012, William Magato
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,69 +28,37 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#ifndef llamaos_xen_hypervisor_h_
-#define llamaos_xen_hypervisor_h_
+#ifndef llamaos_xen_console_h_
+#define llamaos_xen_console_h_
 
 #include <cstdint>
 
 #include <xen/xen.h>
-
-#include <llamaos/xen/Console.h>
-#include <llamaos/xen/Memory.h>
+#include <xen/event_channel.h>
+#include <xen/io/console.h>
 
 namespace llamaos {
 namespace xen {
 
-/**
- * @brief Hypervisor class.
- *
- */
-class Hypervisor
+class Console
 {
 public:
-   /**
-    * @brief Allow public access to singleton Hypervisor object.
-    *
-    */
-   static Hypervisor *get_instance ();
+   Console (xencons_interface *interface, evtchn_port_t port);
+   virtual ~Console ();
 
-   /**
-    * @brief Only public constructor (throws if called more than once).
-    *
-    */
-   Hypervisor (const start_info_t *start_info);
-
-   /**
-    * @brief Destructor.
-    *
-    */
-   virtual ~Hypervisor ();
-
-   /**
-    * @brief Xen start_info structure.
-    *
-    */
-   const start_info_t start_info;
-
-   /**
-    * @brief System memory object.
-    *
-    */
-   Memory memory;
-
-   /**
-    * @brief Systme console.
-    *
-    */
-   Console console;
+   void write (char data) const;
+   void write (const char *data, unsigned int length) const;
 
 private:
-   Hypervisor ();
-   Hypervisor (const Hypervisor &);
-   Hypervisor &operator= (const Hypervisor &);
+   Console ();
+   Console (const Console &);
+   Console &operator= (const Console &);
+
+   xencons_interface *const interface;
+   evtchn_port_t port;
 
 };
 
 } }
 
-#endif  // llamaos_xen_hypervisor_h_
+#endif  // llamaos_xen_console_h_

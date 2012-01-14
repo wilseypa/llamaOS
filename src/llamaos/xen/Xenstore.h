@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2011, William Magato
+Copyright (c) 2012, William Magato
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,69 +28,53 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#ifndef llamaos_xen_hypervisor_h_
-#define llamaos_xen_hypervisor_h_
+#ifndef llamaos_xen_xenstore_h_
+#define llamaos_xen_xenstore_h_
 
 #include <cstdint>
 
-#include <xen/xen.h>
+#include <string>
 
-#include <llamaos/xen/Console.h>
-#include <llamaos/xen/Memory.h>
+#include <xen/xen.h>
+#include <xen/event_channel.h>
+#include <xen/io/xs_wire.h>
 
 namespace llamaos {
 namespace xen {
 
 /**
- * @brief Hypervisor class.
+ * @brief C++ wrapper class for Xen Xenstore interface.
  *
  */
-class Hypervisor
+class Xenstore
 {
 public:
    /**
-    * @brief Allow public access to singleton Hypervisor object.
+    * @brief Constructor.
     *
+    * @param start_info
     */
-   static Hypervisor *get_instance ();
+   Xenstore (xenstore_domain_interface *interface, evtchn_port_t port);
 
    /**
-    * @brief Only public constructor (throws if called more than once).
+    * @brief Read information from the Xenstore.
+    *
+    * @param key
+    * 
+    * @return value
     *
     */
-   Hypervisor (const start_info_t *start_info);
-
-   /**
-    * @brief Destructor.
-    *
-    */
-   virtual ~Hypervisor ();
-
-   /**
-    * @brief Xen start_info structure.
-    *
-    */
-   const start_info_t start_info;
-
-   /**
-    * @brief System memory object.
-    *
-    */
-   Memory memory;
-
-   /**
-    * @brief Systme console.
-    *
-    */
-   Console console;
+   std::string read (const std::string &key) const;
 
 private:
-   Hypervisor ();
-   Hypervisor (const Hypervisor &);
-   Hypervisor &operator= (const Hypervisor &);
+//   bool write_request (const char *message, int length) const;
+//   bool read_response (char *message, int length) const;
+
+   xenstore_domain_interface *const interface;
+   const evtchn_port_t port;
 
 };
 
 } }
 
-#endif  // llamaos_xen_hypervisor_h_
+#endif  // llamaos_xen_xenstore_h_

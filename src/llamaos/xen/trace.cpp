@@ -33,10 +33,11 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <cstdio>
 #include <cstring>
 
+#include <llamaos/xen/Hypercall.h>
+
+#if 0
 #include <xen/event_channel.h>
 #include <xen/io/console.h>
-
-#include <llamaos/xen/Hypercall.h>
 
 #define mb()  __asm__ __volatile__ ( "mfence" : : : "memory")
 #define rmb() __asm__ __volatile__ ( "lfence" : : : "memory")
@@ -88,6 +89,7 @@ static void console_write (const char *s)
       llamaos::xen::Hypercall::event_channel_send (event_channel);
    }
 }
+#endif
 
 namespace llamaos {
 
@@ -107,7 +109,7 @@ int trace (const char *format, ...)
    // write buffer to system output/log
    xen::Hypercall::console_io (buffer);
 
-   console_write (buffer);
+//   console_write (buffer);
 
    // return the number characters written
    return count;
