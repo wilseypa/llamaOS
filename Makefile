@@ -21,7 +21,8 @@ VMMLIBS = \
 
 # list of standard llamaOS apps
 APPS = \
-  hello
+  hello \
+  latency
 
 # include list of custom llamaOS apps
 -include apps.mk
