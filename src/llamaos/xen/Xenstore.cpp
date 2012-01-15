@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2011, William Magato
+Copyright (c) 2012, William Magato
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -26,35 +26,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 The views and conclusions contained in the software and documentation are those
 of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
-
-Some of this file's content copied from Chisnall, The Definitive Guide to the
-Xen Hypervisor. Copyright statement is as follows:
-
-Copyright (c) 2007 David Chisnall
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
 */
 
 #include <cstring>
-#include <stdlib.h>
+#include <cstdlib>
 
 #include <stdexcept>
+#include <sstream>
 
 #include <llamaos/xen/Hypercall.h>
 #include <llamaos/xen/Xenstore.h>
@@ -188,6 +166,38 @@ Xenstore::~Xenstore ()
 
 }
 
+void Xenstore::write_request (const char *data, unsigned int length) const
+{
+   if (length > XENSTORE_RING_SIZE)
+   {
+      throw runtime_error ("Xenstore write: message too long");
+   }
+
+   // check for space in the ring
+   if ((interface->req_prod - interface->req_cons) < length)
+   {
+      // tell dom0 to consume some data
+      Hypercall::event_channel_send (port);
+
+      // yield cpu to dom0
+      llamaos::xen::Hypercall::sched_op_yield ();
+      mb();
+   }
+
+   for (unsigned int i = 0; i < length; i++)
+   {
+      // get current index into ring and write data
+      XENSTORE_RING_IDX index = MASK_XENSTORE_IDX(interface->req_prod);
+      interface->req [index] = data [i];
+   }
+
+   // ensure write is processed
+   wmb();
+
+   // increment index
+   interface->req_prod += length;
+}
+
 void Xenstore::write_request (const std::string &key) const
 {
    struct xsd_sockmsg msg;
@@ -197,11 +207,68 @@ void Xenstore::write_request (const std::string &key) const
    msg.tx_id = 0;
    msg.len = key.size () + 1;
 
+   write_request (reinterpret_cast<const char *>(&msg), sizeof(msg));
+   write_request (key.c_str (), key.size () + 1);
+}
+
+void Xenstore::read_response (char *data, unsigned int length) const
+{
+   if (length > XENSTORE_RING_SIZE)
+   {
+      throw runtime_error ("Xenstore write: message too long");
+   }
+
+   for (unsigned int i = 0; i < length; i++)
+   {
+      while (0 == (interface->rsp_prod - interface->rsp_cons))
+      {
+         // yield cpu to dom0
+         llamaos::xen::Hypercall::sched_op_yield ();
+         mb ();
+      }
+
+      // get current index into ring and read data
+      XENSTORE_RING_IDX index = MASK_XENSTORE_IDX(interface->rsp_cons);
+      data [i] = interface->rsp [index];
+   }
+
+   interface->rsp_cons += length;
+}
+
+string Xenstore::read_response (unsigned int length) const
+{
+   stringstream sstream;
+
+   for (unsigned int i = 0; i < length; i++)
+   {
+      while (0 == (interface->rsp_prod - interface->rsp_cons))
+      {
+         // yield cpu to dom0
+         llamaos::xen::Hypercall::sched_op_yield ();
+         mb ();
+      }
+
+      // get current index into ring and read data
+      XENSTORE_RING_IDX index = MASK_XENSTORE_IDX(interface->rsp_cons);
+      sstream << interface->rsp [index];
+   }
+
+   interface->rsp_cons += length;
+
+   return sstream.str ();
 }
 
 string Xenstore::read_response () const
 {
-   return "";
+   struct xsd_sockmsg msg;
+   read_response (reinterpret_cast<char *>(&msg), sizeof(msg));
+
+   if (msg.req_id != xenstore_req_id++)
+   {
+      throw runtime_error ("Xenstore read: returned invalid request id");
+   }
+
+   return read_response (msg.len);
 }
 
 string Xenstore::read (const string &key) const

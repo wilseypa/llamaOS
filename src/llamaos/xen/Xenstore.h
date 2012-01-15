@@ -79,7 +79,11 @@ private:
    Xenstore (const Xenstore &);
    Xenstore &operator= (const Xenstore &);
 
+   void write_request (const char *data, unsigned int length) const;
    void write_request (const std::string &key) const;
+
+   void read_response (char *data, unsigned int length) const;
+   std::string read_response (unsigned int length) const;
    std::string read_response () const;
 
    xenstore_domain_interface *const interface;
