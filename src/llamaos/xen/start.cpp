@@ -67,11 +67,6 @@ shared_info_t *HYPERVISOR_shared_info = 0;
 
 uint8_t xen_features [XENFEAT_NR_SUBMAPS * 32];
 
-extern "C"
-void do_simd_coprocessor_error(struct pt_regs * /* regs */)
-{
-
-}
 
 extern "C"
 void do_hypervisor_callback (struct pt_regs * /* regs */)

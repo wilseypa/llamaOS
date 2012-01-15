@@ -22,6 +22,7 @@ SOURCES = \
   xen/memory.cpp \
   xen/start.cpp \
   xen/trace.cpp \
+  xen/Trap.cpp \
   xen/Xenstore.cpp
 
 BINARY = xen.a
