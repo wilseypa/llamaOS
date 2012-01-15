@@ -28,60 +28,32 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <stdexcept>
-
 #include <llamaos/memory/memory.h>
-#include <llamaos/xen/Hypervisor.h>
-#include <llamaos/trace.h>
+#include <llamaos/xen/Events.h>
+#include <llamaos/xen/Hypercall.h>
 
-using namespace std;
-using namespace llamaos;
 using namespace llamaos::memory;
 using namespace llamaos::xen;
 
-static Hypervisor *instance = nullptr;
+extern "C"
+void hypervisor_callback (void);
 
-static const start_info_t enforce_single_instance (const start_info_t *start_info)
+extern "C"
+void do_hypervisor_callback (struct pt_regs * /* regs */)
 {
-   if (nullptr != instance)
-   {
-      throw runtime_error ("duplicate Hypervisor objects created");
-   }
 
-   if (nullptr == start_info)
-   {
-      throw runtime_error ("invalid start_info pointer");
-   }
-
-   return *start_info;
 }
 
-Hypervisor *Hypervisor::get_instance ()
-{
-   if (nullptr == instance)
-   {
-      throw runtime_error ("invalid Hypervisor instance");
-   }
+extern "C"
+void failsafe_callback (void);
 
-   return instance;
+Events::Events ()
+{
+   Hypercall::set_callbacks (pointer_to_address (hypervisor_callback),
+                             pointer_to_address (failsafe_callback));
 }
 
-Hypervisor::Hypervisor (const start_info_t *start_info)
-   :  start_info(enforce_single_instance(start_info)),
-      console(machine_page_to_virtual_pointer<xencons_interface>(start_info->console.domU.mfn), start_info->console.domU.evtchn),
-      trap(),
-      events(),
-      xenstore(machine_page_to_virtual_pointer<xenstore_domain_interface>(start_info->store_mfn), start_info->store_evtchn)
+Events::~Events ()
 {
-   instance = this;
-   trace ("Hypervisor created.\n");
-
-   trace ("Xenstore name: %s\n", xenstore.read ("name").c_str ()); 
-
-   trace ("float math: %lf, %lf, %lf\n", 1.0 / 2638.0, 25 / 43219.0, 1 / 3.0);
-}
-
-Hypervisor::~Hypervisor ()
-{
-
+   Hypercall::set_callbacks (0UL, 0UL);
 }

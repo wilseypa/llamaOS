@@ -28,60 +28,20 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <stdexcept>
+#ifndef llamaos_xen_events_h_
+#define llamaos_xen_events_h_
 
-#include <llamaos/memory/memory.h>
-#include <llamaos/xen/Hypervisor.h>
-#include <llamaos/trace.h>
+namespace llamaos {
+namespace xen {
 
-using namespace std;
-using namespace llamaos;
-using namespace llamaos::memory;
-using namespace llamaos::xen;
-
-static Hypervisor *instance = nullptr;
-
-static const start_info_t enforce_single_instance (const start_info_t *start_info)
+class Events
 {
-   if (nullptr != instance)
-   {
-      throw runtime_error ("duplicate Hypervisor objects created");
-   }
+public:
+   Events ();
+   virtual ~Events ();
 
-   if (nullptr == start_info)
-   {
-      throw runtime_error ("invalid start_info pointer");
-   }
+};
 
-   return *start_info;
-}
+} }
 
-Hypervisor *Hypervisor::get_instance ()
-{
-   if (nullptr == instance)
-   {
-      throw runtime_error ("invalid Hypervisor instance");
-   }
-
-   return instance;
-}
-
-Hypervisor::Hypervisor (const start_info_t *start_info)
-   :  start_info(enforce_single_instance(start_info)),
-      console(machine_page_to_virtual_pointer<xencons_interface>(start_info->console.domU.mfn), start_info->console.domU.evtchn),
-      trap(),
-      events(),
-      xenstore(machine_page_to_virtual_pointer<xenstore_domain_interface>(start_info->store_mfn), start_info->store_evtchn)
-{
-   instance = this;
-   trace ("Hypervisor created.\n");
-
-   trace ("Xenstore name: %s\n", xenstore.read ("name").c_str ()); 
-
-   trace ("float math: %lf, %lf, %lf\n", 1.0 / 2638.0, 25 / 43219.0, 1 / 3.0);
-}
-
-Hypervisor::~Hypervisor ()
-{
-
-}
+#endif  // llamaos_xen_events_h_

@@ -16,6 +16,7 @@ SOURCES = \
   memory/Entry.cpp \
   memory/memory.cpp \
   xen/Console.cpp \
+  xen/Events.cpp \
   xen/glibc_export.cpp \
   xen/Hypercall.cpp \
   xen/Hypervisor.cpp \

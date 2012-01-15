@@ -67,13 +67,6 @@ shared_info_t *HYPERVISOR_shared_info = 0;
 
 uint8_t xen_features [XENFEAT_NR_SUBMAPS * 32];
 
-
-extern "C"
-void do_hypervisor_callback (struct pt_regs * /* regs */)
-{
-
-}
-
 static bool verify_magic (const start_info_t *start_info)
 {
    if (   (nullptr != start_info)
@@ -149,12 +142,12 @@ void start (start_info_t *start_info)
             __CTOR_LIST__[i] ();
          }
 
+         // initialize libstdc++
+         ios_base::Init ios_base_init;
+
          // create the one and only hypervisor object
          trace ("Creating Hypervisor...\n");
          Hypervisor hypervisor (start_info);
-
-         // initialize libstdc++
-         ios_base::Init ios_base_init;
 
          // start the application
          char *argv [2];
