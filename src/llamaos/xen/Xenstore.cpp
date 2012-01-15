@@ -36,121 +36,13 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 #include <llamaos/xen/Hypercall.h>
 #include <llamaos/xen/Xenstore.h>
+#include <llamaos/trace.h>
 
 using namespace std;
 using namespace llamaos::xen;
 
 #define mb()  __asm__ __volatile__ ( "mfence" : : : "memory")
 #define wmb() __asm__ __volatile__ ( "" : : : "memory")
-
-#if 0
-namespace xenstore {
-
-void write (xenstore_domain_interface *interface, char data)
-{
-   // ensure write is processed
-   mb();
-
-   // check for space in the ring
-   if ((interface->req_prod - interface->req_cons) >= sizeof(interface->req))
-   {
-      // tell dom0 to consume some data
-      Hypercall::event_channel_send (port);
-
-      // yield cpu to dom0
-      llamaos::xen::Hypercall::sched_op_yield ();
-      mb();
-   }
-
-   // get current index into ring and write data
-   XENSTORE_RING_IDX index = MASK_XENSTORE_IDX(interface->req_prod, interface->req);
-   interface->req [index] = data;
-
-   // ensure write is processed
-   wmb();
-
-   // increment index
-   interface->req_prod++;
-}
-
-static void write (xenstore_domain_interface *interface, const char *data, unsigned int length)
-{
-   /* Check that the message will fit */
-   if (length > XENSTORE_RING_SIZE)
-   {
-      throw runtime_error ("Xenstore write: message too long");
-   }
-
-   unsigned int i = interface->req_prod;
-   unsigned int j = 0;
-
-   while (j < request_length)
-   {
-      /* Wait for the back end to clear enough space in the buffer */
-      XENSTORE_RING_IDX data;
-
-      do
-      {
-         data = i - interface->req_cons;
-         mb();
-      } while (data >= sizeof(interface->req));
-
-      /* Copy the byte */
-      int ring_index = MASK_XENSTORE_IDX (i++);
-      interface->req [ring_index] = request [j++];
-   }
-
-   /* Ensure that the data really is in the ring before continuing */
-   wmb();
-   interface->req_prod = i;
-}
-
-static void write (xenstore_domain_interface *interface,
-                   const struct xsd_sockmsg &sockmsg)
-{
-   write_request (interface, reinterpret_cast<const char *>(&sockmsg), sizeof(struct xsd_sockmsg));
-}
-
-}
-
-
-
-
-
-static void write_request (xenstore_domain_interface *interface, const string &message)
-{
-   write_request (interface, message.c_str (), message.size () + 1);
-}
-
-static void read_response (xenstore_domain_interface *interface,
-                           struct xsd_sockmsg &sockmsg)
-{
-   char *message = static_cast<char *>(&sockmsg);
-
-   unsigned int i = interface->rsp_cons;
-   unsigned int j = 0;
-
-   while (j < sizeof(struct xsd_sockmsg))
-   {
-      /* Wait for the back end put data in the buffer */
-      XENSTORE_RING_IDX data;
-
-      do
-      {
-         data = interface->rsp_prod - i;
-         mb();
-      } while (data == 0);
-
-      /* Copy the byte */
-      int ring_index = MASK_XENSTORE_IDX(i++);
-      message [j++] = interface->rsp[ring_index];
-   }
-
-   interface->rsp_cons = i;
-}
-#endif
-
-
 
 static uint32_t xenstore_req_id = 1;
 
@@ -184,10 +76,12 @@ void Xenstore::write_request (const char *data, unsigned int length) const
       mb();
    }
 
+   XENSTORE_RING_IDX req_prod = interface->req_prod;
+
    for (unsigned int i = 0; i < length; i++)
    {
       // get current index into ring and write data
-      XENSTORE_RING_IDX index = MASK_XENSTORE_IDX(interface->req_prod);
+      XENSTORE_RING_IDX index = MASK_XENSTORE_IDX(req_prod++);
       interface->req [index] = data [i];
    }
 
@@ -218,9 +112,11 @@ void Xenstore::read_response (char *data, unsigned int length) const
       throw runtime_error ("Xenstore write: message too long");
    }
 
+   XENSTORE_RING_IDX rsp_cons = interface->rsp_cons;
+
    for (unsigned int i = 0; i < length; i++)
    {
-      while (0 == (interface->rsp_prod - interface->rsp_cons))
+      while (0 == (interface->rsp_prod - rsp_cons))
       {
          // yield cpu to dom0
          llamaos::xen::Hypercall::sched_op_yield ();
@@ -228,7 +124,7 @@ void Xenstore::read_response (char *data, unsigned int length) const
       }
 
       // get current index into ring and read data
-      XENSTORE_RING_IDX index = MASK_XENSTORE_IDX(interface->rsp_cons);
+      XENSTORE_RING_IDX index = MASK_XENSTORE_IDX(rsp_cons++);
       data [i] = interface->rsp [index];
    }
 
@@ -238,10 +134,11 @@ void Xenstore::read_response (char *data, unsigned int length) const
 string Xenstore::read_response (unsigned int length) const
 {
    stringstream sstream;
+   XENSTORE_RING_IDX rsp_cons = interface->rsp_cons;
 
    for (unsigned int i = 0; i < length; i++)
    {
-      while (0 == (interface->rsp_prod - interface->rsp_cons))
+      while (0 == (interface->rsp_prod - rsp_cons))
       {
          // yield cpu to dom0
          llamaos::xen::Hypercall::sched_op_yield ();
@@ -249,7 +146,7 @@ string Xenstore::read_response (unsigned int length) const
       }
 
       // get current index into ring and read data
-      XENSTORE_RING_IDX index = MASK_XENSTORE_IDX(interface->rsp_cons);
+      XENSTORE_RING_IDX index = MASK_XENSTORE_IDX(rsp_cons++);
       sstream << interface->rsp [index];
    }
 
@@ -281,22 +178,4 @@ string Xenstore::read (const string &key) const
 
    // reasponse from Xenstore
    return read_response ();
-#if 0
-
-   write_request (msg, key);
-
-   /* Notify the back end */
-   Hypercall::event_channel_send (port);
-
-   return read_response ();
-
-//   msg = read_response ();
-
-//   if (msg.req_id != req_id++)
-//   {
-//      throw runtime_error ("Xenstore read: returned invalid request id");
-//   }
-
-//   return read_response (msg.len);
-#endif
 }

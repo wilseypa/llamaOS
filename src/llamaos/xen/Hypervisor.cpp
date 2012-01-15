@@ -73,6 +73,8 @@ Hypervisor::Hypervisor (const start_info_t *start_info)
 {
    instance = this;
    trace ("Hypervisor created.\n");
+
+   trace ("Xenstore name: %s\n", xenstore.read ("name").c_str ()); 
 }
 
 Hypervisor::~Hypervisor ()
