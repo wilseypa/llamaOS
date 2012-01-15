@@ -12,6 +12,9 @@ CPPFLAGS += -Wall -Wextra -Weffc++ \
 VPATH = src:src/llamaos/apps/latency
 
 SOURCES = \
+  latency_data.cpp \
+  latency_null.cpp \
+  latency_time.cpp \
   main.cpp
 
 OBJECTS = $(SOURCES:%.cpp=$(OBJDIR)/%.o)
