@@ -36,10 +36,14 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <map>
 
 #include <xen/xen.h>
+#include <xen/event_channel.h>
 
 struct shared_info;
 namespace llamaos {
 namespace xen {
+
+typedef void (*event_handler_t)(void *);
+typedef std::map<evtchn_port_t, std::pair<event_handler_t, void *> > handler_map_t;
 
 class Events
 {
@@ -47,16 +51,28 @@ public:
    Events (shared_info_t *shared_info);
    virtual ~Events ();
 
-   void callback ();
+   void bind (evtchn_port_t port, event_handler_t handler, void *data);
+   void unbind (evtchn_port_t port);
+
+   void bind_virq (unsigned int virq, event_handler_t handler, void *data);
+   void unbind_virq (unsigned int virq);
+
+   void bind_irq (unsigned int irq, event_handler_t handler, void *data);
+   void unbind_irq (unsigned int irq);
+
+   void callback () const;
 
 private:
    Events ();
    Events (const Events &);
    Events &operator= (const Events &);
 
+   void call_handler (evtchn_port_t port) const;
+
    shared_info_t *const shared_info;
    vcpu_info_t *const vcpu_info;
-//   std::map<evtchn_port_t, Channel> channels;
+
+   handler_map_t handlers;
 
 };
 

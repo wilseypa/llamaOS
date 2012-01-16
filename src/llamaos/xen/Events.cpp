@@ -34,42 +34,18 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <llamaos/xen/Hypervisor.h>
 #include <llamaos/trace.h>
 
-#define xchg(ptr,v) ((__typeof__(*(ptr)))__xchg((unsigned long)(v),(ptr),sizeof(*(ptr))))
-#define __xg(x) ((volatile long *)(x))
-static inline unsigned long __xchg(unsigned long x, volatile void * ptr, int size)
-{
-        switch (size) {
-                case 1:
-                        __asm__ __volatile__("xchgb %b0,%1"
-                                :"=q" (x)
-                                :"m" (*__xg(ptr)), "0" (x)
-                                :"memory");
-                        break;
-                case 2:
-                        __asm__ __volatile__("xchgw %w0,%1"
-                                :"=r" (x)
-                                :"m" (*__xg(ptr)), "0" (x)
-                                :"memory");
-                        break;
-                case 4:
-                        __asm__ __volatile__("xchgl %k0,%1"
-                                :"=r" (x)
-                                :"m" (*__xg(ptr)), "0" (x)
-                                :"memory");
-                        break;
-                case 8:
-                        __asm__ __volatile__("xchgq %0,%1"
-                                :"=r" (x)
-                                :"m" (*__xg(ptr)), "0" (x)
-                                :"memory");
-                        break;
-        }
-        return x;
-}
-
 using namespace llamaos;
 using namespace llamaos::memory;
 using namespace llamaos::xen;
+
+// pulled from mini-os x86/os.h
+#define ADDR (*(volatile long *) addr)
+static __inline__ void synch_clear_bit(int nr, volatile void * addr)
+{
+    __asm__ __volatile__ (
+        "lock btrl %1,%0"
+        : "=m" (ADDR) : "Ir" (nr) : "memory" );
+}
 
 extern "C"
 void hypervisor_callback (void);
@@ -85,14 +61,11 @@ void failsafe_callback (void);
 
 Events::Events (shared_info_t *shared_info)
    :  shared_info(shared_info),
-      vcpu_info(&shared_info->vcpu_info [0])
+      vcpu_info(&shared_info->vcpu_info [0]),
+      handlers()
 {
    Hypercall::set_callbacks (pointer_to_address (hypervisor_callback),
                              pointer_to_address (failsafe_callback));
-
-   evtchn_port_t port = 0;
-   Hypercall::event_channel_bind_virq (VIRQ_TIMER, port);
-   trace ("VIRQ_TIMER port: %x\n", port);
 
    vcpu_info->evtchn_upcall_mask = 0;
 }
@@ -102,23 +75,77 @@ Events::~Events ()
    Hypercall::set_callbacks (0UL, 0UL);
 }
 
-void Events::callback ()
+void Events::bind (unsigned int port, event_handler_t handler, void *data)
+{
+
+}
+
+void Events::unbind (unsigned int port)
+{
+
+}
+
+void Events::bind_virq (unsigned int virq, event_handler_t handler, void *data)
+{
+   evtchn_port_t port = 0;
+
+   Hypercall::event_channel_bind_virq (virq, port);
+
+   handlers [port] = std::pair<event_handler_t, void *> (handler, data);
+   trace ("bind_virq: %x\n", virq);
+}
+
+void Events::unbind_virq (unsigned int virq)
+{
+
+}
+
+void Events::bind_irq (unsigned int irq, event_handler_t handler, void *data)
+{
+
+}
+
+void Events::unbind_irq (unsigned int irq)
+{
+
+}
+
+void Events::callback () const
 {
 //   trace ("Events callback...\n");
 //   trace ("  evtchn_upcall_pending: %lx\n", vcpu_info->evtchn_upcall_pending);
 //   trace ("     evtchn_upcall_mask: %lx\n", vcpu_info->evtchn_upcall_mask);
 //   trace ("     evtchn_pending_sel: %lx\n", vcpu_info->evtchn_pending_sel);
 
-   vcpu_info->evtchn_upcall_pending = 0;
-///   vcpu_info->evtchn_pending_sel = 0;
-   xchg(&vcpu_info->evtchn_pending_sel, 0);
+   static const unsigned int PENDING_SIZE = (sizeof(unsigned long) * 8);
 
-   for (unsigned int i = 0; i < 64; i++)
+   vcpu_info->evtchn_upcall_pending = 0;
+   vcpu_info->evtchn_pending_sel = 0;
+
+   for (unsigned int i = 0; i < PENDING_SIZE; i++)
    {
-      if (0 != shared_info->evtchn_pending [i])
+      if (0UL != shared_info->evtchn_pending [i])
       {
-//         trace ("  evtchn_pending [%u]: %lx\n", i, shared_info->evtchn_pending [i]);
-         shared_info->evtchn_pending [i] = 0;
+         for (unsigned int j = 0; j < sizeof(unsigned long); j++)
+         {
+            if (shared_info->evtchn_pending [i] | (1 << j))
+            {
+               call_handler ((i * sizeof(unsigned long)) + j);
+               synch_clear_bit(j, &shared_info->evtchn_pending [i]);
+            }
+         }
       }
    }
+}
+
+void Events::call_handler (evtchn_port_t port) const
+{
+   handler_map_t::const_iterator iter = handlers.find (port);
+
+   if (iter == handlers.end ())
+   {
+      trace ("ignoring invalid handler: %x\n", port);
+   }
+
+   iter->second.first (iter->second.second);
 }

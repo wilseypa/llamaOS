@@ -28,6 +28,7 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
+#include <iostream>
 #include <stdexcept>
 
 #include <llamaos/memory/memory.h>
@@ -76,6 +77,14 @@ static shared_info_t *map_shared_info (const start_info_t *start_info)
    return 0;
 }
 
+static void virq_timer_event (void * /* data */)
+{
+//   Hypervisor *hypervisor = reinterpret_cast<Hypervisor *> (data);
+
+   cout.flush ();
+   // fflush (stdout);
+}
+
 Hypervisor *Hypervisor::get_instance ()
 {
    if (nullptr == instance)
@@ -100,6 +109,9 @@ Hypervisor::Hypervisor (const start_info_t *start_info)
    trace ("Xenstore name: %s\n", xenstore.read ("name").c_str ()); 
 
    trace ("float math: %lf, %lf, %lf\n", 1.0 / 2638.0, 25 / 43219.0, 1 / 3.0);
+
+   trace ("binding to VIRQ_TIMER...\n");
+   events.bind_virq (VIRQ_TIMER, virq_timer_event, this);
 }
 
 Hypervisor::~Hypervisor ()
