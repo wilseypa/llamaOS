@@ -107,14 +107,14 @@ bool Hypercall::set_callbacks (uint64_t event_address, uint64_t failsafe_address
    return true;
 }
 
-bool Hypercall::update_va_mapping (uint64_t pseudo_page, uint64_t machine_page)
+bool Hypercall::update_va_mapping (uint64_t virtual_address, uint64_t machine_address)
 {
    pte_t val;
-   val.pte = machine_page | 7;
+   val.pte = machine_address | 7;
 
-   if (0 != HYPERVISOR_update_va_mapping (pseudo_page, val, UVMF_INVLPG))
+   if (0 != HYPERVISOR_update_va_mapping (virtual_address, val, UVMF_INVLPG))
    {
-      trace ("HYPERVISOR_update_va_mapping (pseudo_page: %lx, machine_page: %lx) FAILED\n", pseudo_page, machine_page);
+      trace ("HYPERVISOR_update_va_mapping (pseudo_page: %lx, machine_page: %lx) FAILED\n", virtual_address, machine_address);
       return false;
    }
 
@@ -193,5 +193,21 @@ bool Hypercall::event_channel_send (evtchn_port_t port)
       return false;
    }
 
+   return true;
+}
+
+bool Hypercall::event_channel_bind_virq (uint32_t virq, evtchn_port_t &port)
+{
+   evtchn_bind_virq_t op;
+   op.virq = virq;
+   op.vcpu = 0;
+
+   if (0 != HYPERVISOR_event_channel_op (EVTCHNOP_bind_virq, &op))
+   {
+      trace ("HYPERVISOR_event_channel_op (EVTCHNOP_bind_virq, virq: %u) FAILED\n", virq);
+      return false;
+   }
+
+   port = op.port;
    return true;
 }

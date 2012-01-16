@@ -75,6 +75,12 @@ public:
    const start_info_t start_info;
 
    /**
+    * @brief Xen shared_info structure.
+    *
+    */
+   shared_info_t *const shared_info;
+
+   /**
     * @brief Systme console.
     *
     */

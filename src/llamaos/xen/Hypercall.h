@@ -103,7 +103,7 @@ public:
     * @param machine_page
     *
     */
-   static bool update_va_mapping (uint64_t pseudo_page, uint64_t machine_page);
+   static bool update_va_mapping (uint64_t virtual_address, uint64_t machine_address);
 
    // llamaOS UNSUPPORTED CALLS
    //   __HYPERVISOR_set_timer_op         15
@@ -174,6 +174,8 @@ public:
     *
     */
    static bool event_channel_send (evtchn_port_t port);
+
+   static bool event_channel_bind_virq (uint32_t virq, evtchn_port_t &port);
 
    // llamaOS UNSUPPORTED CALLS
    //   __HYPERVISOR_physdev_op           33

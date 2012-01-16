@@ -31,14 +31,32 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #ifndef llamaos_xen_events_h_
 #define llamaos_xen_events_h_
 
+#include <cstdint>
+
+#include <map>
+
+#include <xen/xen.h>
+
+struct shared_info;
 namespace llamaos {
 namespace xen {
 
 class Events
 {
 public:
-   Events ();
+   Events (shared_info_t *shared_info);
    virtual ~Events ();
+
+   void callback ();
+
+private:
+   Events ();
+   Events (const Events &);
+   Events &operator= (const Events &);
+
+   shared_info_t *const shared_info;
+   vcpu_info_t *const vcpu_info;
+//   std::map<evtchn_port_t, Channel> channels;
 
 };
 

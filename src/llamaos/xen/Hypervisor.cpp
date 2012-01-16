@@ -31,6 +31,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <stdexcept>
 
 #include <llamaos/memory/memory.h>
+#include <llamaos/xen/Hypercall.h>
 #include <llamaos/xen/Hypervisor.h>
 #include <llamaos/trace.h>
 
@@ -56,6 +57,25 @@ static const start_info_t enforce_single_instance (const start_info_t *start_inf
    return *start_info;
 }
 
+// defined in entry assembler
+extern shared_info_t shared_info;
+
+// used in entry assembler
+shared_info_t *HYPERVISOR_shared_info = 0;
+
+static shared_info_t *map_shared_info (const start_info_t *start_info)
+{
+   if (Hypercall::update_va_mapping (pointer_to_address(&shared_info), start_info->shared_info))
+   {
+      // !BAM try to get rid of this global
+      HYPERVISOR_shared_info = &shared_info;
+
+      return &shared_info;
+   }
+
+   return 0;
+}
+
 Hypervisor *Hypervisor::get_instance ()
 {
    if (nullptr == instance)
@@ -68,9 +88,10 @@ Hypervisor *Hypervisor::get_instance ()
 
 Hypervisor::Hypervisor (const start_info_t *start_info)
    :  start_info(enforce_single_instance(start_info)),
+      shared_info(map_shared_info(start_info)),
       console(machine_page_to_virtual_pointer<xencons_interface>(start_info->console.domU.mfn), start_info->console.domU.evtchn),
       traps(),
-      events(),
+      events(shared_info),
       xenstore(machine_page_to_virtual_pointer<xenstore_domain_interface>(start_info->store_mfn), start_info->store_evtchn)
 {
    instance = this;

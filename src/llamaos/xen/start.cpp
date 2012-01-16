@@ -62,9 +62,6 @@ extern uint64_t  pseudo_table_size;
 // runtime stack memory
 char RUNTIME_STACK [2 * llamaos::STACK_SIZE];
 
-// used in entry assembler
-shared_info_t *HYPERVISOR_shared_info = 0;
-
 uint8_t xen_features [XENFEAT_NR_SUBMAPS * 32];
 
 static bool verify_magic (const start_info_t *start_info)
@@ -133,18 +130,18 @@ void start (start_info_t *start_info)
       // register callbacks to the glibc library
       register_glibc_exports ();
 
+      uint64_t ctor_size = reinterpret_cast<uint64_t>(__CTOR_LIST__[0]);
+      trace ("__CTOR_LIST__[0]: %lx\n", ctor_size);
+      for (uint64_t i = ctor_size; i >= 1; i--)
+      {
+         __CTOR_LIST__[i] ();
+      }
+
+      // initialize libstdc++
+      ios_base::Init ios_base_init;
+
       try
       {
-         uint64_t ctor_size = reinterpret_cast<uint64_t>(__CTOR_LIST__[0]);
-         trace ("__CTOR_LIST__[0]: %lx\n", ctor_size);
-         for (uint64_t i = ctor_size; i >= 1; i--)
-         {
-            __CTOR_LIST__[i] ();
-         }
-
-         // initialize libstdc++
-         ios_base::Init ios_base_init;
-
          // create the one and only hypervisor object
          trace ("Creating Hypervisor...\n");
          Hypervisor hypervisor (start_info);
@@ -157,12 +154,7 @@ void start (start_info_t *start_info)
 
          trace ("ending llamaOS...\n");
 
-         uint64_t dtor_size = reinterpret_cast<uint64_t>(__DTOR_LIST__[0]);
-         trace ("__DTOR_LIST__[0]: %lx\n", dtor_size);
-         for (uint64_t i = dtor_size; i >= 1; i--)
-         {
-            __DTOR_LIST__[i] ();
-         }
+         for (;;);
       }
       catch (const std::runtime_error &e)
       {
@@ -173,8 +165,14 @@ void start (start_info_t *start_info)
          trace ("*** unknown exception ***\n");
       }
 
-      for (;;);
       Hypercall::sched_op_shutdown ();
+
+      uint64_t dtor_size = reinterpret_cast<uint64_t>(__DTOR_LIST__[0]);
+      trace ("__DTOR_LIST__[0]: %lx\n", dtor_size);
+      for (uint64_t i = dtor_size; i >= 1; i--)
+      {
+         __DTOR_LIST__[i] ();
+      }
    }
    // else
    // something terrible is wrong and nothing can be done about it!
