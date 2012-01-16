@@ -37,7 +37,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 #include <llamaos/xen/Console.h>
 #include <llamaos/xen/Events.h>
-#include <llamaos/xen/Trap.h>
+#include <llamaos/xen/Traps.h>
 #include <llamaos/xen/Xenstore.h>
 
 namespace llamaos {
@@ -80,7 +80,7 @@ public:
     */
    Console console;
 
-   Trap trap;
+   Traps traps;
    Events events;
    Xenstore xenstore;
 

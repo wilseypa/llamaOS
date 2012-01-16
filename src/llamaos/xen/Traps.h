@@ -28,38 +28,20 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <cstdint>
+#ifndef llamaos_xen_traps_h_
+#define llamaos_xen_traps_h_
 
-#include <xen/xen.h>
+namespace llamaos {
+namespace xen {
 
-#include <llamaos/xen/Hypercall.h>
-#include <llamaos/xen/Trap.h>
-#include <llamaos/memory/memory.h>
-
-using namespace llamaos::xen;
-using namespace llamaos::memory;
-
-// defined in Entry.S
-extern "C"
-void simd_coprocessor_error (void);
-
-extern "C"
-void do_simd_coprocessor_error(struct pt_regs * /* regs */)
+class Traps
 {
+public:
+   Traps ();
+   virtual ~Traps ();
 
-}
-
-static trap_info_t table[] = {
-   {19, 0, 0, pointer_to_address(simd_coprocessor_error)},
-   {0, 0, 0, 0},
 };
 
-Trap::Trap ()
-{
-   Hypercall::set_trap_table (table);
-}
+} }
 
-Trap::~Trap ()
-{
-   Hypercall::set_trap_table (0);
-}
+#endif  // llamaos_xen_traps_h_
