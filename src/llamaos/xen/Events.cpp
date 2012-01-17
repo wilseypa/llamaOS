@@ -59,6 +59,9 @@ void do_hypervisor_callback (struct pt_regs * /* regs */)
 extern "C"
 void failsafe_callback (void);
 
+static const unsigned int PENDING_SIZE = (sizeof(unsigned long) * 8);
+static const unsigned int MASK_SIZE = (sizeof(unsigned long) * 8);
+
 Events::Events (shared_info_t *shared_info)
    :  shared_info(shared_info),
       vcpu_info(&shared_info->vcpu_info [0]),
@@ -66,6 +69,11 @@ Events::Events (shared_info_t *shared_info)
 {
    Hypercall::set_callbacks (pointer_to_address (hypervisor_callback),
                              pointer_to_address (failsafe_callback));
+
+   for (unsigned int i = 0; i < PENDING_SIZE; i++)
+   {
+      shared_info->evtchn_mask [i] = ~0UL;
+   }
 
    vcpu_info->evtchn_upcall_mask = 0;
 }
@@ -92,7 +100,9 @@ void Events::bind_virq (unsigned int virq, event_handler_t handler, void *data)
    Hypercall::event_channel_bind_virq (virq, port);
 
    handlers [port] = std::pair<event_handler_t, void *> (handler, data);
-   trace ("bind_virq: %x\n", virq);
+   trace ("bind_virq: %x\n", port);
+
+   shared_info->evtchn_mask [port / sizeof(unsigned long)] &= ~(1 << (port % sizeof(unsigned long)));
 }
 
 void Events::unbind_virq (unsigned int virq)
@@ -116,8 +126,8 @@ void Events::callback () const
 //   trace ("  evtchn_upcall_pending: %lx\n", vcpu_info->evtchn_upcall_pending);
 //   trace ("     evtchn_upcall_mask: %lx\n", vcpu_info->evtchn_upcall_mask);
 //   trace ("     evtchn_pending_sel: %lx\n", vcpu_info->evtchn_pending_sel);
-
-   static const unsigned int PENDING_SIZE = (sizeof(unsigned long) * 8);
+//   trace ("      evtchn_pending[0]: %lx\n", shared_info->evtchn_pending [0]);
+//   trace ("      evtchn_pending[1]: %lx\n", shared_info->evtchn_pending [1]);
 
    vcpu_info->evtchn_upcall_pending = 0;
    vcpu_info->evtchn_pending_sel = 0;
@@ -128,7 +138,7 @@ void Events::callback () const
       {
          for (unsigned int j = 0; j < sizeof(unsigned long); j++)
          {
-            if (shared_info->evtchn_pending [i] | (1 << j))
+            if (shared_info->evtchn_pending [i] & (1 << j))
             {
                call_handler ((i * sizeof(unsigned long)) + j);
                synch_clear_bit(j, &shared_info->evtchn_pending [i]);
@@ -145,6 +155,7 @@ void Events::call_handler (evtchn_port_t port) const
    if (iter == handlers.end ())
    {
       trace ("ignoring invalid handler: %x\n", port);
+      return;
    }
 
    iter->second.first (iter->second.second);
