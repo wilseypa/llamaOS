@@ -153,8 +153,6 @@ void start (start_info_t *start_info)
          main (1, argv);
 
          trace ("ending llamaOS...\n");
-
-         for (;;);
       }
       catch (const std::runtime_error &e)
       {
@@ -172,6 +170,11 @@ void start (start_info_t *start_info)
       for (uint64_t i = dtor_size; i >= 1; i--)
       {
          __DTOR_LIST__[i] ();
+      }
+
+      for (;;)
+      {
+         Hypercall::sched_op_yield ();
       }
    }
    // else
