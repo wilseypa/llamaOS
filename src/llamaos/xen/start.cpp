@@ -163,7 +163,7 @@ void start (start_info_t *start_info)
          trace ("*** unknown exception ***\n");
       }
 
-      Hypercall::sched_op_shutdown ();
+//      Hypercall::sched_op_shutdown ();
 
       uint64_t dtor_size = reinterpret_cast<uint64_t>(__DTOR_LIST__[0]);
       trace ("__DTOR_LIST__[0]: %lx\n", dtor_size);

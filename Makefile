@@ -19,6 +19,10 @@ VMMLIBS = \
   hvm \
   kvm
 
+# list of standard llamaNET drivers
+NETS = \
+  e1000e
+
 # list of standard llamaOS apps
 APPS = \
   hello \
@@ -28,7 +32,7 @@ APPS = \
 -include apps.mk
 
 .PHONY: all
-all: syslibs vmmlibs llamaos apps
+all: syslibs vmmlibs llamaos nets apps
 
 .PHONY: clean
 clean:
@@ -58,6 +62,14 @@ $(VMMLIBS):
 .PHONY: llamaos
 llamaos:
 	@$(MAKE) -f $@.mk
+
+.PHONY: nets
+nets:
+	@$(MAKE) $(NETS)
+
+.PHONY: $(NETS)
+$(NETS):
+	@$(MAKE) -f $@.mk VMM=xen
 
 .PHONY: apps
 apps:
