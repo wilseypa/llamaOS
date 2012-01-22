@@ -28,78 +28,24 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#ifndef llamaos_xen_hypervisor_h_
-#define llamaos_xen_hypervisor_h_
-
-#include <cstdint>
-
-#include <xen/xen.h>
-
-#include <llamaos/xen/Console.h>
-#include <llamaos/xen/Events.h>
+#include <llamaos/memory/memory.h>
 #include <llamaos/xen/Grant_table.h>
-#include <llamaos/xen/Traps.h>
-#include <llamaos/xen/Xenstore.h>
+#include <llamaos/xen/Hypercall.h>
+#include <llamaos/config.h>
 
-namespace llamaos {
-namespace xen {
+using namespace llamaos;
+using namespace llamaos::memory;
+using namespace llamaos::xen;
 
-/**
- * @brief Hypervisor class.
- *
- */
-class Hypervisor
+Grant_table::Grant_table (unsigned int size)
+   :  size(size),
+      buffer(new char [size * sizeof(grant_entry_t) + PAGE_SIZE]),
+      entries(reinterpret_cast<grant_entry_t *> (pointer_to_address (buffer) & ~(PAGE_SIZE - 1)))
 {
-public:
-   /**
-    * @brief Allow public access to singleton Hypervisor object.
-    *
-    */
-   static Hypervisor *get_instance ();
+   Hypercall::grant_table_setup_table();
+}
 
-   /**
-    * @brief Only public constructor (throws if called more than once).
-    *
-    */
-   Hypervisor (const start_info_t *start_info);
-
-   /**
-    * @brief Destructor.
-    *
-    */
-   virtual ~Hypervisor ();
-
-   /**
-    * @brief Xen start_info structure.
-    *
-    */
-   const start_info_t start_info;
-
-   /**
-    * @brief Xen shared_info structure.
-    *
-    */
-   shared_info_t *const shared_info;
-
-   /**
-    * @brief Systme console.
-    *
-    */
-   Console console;
-
-   Traps traps;
-   Events events;
-   Grant_table grant_table;
-
-   Xenstore xenstore;
-
-private:
-   Hypervisor ();
-   Hypervisor (const Hypervisor &);
-   Hypervisor &operator= (const Hypervisor &);
-
-};
-
-} }
-
-#endif  // llamaos_xen_hypervisor_h_
+Grant_table::~Grant_table ()
+{
+   delete[] buffer;
+}

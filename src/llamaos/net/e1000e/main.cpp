@@ -28,7 +28,16 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
+#include <iostream>
+
+#include <llamaos/trace.h>
+
+using namespace std;
+using namespace llamaos;
+
 int main (int /* argc */, char ** /* argv [] */)
 {
+   trace ("running e1000e llamaNET domain...\n");
+
    return 0;
 }

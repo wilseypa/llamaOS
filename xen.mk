@@ -18,6 +18,7 @@ SOURCES = \
   xen/Console.cpp \
   xen/Events.cpp \
   xen/glibc_export.cpp \
+  xen/Grant_table.cpp \
   xen/Hypercall.cpp \
   xen/Hypervisor.cpp \
   xen/memory.cpp \

@@ -36,6 +36,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #endif
 
 #include <xen/xen.h>
+#include <xen/grant_table.h>
 #include <xen/sched.h>
 #include <xen/version.h>
 
@@ -141,8 +142,12 @@ bool Hypercall::console_io (const char *str)
    return true;
 }
 
-bool Hypercall::grant_table_op ()
+bool Hypercall::grant_table_setup_table ()
 {
+   struct gnttab_setup_table setup_table;
+   setup_table.dom = DOMID_SELF;
+   setup_table.nr_frames = 1;
+
    return true;
 }
 

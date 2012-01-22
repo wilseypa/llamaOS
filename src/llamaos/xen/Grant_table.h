@@ -28,78 +28,34 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#ifndef llamaos_xen_hypervisor_h_
-#define llamaos_xen_hypervisor_h_
+#ifndef llamaos_xen_grant_table_h_
+#define llamaos_xen_grant_table_h_
 
 #include <cstdint>
 
 #include <xen/xen.h>
-
-#include <llamaos/xen/Console.h>
-#include <llamaos/xen/Events.h>
-#include <llamaos/xen/Grant_table.h>
-#include <llamaos/xen/Traps.h>
-#include <llamaos/xen/Xenstore.h>
+#include <xen/grant_table.h>
 
 namespace llamaos {
 namespace xen {
 
-/**
- * @brief Hypervisor class.
- *
- */
-class Hypervisor
+class Grant_table
 {
 public:
-   /**
-    * @brief Allow public access to singleton Hypervisor object.
-    *
-    */
-   static Hypervisor *get_instance ();
-
-   /**
-    * @brief Only public constructor (throws if called more than once).
-    *
-    */
-   Hypervisor (const start_info_t *start_info);
-
-   /**
-    * @brief Destructor.
-    *
-    */
-   virtual ~Hypervisor ();
-
-   /**
-    * @brief Xen start_info structure.
-    *
-    */
-   const start_info_t start_info;
-
-   /**
-    * @brief Xen shared_info structure.
-    *
-    */
-   shared_info_t *const shared_info;
-
-   /**
-    * @brief Systme console.
-    *
-    */
-   Console console;
-
-   Traps traps;
-   Events events;
-   Grant_table grant_table;
-
-   Xenstore xenstore;
+   Grant_table (unsigned int size);
+   virtual ~Grant_table ();
 
 private:
-   Hypervisor ();
-   Hypervisor (const Hypervisor &);
-   Hypervisor &operator= (const Hypervisor &);
+   Grant_table ();
+   Grant_table (const Grant_table &);
+   Grant_table &operator= (const Grant_table &);
+
+   const unsigned int size;
+   char *const buffer;
+   grant_entry_t *const entries;
 
 };
 
 } }
 
-#endif  // llamaos_xen_hypervisor_h_
+#endif  // llamaos_xen_grant_table_h_
