@@ -32,7 +32,7 @@ APPS = \
 -include apps.mk
 
 .PHONY: all
-all: syslibs vmmlibs llamaos nets apps
+all: syslibs vmmlibs llamaos nets apps gtest test-xen
 
 .PHONY: clean
 clean:
@@ -77,4 +77,12 @@ apps:
 
 .PHONY: $(APPS)
 $(APPS):
+	@$(MAKE) -f $@.mk VMM=xen
+
+.PHONY: gtest
+gtest:
+	@$(MAKE) -f $@.mk
+
+.PHONY: test-xen
+test-xen:
 	@$(MAKE) -f $@.mk VMM=xen
