@@ -9,13 +9,13 @@ ASMFLAGS += $(INCLUDES:%=-I %)
 CPPFLAGS += -Wall -Wextra -Weffc++ \
              $(INCLUDES:%=-I %)
 
-VPATH = src:src/llamaos/apps/latency
+VPATH = src
 
 SOURCES = \
-  latency_data.cpp \
-  latency_null.cpp \
-  latency_time.cpp \
-  main.cpp
+  llamaos/apps/latency/latency_data.cpp \
+  llamaos/apps/latency/latency_null.cpp \
+  llamaos/apps/latency/latency_time.cpp \
+  llamaos/apps/latency/main.cpp
 
 OBJECTS = $(SOURCES:%.cpp=$(OBJDIR)/%.o)
 DEPENDS = $(OBJECTS:%.o=%.d)

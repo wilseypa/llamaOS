@@ -9,10 +9,10 @@ ASMFLAGS += $(INCLUDES:%=-I %)
 CPPFLAGS += -Wall -Wextra -Weffc++ \
              $(INCLUDES:%=-I %)
 
-VPATH = src:src/llamaos/apps/hello
+VPATH = src
 
 SOURCES = \
-  main.cpp
+  llamaos/apps/hello/main.cpp
 
 OBJECTS = $(SOURCES:%.cpp=$(OBJDIR)/%.o)
 DEPENDS = $(OBJECTS:%.o=%.d)

@@ -8,10 +8,10 @@ INCLUDES = \
 CPPFLAGS += -Wall -Wextra -Weffc++ \
              $(INCLUDES:%=-I %)
 
-VPATH = src/llamaos/kvm
+VPATH = src
 
 SOURCES = \
-  trace.cpp
+  llamaos/kvm/trace.cpp
 
 BINARY = kvm.a
 OBJECTS = $(SOURCES:%.cpp=$(OBJDIR)/%.o)

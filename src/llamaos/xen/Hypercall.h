@@ -133,7 +133,7 @@ public:
     * @brief Grant table operations.
     *
     */
-   static bool grant_table_setup_table ();
+   static bool grant_table_setup_table (unsigned int pages);
 
    // llamaOS UNSUPPORTED CALLS
    //   __HYPERVISOR_vm_assist            21

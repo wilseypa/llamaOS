@@ -10,22 +10,22 @@ CPPFLAGS += -Wall -Wextra -Weffc++ \
              $(INCLUDES:%=-I %) \
             -D__XEN_INTERFACE_VERSION__=0x00030205
 
-VPATH = src/llamaos
+VPATH = src
 
 SOURCES = \
-  memory/Entry.cpp \
-  memory/memory.cpp \
-  xen/Console.cpp \
-  xen/Events.cpp \
-  xen/glibc_export.cpp \
-  xen/Grant_table.cpp \
-  xen/Hypercall.cpp \
-  xen/Hypervisor.cpp \
-  xen/memory.cpp \
-  xen/start.cpp \
-  xen/trace.cpp \
-  xen/Traps.cpp \
-  xen/Xenstore.cpp
+  llamaos/memory/Entry.cpp \
+  llamaos/memory/memory.cpp \
+  llamaos/xen/Console.cpp \
+  llamaos/xen/Events.cpp \
+  llamaos/xen/glibc_export.cpp \
+  llamaos/xen/Grant_table.cpp \
+  llamaos/xen/Hypercall.cpp \
+  llamaos/xen/Hypervisor.cpp \
+  llamaos/xen/memory.cpp \
+  llamaos/xen/start.cpp \
+  llamaos/xen/trace.cpp \
+  llamaos/xen/Traps.cpp \
+  llamaos/xen/Xenstore.cpp
 
 BINARY = xen.a
 OBJECTS = $(SOURCES:%.cpp=$(OBJDIR)/%.o)

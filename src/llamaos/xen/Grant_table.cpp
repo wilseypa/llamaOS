@@ -40,12 +40,13 @@ using namespace llamaos::xen;
 Grant_table::Grant_table (unsigned int size)
    :  size(size),
       buffer(new char [size * sizeof(grant_entry_t) + PAGE_SIZE]),
-      entries(reinterpret_cast<grant_entry_t *> (pointer_to_address (buffer) & ~(PAGE_SIZE - 1)))
+      entries(reinterpret_cast<grant_entry_t *> (pointer_to_address (buffer + PAGE_SIZE) & ~(PAGE_SIZE - 1)))
 {
-   Hypercall::grant_table_setup_table();
+//   Hypercall::grant_table_setup_table((size * sizeof(grant_entry_t)) / PAGE_SIZE, entries);
 }
 
 Grant_table::~Grant_table ()
 {
+//   Hypercall::grant_table_setup_table(0, nullptr);
    delete[] buffer;
 }

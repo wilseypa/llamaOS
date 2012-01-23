@@ -5,11 +5,11 @@ MAKEFILE_SOURCES += unwind.mk
 CFLAGS += -DFIRST_PSEUDO_REGISTER=53
 #         -DFIRST_PSEUDO_REGISTER=17
 
-VPATH = gcc
+VPATH = 
 
 SOURCES = \
-  unwind-dw2-fde.c \
-  unwind-dw2.c
+  gcc/unwind-dw2-fde.c \
+  gcc/unwind-dw2.c
 
 BINARY = unwind.a
 OBJECTS = $(SOURCES:%.c=$(OBJDIR)/%.o)

@@ -142,11 +142,12 @@ bool Hypercall::console_io (const char *str)
    return true;
 }
 
-bool Hypercall::grant_table_setup_table ()
+bool Hypercall::grant_table_setup_table (unsigned int pages)
 {
    struct gnttab_setup_table setup_table;
+
    setup_table.dom = DOMID_SELF;
-   setup_table.nr_frames = 1;
+   setup_table.nr_frames = pages;
 
    return true;
 }

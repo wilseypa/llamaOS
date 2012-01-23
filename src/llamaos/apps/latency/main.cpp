@@ -174,9 +174,9 @@ static int run_experiments (void)
    {
       memset(param.data, 0, param.length);
 
-      LATENCY_GET_TIME(t1);
+//      LATENCY_GET_TIME(t1);
       ret = run_experiment (i);
-      LATENCY_GET_TIME(t2);
+//      LATENCY_GET_TIME(t2);
 
       param.results [i] = latency_dif_time_usec (t1, t2);
 
@@ -304,8 +304,8 @@ static void compute_statistics (void)
 
    variance /= param.trials;
 
-   printf ("  mean: %.2f, stdev: %.2f, [%d, %d]\n",
-           mean, sqrt (variance), min_latency, max_latency);
+//   printf ("  mean: %.2f, stdev: %.2f, [%d, %d]\n",
+//           mean, sqrt (variance), min_latency, max_latency);
 }
 
 int main (int argc, char *argv [])

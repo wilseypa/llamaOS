@@ -10,10 +10,10 @@ CPPFLAGS += -Wall -Wextra -Weffc++ \
             -D__XEN_INTERFACE_VERSION__=0x00030205 \
              $(INCLUDES:%=-I %)
 
-VPATH = src/llamaos/xen
+VPATH = src
 
 SOURCES = \
-  trace.cpp
+  llamaos/xen/trace.cpp
 
 BINARY = hvm.a
 OBJECTS = $(SOURCES:%.cpp=$(OBJDIR)/%.o)

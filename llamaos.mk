@@ -8,7 +8,7 @@ INCLUDES = \
 CPPFLAGS += -Wall -Wextra -Weffc++ \
              $(INCLUDES:%=-I %)
 
-VPATH = src/llamaos
+VPATH = src
 
 SOURCES = 
 
