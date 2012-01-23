@@ -10,7 +10,8 @@ INCLUDES = \
   gtest
 
 CPPFLAGS += $(INCLUDES:%=-I %) \
-            -DGTEST_HAS_PTHREAD=0
+            -DGTEST_HAS_PTHREAD=0 -DGTEST_HAS_STREAM_REDIRECTION=0
+
 
 VPATH = gtest/src
 

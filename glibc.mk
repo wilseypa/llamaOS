@@ -23,6 +23,7 @@ SOURCES = \
   glibc/iconv/gconv_open.c \
   glibc/iconv/gconv_simple.c \
   glibc/iconv/gconv_trans.c \
+  glibc/io/mkdir.c \
   glibc/intl/dcgettext.c \
   glibc/intl/dcigettext.c \
   glibc/intl/explodename.c \
@@ -137,6 +138,7 @@ SOURCES = \
   glibc/posix/geteuid.c \
   glibc/posix/getgid.c \
   glibc/posix/getuid.c \
+  glibc/posix/regex.c \
   glibc/stdio-common/_itoa.c \
   glibc/stdio-common/fprintf.c \
   glibc/stdio-common/fxprintf.c \
@@ -163,6 +165,7 @@ SOURCES = \
   glibc/stdlib/cmp.c \
   glibc/stdlib/cxa_atexit.c \
   glibc/stdlib/divrem.c \
+  glibc/stdlib/exit.c \
   glibc/stdlib/fpioconst.c \
   glibc/stdlib/getenv.c \
   glibc/stdlib/grouping.c \
@@ -252,6 +255,7 @@ SOURCES = \
   glibc/sysdeps/llamaos/elf/enbl-secure.c \
   glibc/sysdeps/llamaos/elf/dl-libc.c \
   glibc/sysdeps/llamaos/elf/dl-profstub.c \
+  glibc/sysdeps/llamaos/posix/_exit.c \
   glibc/sysdeps/llamaos/posix/sysconf.c \
   glibc/sysdeps/llamaos/abort.c \
   glibc/sysdeps/llamaos/assert.c \
@@ -275,6 +279,7 @@ SOURCES = \
   glibc/sysdeps/wordsize-64/strtoul_l.c \
   glibc/time/alt_digit.c \
   glibc/time/era.c \
+  glibc/time/gettimeofday.c \
   glibc/time/lc-time-cleanup.c \
   glibc/time/localtime.c \
   glibc/time/mktime.c \
@@ -303,6 +308,7 @@ SOURCES = \
   glibc/wcsmbs/wcsnlen.c \
   glibc/wcsmbs/wcsmbsload.c \
   glibc/wcsmbs/wcsrtombs.c \
+  glibc/wcsmbs/wcsstr.c \
   glibc/wcsmbs/wcsxfrm.c \
   glibc/wcsmbs/wcsxfrm_l.c \
   glibc/wcsmbs/wctob.c \

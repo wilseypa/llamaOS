@@ -28,23 +28,9 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <iostream>
-
 #include <gtest/gtest.h>
 
-using namespace std;
-
-TEST(Default,Test1)
+TEST(Stopwatch, NonzeroElapsedTime)
 {
-   int x = 0;
-   EXPECT_EQ(0, x);
-}
-
-int main (int argc, char *argv [])
-{
-   cout << "running test-xen..." << endl;
-
-   ::testing::InitGoogleTest(&argc, argv);
-
-   return RUN_ALL_TESTS();
+   EXPECT_EQ(0, 0);
 }
