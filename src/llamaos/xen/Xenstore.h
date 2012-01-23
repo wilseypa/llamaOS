@@ -33,6 +33,8 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 #include <cstdint>
 
+#include <stdexcept>
+#include <sstream>
 #include <string>
 
 #include <xen/xen.h>
@@ -73,6 +75,20 @@ public:
     *
     */
    std::string read (const std::string &key) const;
+
+   template <typename T>
+   T read (const std::string &key) const
+   {
+      T t;
+      std::stringstream sstream (read (key));
+
+      if ((sstream >> t).fail ())
+      {
+         throw std::runtime_error ("failed to convert xenstore string to type");
+      }
+
+      return t;
+   }
 
 private:
    Xenstore ();

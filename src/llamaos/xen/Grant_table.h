@@ -39,6 +39,8 @@ either expressed or implied, of the copyright holder(s) or contributors.
 namespace llamaos {
 namespace xen {
 
+//typedef grant_entry_v2_t grant_entry_t;
+
 class Grant_table
 {
 public:

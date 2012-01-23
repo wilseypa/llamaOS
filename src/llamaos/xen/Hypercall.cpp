@@ -142,15 +142,50 @@ bool Hypercall::console_io (const char *str)
    return true;
 }
 
-bool Hypercall::grant_table_setup_table (unsigned int pages)
+bool Hypercall::grant_table_setup_table (unsigned int /* pages */)
 {
-   struct gnttab_setup_table setup_table;
+//   struct gnttab_setup_table setup_table;
 
-   setup_table.dom = DOMID_SELF;
-   setup_table.nr_frames = pages;
+//   setup_table.dom = DOMID_SELF;
+//   setup_table.nr_frames = pages;
 
    return true;
 }
+
+bool Hypercall::grant_table_query_size (uint32_t &frames, uint32_t &max_frames, int16_t &status)
+{
+   gnttab_query_size_t query_size;
+   query_size.dom = DOMID_SELF;
+
+   if (0 != HYPERVISOR_grant_table_op (GNTTABOP_query_size, &query_size, 1))
+   {
+      trace ("HYPERVISOR_grant_table_op (GNTTABOP_query_size) FAILED\n");
+      return false;
+   }
+
+   frames = query_size.nr_frames;
+   max_frames = query_size.max_nr_frames;
+   status = query_size.status;
+   return true;
+}
+
+#if 0
+// needs __XEN_INTERFACE_VERSION__=0x0003020a
+bool Hypercall::grant_table_get_version (uint32_t &version)
+{
+   gnttab_get_version_t get_version;
+   get_version.dom = DOMID_SELF;
+
+   if (0 != HYPERVISOR_grant_table_op (GNTTABOP_get_version, &get_version, 1))
+   {
+      trace ("HYPERVISOR_grant_table_op (GNTTABOP_get_version) FAILED\n");
+      return false;
+   }
+
+   version = get_version.version;
+   return true;
+}
+#endif
 
 bool Hypercall::sched_op_yield ()
 {

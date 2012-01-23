@@ -3,11 +3,13 @@ include common.mk
 MAKEFILE_SOURCES += e1000e.mk
 
 INCLUDES = \
+  xen/include \
   src
 
 ASMFLAGS += $(INCLUDES:%=-I %)
 CPPFLAGS += -Wall -Wextra -Weffc++ \
-             $(INCLUDES:%=-I %)
+             $(INCLUDES:%=-I %) \
+            -D__XEN_INTERFACE_VERSION__=0x00030205
 
 VPATH = src
 

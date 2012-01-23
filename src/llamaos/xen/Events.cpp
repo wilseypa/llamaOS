@@ -83,12 +83,12 @@ Events::~Events ()
    Hypercall::set_callbacks (0UL, 0UL);
 }
 
-void Events::bind (unsigned int port, event_handler_t handler, void *data)
+void Events::bind (unsigned int /* port */, event_handler_t /* handler */, void * /* data */)
 {
 
 }
 
-void Events::unbind (unsigned int port)
+void Events::unbind (unsigned int /* port */)
 {
 
 }
@@ -105,17 +105,17 @@ void Events::bind_virq (unsigned int virq, event_handler_t handler, void *data)
    shared_info->evtchn_mask [port / sizeof(unsigned long)] &= ~(1 << (port % sizeof(unsigned long)));
 }
 
-void Events::unbind_virq (unsigned int virq)
+void Events::unbind_virq (unsigned int /* virq */)
 {
 
 }
 
-void Events::bind_irq (unsigned int irq, event_handler_t handler, void *data)
+void Events::bind_irq (unsigned int /* irq */, event_handler_t /* handler */, void * /* data */)
 {
 
 }
 
-void Events::unbind_irq (unsigned int irq)
+void Events::unbind_irq (unsigned int /* irq */)
 {
 
 }

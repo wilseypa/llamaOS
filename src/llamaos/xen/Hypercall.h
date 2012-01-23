@@ -135,6 +135,11 @@ public:
     */
    static bool grant_table_setup_table (unsigned int pages);
 
+   static bool grant_table_query_size (uint32_t &frames, uint32_t &max_frames, int16_t &status);
+
+   // needs __XEN_INTERFACE_VERSION__=0x00030205
+   // static bool grant_table_get_version (uint32_t &version);
+
    // llamaOS UNSUPPORTED CALLS
    //   __HYPERVISOR_vm_assist            21
    //   __HYPERVISOR_update_va_mapping_otherdomain 22

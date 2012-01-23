@@ -30,14 +30,33 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 #include <iostream>
 
+#include <llamaos/xen/Hypercall.h>
+#include <llamaos/xen/Hypervisor.h>
 #include <llamaos/trace.h>
 
 using namespace std;
 using namespace llamaos;
+using namespace llamaos::xen;
 
 int main (int /* argc */, char ** /* argv [] */)
 {
-   trace ("running e1000e llamaNET domain...\n");
+   cout << "running e1000e llamaNET domain...\n" << endl;
 
+   uint32_t frames = 0;
+   uint32_t max_frames = 0;
+   int16_t status = 0;
+
+   if (!Hypercall::grant_table_query_size (frames, max_frames, status))
+   {
+      cout << "Hypercall::grant_table_query_size FAILED" << endl;
+   }
+   cout << "grant table frames: " << frames << endl;
+   cout << "grant table max frames: " << max_frames << endl;
+   cout << "grant table status: " << status << endl;
+
+   int backend_id = Hypervisor::get_instance ()->xenstore.read<int>("device/pci/0/backend-id");
+
+   cout << "backend-id: " << backend_id << endl;
+   
    return 0;
 }
