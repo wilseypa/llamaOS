@@ -264,6 +264,7 @@ SOURCES = \
   glibc/sysdeps/llamaos/errno.c \
   glibc/sysdeps/llamaos/getcwd.c \
   glibc/sysdeps/llamaos/getpagesize.c \
+  glibc/sysdeps/llamaos/gettimeofday.c \
   glibc/sysdeps/llamaos/init-first.c \
   glibc/sysdeps/llamaos/libc_fatal.c \
   glibc/sysdeps/llamaos/lseek64.c \
@@ -279,7 +280,6 @@ SOURCES = \
   glibc/sysdeps/wordsize-64/strtoul_l.c \
   glibc/time/alt_digit.c \
   glibc/time/era.c \
-  glibc/time/gettimeofday.c \
   glibc/time/lc-time-cleanup.c \
   glibc/time/localtime.c \
   glibc/time/mktime.c \

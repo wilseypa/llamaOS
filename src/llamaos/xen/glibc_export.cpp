@@ -223,6 +223,24 @@ ssize_t llamaos_read (int fd, void *buf, size_t nbytes)
 typedef ssize_t (*llamaos_read_t) (int, void *, size_t);
 extern "C" int register_llamaos_read (llamaos_read_t);
 
+
+
+
+
+/**
+ * @brief int __gettimeofday (struct timeval *tv, struct timezone *tz)
+ *
+ */
+int llamaos_gettimeofday (struct timeval *tv, struct timezone *tz)
+{
+   trace ("glibc calling gettimeofday (%lx, %lx)\n", tv, tz);
+
+   return -1;
+}
+
+typedef int (*llamaos_gettimeofday_t) (struct timeval *, struct timezone *);
+extern "C" int register_llamaos_gettimeofday (llamaos_gettimeofday_t);
+
 /**
  * @brief Initialize the glibc exports.
  *
@@ -240,4 +258,5 @@ void register_glibc_exports ()
    register_llamaos_lseek64 (llamaos_lseek64);
    register_llamaos_poll (llamaos_poll);
    register_llamaos_read (llamaos_read);
+   register_llamaos_gettimeofday (llamaos_gettimeofday);
 }
