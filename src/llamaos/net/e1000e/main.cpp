@@ -54,6 +54,26 @@ int main (int /* argc */, char ** /* argv [] */)
    cout << "grant table max frames: " << max_frames << endl;
    cout << "grant table status: " << status << endl;
 
+   unsigned long frame_list [6] = { 0 };
+   if (!Hypercall::grant_table_setup_table (5, frame_list))
+   {
+      cout << "Hypercall::grant_table_query_size FAILED" << endl;
+   }
+   cout << "frame_list [0]: " << frame_list [0] << endl;
+   cout << "frame_list [1]: " << frame_list [1] << endl;
+   cout << "frame_list [2]: " << frame_list [2] << endl;
+   cout << "frame_list [3]: " << frame_list [3] << endl;
+   cout << "frame_list [4]: " << frame_list [4] << endl;
+   cout << "frame_list [5]: " << frame_list [5] << endl;
+
+   if (!Hypercall::grant_table_query_size (frames, max_frames, status))
+   {
+      cout << "Hypercall::grant_table_query_size FAILED" << endl;
+   }
+   cout << "grant table frames: " << frames << endl;
+   cout << "grant table max frames: " << max_frames << endl;
+   cout << "grant table status: " << status << endl;
+
    int backend_id = Hypervisor::get_instance ()->xenstore.read<int>("device/pci/0/backend-id");
 
    cout << "backend-id: " << backend_id << endl;

@@ -133,7 +133,7 @@ public:
     * @brief Grant table operations.
     *
     */
-   static bool grant_table_setup_table (unsigned int pages);
+   static bool grant_table_setup_table (unsigned int pages, unsigned long *frame_list);
 
    static bool grant_table_query_size (uint32_t &frames, uint32_t &max_frames, int16_t &status);
 

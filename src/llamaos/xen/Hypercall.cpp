@@ -142,12 +142,24 @@ bool Hypercall::console_io (const char *str)
    return true;
 }
 
-bool Hypercall::grant_table_setup_table (unsigned int /* pages */)
+bool Hypercall::grant_table_setup_table (unsigned int pages, unsigned long *frame_list)
 {
-//   struct gnttab_setup_table setup_table;
+   gnttab_setup_table_t setup_table;
 
-//   setup_table.dom = DOMID_SELF;
-//   setup_table.nr_frames = pages;
+   setup_table.dom = DOMID_SELF;
+   setup_table.nr_frames = pages;
+   set_xen_guest_handle(setup_table.frame_list, frame_list);
+
+   if (0 != HYPERVISOR_grant_table_op (GNTTABOP_setup_table, &setup_table, 1))
+   {
+      trace ("HYPERVISOR_grant_table_op (GNTTABOP_setup_table) FAILED\n");
+      return false;
+   }
+   else if (setup_table.status != GNTST_okay)
+   {
+      trace ("HYPERVISOR_grant_table_op (GNTTABOP_setup_table) FAILED (status: %d)\n", setup_table.status);
+      return false;
+   }
 
    return true;
 }
