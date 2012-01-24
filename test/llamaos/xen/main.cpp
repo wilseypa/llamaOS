@@ -37,6 +37,7 @@ using namespace std;
 TEST(Default,Test1)
 {
    int x = 0;
+
    EXPECT_EQ(0, x);
 }
 

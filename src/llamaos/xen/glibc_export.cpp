@@ -112,18 +112,22 @@ extern "C" int register_llamaos_libc_fatal (llamaos_libc_fatal_t);
 extern "C"
 ssize_t llamaos_libc_write (int fd, const void *buf, size_t nbytes)
 {
-   trace ("glibc calling llamaos_libc_write (fd: %d, buf: ", fd);
+//   trace ("glibc calling llamaos_libc_write (fd: %d, buf: ", fd);
 
-   for (unsigned int i = 0; i < nbytes; i++)
+//   for (unsigned int i = 0; i < nbytes; i++)
+//   {
+//      trace ("%c", static_cast<const char *>(buf) [i]);
+//   }
+
+//   trace (", nbytes: %d)\n", nbytes);
+
+   if (stdout->_fileno == fd)
    {
-      trace ("%c", static_cast<const char *>(buf) [i]);
+      Hypervisor::get_instance ()->console.write (static_cast<const char *>(buf), nbytes);
+      return nbytes;
    }
 
-   trace (", nbytes: %d)\n", nbytes);
-
-   Hypervisor::get_instance ()->console.write (static_cast<const char *>(buf), nbytes);
-
-   return nbytes;
+   return 0;
 }
 
 typedef ssize_t (*llamaos_libc_write_t) (int, const void *, size_t);
@@ -225,17 +229,93 @@ extern "C" int register_llamaos_read (llamaos_read_t);
 
 
 
+static inline uint64_t rdtsc ()
+{
+   uint32_t lo, hi;
 
+   asm volatile ("rdtsc" : "=a" (lo), "=d" (hi));
+
+   return (static_cast<uint64_t>(hi) << 32) | lo;
+}
+
+static inline uint64_t tsc_to_ns (const vcpu_time_info_t *time_info, uint64_t tsc)
+{
+   const uint64_t overflow = UINT64_MAX / time_info->tsc_to_system_mul;
+   uint64_t time_ns = 0UL;
+
+   uint64_t stsc = (time_info->tsc_shift < 0)
+                 ? (tsc >> -time_info->tsc_shift) : (tsc << time_info->tsc_shift);
+
+   // mul will overflow 64 bits
+   while (stsc > overflow)
+   {
+      time_ns += ((overflow * time_info->tsc_to_system_mul) >> 32);
+      stsc -= overflow;
+   }
+
+   time_ns += (stsc * time_info->tsc_to_system_mul) >> 32;
+
+   return time_ns;
+}
 
 /**
  * @brief int __gettimeofday (struct timeval *tv, struct timezone *tz)
  *
  */
-int llamaos_gettimeofday (struct timeval *tv, struct timezone *tz)
+int llamaos_gettimeofday (struct timeval *tv, struct timezone * /* tz */)
 {
-   trace ("glibc calling gettimeofday (%lx, %lx)\n", tv, tz);
+   // trace ("glibc calling gettimeofday (%lx, %lx)\n", tv, tz);
 
-   return -1;
+   uint32_t wc_version = 0;
+   uint32_t wc_sec = 0;
+   uint32_t wc_nsec = 0;
+
+   uint32_t version = 0;
+   uint64_t tsc_timestamp = 0;
+   uint64_t system_time = 0;
+
+   shared_info_t *shared_info = Hypervisor::get_instance ()->shared_info;
+   vcpu_time_info_t *time_info = &shared_info->vcpu_info [0].time;
+
+   for (;;)
+   {
+      wc_version = shared_info->wc_version;
+      version = time_info->version;
+
+      if (   !(wc_version & 1)
+          && !(version & 1))
+      {
+         wc_sec = shared_info->wc_sec;
+         wc_nsec = shared_info->wc_nsec;
+         tsc_timestamp = time_info->tsc_timestamp;
+         system_time = time_info->system_time;
+
+         if (   (wc_version == shared_info->wc_version)
+             && (version == time_info->version))
+         {
+            break;
+         }
+      }
+   }
+
+   uint64_t tsc = rdtsc () - tsc_timestamp;
+   uint64_t nsec = tsc_to_ns (time_info, tsc);
+
+   nsec += system_time;
+
+   wc_sec += (nsec / 1000000000UL);
+   wc_nsec += (nsec % 1000000000UL);
+
+   if (wc_nsec > 1000000000UL)
+   {
+      wc_sec += 1;
+      wc_nsec -= 1000000000UL;
+   }
+
+   tv->tv_sec = wc_sec;
+   tv->tv_usec = wc_nsec / 1000;
+
+   return 0;
 }
 
 typedef int (*llamaos_gettimeofday_t) (struct timeval *, struct timezone *);
