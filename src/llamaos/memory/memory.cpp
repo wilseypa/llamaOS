@@ -42,6 +42,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <llamaos/memory/PML4.h>
 
 #include <llamaos/trace.h>
+#include <llamaos/config.h>
 
 namespace llamaos {
 namespace memory {
@@ -54,6 +55,9 @@ static uint64_t end_pseudo_page = 0UL;
 
 static uint64_t start_virtual_address = 0UL;
 static uint64_t end_virtual_address = 0UL;
+
+static uint64_t start_reserved_virtual_address = 0UL;
+static uint64_t reserved_pages = 0UL;
 
 static void *program_break = nullptr;
 
@@ -150,7 +154,8 @@ static uint64_t find_start_page (uint64_t CR3_virtual_address)
 
 static uint64_t find_start_address (uint64_t CR3_virtual_address,
                                     uint64_t start_pseudo_page,
-                                    uint64_t end_pseudo_page)
+                                    uint64_t end_pseudo_page,
+                                    uint64_t total_pages)
 {
    // begin installing new tables in the reserved 512kb padding
    uint64_t table_pseudo_page = start_pseudo_page - 128;
@@ -158,7 +163,7 @@ static uint64_t find_start_address (uint64_t CR3_virtual_address,
    PML4 pml4 (CR3_virtual_address);
 
    // loop over pages, mapping PDP, PD & PT along the way
-   for (uint64_t i = start_pseudo_page; i < end_pseudo_page; i++)
+   for (uint64_t i = start_pseudo_page; i < total_pages; i++)
    {
       // address at this page number
       uint64_t virtual_address = pseudo_to_virtual (page_to_address (i));
@@ -200,7 +205,11 @@ static uint64_t find_start_address (uint64_t CR3_virtual_address,
       PT pt (pd.get_entry (virtual_address));
       PTE pte (pt.get_entry (virtual_address));
 
-      update_table_entry (pte.machine_address, page_to_address (pseudo_page_to_machine_page (i)));
+      // do not try to map the reserved pages
+      if (i < end_pseudo_page)
+      {
+         update_table_entry (pte.machine_address, page_to_address (pseudo_page_to_machine_page (i)));
+      }
    }
 
    if (table_pseudo_page > start_pseudo_page)
@@ -212,15 +221,18 @@ static uint64_t find_start_address (uint64_t CR3_virtual_address,
    return pseudo_to_virtual (page_to_address (start_pseudo_page));
 }
 
-bool initialize (uint64_t CR3_virtual_address, uint64_t total_pages)
+bool initialize (uint64_t CR3_virtual_address, uint64_t total_pages, uint64_t reserved_pages)
 {
    memory::CR3_virtual_address = CR3_virtual_address;
    memory::total_pages = total_pages;
    memory::start_pseudo_page = find_start_page (CR3_virtual_address);
    memory::end_pseudo_page = total_pages;
 
-   memory::start_virtual_address = find_start_address (CR3_virtual_address, start_pseudo_page, end_pseudo_page);
+   memory::start_virtual_address = find_start_address (CR3_virtual_address, start_pseudo_page, end_pseudo_page, total_pages + reserved_pages);
    memory::end_virtual_address = pseudo_to_virtual (page_to_address(end_pseudo_page));
+
+   memory::start_reserved_virtual_address = memory::end_virtual_address;
+   memory::reserved_pages = reserved_pages;
 
    program_break = address_to_pointer<void>(start_virtual_address);
 
@@ -230,7 +242,18 @@ bool initialize (uint64_t CR3_virtual_address, uint64_t total_pages)
    trace ("  start_virtual_address: %lx\n", start_virtual_address);
    trace ("    end_virtual_address: %lx\n", end_virtual_address);
    trace ("\n");
+
    return true;
+}
+
+uint64_t get_reserved_virtual_address ()
+{
+   return memory::start_reserved_virtual_address;
+}
+
+uint64_t get_reserved_size ()
+{
+   return memory::reserved_pages * PAGE_SIZE;
 }
 
 void *set_program_break (void *address)

@@ -66,6 +66,9 @@ public:
     */
    virtual ~Xenstore ();
 
+   void start_transaction (uint32_t id);
+   void end_transaction (uint32_t id);
+
    /**
     * @brief Read information from the Xenstore.
     *
@@ -90,13 +93,36 @@ public:
       return t;
    }
 
+   /**
+    * @brief Write information to the Xenstore.
+    *
+    * @param key
+    * @param value
+    *
+    */
+   void write (const std::string &key, const std::string &value) const;
+
+   template <typename T>
+   void write (const std::string &key, const T &value) const
+   {
+      std::stringstream sstream;
+
+      if ((sstream << value).fail ())
+      {
+         throw std::runtime_error ("failed to convert xenstore type to string");
+      }
+
+      write (key, sstream.str ());
+   }
+
 private:
    Xenstore ();
    Xenstore (const Xenstore &);
    Xenstore &operator= (const Xenstore &);
 
    void write_request (const char *data, unsigned int length) const;
-   void write_request (const std::string &key) const;
+   void write_read_request (const std::string &key) const;
+   void write_write_request (const std::string &key, const std::string &value) const;
 
    void read_response (char *data, unsigned int length) const;
    std::string read_response (unsigned int length) const;

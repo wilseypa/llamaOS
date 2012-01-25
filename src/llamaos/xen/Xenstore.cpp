@@ -58,6 +58,68 @@ Xenstore::~Xenstore ()
 
 }
 
+void Xenstore::start_transaction (uint32_t id)
+{
+   struct xsd_sockmsg msg;
+
+   msg.type = XS_TRANSACTION_START;
+   msg.req_id = xenstore_req_id;
+   msg.tx_id = id;
+   msg.len = 1;
+
+   write_request (reinterpret_cast<const char *>(&msg), sizeof(msg));
+   write_request ("", 1);
+
+   // alert Xenstore of our message
+   Hypercall::event_channel_send (port);
+
+   // read response from Xenstore
+   read_response ();
+}
+
+void Xenstore::end_transaction (uint32_t id)
+{
+   struct xsd_sockmsg msg;
+
+   msg.type = XS_TRANSACTION_END;
+   msg.req_id = xenstore_req_id;
+   msg.tx_id = id;
+   msg.len = 1;
+
+   write_request (reinterpret_cast<const char *>(&msg), sizeof(msg));
+   write_request ("", 1);
+
+   // alert Xenstore of our message
+   Hypercall::event_channel_send (port);
+
+   // read response from Xenstore
+   read_response ();
+}
+
+string Xenstore::read (const string &key) const
+{
+   // write request to Xenstore
+   write_read_request (key);
+
+   // alert Xenstore of our message
+   Hypercall::event_channel_send (port);
+
+   // read response from Xenstore
+   return read_response ();
+}
+
+void Xenstore::write (const std::string &key, const std::string &value) const
+{
+   // write request to Xenstore
+   write_write_request (key, value);
+
+   // alert Xenstore of our message
+   Hypercall::event_channel_send (port);
+
+   // read response from Xenstore
+   read_response ();
+}
+
 void Xenstore::write_request (const char *data, unsigned int length) const
 {
    if (length > XENSTORE_RING_SIZE)
@@ -92,7 +154,7 @@ void Xenstore::write_request (const char *data, unsigned int length) const
    interface->req_prod += length;
 }
 
-void Xenstore::write_request (const std::string &key) const
+void Xenstore::write_read_request (const std::string &key) const
 {
    struct xsd_sockmsg msg;
 
@@ -103,6 +165,20 @@ void Xenstore::write_request (const std::string &key) const
 
    write_request (reinterpret_cast<const char *>(&msg), sizeof(msg));
    write_request (key.c_str (), key.size () + 1);
+}
+
+void Xenstore::write_write_request (const std::string &key, const std::string &value) const
+{
+   struct xsd_sockmsg msg;
+
+   msg.type = XS_WRITE;
+   msg.req_id = xenstore_req_id;
+   msg.tx_id = 0;
+   msg.len = key.size () + 1 + value.size ();
+
+   write_request (reinterpret_cast<const char *>(&msg), sizeof(msg));
+   write_request (key.c_str (), key.size () + 1);
+   write_request (value.c_str (), value.size ());
 }
 
 void Xenstore::read_response (char *data, unsigned int length) const
@@ -166,16 +242,4 @@ string Xenstore::read_response () const
    }
 
    return read_response (msg.len);
-}
-
-string Xenstore::read (const string &key) const
-{
-   // write request to Xenstore
-   write_request (key);
-
-   // alert Xenstore of our message
-   Hypercall::event_channel_send (port);
-
-   // reasponse from Xenstore
-   return read_response ();
 }

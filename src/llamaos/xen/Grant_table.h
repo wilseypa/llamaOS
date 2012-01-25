@@ -33,6 +33,8 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 #include <cstdint>
 
+#include <list>
+
 #include <xen/xen.h>
 #include <xen/grant_table.h>
 
@@ -44,17 +46,20 @@ namespace xen {
 class Grant_table
 {
 public:
-   Grant_table (unsigned int size);
+   Grant_table ();
    virtual ~Grant_table ();
 
+   grant_ref_t grant_access (domid_t domid, void *address);
+
 private:
-   Grant_table ();
    Grant_table (const Grant_table &);
    Grant_table &operator= (const Grant_table &);
 
    const unsigned int size;
-   char *const buffer;
    grant_entry_t *const entries;
+
+   std::list<grant_ref_t> avail;
+   std::list<grant_ref_t> inuse;
 
 };
 

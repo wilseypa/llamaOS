@@ -125,7 +125,8 @@ void start (start_info_t *start_info)
       memory::machine_table_size = MACH2PHYS_NR_ENTRIES;
       memory::pseudo_table = memory::address_to_pointer<uint64_t> (start_info->mfn_list);
       memory::pseudo_table_size = start_info->nr_pages;
-      memory::initialize (start_info->pt_base, start_info->nr_pages);
+
+      memory::initialize (start_info->pt_base, start_info->nr_pages, 512);
 
       // register callbacks to the glibc library
       register_glibc_exports ();

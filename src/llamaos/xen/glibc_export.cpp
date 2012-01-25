@@ -258,6 +258,8 @@ static inline uint64_t tsc_to_ns (const vcpu_time_info_t *time_info, uint64_t ts
    return time_ns;
 }
 
+#define mb()  __asm__ __volatile__ ( "mfence" : : : "memory")
+
 /**
  * @brief int __gettimeofday (struct timeval *tv, struct timezone *tz)
  *
@@ -281,7 +283,7 @@ int llamaos_gettimeofday (struct timeval *tv, struct timezone * /* tz */)
    {
       wc_version = shared_info->wc_version;
       version = time_info->version;
-
+mb();
       if (   !(wc_version & 1)
           && !(version & 1))
       {
@@ -289,6 +291,7 @@ int llamaos_gettimeofday (struct timeval *tv, struct timezone * /* tz */)
          wc_nsec = shared_info->wc_nsec;
          tsc_timestamp = time_info->tsc_timestamp;
          system_time = time_info->system_time;
+mb();
 
          if (   (wc_version == shared_info->wc_version)
              && (version == time_info->version))

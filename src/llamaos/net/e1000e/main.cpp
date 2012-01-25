@@ -28,55 +28,59 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
+#include <sys/time.h>
+
 #include <iostream>
 
+#include <xen/io/pciif.h>
+#include <xen/io/xenbus.h>
+
+#include <llamaos/memory/memory.h>
 #include <llamaos/xen/Hypercall.h>
 #include <llamaos/xen/Hypervisor.h>
+#include <llamaos/config.h>
 #include <llamaos/trace.h>
 
 using namespace std;
 using namespace llamaos;
+using namespace llamaos::memory;
 using namespace llamaos::xen;
 
 int main (int /* argc */, char ** /* argv [] */)
 {
    cout << "running e1000e llamaNET domain...\n" << endl;
 
-   uint32_t frames = 0;
-   uint32_t max_frames = 0;
-   int16_t status = 0;
+   cout << "waiting for 60 secs..." << endl;
+   timeval tv, tv1, tv2;
+   gettimeofday (&tv1, nullptr);
+   tv = tv1;
 
-   if (!Hypercall::grant_table_query_size (frames, max_frames, status))
+   for (;;)
    {
-      cout << "Hypercall::grant_table_query_size FAILED" << endl;
+      gettimeofday (&tv2, nullptr);
+
+      if ((tv2.tv_sec - tv1.tv_sec) > 60)
+      {
+         break;
+      }
    }
-   cout << "grant table frames: " << frames << endl;
-   cout << "grant table max frames: " << max_frames << endl;
-   cout << "grant table status: " << status << endl;
 
-   unsigned long frame_list [6] = { 0 };
-   if (!Hypercall::grant_table_setup_table (5, frame_list))
-   {
-      cout << "Hypercall::grant_table_query_size FAILED" << endl;
-   }
-   cout << "frame_list [0]: " << frame_list [0] << endl;
-   cout << "frame_list [1]: " << frame_list [1] << endl;
-   cout << "frame_list [2]: " << frame_list [2] << endl;
-   cout << "frame_list [3]: " << frame_list [3] << endl;
-   cout << "frame_list [4]: " << frame_list [4] << endl;
-   cout << "frame_list [5]: " << frame_list [5] << endl;
+   cout << "setup pci device xenbus..." << endl;
 
-   if (!Hypercall::grant_table_query_size (frames, max_frames, status))
-   {
-      cout << "Hypercall::grant_table_query_size FAILED" << endl;
-   }
-   cout << "grant table frames: " << frames << endl;
-   cout << "grant table max frames: " << max_frames << endl;
-   cout << "grant table status: " << status << endl;
-
-   int backend_id = Hypervisor::get_instance ()->xenstore.read<int>("device/pci/0/backend-id");
-
+   domid_t backend_id = Hypervisor::get_instance ()->xenstore.read<domid_t>("device/pci/0/backend-id");
    cout << "backend-id: " << backend_id << endl;
-   
+
+   char *buffer = new char [sizeof(struct xen_pci_sharedinfo) + PAGE_SIZE];
+
+   struct xen_pci_sharedinfo *pci_sharedinfo = address_to_pointer<struct xen_pci_sharedinfo> (pointer_to_address (buffer + PAGE_SIZE) & ~(PAGE_SIZE-1));
+   grant_ref_t ref = Hypervisor::get_instance ()->grant_table.grant_access (backend_id, pci_sharedinfo);
+
+   Hypervisor::get_instance ()->xenstore.start_transaction (1);
+   Hypervisor::get_instance ()->xenstore.write ("device/pci/0/pci-op-ref", "511");//ref);
+   Hypervisor::get_instance ()->xenstore.write ("device/pci/0/event-channel", "12"); // 12 is made up, alloc real channel later
+   Hypervisor::get_instance ()->xenstore.write ("device/pci/0/magic", "7");//XEN_PCI_MAGIC);
+   Hypervisor::get_instance ()->xenstore.write ("device/pci/0/state", "3");//XenbusStateInitialised);
+   Hypervisor::get_instance ()->xenstore.end_transaction (1);
+
    return 0;
 }

@@ -28,57 +28,44 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <stdexcept>
+#include <sys/time.h>
 
-#include <llamaos/memory/memory.h>
-#include <llamaos/xen/Grant_table.h>
+#include <gtest/gtest.h>
+
 #include <llamaos/xen/Hypercall.h>
-#include <llamaos/config.h>
 
-using namespace std;
-using namespace llamaos;
-using namespace llamaos::memory;
 using namespace llamaos::xen;
 
-// for now just map a single page for the table
-Grant_table::Grant_table ()
-   :  size(PAGE_SIZE / sizeof(grant_entry_t)),
-      entries(address_to_pointer<grant_entry_t> (get_reserved_virtual_address ())),
-      avail(),
-      inuse()
+TEST(Gettimeofday, NonzeroStartTime)
 {
-   unsigned long frame_list [1] = { 0 };
+   struct timeval tv;
 
-   if (!Hypercall::grant_table_setup_table (1, frame_list))
-   {
-      throw runtime_error ("failed to create grant table");
-   }
-
-   if (!Hypercall::update_va_mapping (pointer_to_address(entries), page_to_address (frame_list [0])))
-   {
-      throw runtime_error ("failed to map grant table");
-   }
-
-   for (grant_ref_t i = 0; i < 512; i++)
-   {
-      avail.push_back(i);
-   }
+   EXPECT_EQ(0, gettimeofday (&tv, 0));
+   EXPECT_NE(0, tv.tv_sec);
 }
 
-Grant_table::~Grant_table ()
+TEST(Gettimeofday, IncrementingSeconds)
 {
-   Hypercall::grant_table_setup_table(0, nullptr);
-}
+   struct timeval tv;
 
-grant_ref_t Grant_table::grant_access (domid_t domid, void *address)
-{
-   grant_ref_t ref = avail.back ();
-   avail.pop_back ();
-   inuse.push_back (ref);
+   EXPECT_EQ(0, gettimeofday (&tv, 0));
+   EXPECT_NE(0, tv.tv_sec);
 
-   entries [ref].domid = domid;
-   entries [ref].frame = virtual_pointer_to_machine_page (address);
-   entries [ref].flags = GTF_permit_access | GTF_reading | GTF_writing;
+   __time_t tv_sec = tv.tv_sec;
 
-   return ref;
+   for (int i = 0; i < 30; i++)
+   {
+      for (;;)
+      {
+         EXPECT_EQ(0, gettimeofday (&tv, 0));
+         EXPECT_NE(0, tv.tv_sec);
+
+         if (tv_sec != tv.tv_sec)
+         {
+            ++tv_sec;
+            EXPECT_EQ(tv_sec, tv.tv_sec);
+            break;
+         }
+      }
+   }
 }

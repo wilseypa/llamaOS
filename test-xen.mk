@@ -15,6 +15,7 @@ VPATH =
 
 SOURCES = \
   test/llamaos/xen/main.cpp \
+  test/llamaos/Gettimeofday.cpp \
   test/llamaos/Stopwatch.cpp
 
 OBJECTS = $(SOURCES:%.cpp=$(OBJDIR)/%.o)

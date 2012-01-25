@@ -86,12 +86,21 @@ inline T *machine_address_to_virtual_pointer (uint64_t address)
    return machine_page_to_virtual_pointer<T> (address_to_page (address));
 }
 
+template <typename T>
+inline uint64_t virtual_pointer_to_machine_page (T *pointer)
+{
+   return pseudo_page_to_machine_page (address_to_page (virtual_to_pseudo (pointer_to_address(pointer))));
+}
+
 void create_table_entry (uint64_t CR3_virtual_address,
                          uint64_t table_virtual_address,
                          uint64_t table_machine_address);
 void update_table_entry (uint64_t entry_machine_address, uint64_t page_machine_address);
 
-bool initialize (uint64_t CR3_virtual_address, uint64_t total_pages);
+bool initialize (uint64_t CR3_virtual_address, uint64_t total_pages, uint64_t reserved_pages);
+
+uint64_t get_reserved_virtual_address ();
+uint64_t get_reserved_size ();
 
 void *set_program_break (void *address);
 

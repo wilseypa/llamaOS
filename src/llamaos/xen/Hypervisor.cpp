@@ -81,8 +81,8 @@ static void virq_timer_event (void * /* data */)
 {
 //   Hypervisor *hypervisor = reinterpret_cast<Hypervisor *> (data);
 
-   // cout.flush ();
-   // fflush (stdout);
+   cout.flush ();
+   fflush (stdout);
 }
 
 Hypervisor *Hypervisor::get_instance ()
@@ -101,7 +101,7 @@ Hypervisor::Hypervisor (const start_info_t *start_info)
       console(machine_page_to_virtual_pointer<xencons_interface>(start_info->console.domU.mfn), start_info->console.domU.evtchn),
       traps(),
       events(shared_info),
-      grant_table(32),
+      grant_table(),
       xenstore(machine_page_to_virtual_pointer<xenstore_domain_interface>(start_info->store_mfn), start_info->store_evtchn)
 {
    instance = this;
