@@ -181,6 +181,7 @@ public:
    static bool event_channel_send (evtchn_port_t port);
 
    static bool event_channel_bind_virq (uint32_t virq, evtchn_port_t &port);
+   static bool event_channel_alloc_unbound (domid_t dom, evtchn_port_t &port);
 
    // llamaOS UNSUPPORTED CALLS
    //   __HYPERVISOR_physdev_op           33

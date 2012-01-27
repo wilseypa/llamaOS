@@ -83,6 +83,11 @@ Events::~Events ()
    Hypercall::set_callbacks (0UL, 0UL);
 }
 
+void Events::alloc (domid_t domid, evtchn_port_t &port)
+{
+
+}
+
 void Events::bind (unsigned int /* port */, event_handler_t /* handler */, void * /* data */)
 {
 

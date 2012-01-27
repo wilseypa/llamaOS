@@ -38,7 +38,6 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <xen/xen.h>
 #include <xen/event_channel.h>
 
-struct shared_info;
 namespace llamaos {
 namespace xen {
 
@@ -50,6 +49,9 @@ class Events
 public:
    Events (shared_info_t *shared_info);
    virtual ~Events ();
+
+   void alloc (domid_t domid, evtchn_port_t &port);
+   void close (evtchn_port_t port);
 
    void bind (evtchn_port_t port, event_handler_t handler, void *data);
    void unbind (evtchn_port_t port);

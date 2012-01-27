@@ -264,3 +264,21 @@ bool Hypercall::event_channel_bind_virq (uint32_t virq, evtchn_port_t &port)
    port = op.port;
    return true;
 }
+
+bool Hypercall::event_channel_alloc_unbound (domid_t dom, evtchn_port_t &port)
+{
+   evtchn_alloc_unbound_t op;
+   op.dom = DOMID_SELF;
+   op.remote_dom = dom;
+
+   if (0 != HYPERVISOR_event_channel_op (EVTCHNOP_alloc_unbound, &op))
+   {
+      trace ("HYPERVISOR_event_channel_op (EVTCHNOP_alloc_unbound) FAILED\n");
+      return false;
+   }
+
+   port = op.port;
+   return true;
+}
+
+

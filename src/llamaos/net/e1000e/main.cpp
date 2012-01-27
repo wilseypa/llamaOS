@@ -75,11 +75,14 @@ int main (int /* argc */, char ** /* argv [] */)
    struct xen_pci_sharedinfo *pci_sharedinfo = address_to_pointer<struct xen_pci_sharedinfo> (pointer_to_address (buffer + PAGE_SIZE) & ~(PAGE_SIZE-1));
    grant_ref_t ref = Hypervisor::get_instance ()->grant_table.grant_access (backend_id, pci_sharedinfo);
 
+   evtchn_port_t port = 0;
+   Hypercall::event_channel_alloc_unbound (0, port);
+
    Hypervisor::get_instance ()->xenstore.start_transaction (1);
-   Hypervisor::get_instance ()->xenstore.write ("device/pci/0/pci-op-ref", "511");//ref);
-   Hypervisor::get_instance ()->xenstore.write ("device/pci/0/event-channel", "12"); // 12 is made up, alloc real channel later
-   Hypervisor::get_instance ()->xenstore.write ("device/pci/0/magic", "7");//XEN_PCI_MAGIC);
-   Hypervisor::get_instance ()->xenstore.write ("device/pci/0/state", "3");//XenbusStateInitialised);
+   Hypervisor::get_instance ()->xenstore.write ("device/pci/0/pci-op-ref", ref);
+   Hypervisor::get_instance ()->xenstore.write ("device/pci/0/event-channel", port);
+   Hypervisor::get_instance ()->xenstore.write ("device/pci/0/magic", XEN_PCI_MAGIC);
+   Hypervisor::get_instance ()->xenstore.write ("device/pci/0/state", XenbusStateInitialised);
    Hypervisor::get_instance ()->xenstore.end_transaction (1);
 
    return 0;
