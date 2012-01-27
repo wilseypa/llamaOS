@@ -59,7 +59,7 @@ int main (int /* argc */, char ** /* argv [] */)
    {
       gettimeofday (&tv2, nullptr);
 
-      if ((tv2.tv_sec - tv1.tv_sec) > 60)
+      if ((tv2.tv_sec - tv1.tv_sec) > 10)
       {
          break;
       }
@@ -84,6 +84,26 @@ int main (int /* argc */, char ** /* argv [] */)
    Hypervisor::get_instance ()->xenstore.write ("device/pci/0/magic", XEN_PCI_MAGIC);
    Hypervisor::get_instance ()->xenstore.write ("device/pci/0/state", XenbusStateInitialised);
    Hypervisor::get_instance ()->xenstore.end_transaction (1);
+
+   gettimeofday (&tv1, nullptr);
+
+   for (;;)
+   {
+      gettimeofday (&tv2, nullptr);
+
+      if ((tv2.tv_sec - tv1.tv_sec) > 10)
+      {
+         break;
+      }
+   }
+
+   Hypervisor::get_instance ()->xenstore.write ("device/pci/0/state", XenbusStateConnected);
+
+   string backend = Hypervisor::get_instance ()->xenstore.read("device/pci/0/backend");
+
+   cout << "backend: " << backend << endl;
+
+   cout << "num-devs: " << Hypervisor::get_instance ()->xenstore.read(backend+"/num-devs");
 
    return 0;
 }
