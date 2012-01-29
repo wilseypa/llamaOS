@@ -34,11 +34,14 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <llamaos/xen/Grant_table.h>
 #include <llamaos/xen/Hypercall.h>
 #include <llamaos/config.h>
+#include <llamaos/trace.h>
 
 using namespace std;
 using namespace llamaos;
 using namespace llamaos::memory;
 using namespace llamaos::xen;
+
+#define wmb() __asm__ __volatile__ ( "" : : : "memory")
 
 // for now just map a single page for the table
 Grant_table::Grant_table ()
@@ -78,7 +81,10 @@ grant_ref_t Grant_table::grant_access (domid_t domid, void *address)
 
    entries [ref].domid = domid;
    entries [ref].frame = virtual_pointer_to_machine_page (address);
-   entries [ref].flags = GTF_permit_access | GTF_reading | GTF_writing;
+
+   trace ("grant_access: %u, %u, %u\n", ref, entries [ref].domid, entries [ref].frame);
+   wmb();
+   entries [ref].flags = GTF_permit_access;
 
    return ref;
 }
