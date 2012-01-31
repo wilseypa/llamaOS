@@ -48,8 +48,19 @@ using namespace llamaos;
 using namespace llamaos::memory;
 using namespace llamaos::xen;
 
-#define mb()  __asm__ __volatile__ ( "mfence" : : : "memory")
-#define wmb() __asm__ __volatile__ ( "" : : : "memory")
+#define mb()    __asm__ __volatile__ ("mfence":::"memory")
+#define rmb()   __asm__ __volatile__ ("lfence":::"memory")
+#define wmb()   __asm__ __volatile__ ("sfence" ::: "memory") /* From CONFIG_UNORDERED_IO (linux) */
+
+#pragma pack(1)
+struct CSR
+{
+   uint32_t CTRL;
+   uint32_t CTRL2;
+   uint32_t STATUS;
+
+};
+#pragma pack()
 
 static uint32_t pci_read (struct xen_pci_sharedinfo *pci_sharedinfo, evtchn_port_t port, uint32_t offset, uint32_t size)
 {
@@ -74,12 +85,56 @@ static uint32_t pci_read (struct xen_pci_sharedinfo *pci_sharedinfo, evtchn_port
    while (pci_sharedinfo->flags & XEN_PCIF_active)
    {
 //      Hypercall::sched_op_block ();
-      mb();
+      rmb();
    }
+
+   rmb();
+
+   // the backend only returns valid bits from zero to size of value
+   switch (size)
+   {
+   default:
+   case 1:
+      pci_sharedinfo->op.value &= 0xFF;
+      break;
+
+   case 2:
+      pci_sharedinfo->op.value &= 0xFFFF;
+      break;
+
+   case 4:
+      pci_sharedinfo->op.value &= 0xFFFFFFFF;
+      break;
+   }
+
+   return pci_sharedinfo->op.value;
+}
+
+static void pci_write (struct xen_pci_sharedinfo *pci_sharedinfo, evtchn_port_t port, uint32_t offset, uint32_t value, uint32_t size)
+{
+   struct xen_pci_op op;
+   memset(&op, 0, sizeof(op));
+
+   op.cmd = XEN_PCI_OP_conf_write;
+   op.domain = 0;
+   op.bus = 0;
+   op.devfn = 0;
+   op.offset = offset;
+   op.size = size;
+   op.value = value;
+
+   pci_sharedinfo->op = op;
+   wmb();
+   pci_sharedinfo->flags |= XEN_PCIF_active;
+   Hypercall::event_channel_send(port);
 
    mb();
 
-   return pci_sharedinfo->op.value;
+   while (pci_sharedinfo->flags & XEN_PCIF_active)
+   {
+//      Hypercall::sched_op_block ();
+      mb();
+   }
 }
 
 int main (int /* argc */, char ** /* argv [] */)
@@ -193,9 +248,79 @@ int main (int /* argc */, char ** /* argv [] */)
    cout << "Min Gnt:             " << hex << pci_read (pci_sharedinfo, port, 62, 1) << endl;
    cout << "Max lat:             " << hex << pci_read (pci_sharedinfo, port, 63, 1) << endl;
 
+   cout << endl << "iterate through cap pointers..." << endl;
+
+   uint32_t next_pointer = pci_read (pci_sharedinfo, port, 52, 1);
+
+   while (0 != next_pointer)
+   {
+      uint32_t cap_id = pci_read (pci_sharedinfo, port, next_pointer, 1);
+
+      switch (cap_id)
+      {
+      default:
+         cout << "Unknown capability id: " << cap_id << endl;
+         cout << endl;
+         break;
+
+      case 0x01:
+         cout << "Power management" << endl;
+         cout << "Cap ID:              " << pci_read (pci_sharedinfo, port, next_pointer +  0, 1) << endl;
+         cout << "Next pointer:        " << pci_read (pci_sharedinfo, port, next_pointer +  1, 1) << endl;
+         cout << "PMC:                 " << pci_read (pci_sharedinfo, port, next_pointer +  2, 2) << endl;
+         cout << "PMCR:                " << pci_read (pci_sharedinfo, port, next_pointer +  4, 2) << endl;
+         cout << "PMCR_BSE:            " << pci_read (pci_sharedinfo, port, next_pointer +  6, 1) << endl;
+         cout << "Data:                " << pci_read (pci_sharedinfo, port, next_pointer +  8, 1) << endl;
+         cout << endl;
+         break;
+
+      case 0x05:
+         cout << endl << "MSI configuration" << endl;
+         cout << "Cap ID:              " << pci_read (pci_sharedinfo, port, next_pointer +  0, 1) << endl;
+         cout << "Next pointer:        " << pci_read (pci_sharedinfo, port, next_pointer +  1, 1) << endl;
+         cout << "Message control:     " << pci_read (pci_sharedinfo, port, next_pointer +  2, 2) << endl;
+         cout << "Message addr:        " << pci_read (pci_sharedinfo, port, next_pointer +  4, 4) << endl;
+         cout << "Message upper addr:  " << pci_read (pci_sharedinfo, port, next_pointer +  8, 4) << endl;
+         cout << "Message data:        " << pci_read (pci_sharedinfo, port, next_pointer + 12, 2) << endl;
+         cout << endl;
+         break;
+
+      case 0x10:
+         cout << endl << "PCIe configuration" << endl;
+         cout << "Cap ID:              " << pci_read (pci_sharedinfo, port, next_pointer +  0, 1) << endl;
+         cout << "Next pointer:        " << pci_read (pci_sharedinfo, port, next_pointer +  1, 1) << endl;
+         cout << "Capability register: " << pci_read (pci_sharedinfo, port, next_pointer +  2, 2) << endl;
+         cout << "Device capability:   " << pci_read (pci_sharedinfo, port, next_pointer +  4, 4) << endl;
+         cout << "Device control:      " << pci_read (pci_sharedinfo, port, next_pointer +  8, 2) << endl;
+         cout << "Device status:       " << pci_read (pci_sharedinfo, port, next_pointer + 10, 2) << endl;
+         cout << "Link capability:     " << pci_read (pci_sharedinfo, port, next_pointer + 12, 4) << endl;
+         cout << "Link control:        " << pci_read (pci_sharedinfo, port, next_pointer + 16, 2) << endl;
+         cout << "Link status:         " << pci_read (pci_sharedinfo, port, next_pointer + 18, 2) << endl;
+         cout << endl;
+         break;
+
+      case 0x11:
+         cout << endl << "MSI-X configuration" << endl;
+         cout << "Cap ID:              " << pci_read (pci_sharedinfo, port, next_pointer +  0, 1) << endl;
+         cout << "Next pointer:        " << pci_read (pci_sharedinfo, port, next_pointer +  1, 1) << endl;
+         cout << "Message control:     " << pci_read (pci_sharedinfo, port, next_pointer +  2, 2) << endl;
+         cout << "Table offset:        " << pci_read (pci_sharedinfo, port, next_pointer +  4, 4) << endl;
+         cout << "PBA offset:          " << pci_read (pci_sharedinfo, port, next_pointer +  8, 4) << endl;
+         cout << endl;
+         break;
+      }
+
+      next_pointer = pci_read (pci_sharedinfo, port, next_pointer + 1, 1);
+   }
+
+   cout << endl << "writing command 2..." << endl;
+   pci_write (pci_sharedinfo, port, 4, 2, 2);
+   cout << "Command:             " << hex << pci_read (pci_sharedinfo, port,  4, 2) << endl;
+
    uint64_t memory_machine_address = pci_read (pci_sharedinfo, port, 16, 4);
    uint64_t memory_virtual_address = get_reserved_virtual_address () + (512 * PAGE_SIZE);
    memory_virtual_address = memory_virtual_address & ~(PAGE_SIZE-1);
+   CSR *csr = address_to_pointer<CSR>(memory_virtual_address);
 
    for (uint64_t i = 0; i < (128 * 1024); i += PAGE_SIZE)
    {
@@ -204,7 +329,36 @@ int main (int /* argc */, char ** /* argv [] */)
       memory_virtual_address += PAGE_SIZE;
    }
 
-   cout << "front of memory: " << address_to_pointer<uint64_t>(memory_virtual_address) << endl;
+   cout << "CSR CTRL: " << hex << csr->CTRL << endl;
+   cout << "CSR STATUS: " << hex << csr->STATUS << endl;
+   cout.flush();
+
+   uint64_t flash_machine_address = pci_read (pci_sharedinfo, port, 20, 4);
+   uint64_t flash_virtual_address = memory_virtual_address;
+   uint32_t *flash_pointer = address_to_pointer<uint32_t>(flash_virtual_address);
+   Hypercall::update_va_mapping (flash_virtual_address, flash_machine_address);
+
+   cout << "flash [0]: " << hex << flash_pointer [0] << endl;
+   cout << "flash [1]: " << hex << flash_pointer [1] << endl;
+
+   cout << "reseting..." << endl;
+   uint32_t CTRL = csr->CTRL;
+   CTRL |= 0x4000000;
+
+   gettimeofday (&tv1, nullptr);
+
+   for (;;)
+   {
+      gettimeofday (&tv2, nullptr);
+
+      if ((tv2.tv_sec - tv1.tv_sec) > 3)
+      {
+         break;
+      }
+   }
+
+   cout << "CSR CTRL: " << hex << csr->CTRL << endl;
+   cout << "CSR STATUS: " << hex << csr->STATUS << endl;
 
    return 0;
 }
