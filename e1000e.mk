@@ -14,6 +14,7 @@ CPPFLAGS += -Wall -Wextra -Weffc++ \
 VPATH = src
 
 SOURCES = \
+  llamaos/net/e1000e/CSR.cpp \
   llamaos/net/e1000e/main.cpp
 
 OBJECTS = $(SOURCES:%.cpp=$(OBJDIR)/%.o)

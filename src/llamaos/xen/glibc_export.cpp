@@ -258,8 +258,6 @@ static inline uint64_t tsc_to_ns (const vcpu_time_info_t *time_info, uint64_t ts
    return time_ns;
 }
 
-#define mb()  __asm__ __volatile__ ( "mfence" : : : "memory")
-
 /**
  * @brief int __gettimeofday (struct timeval *tv, struct timezone *tz)
  *

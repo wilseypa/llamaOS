@@ -36,6 +36,10 @@ either expressed or implied, of the copyright holder(s) or contributors.
 // defined by linker script
 extern char _text;
 
+#define mb()    __asm__ __volatile__ ("mfence":::"memory")
+#define rmb()   __asm__ __volatile__ ("lfence":::"memory")
+#define wmb()   __asm__ __volatile__ ("sfence" ::: "memory") /* From CONFIG_UNORDERED_IO (linux) */
+
 namespace llamaos {
 namespace memory {
 

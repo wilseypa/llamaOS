@@ -38,6 +38,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <xen/io/xenbus.h>
 
 #include <llamaos/memory/memory.h>
+#include <llamaos/net/e1000e/CSR.h>
 #include <llamaos/xen/Hypercall.h>
 #include <llamaos/xen/Hypervisor.h>
 #include <llamaos/config.h>
@@ -46,21 +47,8 @@ either expressed or implied, of the copyright holder(s) or contributors.
 using namespace std;
 using namespace llamaos;
 using namespace llamaos::memory;
+using namespace llamaos::net::e1000e;
 using namespace llamaos::xen;
-
-#define mb()    __asm__ __volatile__ ("mfence":::"memory")
-#define rmb()   __asm__ __volatile__ ("lfence":::"memory")
-#define wmb()   __asm__ __volatile__ ("sfence" ::: "memory") /* From CONFIG_UNORDERED_IO (linux) */
-
-#pragma pack(1)
-struct CSR
-{
-   uint32_t CTRL;
-   uint32_t CTRL2;
-   uint32_t STATUS;
-
-};
-#pragma pack()
 
 static uint32_t pci_read (struct xen_pci_sharedinfo *pci_sharedinfo, evtchn_port_t port, uint32_t offset, uint32_t size)
 {
@@ -313,37 +301,42 @@ int main (int /* argc */, char ** /* argv [] */)
       next_pointer = pci_read (pci_sharedinfo, port, next_pointer + 1, 1);
    }
 
+   // enable PCIe memory
    cout << endl << "writing command 2..." << endl;
    pci_write (pci_sharedinfo, port, 4, 2, 2);
    cout << "Command:             " << hex << pci_read (pci_sharedinfo, port,  4, 2) << endl;
 
+   // enable bus master
+   cout << endl << "writing command 4..." << endl;
+   pci_write (pci_sharedinfo, port, 4, 4, 2);
+   cout << "Command:             " << hex << pci_read (pci_sharedinfo, port,  4, 2) << endl;
+
+   // map the 128k PCIe memory
    uint64_t memory_machine_address = pci_read (pci_sharedinfo, port, 16, 4);
+   memory_machine_address &= 0xFFFFFFF0;
+
    uint64_t memory_virtual_address = get_reserved_virtual_address () + (512 * PAGE_SIZE);
-   memory_virtual_address = memory_virtual_address & ~(PAGE_SIZE-1);
-   CSR *csr = address_to_pointer<CSR>(memory_virtual_address);
+   memory_virtual_address &= ~(PAGE_SIZE-1);
 
-   for (uint64_t i = 0; i < (128 * 1024); i += PAGE_SIZE)
-   {
-      Hypercall::update_va_mapping (memory_virtual_address, memory_machine_address);
-      memory_machine_address += PAGE_SIZE;
-      memory_virtual_address += PAGE_SIZE;
-   }
+   CSR csr (memory_machine_address, memory_virtual_address);
+//   CSR *csr = address_to_pointer<CSR>(memory_virtual_address);
 
-   cout << "CSR CTRL: " << hex << csr->CTRL << endl;
-   cout << "CSR STATUS: " << hex << csr->STATUS << endl;
-   cout.flush();
+//   for (uint64_t i = 0; i < (128 * 1024); i += PAGE_SIZE)
+//   {
+//      Hypercall::update_va_mapping (memory_virtual_address, memory_machine_address);
+//      memory_machine_address += PAGE_SIZE;
+//      memory_virtual_address += PAGE_SIZE;
+//   }
 
-   uint64_t flash_machine_address = pci_read (pci_sharedinfo, port, 20, 4);
-   uint64_t flash_virtual_address = memory_virtual_address;
-   uint32_t *flash_pointer = address_to_pointer<uint32_t>(flash_virtual_address);
-   Hypercall::update_va_mapping (flash_virtual_address, flash_machine_address);
+   Device_control CTRL = csr.read_CTRL ();
+   Device_status STATUS = csr.read_STATUS ();
 
-   cout << "flash [0]: " << hex << flash_pointer [0] << endl;
-   cout << "flash [1]: " << hex << flash_pointer [1] << endl;
+   cout << "CSR CTRL: " << hex << CTRL << endl;
+   cout << "CSR STATUS: " << hex << STATUS << endl;
 
    cout << "reseting..." << endl;
-   uint32_t CTRL = csr->CTRL;
-   CTRL |= 0x4000000;
+   CTRL.set_RST (true);
+   csr.write_CTRL (CTRL);
 
    gettimeofday (&tv1, nullptr);
 
@@ -357,8 +350,11 @@ int main (int /* argc */, char ** /* argv [] */)
       }
    }
 
-   cout << "CSR CTRL: " << hex << csr->CTRL << endl;
-   cout << "CSR STATUS: " << hex << csr->STATUS << endl;
+   CTRL = csr.read_CTRL ();
+   STATUS = csr.read_STATUS ();
+
+   cout << "CSR CTRL: " << hex << CTRL << endl;
+   cout << "CSR STATUS: " << hex << STATUS << endl;
 
    return 0;
 }

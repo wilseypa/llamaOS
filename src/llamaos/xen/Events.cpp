@@ -83,7 +83,7 @@ Events::~Events ()
    Hypercall::set_callbacks (0UL, 0UL);
 }
 
-void Events::alloc (domid_t domid, evtchn_port_t &port)
+void Events::alloc (domid_t /* domid */, evtchn_port_t & /* port */)
 {
 
 }

@@ -41,8 +41,6 @@ using namespace llamaos;
 using namespace llamaos::memory;
 using namespace llamaos::xen;
 
-#define wmb() __asm__ __volatile__ ( "" : : : "memory")
-
 // for now just map a single page for the table
 Grant_table::Grant_table ()
    :  size(PAGE_SIZE / sizeof(grant_entry_t)),
