@@ -362,7 +362,37 @@ namespace e1000e {
 ostream &operator<< (ostream &out, const Device_control &CTRL)
 {
    out << "Device control" << endl;
-   out << "  FD: " << CTRL.get_FD () << " (" << ((CTRL.get_FD ()) ? "Full" : "Half") << " duplex)";
+   out << "  FD: " << CTRL.get_FD () << " (" << ((CTRL.get_FD ()) ? "Full" : "Half") << " duplex)" << endl;
+   out << "  GIO master disable: " << CTRL.get_GIO_master_disable () << endl;
+   out << "  ASDE: " << CTRL.get_ASDE () << endl;
+   out << "  SLU: " << CTRL.get_SLU () << endl;
+
+   out << "  SPEED: " << CTRL.get_SPEED ();
+
+   switch (CTRL.get_SPEED ())
+   {
+   default:
+   case Device_control::SPEED_10MBS:
+      out << " (10 MB/S)" << endl;
+      break;
+
+   case Device_control::SPEED_100MBS:
+      out << " (100 MB/S)" << endl;
+      break;
+
+   case Device_control::SPEED_1000MBS:
+      out << " (1000 MB/S)" << endl;
+      break;
+   }
+
+   out << "  FRCSPD: " << CTRL.get_FRCSPD () << endl;
+   out << "  FRCDPLX: " << CTRL.get_FRCDPLX () << endl;
+   out << "  ADVD3WUC: " << CTRL.get_ADVD3WUC () << endl;
+   out << "  RST: " << CTRL.get_RST () << endl;
+   out << "  RFCE: " << CTRL.get_RFCE () << endl;
+   out << "  TFCE: " << CTRL.get_TFCE () << endl;
+   out << "  VME: " << CTRL.get_VME () << endl;
+   out << "  PHY_RST: " << CTRL.get_PHY_RST () << endl;
 
    return out;
 }
@@ -370,7 +400,48 @@ ostream &operator<< (ostream &out, const Device_control &CTRL)
 ostream &operator<< (std::ostream &out, const Device_status &STATUS)
 {
    out << "Device status" << endl;
-   out << "  FD: " << STATUS.get_FD () << " (" << ((STATUS.get_FD ()) ? "Full" : "Half") << " duplex)";
+   out << "  FD: " << STATUS.get_FD () << " (" << ((STATUS.get_FD ()) ? "Full" : "Half") << " duplex)" << endl;
+   out << "  LU: " << STATUS.get_LU () << " (" << ((STATUS.get_LU ()) ? "Link up" : "Link down") << " )" << endl;
+   out << "  TXOFF: " << STATUS.get_TXOFF () << endl;
+
+   out << "  SPEED: " << STATUS.get_SPEED ();
+
+   switch (STATUS.get_SPEED ())
+   {
+   default:
+   case Device_control::SPEED_10MBS:
+      out << " (10 MB/S)" << endl;
+      break;
+
+   case Device_control::SPEED_100MBS:
+      out << " (100 MB/S)" << endl;
+      break;
+
+   case Device_control::SPEED_1000MBS:
+      out << " (1000 MB/S)" << endl;
+      break;
+   }
+
+   out << "  ASDV: " << STATUS.get_ASDV ();
+
+   switch (STATUS.get_ASDV ())
+   {
+   default:
+   case Device_control::SPEED_10MBS:
+      out << " (10 MB/S)" << endl;
+      break;
+
+   case Device_control::SPEED_100MBS:
+      out << " (100 MB/S)" << endl;
+      break;
+
+   case Device_control::SPEED_1000MBS:
+      out << " (1000 MB/S)" << endl;
+      break;
+   }
+
+   out << "  PHYRA: " << STATUS.get_PHYRA () << endl;
+   out << "  GIO master enabled: " << STATUS.get_GIO_MASTER_ENABLED () << endl;
 
    return out;
 }
