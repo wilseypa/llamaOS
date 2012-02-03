@@ -318,9 +318,9 @@ CSR::CSR (uint64_t machine_address, uint64_t virtual_address)
    :  pointer(address_to_pointer<uint32_t>(virtual_address))
 {
    // mapping 128k
-   for (unsigned int i = 0; i < 32; i++)
+   for (uint64_t i = 0; i < 32; i++)
    {
-      unsigned int offset = (i * PAGE_SIZE);
+      uint64_t offset = (i * PAGE_SIZE);
       Hypercall::update_va_mapping (virtual_address + offset, machine_address + offset);
    }
 }

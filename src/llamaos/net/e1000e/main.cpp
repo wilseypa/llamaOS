@@ -301,32 +301,26 @@ int main (int /* argc */, char ** /* argv [] */)
       next_pointer = pci_read (pci_sharedinfo, port, next_pointer + 1, 1);
    }
 
+   uint16_t Command = pci_read (pci_sharedinfo, port,  4, 2);
+
    // enable PCIe memory
-   cout << endl << "writing command 2..." << endl;
-   pci_write (pci_sharedinfo, port, 4, 2, 2);
-   cout << "Command:             " << hex << pci_read (pci_sharedinfo, port,  4, 2) << endl;
+   Command |= 0x2;
 
    // enable bus master
-   cout << endl << "writing command 4..." << endl;
-   pci_write (pci_sharedinfo, port, 4, 4, 2);
+   Command |= 0x4;
+
+   cout << endl << "writing command..." << endl;
+   pci_write (pci_sharedinfo, port, 4, Command, 2);
    cout << "Command:             " << hex << pci_read (pci_sharedinfo, port,  4, 2) << endl;
 
    // map the 128k PCIe memory
    uint64_t memory_machine_address = pci_read (pci_sharedinfo, port, 16, 4);
-   memory_machine_address &= 0xFFFFFFF0;
+   memory_machine_address &= ~0xF;
 
    uint64_t memory_virtual_address = get_reserved_virtual_address () + (512 * PAGE_SIZE);
    memory_virtual_address &= ~(PAGE_SIZE-1);
 
    CSR csr (memory_machine_address, memory_virtual_address);
-//   CSR *csr = address_to_pointer<CSR>(memory_virtual_address);
-
-//   for (uint64_t i = 0; i < (128 * 1024); i += PAGE_SIZE)
-//   {
-//      Hypercall::update_va_mapping (memory_virtual_address, memory_machine_address);
-//      memory_machine_address += PAGE_SIZE;
-//      memory_virtual_address += PAGE_SIZE;
-//   }
 
    Device_control CTRL = csr.read_CTRL ();
    Device_status STATUS = csr.read_STATUS ();
@@ -334,9 +328,27 @@ int main (int /* argc */, char ** /* argv [] */)
    cout << "CSR CTRL: " << hex << CTRL << endl;
    cout << "CSR STATUS: " << hex << STATUS << endl;
 
-   cout << "reseting..." << endl;
-   CTRL.set_RST (true);
+   cout << "setting GIO_master_disable..." << endl;
+   CTRL.set_GIO_master_disable (true);
    csr.write_CTRL (CTRL);
+
+   cout << "waiting for GIO_master_disable..." << endl;
+   STATUS = csr.read_STATUS ();
+   while (STATUS.get_GIO_MASTER_ENABLED())
+   {
+      STATUS = csr.read_STATUS ();
+   }
+
+   cout << "masking interrupts..." << endl;
+   csr.write (0x000D8, 0x1FFFFFF);
+
+   cout << "disable receiver..." << endl;
+   csr.write (0x00100, 0);
+
+   cout << "disable transmitter..." << endl;
+   csr.write (0x00400, (1 << 3));
+
+   STATUS = csr.read_STATUS ();
 
    gettimeofday (&tv1, nullptr);
 
@@ -344,7 +356,92 @@ int main (int /* argc */, char ** /* argv [] */)
    {
       gettimeofday (&tv2, nullptr);
 
-      if ((tv2.tv_sec - tv1.tv_sec) > 3)
+      if ((tv2.tv_sec - tv1.tv_sec) > 2)
+      {
+         break;
+      }
+   }
+
+   cout << "getting hw semaphore..." << csr.read (0x00F00) << endl;
+   uint32_t extcnf_ctrl = csr.read (0x00F00);
+   extcnf_ctrl |= 0x20;
+   csr.write(0x00F00, extcnf_ctrl);
+
+   extcnf_ctrl = csr.read (0x00F00);
+   cout << "getting hw semaphore..." << csr.read (0x00F00) << endl;
+
+   while (!(extcnf_ctrl & 0x20))
+   {
+      extcnf_ctrl |= 0x20;
+
+   gettimeofday (&tv1, nullptr);
+
+   for (;;)
+   {
+      gettimeofday (&tv2, nullptr);
+
+      if ((tv2.tv_sec - tv1.tv_sec) > 1)
+      {
+         break;
+      }
+   }
+
+      csr.write(0x00F00, extcnf_ctrl);
+      extcnf_ctrl = csr.read (0x00F00);
+   cout << "getting hw semaphore..." << csr.read (0x00F00) << endl;
+   break;
+   }
+
+
+   cout << "reseting..." << endl;
+   CTRL.set_RST (true);
+   csr.write_CTRL (CTRL);
+
+   cout << "release hw semaphore..." << endl;
+   extcnf_ctrl = csr.read (0x00F00);
+   extcnf_ctrl &= ~0x20;
+   csr.write(0x00F00, extcnf_ctrl);
+
+   gettimeofday (&tv1, nullptr);
+
+   for (;;)
+   {
+      gettimeofday (&tv2, nullptr);
+
+      if ((tv2.tv_sec - tv1.tv_sec) > 2)
+      {
+         break;
+      }
+   }
+
+   cout << "reset EEPROM..." << endl;
+   uint32_t ctrl_ext = csr.read (0x00018);
+   ctrl_ext |= 0x2000;
+   csr.write(0x00018, ctrl_ext);
+   STATUS = csr.read_STATUS ();
+
+   gettimeofday (&tv1, nullptr);
+
+   for (;;)
+   {
+      gettimeofday (&tv2, nullptr);
+
+      if ((tv2.tv_sec - tv1.tv_sec) > 2)
+      {
+         break;
+      }
+   }
+
+   cout << "waiting for EEPROM read..." << endl;
+   while (!(csr.read(0x00010) & 0x200));
+
+   gettimeofday (&tv1, nullptr);
+
+   for (;;)
+   {
+      gettimeofday (&tv2, nullptr);
+
+      if ((tv2.tv_sec - tv1.tv_sec) > 2)
       {
          break;
       }
@@ -355,6 +452,11 @@ int main (int /* argc */, char ** /* argv [] */)
 
    cout << "CSR CTRL: " << hex << CTRL << endl;
    cout << "CSR STATUS: " << hex << STATUS << endl;
+
+   cout << "masking interrupts..." << endl;
+   csr.write (0x000D8, 0x1FFFFFF);
+   csr.read(0x000C0);
+
 
    return 0;
 }
