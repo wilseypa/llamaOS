@@ -15,7 +15,8 @@ VPATH = src
 
 SOURCES = \
   llamaos/net/e1000e/CSR.cpp \
-  llamaos/net/e1000e/main.cpp
+  llamaos/net/e1000e/main.cpp \
+  llamaos/net/e1000e/PCI.cpp
 
 OBJECTS = $(SOURCES:%.cpp=$(OBJDIR)/%.o)
 DEPENDS = $(OBJECTS:%.o=%.d)

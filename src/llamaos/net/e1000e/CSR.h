@@ -28,6 +28,9 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
+#ifndef llamaos_net_e1000e_csr_h_
+#define llamaos_net_e1000e_csr_h_
+
 #include <cstdint>
 
 namespace llamaos {
@@ -155,3 +158,5 @@ std::ostream &operator<< (std::ostream &out, const Device_control &CTRL);
 std::ostream &operator<< (std::ostream &out, const Device_status &STATUS);
 
 } } }
+
+#endif  // llamaos_net_e1000e_pci_h_
