@@ -46,16 +46,18 @@ public:
    Console (xencons_interface *interface, evtchn_port_t port);
    virtual ~Console ();
 
+   static void event_handler (void *data);
+
    void write (char data) const;
    void write (const char *data, unsigned int length) const;
+
+   xencons_interface *const interface;
+   evtchn_port_t port;
 
 private:
    Console ();
    Console (const Console &);
    Console &operator= (const Console &);
-
-   xencons_interface *const interface;
-   evtchn_port_t port;
 
 };
 

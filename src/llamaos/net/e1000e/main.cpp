@@ -50,6 +50,26 @@ using namespace llamaos::memory;
 using namespace llamaos::net::e1000e;
 using namespace llamaos::xen;
 
+// crude sleep function
+static void sleep (unsigned int sec)
+{
+   timeval tv1, tv2;
+
+   gettimeofday (&tv1, nullptr);
+
+   for (;;)
+   {
+      gettimeofday (&tv2, nullptr);
+
+      if ((tv2.tv_sec - tv1.tv_sec) > sec)
+      {
+         break;
+      }
+
+      Hypercall::sched_op_yield ();
+   }
+}
+
 static uint32_t pci_read (struct xen_pci_sharedinfo *pci_sharedinfo, evtchn_port_t port, uint32_t offset, uint32_t size)
 {
    struct xen_pci_op op;
@@ -130,6 +150,8 @@ int main (int /* argc */, char ** /* argv [] */)
    cout << "running e1000e llamaNET domain...\n" << endl;
 
    cout << "waiting..." << endl;
+   sleep (3);
+
    timeval tv, tv1, tv2;
    gettimeofday (&tv1, nullptr);
    tv = tv1;

@@ -28,13 +28,11 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
+#include <llamaos/memory/memory.h>
 #include <llamaos/xen/Console.h>
 #include <llamaos/xen/Hypercall.h>
 
 using namespace llamaos::xen;
-
-#define mb()  __asm__ __volatile__ ( "mfence" : : : "memory")
-#define wmb() __asm__ __volatile__ ( "" : : : "memory")
 
 Console::Console (xencons_interface *interface, evtchn_port_t port)
    :  interface(interface),
@@ -48,13 +46,32 @@ Console::~Console ()
 
 }
 
+void Console::event_handler (void *data)
+{
+   Console *console = static_cast<Console *>(data);
+
+   // ensure write is processed
+   mb();
+
+   while ((console->interface->in_prod - console->interface->in_cons) > 0)
+   {
+      // ensure write is processed
+      wmb();
+
+      // increment index
+      console->interface->in_cons++;
+
+      mb();
+   }
+}
+
 void Console::write (char data) const
 {
    // ensure write is processed
    mb();
 
    // check for space in the ring
-   if ((interface->out_prod - interface->out_cons) >= sizeof(interface->out))
+   while ((interface->out_prod - interface->out_cons) >= sizeof(interface->out))
    {
       // tell dom0 to consume some data
       Hypercall::event_channel_send (port);

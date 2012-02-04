@@ -81,6 +81,7 @@ static void virq_timer_event (void * /* data */)
 {
 //   Hypervisor *hypervisor = reinterpret_cast<Hypervisor *> (data);
 
+//   cout << "virq_timer_event" << endl;
    cout.flush ();
    fflush (stdout);
 }
@@ -112,7 +113,10 @@ Hypervisor::Hypervisor (const start_info_t *start_info)
    trace ("float math: %lf, %lf, %lf\n", 1.0 / 2638.0, 25 / 43219.0, 1 / 3.0);
 
    trace ("binding to VIRQ_TIMER...\n");
+   cout << "binding to VIRQ_TIMER..." << endl;
    events.bind_virq (VIRQ_TIMER, virq_timer_event, this);
+
+   events.bind (console.port, console.event_handler, &console);
 }
 
 Hypervisor::~Hypervisor ()

@@ -28,6 +28,8 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
+#include <iostream>
+
 #include <llamaos/memory/memory.h>
 #include <llamaos/xen/Events.h>
 #include <llamaos/xen/Hypercall.h>
@@ -67,15 +69,20 @@ Events::Events (shared_info_t *shared_info)
       vcpu_info(&shared_info->vcpu_info [0]),
       handlers()
 {
+   vcpu_info->evtchn_upcall_mask = 1;
+
    Hypercall::set_callbacks (pointer_to_address (hypervisor_callback),
                              pointer_to_address (failsafe_callback));
 
    for (unsigned int i = 0; i < PENDING_SIZE; i++)
    {
-      shared_info->evtchn_mask [i] = ~0UL;
+      shared_info->evtchn_pending [i] = 0UL;
+      shared_info->evtchn_mask [i] = 0UL;
    }
 
+   vcpu_info->evtchn_upcall_pending = 0;
    vcpu_info->evtchn_upcall_mask = 0;
+   vcpu_info->evtchn_pending_sel = 0UL;
 }
 
 Events::~Events ()
@@ -88,9 +95,9 @@ void Events::alloc (domid_t /* domid */, evtchn_port_t & /* port */)
 
 }
 
-void Events::bind (unsigned int /* port */, event_handler_t /* handler */, void * /* data */)
+void Events::bind (unsigned int port, event_handler_t handler, void *data)
 {
-
+   handlers [port] = std::pair<event_handler_t, void *> (handler, data);
 }
 
 void Events::unbind (unsigned int /* port */)
@@ -106,8 +113,10 @@ void Events::bind_virq (unsigned int virq, event_handler_t handler, void *data)
 
    handlers [port] = std::pair<event_handler_t, void *> (handler, data);
    trace ("bind_virq: %x\n", port);
-
-   shared_info->evtchn_mask [port / sizeof(unsigned long)] &= ~(1 << (port % sizeof(unsigned long)));
+std::cout << "bind_virq: " << port << std::endl;
+std::cout << "evtchn_mask [0]: " << shared_info->evtchn_mask [0] << std::endl;
+//   shared_info->evtchn_mask [port / sizeof(unsigned long)] &= ~(1 << (port % sizeof(unsigned long)));
+std::cout << "evtchn_mask [0]: " << shared_info->evtchn_mask [0] << std::endl;
 }
 
 void Events::unbind_virq (unsigned int /* virq */)
@@ -133,7 +142,8 @@ void Events::callback () const
 //   trace ("     evtchn_pending_sel: %lx\n", vcpu_info->evtchn_pending_sel);
 //   trace ("      evtchn_pending[0]: %lx\n", shared_info->evtchn_pending [0]);
 //   trace ("      evtchn_pending[1]: %lx\n", shared_info->evtchn_pending [1]);
-
+//static unsigned int c = 0;
+//std::cout << c++ << " callback port:";
    vcpu_info->evtchn_upcall_pending = 0;
    vcpu_info->evtchn_pending_sel = 0;
 
@@ -146,20 +156,24 @@ void Events::callback () const
             if (shared_info->evtchn_pending [i] & (1 << j))
             {
                call_handler ((i * sizeof(unsigned long)) + j);
-               synch_clear_bit(j, &shared_info->evtchn_pending [i]);
+               // synch_clear_bit(j, &shared_info->evtchn_pending [i]);
             }
          }
+
+         shared_info->evtchn_pending [i] = 0UL;
       }
    }
+//std::cout << std::endl;
 }
 
 void Events::call_handler (evtchn_port_t port) const
 {
+//std::cout << " " << port;
    handler_map_t::const_iterator iter = handlers.find (port);
 
    if (iter == handlers.end ())
    {
-      trace ("ignoring invalid handler: %x\n", port);
+//      trace ("ignoring invalid handler: %x\n", port);
       return;
    }
 
