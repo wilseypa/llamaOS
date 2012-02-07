@@ -122,6 +122,20 @@ bool Hypercall::update_va_mapping (uint64_t virtual_address, uint64_t machine_ad
    return true;
 }
 
+bool Hypercall::update_va_mapping_nocache (uint64_t virtual_address, uint64_t machine_address)
+{
+   pte_t val;
+   val.pte = machine_address | 0x17;
+
+   if (0 != HYPERVISOR_update_va_mapping (virtual_address, val, UVMF_INVLPG))
+   {
+      trace ("HYPERVISOR_update_va_mapping (pseudo_page: %lx, machine_page: %lx) FAILED\n", virtual_address, machine_address);
+      return false;
+   }
+
+   return true;
+}
+
 void Hypercall::xen_version (int &major, int &minor)
 {
    uint32_t version = HYPERVISOR_xen_version (XENVER_version, 0);

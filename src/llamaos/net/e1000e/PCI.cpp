@@ -188,17 +188,17 @@ PCI::~PCI ()
 
 }
 
-uint8_t PCI::read_config_byte (uint64_t offset)
+uint8_t PCI::read_config_byte (uint64_t offset) const
 {
    return pci_read (pci_sharedinfo, port, offset, 1);
 }
 
-uint16_t PCI::read_config_word (uint64_t offset)
+uint16_t PCI::read_config_word (uint64_t offset) const
 {
    return pci_read (pci_sharedinfo, port, offset, 2);
 }
 
-uint32_t PCI::read_config_dword (uint64_t offset)
+uint32_t PCI::read_config_dword (uint64_t offset) const
 {
    return pci_read (pci_sharedinfo, port, offset, 4);
 }
@@ -216,4 +216,100 @@ void PCI::write_config_word (uint64_t offset, uint16_t value)
 void PCI::write_config_dword (uint64_t offset, uint32_t value)
 {
    pci_write (pci_sharedinfo, port, offset, value, 4);
+}
+
+void PCI::print_config () const
+{
+   cout << "Vendor ID:           " << hex << read_config_word (0) << endl;
+   cout << "Device ID:           " << hex << read_config_word (2) << endl;
+   cout << "Command:             " << hex << read_config_word (4) << endl;
+   cout << "Status:              " << hex << read_config_word (6) << endl;
+   cout << "Rev ID:              " << hex << static_cast<int>(read_config_byte (8)) << endl;
+   cout << "Class Code [0]:      " << hex << static_cast<int>(read_config_byte (9)) << endl;
+   cout << "Class Code [1]:      " << hex << static_cast<int>(read_config_byte (10)) << endl;
+   cout << "Class Code [2]:      " << hex << static_cast<int>(read_config_byte (11)) << endl;
+   cout << "Cache line:          " << hex << static_cast<int>(read_config_byte (12)) << endl;
+   cout << "Lat timer:           " << hex << static_cast<int>(read_config_byte (13)) << endl;
+   cout << "Header type:         " << hex << static_cast<int>(read_config_byte (14)) << endl;
+   cout << "BIST:                " << hex << static_cast<int>(read_config_byte (15)) << endl;
+   cout << "BAR0:                " << hex << read_config_dword (16) << endl;
+   cout << "BAR1:                " << hex << read_config_dword (20) << endl;
+   cout << "BAR2:                " << hex << read_config_dword (24) << endl;
+   cout << "BAR3:                " << hex << read_config_dword (28) << endl;
+   cout << "BAR4:                " << hex << read_config_dword (32) << endl;
+   cout << "BAR5:                " << hex << read_config_dword (36) << endl;
+   cout << "Cardbus CIS:         " << hex << read_config_dword (40) << endl;
+   cout << "Subsystem Vendor ID: " << hex << read_config_word (44) << endl;
+   cout << "Subsystem ID:        " << hex << read_config_word (46) << endl;
+   cout << "Expansion ROM:       " << hex << read_config_dword (48) << endl;
+   cout << "Cap. Pointer:        " << hex << static_cast<int>(read_config_byte (52)) << endl;
+   cout << "Interrupt line:      " << hex << static_cast<int>(read_config_byte (60)) << endl;
+   cout << "Interrupt pin:       " << hex << static_cast<int>(read_config_byte (61)) << endl;
+   cout << "Min Gnt:             " << hex << static_cast<int>(read_config_byte (62)) << endl;
+   cout << "Max lat:             " << hex << static_cast<int>(read_config_byte (63)) << endl;
+
+   cout << endl << "iterate through cap pointers..." << endl;
+
+   uint32_t next_pointer = read_config_byte (52);
+
+   while (0 != next_pointer)
+   {
+      uint32_t cap_id = read_config_byte (next_pointer);
+
+      switch (cap_id)
+      {
+      default:
+         cout << "Unknown capability id: " << cap_id << endl;
+         cout << endl;
+         break;
+
+      case 0x01:
+         cout << "Power management" << endl;
+         cout << "Cap ID:              " << static_cast<int>(read_config_byte (next_pointer +  0)) << endl;
+         cout << "Next pointer:        " << static_cast<int>(read_config_byte (next_pointer +  1)) << endl;
+         cout << "PMC:                 " << read_config_word (next_pointer +  2) << endl;
+         cout << "PMCR:                " << read_config_word (next_pointer +  4) << endl;
+         cout << "PMCR_BSE:            " << static_cast<int>(read_config_byte (next_pointer +  6)) << endl;
+         cout << "Data:                " << static_cast<int>(read_config_byte (next_pointer +  8)) << endl;
+         cout << endl;
+         break;
+
+      case 0x05:
+         cout << endl << "MSI configuration" << endl;
+         cout << "Cap ID:              " << static_cast<int>(read_config_byte (next_pointer +  0)) << endl;
+         cout << "Next pointer:        " << static_cast<int>(read_config_byte (next_pointer +  1)) << endl;
+         cout << "Message control:     " << read_config_word (next_pointer +  2) << endl;
+         cout << "Message addr:        " << read_config_dword (next_pointer +  4) << endl;
+         cout << "Message upper addr:  " << read_config_dword (next_pointer +  8) << endl;
+         cout << "Message data:        " << read_config_word (next_pointer + 12) << endl;
+         cout << endl;
+         break;
+
+      case 0x10:
+         cout << endl << "PCIe configuration" << endl;
+         cout << "Cap ID:              " << static_cast<int>(read_config_byte (next_pointer +  0)) << endl;
+         cout << "Next pointer:        " << static_cast<int>(read_config_byte (next_pointer +  1)) << endl;
+         cout << "Capability register: " << read_config_word (next_pointer +  2) << endl;
+         cout << "Device capability:   " << read_config_dword (next_pointer +  4) << endl;
+         cout << "Device control:      " << read_config_word (next_pointer +  8) << endl;
+         cout << "Device status:       " << read_config_word (next_pointer + 10) << endl;
+         cout << "Link capability:     " << read_config_dword (next_pointer + 12) << endl;
+         cout << "Link control:        " << read_config_word (next_pointer + 16) << endl;
+         cout << "Link status:         " << read_config_word (next_pointer + 18) << endl;
+         cout << endl;
+         break;
+
+      case 0x11:
+         cout << endl << "MSI-X configuration" << endl;
+         cout << "Cap ID:              " << static_cast<int>(read_config_byte (next_pointer +  0)) << endl;
+         cout << "Next pointer:        " << static_cast<int>(read_config_byte (next_pointer +  1)) << endl;
+         cout << "Message control:     " << read_config_word (next_pointer +  2) << endl;
+         cout << "Table offset:        " << read_config_dword (next_pointer +  4) << endl;
+         cout << "PBA offset:          " << read_config_dword (next_pointer +  8) << endl;
+         cout << endl;
+         break;
+      }
+
+      next_pointer = read_config_byte (next_pointer + 1);
+   }
 }

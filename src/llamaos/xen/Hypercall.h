@@ -105,6 +105,15 @@ public:
     */
    static bool update_va_mapping (uint64_t virtual_address, uint64_t machine_address);
 
+   /**
+    * @brief
+    *
+    * @param pseudo_page
+    * @param machine_page
+    *
+    */
+   static bool update_va_mapping_nocache (uint64_t virtual_address, uint64_t machine_address);
+
    // llamaOS UNSUPPORTED CALLS
    //   __HYPERVISOR_set_timer_op         15
    //   __HYPERVISOR_event_channel_op_compat 16 /* compat since 0x00030202 */

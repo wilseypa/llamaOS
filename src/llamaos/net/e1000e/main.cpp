@@ -81,101 +81,9 @@ int main (int /* argc */, char ** /* argv [] */)
 
    PCI pci;
 
+   pci.print_config ();
 
-   cout << "Vendor ID:           " << hex << pci.read_config_word (0) << endl;
-   cout << "Device ID:           " << hex << pci.read_config_word (2) << endl;
-   cout << "Command:             " << hex << pci.read_config_word (4) << endl;
-   cout << "Status:              " << hex << pci.read_config_word (6) << endl;
-   cout << "Rev ID:              " << hex << static_cast<int>(pci.read_config_byte (8)) << endl;
-   cout << "Class Code [0]:      " << hex << static_cast<int>(pci.read_config_byte (9)) << endl;
-   cout << "Class Code [1]:      " << hex << static_cast<int>(pci.read_config_byte (10)) << endl;
-   cout << "Class Code [2]:      " << hex << static_cast<int>(pci.read_config_byte (11)) << endl;
-   cout << "Cache line:          " << hex << static_cast<int>(pci.read_config_byte (12)) << endl;
-   cout << "Lat timer:           " << hex << static_cast<int>(pci.read_config_byte (13)) << endl;
-   cout << "Header type:         " << hex << static_cast<int>(pci.read_config_byte (14)) << endl;
-   cout << "BIST:                " << hex << static_cast<int>(pci.read_config_byte (15)) << endl;
-   cout << "BAR0:                " << hex << pci.read_config_dword (16) << endl;
-   cout << "BAR1:                " << hex << pci.read_config_dword (20) << endl;
-   cout << "BAR2:                " << hex << pci.read_config_dword (24) << endl;
-   cout << "BAR3:                " << hex << pci.read_config_dword (28) << endl;
-   cout << "BAR4:                " << hex << pci.read_config_dword (32) << endl;
-   cout << "BAR5:                " << hex << pci.read_config_dword (36) << endl;
-   cout << "Cardbus CIS:         " << hex << pci.read_config_dword (40) << endl;
-   cout << "Subsystem Vendor ID: " << hex << pci.read_config_word (44) << endl;
-   cout << "Subsystem ID:        " << hex << pci.read_config_word (46) << endl;
-   cout << "Expansion ROM:       " << hex << pci.read_config_dword (48) << endl;
-   cout << "Cap. Pointer:        " << hex << static_cast<int>(pci.read_config_byte (52)) << endl;
-   cout << "Interrupt line:      " << hex << static_cast<int>(pci.read_config_byte (60)) << endl;
-   cout << "Interrupt pin:       " << hex << static_cast<int>(pci.read_config_byte (61)) << endl;
-   cout << "Min Gnt:             " << hex << static_cast<int>(pci.read_config_byte (62)) << endl;
-   cout << "Max lat:             " << hex << static_cast<int>(pci.read_config_byte (63)) << endl;
-
-   cout << endl << "iterate through cap pointers..." << endl;
-
-   uint32_t next_pointer = pci.read_config_byte (52);
-
-   while (0 != next_pointer)
-   {
-      uint32_t cap_id = pci.read_config_byte (next_pointer);
-
-      switch (cap_id)
-      {
-      default:
-         cout << "Unknown capability id: " << cap_id << endl;
-         cout << endl;
-         break;
-
-      case 0x01:
-         cout << "Power management" << endl;
-         cout << "Cap ID:              " << static_cast<int>(pci.read_config_byte (next_pointer +  0)) << endl;
-         cout << "Next pointer:        " << static_cast<int>(pci.read_config_byte (next_pointer +  1)) << endl;
-         cout << "PMC:                 " << pci.read_config_word (next_pointer +  2) << endl;
-         cout << "PMCR:                " << pci.read_config_word (next_pointer +  4) << endl;
-         cout << "PMCR_BSE:            " << static_cast<int>(pci.read_config_byte (next_pointer +  6)) << endl;
-         cout << "Data:                " << static_cast<int>(pci.read_config_byte (next_pointer +  8)) << endl;
-         cout << endl;
-         break;
-
-      case 0x05:
-         cout << endl << "MSI configuration" << endl;
-         cout << "Cap ID:              " << static_cast<int>(pci.read_config_byte (next_pointer +  0)) << endl;
-         cout << "Next pointer:        " << static_cast<int>(pci.read_config_byte (next_pointer +  1)) << endl;
-         cout << "Message control:     " << pci.read_config_word (next_pointer +  2) << endl;
-         cout << "Message addr:        " << pci.read_config_dword (next_pointer +  4) << endl;
-         cout << "Message upper addr:  " << pci.read_config_dword (next_pointer +  8) << endl;
-         cout << "Message data:        " << pci.read_config_word (next_pointer + 12) << endl;
-         cout << endl;
-         break;
-
-      case 0x10:
-         cout << endl << "PCIe configuration" << endl;
-         cout << "Cap ID:              " << static_cast<int>(pci.read_config_byte (next_pointer +  0)) << endl;
-         cout << "Next pointer:        " << static_cast<int>(pci.read_config_byte (next_pointer +  1)) << endl;
-         cout << "Capability register: " << pci.read_config_word (next_pointer +  2) << endl;
-         cout << "Device capability:   " << pci.read_config_dword (next_pointer +  4) << endl;
-         cout << "Device control:      " << pci.read_config_word (next_pointer +  8) << endl;
-         cout << "Device status:       " << pci.read_config_word (next_pointer + 10) << endl;
-         cout << "Link capability:     " << pci.read_config_dword (next_pointer + 12) << endl;
-         cout << "Link control:        " << pci.read_config_word (next_pointer + 16) << endl;
-         cout << "Link status:         " << pci.read_config_word (next_pointer + 18) << endl;
-         cout << endl;
-         break;
-
-      case 0x11:
-         cout << endl << "MSI-X configuration" << endl;
-         cout << "Cap ID:              " << static_cast<int>(pci.read_config_byte (next_pointer +  0)) << endl;
-         cout << "Next pointer:        " << static_cast<int>(pci.read_config_byte (next_pointer +  1)) << endl;
-         cout << "Message control:     " << pci.read_config_word (next_pointer +  2) << endl;
-         cout << "Table offset:        " << pci.read_config_dword (next_pointer +  4) << endl;
-         cout << "PBA offset:          " << pci.read_config_dword (next_pointer +  8) << endl;
-         cout << endl;
-         break;
-      }
-
-      next_pointer = pci.read_config_byte (next_pointer + 1);
-   }
-
-return 0;
+   return 0;
 
    uint16_t Command = pci.read_config_word (4);
 
@@ -191,8 +99,11 @@ return 0;
 
    // map the 128k PCIe memory
    uint64_t memory_machine_address = pci.read_config_dword (16);
-   memory_machine_address &= ~0xF;
 
+   // clear the BAR address flags
+   memory_machine_address &= ~0xFUL;
+
+   // also a hack, get an open address in the second half of the reserved area
    uint64_t memory_virtual_address = get_reserved_virtual_address () + (512 * PAGE_SIZE);
    memory_virtual_address &= ~(PAGE_SIZE-1);
 

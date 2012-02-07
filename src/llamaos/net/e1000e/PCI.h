@@ -46,13 +46,15 @@ public:
    PCI ();
    virtual ~PCI ();
 
-   uint8_t read_config_byte (uint64_t offset);
-   uint16_t read_config_word (uint64_t offset);
-   uint32_t read_config_dword (uint64_t offset);
+   uint8_t read_config_byte (uint64_t offset) const;
+   uint16_t read_config_word (uint64_t offset) const;
+   uint32_t read_config_dword (uint64_t offset) const;
 
    void write_config_byte (uint64_t offset, uint8_t value);
    void write_config_word (uint64_t offset, uint16_t value);
    void write_config_dword (uint64_t offset, uint32_t value);
+
+   void print_config () const;
 
 private:
    PCI (const PCI &);
