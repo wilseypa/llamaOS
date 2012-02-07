@@ -165,9 +165,9 @@ void start (start_info_t *start_info)
          trace ("*** unknown exception ***\n");
       }
 
-      for (;;)
+      for (int i = 0; i < 100; i++)
       {
-         Hypercall::sched_op_block ();
+         Hypercall::sched_op_yield ();
       }
 
       uint64_t dtor_size = reinterpret_cast<uint64_t>(__DTOR_LIST__[0]);
@@ -177,7 +177,7 @@ void start (start_info_t *start_info)
          __DTOR_LIST__[i] ();
       }
 
-//      Hypercall::sched_op_shutdown ();
+      Hypercall::sched_op_shutdown ();
    }
    // else
    // something terrible is wrong and nothing can be done about it!
