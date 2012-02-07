@@ -194,6 +194,6 @@ int main (int /* argc */, char ** /* argv [] */)
    csr.write (0x000D8, 0x1FFFFFF);
    csr.read(0x000C0);
 
-
+   cout.flush ();
    return 0;
 }

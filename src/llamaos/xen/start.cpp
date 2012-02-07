@@ -155,6 +155,15 @@ void start (start_info_t *start_info)
          main (1, argv);
 
          trace ("ending llamaOS...\n");
+
+         uint64_t dtor_size = reinterpret_cast<uint64_t>(__DTOR_LIST__[0]);
+         trace ("__DTOR_LIST__[0]: %lx\n", dtor_size);
+         for (uint64_t i = dtor_size; i >= 1; i--)
+         {
+            __DTOR_LIST__[i] ();
+         }
+
+         Hypercall::sched_op_shutdown ();
       }
       catch (const std::runtime_error &e)
       {
@@ -164,20 +173,6 @@ void start (start_info_t *start_info)
       {
          trace ("*** unknown exception ***\n");
       }
-
-      for (int i = 0; i < 100; i++)
-      {
-         Hypercall::sched_op_yield ();
-      }
-
-      uint64_t dtor_size = reinterpret_cast<uint64_t>(__DTOR_LIST__[0]);
-      trace ("__DTOR_LIST__[0]: %lx\n", dtor_size);
-      for (uint64_t i = dtor_size; i >= 1; i--)
-      {
-         __DTOR_LIST__[i] ();
-      }
-
-      Hypercall::sched_op_shutdown ();
    }
    // else
    // something terrible is wrong and nothing can be done about it!
