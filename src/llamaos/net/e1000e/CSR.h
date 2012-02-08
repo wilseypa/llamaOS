@@ -150,7 +150,7 @@ private:
    CSR (const CSR &);
    CSR &operator= (const CSR &);
 
-   uint32_t *const pointer;
+   uint8_t *const pointer;
 
 };
 

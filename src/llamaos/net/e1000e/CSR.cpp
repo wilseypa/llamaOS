@@ -41,6 +41,36 @@ using namespace llamaos::memory;
 using namespace llamaos::net::e1000e;
 using namespace llamaos::xen;
 
+// !!! stolen from Linux !!!
+# define __force
+# define __iomem
+
+#define build_mmio_read(name, size, type, reg, barrier) \
+static inline type name(const volatile void __iomem *addr) \
+{ type ret; asm volatile("mov" size " %1,%0":reg (ret) \
+:"m" (*(volatile type __force *)addr) barrier); return ret; }
+
+#define build_mmio_write(name, size, type, reg, barrier) \
+static inline void name(type val, volatile void __iomem *addr) \
+{ asm volatile("mov" size " %0,%1": :reg (val), \
+"m" (*(volatile type __force *)addr) barrier); }
+
+build_mmio_read(readb, "b", unsigned char, "=q", :"memory")
+build_mmio_read(readw, "w", unsigned short, "=r", :"memory")
+build_mmio_read(readl, "l", unsigned int, "=r", :"memory")
+
+build_mmio_read(__readb, "b", unsigned char, "=q", )
+build_mmio_read(__readw, "w", unsigned short, "=r", )
+build_mmio_read(__readl, "l", unsigned int, "=r", )
+
+build_mmio_write(writeb, "b", unsigned char, "q", :"memory")
+build_mmio_write(writew, "w", unsigned short, "r", :"memory")
+build_mmio_write(writel, "l", unsigned int, "r", :"memory")
+
+build_mmio_write(__writeb, "b", unsigned char, "q", )
+build_mmio_write(__writew, "w", unsigned short, "r", )
+build_mmio_write(__writel, "l", unsigned int, "r", )
+
 static inline bool tst_bit (uint32_t value, uint32_t mask)
 {
    return !!(value & mask);
@@ -315,7 +345,7 @@ bool Device_status::get_GIO_MASTER_ENABLED () const
 }
 
 CSR::CSR (uint64_t machine_address, uint64_t virtual_address)
-   :  pointer(address_to_pointer<uint32_t>(virtual_address))
+   :  pointer(address_to_pointer<uint8_t>(virtual_address))
 {
    // mapping 128k
    for (uint64_t i = 0; i < 32; i++)
@@ -332,27 +362,31 @@ CSR::~CSR ()
 
 uint32_t CSR::read (uint64_t offset) const
 {
-   return pointer [offset];
+   return readl(pointer + offset);
 }
 
 void CSR::write (uint64_t offset, uint32_t value)
 {
-   pointer [offset] = value;
+   writel (value, pointer + offset);
 }
 
 Device_control CSR::read_CTRL () const
 {
-   return Device_control (pointer [0x00000]);
+   uint32_t value = readl(pointer + 0x00000);
+
+   return Device_control (value);
 }
 
 void CSR::write_CTRL (const Device_control &CTRL)
 {
-   pointer [0x00000] = CTRL.value;
+   writel (CTRL.value, pointer + 0x00000);
 }
 
 Device_status CSR::read_STATUS () const
 {
-   return Device_status (pointer [0x00008]);
+   uint32_t value = readl (pointer + 0x00008);
+
+   return Device_status (value);
 }
 
 namespace llamaos {

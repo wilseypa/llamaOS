@@ -71,7 +71,6 @@ static void sleep (unsigned int sec)
    }
 }
 
-
 int main (int /* argc */, char ** /* argv [] */)
 {
    cout << "running e1000e llamaNET domain...\n" << endl;
@@ -82,8 +81,6 @@ int main (int /* argc */, char ** /* argv [] */)
    PCI pci;
 
    pci.print_config ();
-
-   return 0;
 
    uint16_t Command = pci.read_config_word (4);
 
@@ -115,12 +112,45 @@ int main (int /* argc */, char ** /* argv [] */)
    cout << "CSR CTRL: " << hex << CTRL << endl;
    cout << "CSR STATUS: " << hex << STATUS << endl;
 
+   cout << "masking interrupts..." << endl;
+   csr.write (0x000D8, 0x1FFFFFF);
+
+   cout << "reseting..." << endl;
+   csr.write (0x00000, 0x84000000);
+
+   sleep (2);
+
+   cout << "masking interrupts..." << endl;
+   csr.write (0x000D8, 0x1FFFFFF);
+
+   STATUS = csr.read_STATUS ();
+   cout << "CSR STATUS: " << hex << STATUS << endl;
+
+   cout << "forcing speed and duplex..." << endl;
+   csr.write (0x00000, 0x101B01);
+
+   sleep (2);
+
+   STATUS = csr.read_STATUS ();
+   cout << "CSR STATUS: " << hex << STATUS << endl;
+
+   cout << "setting link up..." << endl;
+   csr.write (0x00000, 0x101B41);
+
+   sleep (2);
+
+   STATUS = csr.read_STATUS ();
+   cout << "CSR STATUS: " << hex << STATUS << endl;
+
+   return 0;
+
    cout << "setting GIO_master_disable..." << endl;
    CTRL.set_GIO_master_disable (true);
    csr.write_CTRL (CTRL);
 
    cout << "waiting for GIO_master_disable..." << endl;
    STATUS = csr.read_STATUS ();
+
    while (STATUS.get_GIO_MASTER_ENABLED())
    {
       STATUS = csr.read_STATUS ();
