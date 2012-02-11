@@ -106,11 +106,11 @@ int main (int /* argc */, char ** /* argv [] */)
 
    CSR csr (memory_machine_address, memory_virtual_address);
 
-   Device_control CTRL = csr.read_CTRL ();
-   Device_status STATUS = csr.read_STATUS ();
+   CTRL ctrl = csr.read_CTRL ();
+   STATUS status = csr.read_STATUS ();
 
-   cout << "CSR CTRL: " << hex << CTRL << endl;
-   cout << "CSR STATUS: " << hex << STATUS << endl;
+   cout << "CSR CTRL: " << hex << ctrl << endl;
+   cout << "CSR STATUS: " << hex << status << endl;
 
    cout << "masking interrupts..." << endl;
    csr.write (0x000D8, 0x1FFFFFF);
@@ -123,27 +123,34 @@ int main (int /* argc */, char ** /* argv [] */)
    cout << "masking interrupts..." << endl;
    csr.write (0x000D8, 0x1FFFFFF);
 
-   STATUS = csr.read_STATUS ();
-   cout << "CSR STATUS: " << hex << STATUS << endl;
+   status = csr.read_STATUS ();
+   cout << "CSR STATUS: " << hex << status << endl;
+
+   CTRL_EXT ctrl_ext = csr.read_CTRL_EXT ();
+   cout << "CSR CTRL_EXT: " << hex << ctrl_ext << endl;
+   ctrl_ext.SPD_BYPS (true);
+   csr.write_CTRL_EXT (ctrl_ext);
+   cout << "CSR CTRL_EXT: " << hex << ctrl_ext << endl;
 
    cout << "forcing speed and duplex..." << endl;
    csr.write (0x00000, 0x101B01);
 
    sleep (2);
 
-   STATUS = csr.read_STATUS ();
-   cout << "CSR STATUS: " << hex << STATUS << endl;
+   status = csr.read_STATUS ();
+   cout << "CSR STATUS: " << hex << status << endl;
 
    cout << "setting link up..." << endl;
    csr.write (0x00000, 0x101B41);
 
    sleep (2);
 
-   STATUS = csr.read_STATUS ();
-   cout << "CSR STATUS: " << hex << STATUS << endl;
+   status = csr.read_STATUS ();
+   cout << "CSR STATUS: " << hex << status << endl;
 
-   return 0;
+   for (;;);
 
+#if 0
    cout << "setting GIO_master_disable..." << endl;
    CTRL.set_GIO_master_disable (true);
    csr.write_CTRL (CTRL);
@@ -223,6 +230,7 @@ int main (int /* argc */, char ** /* argv [] */)
    cout << "masking interrupts..." << endl;
    csr.write (0x000D8, 0x1FFFFFF);
    csr.read(0x000C0);
+#endif
 
    cout.flush ();
    return 0;

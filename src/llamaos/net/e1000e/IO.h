@@ -28,18 +28,14 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <iostream>
+#ifndef llamaos_net_e1000e_io_h_
+#define llamaos_net_e1000e_io_h_
 
-#include <llamaos/memory/memory.h>
-#include <llamaos/net/e1000e/CSR.h>
-#include <llamaos/xen/Hypercall.h>
-#include <llamaos/config.h>
+#include <cstdint>
 
-using namespace std;
-using namespace llamaos;
-using namespace llamaos::memory;
-using namespace llamaos::net::e1000e;
-using namespace llamaos::xen;
+namespace llamaos {
+namespace net {
+namespace e1000e {
 
 // !!! stolen from Linux !!!
 # define __force
@@ -88,67 +84,6 @@ static inline void chg_bit (uint32_t &value, uint32_t mask, bool flag)
    }
 }
 
-CSR::CSR (uint64_t machine_address, uint64_t virtual_address)
-   :  pointer(address_to_pointer<uint8_t>(virtual_address))
-{
-   // mapping 128k
-   for (uint64_t i = 0; i < 32; i++)
-   {
-      uint64_t offset = (i * PAGE_SIZE);
-      Hypercall::update_va_mapping_nocache (virtual_address + offset, machine_address + offset);
-   }
-}
-
-CSR::~CSR ()
-{
-
-}
-
-uint32_t CSR::read (uint64_t offset) const
-{
-   return readl(pointer + offset);
-}
-
-void CSR::write (uint64_t offset, uint32_t value)
-{
-   writel (value, pointer + offset);
-}
-
-CTRL CSR::read_CTRL () const
-{
-   uint32_t value = readl(pointer + 0x00000);
-
-   return CTRL (value);
-}
-
-void CSR::write_CTRL (const CTRL &ctrl)
-{
-   writel (ctrl, pointer + 0x00000);
-}
-
-STATUS CSR::read_STATUS () const
-{
-   uint32_t value = readl (pointer + 0x00008);
-
-   return STATUS (value);
-}
-
-CTRL_EXT CSR::read_CTRL_EXT () const
-{
-   uint32_t value = readl (pointer + 0x00018);
-
-   return CTRL_EXT (value);
-}
-
-void CSR::write_CTRL_EXT (const CTRL_EXT &reg)
-{
-   writel (reg, pointer + 0x00018);
-}
-
-namespace llamaos {
-namespace net {
-namespace e1000e {
-
-
-
 } } }
+
+#endif  // llamaos_net_e1000e_io_h_

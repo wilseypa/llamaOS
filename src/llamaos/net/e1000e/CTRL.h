@@ -28,45 +28,71 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#ifndef llamaos_net_e1000e_csr_h_
-#define llamaos_net_e1000e_csr_h_
+#ifndef llamaos_net_e1000e_ctrl_h_
+#define llamaos_net_e1000e_ctrl_h_
 
 #include <cstdint>
 
-#include <llamaos/net/e1000e/CTRL.h>
-#include <llamaos/net/e1000e/CTRL_EXT.h>
-#include <llamaos/net/e1000e/STATUS.h>
+#include <ostream>
 
 namespace llamaos {
 namespace net {
 namespace e1000e {
 
-class CSR
+class CTRL
 {
 public:
-   CSR (uint64_t machine_address, uint64_t virtual_address);
-   virtual ~CSR ();
+   CTRL (uint32_t value);
 
-   uint32_t read (uint64_t offset) const;
-   void write (uint64_t offset, uint32_t value);
+   operator uint32_t () const;
 
-   CTRL read_CTRL () const;
-   void write_CTRL (const CTRL &);
+   enum LINK_SPEED { SPEED_10MBS, SPEED_100MBS, SPEED_1000MBS };
 
-   STATUS read_STATUS () const;
+   bool FD () const;
+   void FD (bool flag);
 
-   CTRL_EXT read_CTRL_EXT () const;
-   void write_CTRL_EXT (const CTRL_EXT &);
+   bool GIO_MD () const;
+   void GIO_MD (bool flag);
+
+   bool ASDE () const;
+   void ASDE (bool flag);
+
+   bool SLU () const;
+   void SLU (bool flag);
+
+   LINK_SPEED SPEED () const;
+   void SPEED (LINK_SPEED speed);
+
+   bool FRCSPD () const;
+   void FRCSPD (bool flag);
+
+   bool FRCDPLX () const;
+   void FRCDPLX (bool flag);
+
+   bool ADVD3WUC () const;
+   void ADVD3WUC (bool flag);
+
+   bool RST () const;
+   void RST (bool flag);
+
+   bool RFCE () const;
+   void RFCE (bool flag);
+
+   bool TFCE () const;
+   void TFCE (bool flag);
+
+   bool VME () const;
+   void VME (bool flag);
+
+   bool PHY_RST () const;
+   void PHY_RST (bool flag);
 
 private:
-   CSR ();
-   CSR (const CSR &);
-   CSR &operator= (const CSR &);
-
-   uint8_t *const pointer;
-
+   uint32_t value;
 };
+
+std::ostream &operator<< (std::ostream &, const CTRL &);
 
 } } }
 
-#endif  // llamaos_net_e1000e_pci_h_
+#endif  // llamaos_net_e1000e_ctrl_h_

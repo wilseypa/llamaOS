@@ -28,45 +28,65 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#ifndef llamaos_net_e1000e_csr_h_
-#define llamaos_net_e1000e_csr_h_
+#ifndef llamaos_net_e1000e_ctrl_ext_h_
+#define llamaos_net_e1000e_ctrl_ext_h_
 
 #include <cstdint>
-
-#include <llamaos/net/e1000e/CTRL.h>
-#include <llamaos/net/e1000e/CTRL_EXT.h>
-#include <llamaos/net/e1000e/STATUS.h>
 
 namespace llamaos {
 namespace net {
 namespace e1000e {
 
-class CSR
+class CTRL_EXT
 {
 public:
-   CSR (uint64_t machine_address, uint64_t virtual_address);
-   virtual ~CSR ();
+   CTRL_EXT (uint32_t value);
 
-   uint32_t read (uint64_t offset) const;
-   void write (uint64_t offset, uint32_t value);
+   operator uint32_t () const;
 
-   CTRL read_CTRL () const;
-   void write_CTRL (const CTRL &);
+   bool ASDCHK () const;
+   void ASDCHK (bool flag);
 
-   STATUS read_STATUS () const;
+   bool EE_RST () const;
+   void EE_RST (bool flag);
 
-   CTRL_EXT read_CTRL_EXT () const;
-   void write_CTRL_EXT (const CTRL_EXT &);
+   bool SPD_BYPS () const;
+   void SPD_BYPS (bool flag);
+
+   bool RO_DIS () const;
+   void RO_DIS (bool flag);
+
+   bool DMA_DGE () const;
+   void DMA_DGE (bool flag);
+
+   bool PHY_PDE () const;
+   void PHY_PDE (bool flag);
+
+   bool TX_LS_FLOW () const;
+   void TX_LS_FLOW (bool flag);
+
+   bool TX_LS () const;
+   void TX_LS (bool flag);
+
+   bool EIAME () const;
+   void EIAME (bool flag);
+
+   bool IAME () const;
+   void IAME (bool flag);
+
+   bool DRV_LOAD () const;
+   void DRV_LOAD (bool flag);
+
+   bool INT_TIMERS_CLEAR_ENA () const;
+   void INT_TIMERS_CLEAR_ENA (bool flag);
+
+   bool PBA_SUPPORT () const;
+   void PBA_SUPPORT (bool flag);
 
 private:
-   CSR ();
-   CSR (const CSR &);
-   CSR &operator= (const CSR &);
-
-   uint8_t *const pointer;
-
+   uint32_t value;
 };
 
 } } }
 
-#endif  // llamaos_net_e1000e_pci_h_
+#endif  // llamaos_net_e1000e_ctrl_ext_h_
