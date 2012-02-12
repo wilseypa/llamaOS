@@ -32,6 +32,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 #include <llamaos/memory/memory.h>
 #include <llamaos/net/e1000e/CSR.h>
+#include <llamaos/net/e1000e/IO.h>
 #include <llamaos/xen/Hypercall.h>
 #include <llamaos/config.h>
 
@@ -40,53 +41,6 @@ using namespace llamaos;
 using namespace llamaos::memory;
 using namespace llamaos::net::e1000e;
 using namespace llamaos::xen;
-
-// !!! stolen from Linux !!!
-# define __force
-# define __iomem
-
-#define build_mmio_read(name, size, type, reg, barrier) \
-static inline type name(const volatile void __iomem *addr) \
-{ type ret; asm volatile("mov" size " %1,%0":reg (ret) \
-:"m" (*(volatile type __force *)addr) barrier); return ret; }
-
-#define build_mmio_write(name, size, type, reg, barrier) \
-static inline void name(type val, volatile void __iomem *addr) \
-{ asm volatile("mov" size " %0,%1": :reg (val), \
-"m" (*(volatile type __force *)addr) barrier); }
-
-build_mmio_read(readb, "b", unsigned char, "=q", :"memory")
-build_mmio_read(readw, "w", unsigned short, "=r", :"memory")
-build_mmio_read(readl, "l", unsigned int, "=r", :"memory")
-
-build_mmio_read(__readb, "b", unsigned char, "=q", )
-build_mmio_read(__readw, "w", unsigned short, "=r", )
-build_mmio_read(__readl, "l", unsigned int, "=r", )
-
-build_mmio_write(writeb, "b", unsigned char, "q", :"memory")
-build_mmio_write(writew, "w", unsigned short, "r", :"memory")
-build_mmio_write(writel, "l", unsigned int, "r", :"memory")
-
-build_mmio_write(__writeb, "b", unsigned char, "q", )
-build_mmio_write(__writew, "w", unsigned short, "r", )
-build_mmio_write(__writel, "l", unsigned int, "r", )
-
-static inline bool tst_bit (uint32_t value, uint32_t mask)
-{
-   return !!(value & mask);
-}
-
-static inline void chg_bit (uint32_t &value, uint32_t mask, bool flag)
-{
-   if (flag)
-   {
-      value |= mask;
-   }
-   else
-   {
-      value &= ~mask;
-   }
-}
 
 CSR::CSR (uint64_t machine_address, uint64_t virtual_address)
    :  pointer(address_to_pointer<uint8_t>(virtual_address))
@@ -116,9 +70,7 @@ void CSR::write (uint64_t offset, uint32_t value)
 
 CTRL CSR::read_CTRL () const
 {
-   uint32_t value = readl(pointer + 0x00000);
-
-   return CTRL (value);
+   return CTRL (readl(pointer + 0x00000));
 }
 
 void CSR::write_CTRL (const CTRL &ctrl)
@@ -128,16 +80,12 @@ void CSR::write_CTRL (const CTRL &ctrl)
 
 STATUS CSR::read_STATUS () const
 {
-   uint32_t value = readl (pointer + 0x00008);
-
-   return STATUS (value);
+   return STATUS (readl (pointer + 0x00008));
 }
 
 CTRL_EXT CSR::read_CTRL_EXT () const
 {
-   uint32_t value = readl (pointer + 0x00018);
-
-   return CTRL_EXT (value);
+   return CTRL_EXT (readl (pointer + 0x00018));
 }
 
 void CSR::write_CTRL_EXT (const CTRL_EXT &reg)
@@ -145,10 +93,12 @@ void CSR::write_CTRL_EXT (const CTRL_EXT &reg)
    writel (reg, pointer + 0x00018);
 }
 
-namespace llamaos {
-namespace net {
-namespace e1000e {
+IMS CSR::read_IMS () const
+{
+   return IMS (readl (pointer + 0x000D0));
+}
 
-
-
-} } }
+void CSR::write_IMC (const IMC &reg)
+{
+   writel (reg, pointer + 0x000D8);
+}

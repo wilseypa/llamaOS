@@ -17,6 +17,8 @@ SOURCES = \
   llamaos/net/e1000e/CSR.cpp \
   llamaos/net/e1000e/CTRL.cpp \
   llamaos/net/e1000e/CTRL_EXT.cpp \
+  llamaos/net/e1000e/IMC.cpp \
+  llamaos/net/e1000e/IMS.cpp \
   llamaos/net/e1000e/main.cpp \
   llamaos/net/e1000e/PCI.cpp \
   llamaos/net/e1000e/STATUS.cpp

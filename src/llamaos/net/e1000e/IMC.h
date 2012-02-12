@@ -28,50 +28,77 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#ifndef llamaos_net_e1000e_csr_h_
-#define llamaos_net_e1000e_csr_h_
+#ifndef llamaos_net_e1000e_imc_h_
+#define llamaos_net_e1000e_imc_h_
 
 #include <cstdint>
-
-#include <llamaos/net/e1000e/CTRL.h>
-#include <llamaos/net/e1000e/CTRL_EXT.h>
-#include <llamaos/net/e1000e/IMC.h>
-#include <llamaos/net/e1000e/IMS.h>
-#include <llamaos/net/e1000e/STATUS.h>
 
 namespace llamaos {
 namespace net {
 namespace e1000e {
 
-class CSR
+class IMC
 {
 public:
-   CSR (uint64_t machine_address, uint64_t virtual_address);
-   virtual ~CSR ();
+   static const IMC ALL;
 
-   uint32_t read (uint64_t offset) const;
-   void write (uint64_t offset, uint32_t value);
+   IMC ();
+   IMC (uint32_t value);
 
-   CTRL read_CTRL () const;
-   void write_CTRL (const CTRL &);
+   operator uint32_t () const;
 
-   STATUS read_STATUS () const;
+   bool TXDW () const;
+   void TXDW (bool flag);
 
-   CTRL_EXT read_CTRL_EXT () const;
-   void write_CTRL_EXT (const CTRL_EXT &);
+   bool TXQE () const;
+   void TXQE (bool flag);
 
-   IMS read_IMS () const;
-   void write_IMC (const IMC &);
+   bool LSC () const;
+   void LSC (bool flag);
+
+   bool RXDMTO () const;
+   void RXDMTO (bool flag);
+
+   bool RXO () const;
+   void RXO (bool flag);
+
+   bool RXTO () const;
+   void RXTO (bool flag);
+
+   bool MDAC () const;
+   void MDAC (bool flag);
+
+   bool TXD_LOW () const;
+   void TXD_LOW (bool flag);
+
+   bool SRPD () const;
+   void SRPD (bool flag);
+
+   bool ACK () const;
+   void ACK (bool flag);
+
+   bool MNG () const;
+   void MNG (bool flag);
+
+   bool RXQ0 () const;
+   void RXQ0 (bool flag);
+
+   bool RXQ1 () const;
+   void RXQ1 (bool flag);
+
+   bool TXQ0 () const;
+   void TXQ0 (bool flag);
+
+   bool TXQ1 () const;
+   void TXQ1 (bool flag);
+
+   bool OTHER () const;
+   void OTHER (bool flag);
 
 private:
-   CSR ();
-   CSR (const CSR &);
-   CSR &operator= (const CSR &);
-
-   uint8_t *const pointer;
-
+   uint32_t value;
 };
 
 } } }
 
-#endif  // llamaos_net_e1000e_pci_h_
+#endif  // llamaos_net_e1000e_imc_h_

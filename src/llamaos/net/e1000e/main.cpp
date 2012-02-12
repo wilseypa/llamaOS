@@ -113,7 +113,9 @@ int main (int /* argc */, char ** /* argv [] */)
    cout << "CSR STATUS: " << hex << status << endl;
 
    cout << "masking interrupts..." << endl;
-   csr.write (0x000D8, 0x1FFFFFF);
+   cout << csr.read_IMS () << endl;
+   csr.write_IMC(IMC::ALL);
+   cout << csr.read_IMS () << endl;
 
    cout << "reseting..." << endl;
    csr.write (0x00000, 0x84000000);
@@ -121,7 +123,9 @@ int main (int /* argc */, char ** /* argv [] */)
    sleep (2);
 
    cout << "masking interrupts..." << endl;
-   csr.write (0x000D8, 0x1FFFFFF);
+   cout << csr.read_IMS () << endl;
+   csr.write_IMC(IMC::ALL);
+   cout << csr.read_IMS () << endl;
 
    status = csr.read_STATUS ();
    cout << "CSR STATUS: " << hex << status << endl;

@@ -28,50 +28,62 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#ifndef llamaos_net_e1000e_csr_h_
-#define llamaos_net_e1000e_csr_h_
+#ifndef llamaos_net_e1000e_ims_h_
+#define llamaos_net_e1000e_ims_h_
 
 #include <cstdint>
 
-#include <llamaos/net/e1000e/CTRL.h>
-#include <llamaos/net/e1000e/CTRL_EXT.h>
-#include <llamaos/net/e1000e/IMC.h>
-#include <llamaos/net/e1000e/IMS.h>
-#include <llamaos/net/e1000e/STATUS.h>
+#include <ostream>
 
 namespace llamaos {
 namespace net {
 namespace e1000e {
 
-class CSR
+class IMS
 {
 public:
-   CSR (uint64_t machine_address, uint64_t virtual_address);
-   virtual ~CSR ();
+   IMS (uint32_t value);
 
-   uint32_t read (uint64_t offset) const;
-   void write (uint64_t offset, uint32_t value);
+   operator uint32_t () const;
 
-   CTRL read_CTRL () const;
-   void write_CTRL (const CTRL &);
+   bool TXDW () const;
 
-   STATUS read_STATUS () const;
+   bool TXQE () const;
 
-   CTRL_EXT read_CTRL_EXT () const;
-   void write_CTRL_EXT (const CTRL_EXT &);
+   bool LSC () const;
 
-   IMS read_IMS () const;
-   void write_IMC (const IMC &);
+   bool RXDMTO () const;
+
+   bool RXO () const;
+
+   bool RXTO () const;
+
+   bool MDAC () const;
+
+   bool TXD_LOW () const;
+
+   bool SRPD () const;
+
+   bool ACK () const;
+
+   bool MNG () const;
+
+   bool RXQ0 () const;
+
+   bool RXQ1 () const;
+
+   bool TXQ0 () const;
+
+   bool TXQ1 () const;
+
+   bool OTHER () const;
 
 private:
-   CSR ();
-   CSR (const CSR &);
-   CSR &operator= (const CSR &);
-
-   uint8_t *const pointer;
-
+   uint32_t value;
 };
+
+std::ostream &operator<< (std::ostream &, const IMS &);
 
 } } }
 
-#endif  // llamaos_net_e1000e_pci_h_
+#endif  // llamaos_net_e1000e_ims_h_
