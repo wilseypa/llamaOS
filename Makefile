@@ -21,7 +21,7 @@ VMMLIBS = \
 
 # list of standard llamaNET drivers
 NETS = \
-  e1000e
+  82574
 
 # list of standard llamaOS apps
 APPS = \

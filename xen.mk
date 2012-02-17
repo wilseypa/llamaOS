@@ -22,6 +22,7 @@ SOURCES = \
   llamaos/xen/Hypercall.cpp \
   llamaos/xen/Hypervisor.cpp \
   llamaos/xen/memory.cpp \
+  llamaos/xen/PCI.cpp \
   llamaos/xen/start.cpp \
   llamaos/xen/trace.cpp \
   llamaos/xen/Traps.cpp \
