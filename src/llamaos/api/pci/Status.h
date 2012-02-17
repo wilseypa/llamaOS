@@ -28,8 +28,8 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#ifndef llamaos_api_pci_h_
-#define llamaos_api_pci_h_
+#ifndef llamaos_api_pci_status_h_
+#define llamaos_api_pci_status_h_
 
 #include <cstdint>
 
@@ -37,31 +37,25 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 namespace llamaos {
 namespace api {
+namespace pci {
 
-class PCI
+class Status
 {
 public:
-   PCI ();
-   virtual ~PCI ();
+   Status (uint16_t value);
 
-   uint8_t read_config_byte (uint64_t offset) const;
-   uint16_t read_config_word (uint64_t offset) const;
-   uint32_t read_config_dword (uint64_t offset) const;
+   operator uint16_t () const;
 
-   void write_config_byte (uint64_t offset, uint8_t value) const;
-   void write_config_word (uint64_t offset, uint16_t value) const;
-   void write_config_dword (uint64_t offset, uint32_t value) const;
+   bool Interrupt_status () const;
+
+   bool New_capabilities () const;
 
 private:
-   PCI (const PCI&);
-   PCI &operator= (const PCI&);
-
-   class PCI_impl *const impl;
-
+   uint16_t value;
 };
 
-std::ostream &operator<< (std::ostream &, const PCI &);
+std::ostream &operator<< (std::ostream &, const Status &);
 
-} }
+} } }
 
-#endif  // llamaos_dpi_pci_h_
+#endif  // llamaos_api_pci_status_h_
