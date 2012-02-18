@@ -194,5 +194,11 @@ int main (int /* argc */, char ** /* argv [] */)
    status = csr.read_STATUS ();
    cout << "CSR STATUS: " << hex << status << endl;
 
+   cout << "GCR: " << hex << csr.read (0x05B00) << endl;
+   uint32_t gcr = csr.read (0x05B00);
+   gcr |= (1 << 22);
+   csr.write(0x05B00, gcr);
+   cout << "GCR: " << hex << csr.read (0x05B00) << endl;
+
    return 0;
 }
