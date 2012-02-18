@@ -1,6 +1,6 @@
 
 include common.mk
-MAKEFILE_SOURCES += 82574.mk
+MAKEFILE_SOURCES += i82574.mk
 
 INCLUDES = \
   xen/include \
@@ -14,13 +14,13 @@ CPPFLAGS += -Wall -Wextra -Weffc++ \
 VPATH = src
 
 SOURCES = \
-  llamaos/net/82574/main.cpp
+  llamaos/net/i82574/main.cpp
 
 OBJECTS = $(SOURCES:%.cpp=$(OBJDIR)/%.o)
 DEPENDS = $(OBJECTS:%.o=%.d)
 
 # the entry object must be the first object listed here or the guest will crash!
-$(BINDIR)/82574-$(VMM): $(OBJDIR)/llamaos/$(VMM)/x86_64.o $(OBJECTS) $(LIBDIR)/$(VMM).a $(LIBDIR)/llamaos.a $(SYSLIB_LINKS)
+$(BINDIR)/i82574-$(VMM): $(OBJDIR)/llamaos/$(VMM)/x86_64.o $(OBJECTS) $(LIBDIR)/$(VMM).a $(LIBDIR)/llamaos.a $(SYSLIB_LINKS)
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
 	@$(LD) $(LDFLAGS) -T x86_64.lds -o $@ $^
