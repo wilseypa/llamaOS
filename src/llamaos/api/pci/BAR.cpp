@@ -48,7 +48,7 @@ BAR::operator uint32_t () const
 
 bool BAR::Memory () const
 {
-   return test_bit (value, 0);
+   return !test_bit (value, 0);
 }
 
 bool BAR::Type64 () const
@@ -79,7 +79,7 @@ ostream &llamaos::api::pci::operator<< (ostream &out, const BAR &bar)
       out << "  I/O space" << endl;
    }
 
-   out << " Address: " << hex << bar.Address () << endl;
+   out << "  Address: " << hex << bar.Address () << endl;
 
    return out;
 }

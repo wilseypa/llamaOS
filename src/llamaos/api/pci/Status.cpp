@@ -53,7 +53,7 @@ bool Status::Interrupt_status () const
 
 bool Status::New_capabilities () const
 {
-   return test_bit (value, 0);
+   return test_bit (value, 4);
 }
 
 ostream &llamaos::api::pci::operator<< (std::ostream &out, const Status &status)

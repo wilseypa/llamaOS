@@ -30,7 +30,10 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 #include <iostream>
 
+#include <llamaos/api/pci/BAR.h>
+#include <llamaos/api/pci/Command.h>
 #include <llamaos/api/pci/PCI.h>
+#include <llamaos/api/pci/Status.h>
 #include <llamaos/api/sleep.h>
 
 using namespace std;
@@ -62,6 +65,22 @@ int main (int /* argc */, char ** /* argv [] */)
       cout << "PCI hardware detected is not 82574" << endl;
       return -1;
    }
+
+   Command command = pci.read_config_word (4);
+   Status status =  pci.read_config_word (6);
+
+   cout << command << status << endl;
+
+   command.Interrupt_disable (true);
+   command.IO_enable(false);
+   command.Mastering_enable(true);
+   command.Memory_enable(true);
+
+   cout << "Writing " << command << endl;
+   pci.write_config_word (4, command);
+
+   BAR bar0 = pci.read_config_dword (16);
+   cout << bar0 << endl;
 
    return 0;
 }
