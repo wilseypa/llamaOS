@@ -28,11 +28,12 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <llamaos/net/e1000e/IMS.h>
-#include <llamaos/net/e1000e/IO.h>
+#include <llamaos/api/bit.h>
+#include <llamaos/net/i82574/IMS.h>
 
 using namespace std;
-using namespace llamaos::net::e1000e;
+using namespace llamaos::api;
+using namespace llamaos::net::i82574;
 
 IMS::IMS (uint32_t value)
    :  value(value)
@@ -47,85 +48,85 @@ IMS::operator uint32_t () const
 
 bool IMS::TXDW () const
 {
-   return tst_bit (value, (1 << 0));
+   return test_bit (value, 0);
 }
 
 bool IMS::TXQE () const
 {
-   return tst_bit (value, (1 << 1));
+   return test_bit (value, 1);
 }
 
 bool IMS::LSC () const
 {
-   return tst_bit (value, (1 << 2));
+   return test_bit (value, 2);
 }
 
 bool IMS::RXDMTO () const
 {
-   return tst_bit (value, (1 << 4));
+   return test_bit (value, 4);
 }
 
 bool IMS::RXO () const
 {
-   return tst_bit (value, (1 << 6));
+   return test_bit (value, 6);
 }
 
 bool IMS::RXTO () const
 {
-   return tst_bit (value, (1 << 7));
+   return test_bit (value, 7);
 }
 
 bool IMS::MDAC () const
 {
-   return tst_bit (value, (1 << 9));
+   return test_bit (value, 9);
 }
 
 bool IMS::TXD_LOW () const
 {
-   return tst_bit (value, (1 << 15));
+   return test_bit (value, 15);
 }
 
 bool IMS::SRPD () const
 {
-   return tst_bit (value, (1 << 16));
+   return test_bit (value, 16);
 }
 
 bool IMS::ACK () const
 {
-   return tst_bit (value, (1 << 17));
+   return test_bit (value, 17);
 }
 
 bool IMS::MNG () const
 {
-   return tst_bit (value, (1 << 18));
+   return test_bit (value, 18);
 }
 
 bool IMS::RXQ0 () const
 {
-   return tst_bit (value, (1 << 20));
+   return test_bit (value, 20);
 }
 
 bool IMS::RXQ1 () const
 {
-   return tst_bit (value, (1 << 21));
+   return test_bit (value, 21);
 }
 
 bool IMS::TXQ0 () const
 {
-   return tst_bit (value, (1 << 22));
+   return test_bit (value, 22);
 }
 
 bool IMS::TXQ1 () const
 {
-   return tst_bit (value, (1 << 23));
+   return test_bit (value, 23);
 }
 
 bool IMS::OTHER () const
 {
-   return tst_bit (value, (1 << 24));
+   return test_bit (value, 24);
 }
 
-ostream &llamaos::net::e1000e::operator<< (ostream &out, const IMS &ims)
+ostream &llamaos::net::i82574::operator<< (ostream &out, const IMS &ims)
 {
    out << "IMS" << endl;
    out << "  TXDW: " << ims.TXDW () << endl;

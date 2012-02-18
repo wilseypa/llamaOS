@@ -28,8 +28,8 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#ifndef llamaos_net_e1000e_ims_h_
-#define llamaos_net_e1000e_ims_h_
+#ifndef llamaos_net_i82574_ctrl_h_
+#define llamaos_net_i82574_ctrl_h_
 
 #include <cstdint>
 
@@ -37,53 +37,62 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 namespace llamaos {
 namespace net {
-namespace e1000e {
+namespace i82574 {
 
-class IMS
+class CTRL
 {
 public:
-   IMS (uint32_t value);
+   CTRL (uint32_t value);
 
    operator uint32_t () const;
 
-   bool TXDW () const;
+   enum LINK_SPEED { SPEED_10MBS, SPEED_100MBS, SPEED_1000MBS };
 
-   bool TXQE () const;
+   bool FD () const;
+   void FD (bool flag);
 
-   bool LSC () const;
+   bool GIO_MD () const;
+   void GIO_MD (bool flag);
 
-   bool RXDMTO () const;
+   bool ASDE () const;
+   void ASDE (bool flag);
 
-   bool RXO () const;
+   bool SLU () const;
+   void SLU (bool flag);
 
-   bool RXTO () const;
+   LINK_SPEED SPEED () const;
+   void SPEED (LINK_SPEED speed);
 
-   bool MDAC () const;
+   bool FRCSPD () const;
+   void FRCSPD (bool flag);
 
-   bool TXD_LOW () const;
+   bool FRCDPLX () const;
+   void FRCDPLX (bool flag);
 
-   bool SRPD () const;
+   bool ADVD3WUC () const;
+   void ADVD3WUC (bool flag);
 
-   bool ACK () const;
+   bool RST () const;
+   void RST (bool flag);
 
-   bool MNG () const;
+   bool RFCE () const;
+   void RFCE (bool flag);
 
-   bool RXQ0 () const;
+   bool TFCE () const;
+   void TFCE (bool flag);
 
-   bool RXQ1 () const;
+   bool VME () const;
+   void VME (bool flag);
 
-   bool TXQ0 () const;
-
-   bool TXQ1 () const;
-
-   bool OTHER () const;
+   bool PHY_RST () const;
+   void PHY_RST (bool flag);
 
 private:
    uint32_t value;
 };
 
-std::ostream &operator<< (std::ostream &, const IMS &);
+std::ostream &operator<< (std::ostream &, const CTRL &);
 
 } } }
 
-#endif  // llamaos_net_e1000e_ims_h_
+#endif  // llamaos_net_i82574_ctrl_h_

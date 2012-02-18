@@ -28,65 +28,62 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#ifndef llamaos_net_e1000e_ctrl_ext_h_
-#define llamaos_net_e1000e_ctrl_ext_h_
+#ifndef llamaos_net_i82574_ims_h_
+#define llamaos_net_i82574_ims_h_
 
 #include <cstdint>
 
+#include <ostream>
+
 namespace llamaos {
 namespace net {
-namespace e1000e {
+namespace i82574 {
 
-class CTRL_EXT
+class IMS
 {
 public:
-   CTRL_EXT (uint32_t value);
+   IMS (uint32_t value);
 
    operator uint32_t () const;
 
-   bool ASDCHK () const;
-   void ASDCHK (bool flag);
+   bool TXDW () const;
 
-   bool EE_RST () const;
-   void EE_RST (bool flag);
+   bool TXQE () const;
 
-   bool SPD_BYPS () const;
-   void SPD_BYPS (bool flag);
+   bool LSC () const;
 
-   bool RO_DIS () const;
-   void RO_DIS (bool flag);
+   bool RXDMTO () const;
 
-   bool DMA_DGE () const;
-   void DMA_DGE (bool flag);
+   bool RXO () const;
 
-   bool PHY_PDE () const;
-   void PHY_PDE (bool flag);
+   bool RXTO () const;
 
-   bool TX_LS_FLOW () const;
-   void TX_LS_FLOW (bool flag);
+   bool MDAC () const;
 
-   bool TX_LS () const;
-   void TX_LS (bool flag);
+   bool TXD_LOW () const;
 
-   bool EIAME () const;
-   void EIAME (bool flag);
+   bool SRPD () const;
 
-   bool IAME () const;
-   void IAME (bool flag);
+   bool ACK () const;
 
-   bool DRV_LOAD () const;
-   void DRV_LOAD (bool flag);
+   bool MNG () const;
 
-   bool INT_TIMERS_CLEAR_ENA () const;
-   void INT_TIMERS_CLEAR_ENA (bool flag);
+   bool RXQ0 () const;
 
-   bool PBA_SUPPORT () const;
-   void PBA_SUPPORT (bool flag);
+   bool RXQ1 () const;
+
+   bool TXQ0 () const;
+
+   bool TXQ1 () const;
+
+   bool OTHER () const;
 
 private:
    uint32_t value;
 };
 
+std::ostream &operator<< (std::ostream &, const IMS &);
+
 } } }
 
-#endif  // llamaos_net_e1000e_ctrl_ext_h_
+#endif  // llamaos_net_i82574_ims_h_

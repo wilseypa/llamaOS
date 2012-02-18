@@ -36,6 +36,9 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <llamaos/api/pci/Status.h>
 #include <llamaos/api/sleep.h>
 #include <llamaos/memory/memory.h>
+#include <llamaos/net/i82574/CSR.h>
+#include <llamaos/net/i82574/CTRL.h>
+#include <llamaos/net/i82574/STATUS.h>
 #include <llamaos/config.h>
 
 using namespace std;
@@ -43,6 +46,7 @@ using namespace llamaos;
 using namespace llamaos::api;
 using namespace llamaos::api::pci;
 using namespace llamaos::memory;
+using namespace llamaos::net::i82574;
 
 int main (int /* argc */, char ** /* argv [] */)
 {
@@ -69,18 +73,18 @@ int main (int /* argc */, char ** /* argv [] */)
       return -1;
    }
 
-   Command command = pci.read_config_word (4);
-   Status status =  pci.read_config_word (6);
+   Command config_command = pci.read_config_word (4);
+   Status config_status =  pci.read_config_word (6);
 
-   cout << command << status << endl;
+   cout << config_command << config_status << endl;
 
-   command.Interrupt_disable (true);
-   command.IO_enable(false);
-   command.Mastering_enable(true);
-   command.Memory_enable(true);
+   config_command.Interrupt_disable (true);
+   config_command.IO_enable(false);
+   config_command.Mastering_enable(true);
+   config_command.Memory_enable(true);
 
-   cout << "Writing " << command << endl;
-   pci.write_config_word (4, command);
+   cout << "Writing " << config_command << endl;
+   pci.write_config_word (4, config_command);
 
    BAR bar0 = pci.read_config_dword (16);
    cout << bar0 << endl;
@@ -98,13 +102,99 @@ int main (int /* argc */, char ** /* argv [] */)
       Hypercall::update_va_mapping_nocache (virtual_address + offset, machine_address + offset);
    }
 
-//   CSR csr (virtual_address);
+   CSR csr (virtual_address);
+   CTRL ctrl = csr.read_CTRL ();
+   STATUS status = csr.read_STATUS ();
 
-//   CTRL ctrl = csr.read_CTRL ();
-//   STATUS status = csr.read_STATUS ();
+   cout << "CSR CTRL: " << hex << ctrl << endl;
+   cout << "CSR STATUS: " << hex << status << endl;
 
-//   cout << "CSR CTRL: " << hex << ctrl << endl;
-//   cout << "CSR STATUS: " << hex << status << endl;
+   cout << "setting GIO_master_disable..." << endl;
+   CTRL.GIO_MD(true);
+   csr.write_CTRL (CTRL);
+
+   cout << "waiting for GIO_master_disable..." << endl;
+   STATUS = csr.read_STATUS ();
+
+   while (STATUS.GIO_ME ())
+   {
+      STATUS = csr.read_STATUS ();
+   }
+
+   cout << "masking interrupts..." << endl;
+   cout << csr.read_IMS () << endl;
+   csr.write_IMC(IMC::ALL);
+   cout << csr.read_IMS () << endl;
+
+   cout << "getting hw semaphore..." << csr.read (0x00F00) << endl;
+   uint32_t extcnf_ctrl = csr.read (0x00F00);
+   extcnf_ctrl |= 0x20;
+   csr.write(0x00F00, extcnf_ctrl);
+
+   extcnf_ctrl = csr.read (0x00F00);
+   cout << "getting hw semaphore..." << csr.read (0x00F00) << endl;
+
+   while (!(extcnf_ctrl & 0x20))
+   {
+      extcnf_ctrl |= 0x20;
+
+      sleep (1);
+
+      csr.write(0x00F00, extcnf_ctrl);
+      extcnf_ctrl = csr.read (0x00F00);
+      cout << "getting hw semaphore..." << csr.read (0x00F00) << endl;
+      break;
+   }
+
+
+
+
+
+   cout << "reseting..." << endl;
+   ctrl.RST(true);
+   ctrl.PHY_RST(true);
+   csr.write_CTRL(ctrl);
+
+   sleep (2);
+
+   cout << "masking interrupts..." << endl;
+   cout << csr.read_IMS () << endl;
+   csr.write_IMC(IMC::ALL);
+   cout << csr.read_IMS () << endl;
+
+   status = csr.read_STATUS ();
+   cout << "CSR STATUS: " << hex << status << endl;
+
+   CTRL_EXT ctrl_ext = csr.read_CTRL_EXT ();
+   cout << "CSR CTRL_EXT: " << hex << ctrl_ext << endl;
+   ctrl_ext.SPD_BYPS (true);
+   csr.write_CTRL_EXT (ctrl_ext);
+   cout << "CSR CTRL_EXT: " << hex << ctrl_ext << endl;
+
+   cout << "forcing speed and duplex..." << endl;
+   ctrl = CTRL (0);
+   ctrl.FD (true);
+   ctrl.SPEED (CTRL::SPEED_1000MBS);
+   ctrl.FRCSPD (true);
+   ctrl.FRCDPLX (true);
+   ctrl.ADVD3WUC (true);
+   csr.write_CTRL (ctrl);
+
+   sleep (2);
+
+   status = csr.read_STATUS ();
+   cout << "CSR STATUS: " << hex << status << endl;
+
+   sleep (5);
+
+   cout << "setting link up..." << endl;
+   ctrl.SLU (true);
+   csr.write_CTRL (ctrl);
+
+   sleep (2);
+
+   status = csr.read_STATUS ();
+   cout << "CSR STATUS: " << hex << status << endl;
 
    return 0;
 }

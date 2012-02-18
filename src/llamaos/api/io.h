@@ -28,46 +28,42 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#ifndef llamaos_net_e1000e_status_h_
-#define llamaos_net_e1000e_status_h_
-
-#include <cstdint>
-
-#include <ostream>
+#ifndef llamaos_api_io_h_
+#define llamaos_api_io_h_
 
 namespace llamaos {
-namespace net {
-namespace e1000e {
+namespace api {
 
-class STATUS
-{
-public:
-   STATUS (uint32_t value);
+// !!! stolen from Linux !!!
+# define __force
+# define __iomem
 
-   operator uint32_t () const;
+#define build_mmio_read(name, size, type, reg, barrier) \
+static inline type name(const volatile void __iomem *addr) \
+{ type ret; asm volatile("mov" size " %1,%0":reg (ret) \
+:"m" (*(volatile type __force *)addr) barrier); return ret; }
 
-   enum LINK_SPEED { SPEED_10MBS, SPEED_100MBS, SPEED_1000MBS };
+#define build_mmio_write(name, size, type, reg, barrier) \
+static inline void name(type val, volatile void __iomem *addr) \
+{ asm volatile("mov" size " %0,%1": :reg (val), \
+"m" (*(volatile type __force *)addr) barrier); }
 
-   bool FD () const;
+build_mmio_read(readb, "b", unsigned char, "=q", :"memory")
+build_mmio_read(readw, "w", unsigned short, "=r", :"memory")
+build_mmio_read(readl, "l", unsigned int, "=r", :"memory")
 
-   bool LU () const;
+build_mmio_read(__readb, "b", unsigned char, "=q", )
+build_mmio_read(__readw, "w", unsigned short, "=r", )
+build_mmio_read(__readl, "l", unsigned int, "=r", )
 
-   bool TXOFF () const;
+build_mmio_write(writeb, "b", unsigned char, "q", :"memory")
+build_mmio_write(writew, "w", unsigned short, "r", :"memory")
+build_mmio_write(writel, "l", unsigned int, "r", :"memory")
 
-   LINK_SPEED SPEED () const;
+build_mmio_write(__writeb, "b", unsigned char, "q", )
+build_mmio_write(__writew, "w", unsigned short, "r", )
+build_mmio_write(__writel, "l", unsigned int, "r", )
 
-   LINK_SPEED ASDV () const;
+} }
 
-   bool PHYRA () const;
-
-   bool GIO_ME () const;
-
-private:
-   uint32_t value;
-};
-
-std::ostream &operator<< (std::ostream &, const STATUS &);
-
-} } }
-
-#endif  // llamaos_net_e1000e_status_h_
+#endif  // llamaos_api_io_h_

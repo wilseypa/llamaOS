@@ -28,71 +28,65 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#ifndef llamaos_net_e1000e_ctrl_h_
-#define llamaos_net_e1000e_ctrl_h_
+#ifndef llamaos_net_i82574_ctrl_ext_h_
+#define llamaos_net_i82574_ctrl_ext_h_
 
 #include <cstdint>
 
-#include <ostream>
-
 namespace llamaos {
 namespace net {
-namespace e1000e {
+namespace i82574 {
 
-class CTRL
+class CTRL_EXT
 {
 public:
-   CTRL (uint32_t value);
+   CTRL_EXT (uint32_t value);
 
    operator uint32_t () const;
 
-   enum LINK_SPEED { SPEED_10MBS, SPEED_100MBS, SPEED_1000MBS };
+   bool ASDCHK () const;
+   void ASDCHK (bool flag);
 
-   bool FD () const;
-   void FD (bool flag);
+   bool EE_RST () const;
+   void EE_RST (bool flag);
 
-   bool GIO_MD () const;
-   void GIO_MD (bool flag);
+   bool SPD_BYPS () const;
+   void SPD_BYPS (bool flag);
 
-   bool ASDE () const;
-   void ASDE (bool flag);
+   bool RO_DIS () const;
+   void RO_DIS (bool flag);
 
-   bool SLU () const;
-   void SLU (bool flag);
+   bool DMA_DGE () const;
+   void DMA_DGE (bool flag);
 
-   LINK_SPEED SPEED () const;
-   void SPEED (LINK_SPEED speed);
+   bool PHY_PDE () const;
+   void PHY_PDE (bool flag);
 
-   bool FRCSPD () const;
-   void FRCSPD (bool flag);
+   bool TX_LS_FLOW () const;
+   void TX_LS_FLOW (bool flag);
 
-   bool FRCDPLX () const;
-   void FRCDPLX (bool flag);
+   bool TX_LS () const;
+   void TX_LS (bool flag);
 
-   bool ADVD3WUC () const;
-   void ADVD3WUC (bool flag);
+   bool EIAME () const;
+   void EIAME (bool flag);
 
-   bool RST () const;
-   void RST (bool flag);
+   bool IAME () const;
+   void IAME (bool flag);
 
-   bool RFCE () const;
-   void RFCE (bool flag);
+   bool DRV_LOAD () const;
+   void DRV_LOAD (bool flag);
 
-   bool TFCE () const;
-   void TFCE (bool flag);
+   bool INT_TIMERS_CLEAR_ENA () const;
+   void INT_TIMERS_CLEAR_ENA (bool flag);
 
-   bool VME () const;
-   void VME (bool flag);
-
-   bool PHY_RST () const;
-   void PHY_RST (bool flag);
+   bool PBA_SUPPORT () const;
+   void PBA_SUPPORT (bool flag);
 
 private:
    uint32_t value;
 };
 
-std::ostream &operator<< (std::ostream &, const CTRL &);
-
 } } }
 
-#endif  // llamaos_net_e1000e_ctrl_h_
+#endif  // llamaos_net_i82574_ctrl_ext_h_

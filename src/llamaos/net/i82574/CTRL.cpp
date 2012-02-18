@@ -28,11 +28,12 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <llamaos/net/e1000e/CTRL.h>
-#include <llamaos/net/e1000e/IO.h>
+#include <llamaos/api/bit.h>
+#include <llamaos/net/i82574/CTRL.h>
 
 using namespace std;
-using namespace llamaos::net::e1000e;
+using namespace llamaos::api;
+using namespace llamaos::net::i82574;
 
 CTRL::CTRL (uint32_t value)
    :  value(value)
@@ -47,51 +48,51 @@ CTRL::operator uint32_t () const
 
 bool CTRL::FD () const
 {
-   return tst_bit (value, (1 << 0));
+   return test_bit (value, 0);
 }
 
 void CTRL::FD (bool flag)
 {
-   chg_bit (value, (1 << 0), flag);
+   edit_bit (value, 0, flag);
 }
 
 bool CTRL::GIO_MD () const
 {
-   return tst_bit (value, (1 << 2));
+   return test_bit (value, 2);
 }
 
 void CTRL::GIO_MD (bool flag)
 {
-   chg_bit (value, (1 << 2), flag);
+   edit_bit (value, 2, flag);
 }
 
 bool CTRL::ASDE () const
 {
-   return tst_bit (value, (1 << 5));
+   return test_bit (value, 5);
 }
 
 void CTRL::ASDE (bool flag)
 {
-   chg_bit (value, (1 << 5), flag);
+   edit_bit (value, 5, flag);
 }
 
 bool CTRL::SLU () const
 {
-   return tst_bit (value, (1 << 6));
+   return test_bit (value, 6);
 }
 
 void CTRL::SLU (bool flag)
 {
-   chg_bit (value, (1 << 6), flag);
+   edit_bit (value, 6, flag);
 }
 
 CTRL::LINK_SPEED CTRL::SPEED () const
 {
-   if (tst_bit (value, (1 << 9)))
+   if (test_bit (value, 9))
    {
       return SPEED_1000MBS;
    }
-   else if (tst_bit (value, (1 << 8)))
+   else if (test_bit (value, 8))
    {
       return SPEED_100MBS;
    }
@@ -105,103 +106,103 @@ void CTRL::SPEED (LINK_SPEED speed)
    {
    default:
    case SPEED_10MBS:
-      chg_bit (value, (1 << 8), false);
-      chg_bit (value, (1 << 9), false);
+      reset_bit (value, 8);
+      reset_bit (value, 9);
       break;
 
    case SPEED_100MBS:
-      chg_bit (value, (1 << 8), true);
-      chg_bit (value, (1 << 9), false);
+      set_bit (value, 8);
+      reset_bit (value, 9);
       break;
 
    case SPEED_1000MBS:
-      chg_bit (value, (1 << 8), false);
-      chg_bit (value, (1 << 9), true);
+      reset_bit (value, 8);
+      set_bit (value, 9);
       break;
    }
 }
 
 bool CTRL::FRCSPD () const
 {
-   return tst_bit (value, (1 << 11));
+   return test_bit (value, 11);
 }
 
 void CTRL::FRCSPD (bool flag)
 {
-   chg_bit (value, (1 << 11), flag);
+   edit_bit (value, 11, flag);
 }
 
 bool CTRL::FRCDPLX () const
 {
-   return tst_bit (value, (1 << 12));
+   return test_bit (value, 12);
 }
 
 void CTRL::FRCDPLX (bool flag)
 {
-   chg_bit (value, (1 << 12), flag);
+   edit_bit (value, 12, flag);
 }
 
 bool CTRL::ADVD3WUC () const
 {
-   return tst_bit (value, (1 << 20));
+   return test_bit (value, 20);
 }
 
 void CTRL::ADVD3WUC (bool flag)
 {
-   chg_bit (value, (1 << 20), flag);
+   edit_bit (value, 20, flag);
 }
 
 bool CTRL::RST () const
 {
-   return tst_bit (value, (1 << 26));
+   return test_bit (value, 26);
 }
 
 void CTRL::RST (bool flag)
 {
-   chg_bit (value, (1 << 26), flag);
+   edit_bit (value, 26, flag);
 }
 
 bool CTRL::RFCE () const
 {
-   return tst_bit (value, (1 << 27));
+   return test_bit (value, 27);
 }
 
 void CTRL::RFCE (bool flag)
 {
-   chg_bit (value, (1 << 27), flag);
+   edit_bit (value, 27, flag);
 }
 
 bool CTRL::TFCE () const
 {
-   return tst_bit (value, (1 << 28));
+   return test_bit (value, 28);
 }
 
 void CTRL::TFCE (bool flag)
 {
-   chg_bit (value, (1 << 28), flag);
+   edit_bit (value, 28, flag);
 }
 
 bool CTRL::VME () const
 {
-   return tst_bit (value, (1 << 30));
+   return test_bit (value, 30);
 }
 
 void CTRL::VME (bool flag)
 {
-   chg_bit (value, (1 << 30), flag);
+   edit_bit (value, 30, flag);
 }
 
 bool CTRL::PHY_RST () const
 {
-   return tst_bit (value, (1 << 31));
+   return test_bit (value, 31);
 }
 
 void CTRL::PHY_RST (bool flag)
 {
-   chg_bit (value, (1 << 31), flag);
+   edit_bit (value, 31, flag);
 }
 
-ostream &llamaos::net::e1000e::operator<< (ostream &out, const CTRL &ctrl)
+ostream &llamaos::net::i82574::operator<< (ostream &out, const CTRL &ctrl)
 {
    out << "Device control" << endl;
    out << "  FD: " << ctrl.FD () << " (" << ((ctrl.FD ()) ? "Full" : "Half") << " duplex)" << endl;

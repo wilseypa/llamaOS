@@ -28,14 +28,14 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#ifndef llamaos_net_e1000e_imc_h_
-#define llamaos_net_e1000e_imc_h_
+#ifndef llamaos_net_i82574_imc_h_
+#define llamaos_net_i82574_imc_h_
 
 #include <cstdint>
 
 namespace llamaos {
 namespace net {
-namespace e1000e {
+namespace i82574 {
 
 class IMC
 {
@@ -101,4 +101,4 @@ private:
 
 } } }
 
-#endif  // llamaos_net_e1000e_imc_h_
+#endif  // llamaos_net_i82574_imc_h_

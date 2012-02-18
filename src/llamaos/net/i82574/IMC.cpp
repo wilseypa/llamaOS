@@ -28,10 +28,11 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <llamaos/net/e1000e/IMC.h>
-#include <llamaos/net/e1000e/IO.h>
+#include <llamaos/api/bit.h>
+#include <llamaos/net/i82574/IMC.h>
 
-using namespace llamaos::net::e1000e;
+using namespace llamaos::api;
+using namespace llamaos::net::i82574;
 
 const IMC IMC::ALL (0x1F782D7);
 
@@ -54,160 +55,160 @@ IMC::operator uint32_t () const
 
 bool IMC::TXDW () const
 {
-   return tst_bit (value, (1 << 0));
+   return test_bit (value, 0);
 }
 
 void IMC::TXDW (bool flag)
 {
-   chg_bit (value, (1 << 0), flag);
+   edit_bit (value, 0, flag);
 }
 
 bool IMC::TXQE () const
 {
-   return tst_bit (value, (1 << 1));
+   return test_bit (value, 1);
 }
 
 void IMC::TXQE (bool flag)
 {
-   chg_bit (value, (1 << 1), flag);
+   edit_bit (value, 1, flag);
 }
 
 bool IMC::LSC () const
 {
-   return tst_bit (value, (1 << 2));
+   return test_bit (value, 2);
 }
 
 void IMC::LSC (bool flag)
 {
-   chg_bit (value, (1 << 2), flag);
+   edit_bit (value, 2, flag);
 }
 
 bool IMC::RXDMTO () const
 {
-   return tst_bit (value, (1 << 4));
+   return test_bit (value, 4);
 }
 
 void IMC::RXDMTO (bool flag)
 {
-   chg_bit (value, (1 << 4), flag);
+   edit_bit (value, 4, flag);
 }
 
 bool IMC::RXO () const
 {
-   return tst_bit (value, (1 << 6));
+   return test_bit (value, 6);
 }
 
 void IMC::RXO (bool flag)
 {
-   chg_bit (value, (1 << 6), flag);
+   edit_bit (value, 6, flag);
 }
 
 bool IMC::RXTO () const
 {
-   return tst_bit (value, (1 << 7));
+   return test_bit (value, 7);
 }
 
 void IMC::RXTO (bool flag)
 {
-   chg_bit (value, (1 << 7), flag);
+   edit_bit (value, 7, flag);
 }
 
 bool IMC::MDAC () const
 {
-   return tst_bit (value, (1 << 9));
+   return test_bit (value, 9);
 }
 
 void IMC::MDAC (bool flag)
 {
-   chg_bit (value, (1 << 9), flag);
+   edit_bit (value, 9, flag);
 }
 
 bool IMC::TXD_LOW () const
 {
-   return tst_bit (value, (1 << 15));
+   return test_bit (value, 15);
 }
 
 void IMC::TXD_LOW (bool flag)
 {
-   chg_bit (value, (1 << 15), flag);
+   edit_bit (value, 15, flag);
 }
 
 bool IMC::SRPD () const
 {
-   return tst_bit (value, (1 << 16));
+   return test_bit (value, 16);
 }
 
 void IMC::SRPD (bool flag)
 {
-   chg_bit (value, (1 << 16), flag);
+   edit_bit (value, 16, flag);
 }
 
 bool IMC::ACK () const
 {
-   return tst_bit (value, (1 << 17));
+   return test_bit (value, 17);
 }
 
 void IMC::ACK (bool flag)
 {
-   chg_bit (value, (1 << 17), flag);
+   edit_bit (value, 17, flag);
 }
 
 bool IMC::MNG () const
 {
-   return tst_bit (value, (1 << 18));
+   return test_bit (value, 18);
 }
 
 void IMC::MNG (bool flag)
 {
-   chg_bit (value, (1 << 18), flag);
+   edit_bit (value, 18, flag);
 }
 
 bool IMC::RXQ0 () const
 {
-   return tst_bit (value, (1 << 20));
+   return test_bit (value, 20);
 }
 
 void IMC::RXQ0 (bool flag)
 {
-   chg_bit (value, (1 << 20), flag);
+   edit_bit (value, 20, flag);
 }
 
 bool IMC::RXQ1 () const
 {
-   return tst_bit (value, (1 << 21));
+   return test_bit (value, 21);
 }
 
 void IMC::RXQ1 (bool flag)
 {
-   chg_bit (value, (1 << 21), flag);
+   edit_bit (value, 21, flag);
 }
 
 bool IMC::TXQ0 () const
 {
-   return tst_bit (value, (1 << 22));
+   return test_bit (value, 22);
 }
 
 void IMC::TXQ0 (bool flag)
 {
-   chg_bit (value, (1 << 22), flag);
+   edit_bit (value, 22, flag);
 }
 
 bool IMC::TXQ1 () const
 {
-   return tst_bit (value, (1 << 23));
+   return test_bit (value, 23);
 }
 
 void IMC::TXQ1 (bool flag)
 {
-   chg_bit (value, (1 << 23), flag);
+   edit_bit (value, 23, flag);
 }
 
 bool IMC::OTHER () const
 {
-   return tst_bit (value, (1 << 24));
+   return test_bit (value, 24);
 }
 
 void IMC::OTHER (bool flag)
 {
-   chg_bit (value, (1 << 24), flag);
+   edit_bit (value, 24, flag);
 }

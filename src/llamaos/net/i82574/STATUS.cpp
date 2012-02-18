@@ -28,11 +28,12 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <llamaos/net/e1000e/STATUS.h>
-#include <llamaos/net/e1000e/IO.h>
+#include <llamaos/api/bit.h>
+#include <llamaos/net/i82574/STATUS.h>
 
 using namespace std;
-using namespace llamaos::net::e1000e;
+using namespace llamaos::api;
+using namespace llamaos::net::i82574;
 
 STATUS::STATUS (uint32_t value)
    :  value(value)
@@ -42,26 +43,26 @@ STATUS::STATUS (uint32_t value)
 
 bool STATUS::FD () const
 {
-   return tst_bit (value, (1 << 0));
+   return test_bit (value, 0);
 }
 
 bool STATUS::LU () const
 {
-   return tst_bit (value, (1 << 1));
+   return test_bit (value, 1);
 }
 
 bool STATUS::TXOFF () const
 {
-   return tst_bit (value, (1 << 4));
+   return test_bit (value, 4);
 }
 
 STATUS::LINK_SPEED STATUS::SPEED () const
 {
-   if (tst_bit (value, (1 << 7)))
+   if (test_bit (value, 7))
    {
       return SPEED_1000MBS;
    }
-   else if (tst_bit (value, (1 << 6)))
+   else if (test_bit (value, 6))
    {
       return SPEED_100MBS;
    }
@@ -71,11 +72,11 @@ STATUS::LINK_SPEED STATUS::SPEED () const
 
 STATUS::LINK_SPEED STATUS::ASDV () const
 {
-   if (tst_bit (value, (1 << 9)))
+   if (test_bit (value, 9))
    {
       return SPEED_1000MBS;
    }
-   else if (tst_bit (value, (1 << 8)))
+   else if (test_bit (value, 8))
    {
       return SPEED_100MBS;
    }
@@ -85,15 +86,15 @@ STATUS::LINK_SPEED STATUS::ASDV () const
 
 bool STATUS::PHYRA () const
 {
-   return tst_bit (value, (1 << 10));
+   return test_bit (value, 10);
 }
 
 bool STATUS::GIO_ME () const
 {
-   return tst_bit (value, (1 << 19));
+   return test_bit (value, 19);
 }
 
-ostream &llamaos::net::e1000e::operator<< (std::ostream &out, const STATUS &status)
+ostream &llamaos::net::i82574::operator<< (std::ostream &out, const STATUS &status)
 {
    out << "Device status" << endl;
    out << "  FD: " << status.FD () << " (" << ((status.FD ()) ? "Full" : "Half") << " duplex)" << endl;
