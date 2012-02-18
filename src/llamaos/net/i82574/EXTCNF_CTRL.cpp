@@ -28,54 +28,72 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#ifndef llamaos_net_i82574_csr_h_
-#define llamaos_net_i82574_csr_h_
-
-#include <cstdint>
-
-#include <llamaos/net/i82574/CTRL.h>
-#include <llamaos/net/i82574/CTRL_EXT.h>
+#include <llamaos/api/bit.h>
 #include <llamaos/net/i82574/EXTCNF_CTRL.h>
-#include <llamaos/net/i82574/IMC.h>
-#include <llamaos/net/i82574/IMS.h>
-#include <llamaos/net/i82574/STATUS.h>
 
-namespace llamaos {
-namespace net {
-namespace i82574 {
+using namespace std;
+using namespace llamaos::api;
+using namespace llamaos::net::i82574;
 
-class CSR
+EXTCNF_CTRL::EXTCNF_CTRL (uint32_t value)
+   :  value(value)
 {
-public:
-   CSR (uint64_t virtual_address);
-   virtual ~CSR ();
 
-   uint32_t read (uint64_t offset) const;
-   void write (uint64_t offset, uint32_t value);
+}
 
-   CTRL read_CTRL () const;
-   void write_CTRL (const CTRL &);
+EXTCNF_CTRL::operator uint32_t () const
+{
+   return value;
+}
 
-   STATUS read_STATUS () const;
+bool EXTCNF_CTRL::SW_OWN () const
+{
+   return test_bit (value, 5);
+}
 
-   CTRL_EXT read_CTRL_EXT () const;
-   void write_CTRL_EXT (const CTRL_EXT &);
+void EXTCNF_CTRL::SW_OWN (bool flag)
+{
+   edit_bit (value, 5, flag);
+}
 
-   IMS read_IMS () const;
-   void write_IMC (const IMC &);
+bool EXTCNF_CTRL::HW_OWN () const
+{
+   return test_bit (value, 6);
+}
 
-   EXTCNF_CTRL read_EXTCNF_CTRL () const;
-   void write_EXTCNF_CTRL (const EXTCNF_CTRL &);
+void EXTCNF_CTRL::HW_OWN (bool flag)
+{
+   edit_bit (value, 6, flag);
+}
 
-private:
-   CSR ();
-   CSR (const CSR &);
-   CSR &operator= (const CSR &);
+bool EXTCNF_CTRL::MNG_OWN () const
+{
+   return test_bit (value, 7);
+}
 
-   uint8_t *const pointer;
+void EXTCNF_CTRL::MNG_OWN (bool flag)
+{
+   edit_bit (value, 7, flag);
+}
 
-};
+ostream &llamaos::net::i82574::operator<< (ostream &out, const EXTCNF_CTRL &ctrl)
+{
+   if (ctrl.SW_OWN ())
+   {
+      out << "S/W owner";
+   }
+   else if (ctrl.HW_OWN ())
+   {
+      out << "H/W owner";
+   }
+   else if (ctrl.MNG_OWN ())
+   {
+      out << "MNG owner";
+   }
+   else
+   {
+      out << "No owner";
+   }
 
-} } }
-
-#endif  // llamaos_net_i82574_csr_h_
+   return out;
+}

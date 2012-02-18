@@ -95,3 +95,13 @@ void CSR::write_IMC (const IMC &reg)
 {
    writel (reg, pointer + 0x000D8);
 }
+
+EXTCNF_CTRL CSR::read_EXTCNF_CTRL () const
+{
+   return EXTCNF_CTRL (readl (pointer + 0x00F00));
+}
+
+void CSR::write_EXTCNF_CTRL (const EXTCNF_CTRL &reg)
+{
+   writel (reg, pointer + 0x00F00);
+}

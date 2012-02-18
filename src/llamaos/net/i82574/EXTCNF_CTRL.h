@@ -28,54 +28,39 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#ifndef llamaos_net_i82574_csr_h_
-#define llamaos_net_i82574_csr_h_
+#ifndef llamaos_net_i82574_extcnf_ctrl_h_
+#define llamaos_net_i82574_extcnf_ctrl_h_
 
 #include <cstdint>
 
-#include <llamaos/net/i82574/CTRL.h>
-#include <llamaos/net/i82574/CTRL_EXT.h>
-#include <llamaos/net/i82574/EXTCNF_CTRL.h>
-#include <llamaos/net/i82574/IMC.h>
-#include <llamaos/net/i82574/IMS.h>
-#include <llamaos/net/i82574/STATUS.h>
+#include <ostream>
 
 namespace llamaos {
 namespace net {
 namespace i82574 {
 
-class CSR
+class EXTCNF_CTRL
 {
 public:
-   CSR (uint64_t virtual_address);
-   virtual ~CSR ();
+   EXTCNF_CTRL (uint32_t value);
 
-   uint32_t read (uint64_t offset) const;
-   void write (uint64_t offset, uint32_t value);
+   operator uint32_t () const;
 
-   CTRL read_CTRL () const;
-   void write_CTRL (const CTRL &);
+   bool SW_OWN () const;
+   void SW_OWN (bool flag);
 
-   STATUS read_STATUS () const;
+   bool HW_OWN () const;
+   void HW_OWN (bool flag);
 
-   CTRL_EXT read_CTRL_EXT () const;
-   void write_CTRL_EXT (const CTRL_EXT &);
-
-   IMS read_IMS () const;
-   void write_IMC (const IMC &);
-
-   EXTCNF_CTRL read_EXTCNF_CTRL () const;
-   void write_EXTCNF_CTRL (const EXTCNF_CTRL &);
+   bool MNG_OWN () const;
+   void MNG_OWN (bool flag);
 
 private:
-   CSR ();
-   CSR (const CSR &);
-   CSR &operator= (const CSR &);
-
-   uint8_t *const pointer;
-
+   uint32_t value;
 };
+
+std::ostream &operator<< (std::ostream &, const EXTCNF_CTRL &);
 
 } } }
 
-#endif  // llamaos_net_i82574_csr_h_
+#endif  // llamaos_net_i82574_extcnf_ctrl_h_

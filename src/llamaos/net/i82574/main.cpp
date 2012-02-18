@@ -38,6 +38,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <llamaos/memory/memory.h>
 #include <llamaos/net/i82574/CSR.h>
 #include <llamaos/net/i82574/CTRL.h>
+#include <llamaos/net/i82574/EXTCNF_CTRL.h>
 #include <llamaos/net/i82574/STATUS.h>
 #include <llamaos/config.h>
 
@@ -110,15 +111,15 @@ int main (int /* argc */, char ** /* argv [] */)
    cout << "CSR STATUS: " << hex << status << endl;
 
    cout << "setting GIO_master_disable..." << endl;
-   CTRL.GIO_MD(true);
-   csr.write_CTRL (CTRL);
+   ctrl.GIO_MD(true);
+   csr.write_CTRL (ctrl);
 
    cout << "waiting for GIO_master_disable..." << endl;
-   STATUS = csr.read_STATUS ();
+   status = csr.read_STATUS ();
 
-   while (STATUS.GIO_ME ())
+   while (status.GIO_ME ())
    {
-      STATUS = csr.read_STATUS ();
+      status = csr.read_STATUS ();
    }
 
    cout << "masking interrupts..." << endl;
@@ -126,29 +127,26 @@ int main (int /* argc */, char ** /* argv [] */)
    csr.write_IMC(IMC::ALL);
    cout << csr.read_IMS () << endl;
 
-   cout << "getting hw semaphore..." << csr.read (0x00F00) << endl;
-   uint32_t extcnf_ctrl = csr.read (0x00F00);
-   extcnf_ctrl |= 0x20;
-   csr.write(0x00F00, extcnf_ctrl);
+   EXTCNF_CTRL extcnf_ctrl = csr.read_EXTCNF_CTRL ();
+   cout << "getting hw semaphore..." << extcnf_ctrl << endl;
+   extcnf_ctrl =- EXTCNF_CTRL(0);
+   extcnf_ctrl.SW_OWN (true);
+   csr.write_EXTCNF_CTRL (extcnf_ctrl);
 
-   extcnf_ctrl = csr.read (0x00F00);
-   cout << "getting hw semaphore..." << csr.read (0x00F00) << endl;
+   extcnf_ctrl = csr.read_EXTCNF_CTRL ();
+   cout << "getting hw semaphore..." << extcnf_ctrl << endl;
 
-   while (!(extcnf_ctrl & 0x20))
+   while (!(extcnf_ctrl.SW_OWN ()))
    {
-      extcnf_ctrl |= 0x20;
+      extcnf_ctrl.SW_OWN (true);
 
       sleep (1);
 
-      csr.write(0x00F00, extcnf_ctrl);
-      extcnf_ctrl = csr.read (0x00F00);
-      cout << "getting hw semaphore..." << csr.read (0x00F00) << endl;
+      csr.write_EXTCNF_CTRL (extcnf_ctrl);
+      extcnf_ctrl = csr.read_EXTCNF_CTRL ();
+      cout << "getting hw semaphore..." << extcnf_ctrl << endl;
       break;
    }
-
-
-
-
 
    cout << "reseting..." << endl;
    ctrl.RST(true);

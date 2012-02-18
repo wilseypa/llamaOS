@@ -17,6 +17,7 @@ SOURCES = \
   llamaos/net/i82574/CSR.cpp \
   llamaos/net/i82574/CTRL.cpp \
   llamaos/net/i82574/CTRL_EXT.cpp \
+  llamaos/net/i82574/EXTCNF_CTRL.cpp \
   llamaos/net/i82574/IMC.cpp \
   llamaos/net/i82574/IMS.cpp \
   llamaos/net/i82574/main.cpp \
