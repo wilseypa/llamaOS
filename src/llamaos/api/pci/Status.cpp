@@ -28,38 +28,47 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#ifndef llamaos_api_pci_bar_h_
-#define llamaos_api_pci_bar_h_
+#include <llamaos/api/bit.h>
+#include <llamaos/api/pci/Status.h>
 
-#include <cstdint>
+using namespace std;
+using namespace llamaos::api;
+using namespace llamaos::api::pci;
 
-#include <ostream>
-
-namespace llamaos {
-namespace api {
-namespace pci {
-
-class BAR
+Status::Status (uint16_t value)
+   :  value(value)
 {
-public:
-   BAR (uint32_t value);
 
-   operator uint32_t () const;
+}
 
-   bool Memory () const;
+Status::operator uint16_t () const
+{
+   return value;
+}
 
-   bool Type64 () const;
+bool Status::Interrupt_status () const
+{
+   return test_bit (value, 0);
+}
 
-   bool Prefetch () const;
+bool Status::New_capabilities () const
+{
+   return test_bit (value, 0);
+}
 
-   uint32_t Address () const;
+ostream &llamaos::api::pci::operator<< (std::ostream &out, const Status &status)
+{
+   out << "Status Register: " << static_cast<uint16_t>(status) << endl;
 
-private:
-   uint32_t value;
-};
+   if (status.Interrupt_status ())
+   {
+      out << "  Interrupt pending" << endl;
+   }
 
-std::ostream &operator<< (std::ostream &, const BAR &);
+   if (status.New_capabilities ())
+   {
+      out << "  New capabilities present" << endl;
+   }
 
-} } }
-
-#endif  // llamaos_api_pci_bar_h_
+   return out;
+}

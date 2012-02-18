@@ -10,7 +10,11 @@ CPPFLAGS += -Wall -Wextra -Weffc++ \
 
 VPATH = src
 
-SOURCES = 
+SOURCES = \
+  llamaos/api/pci/BAR.cpp \
+  llamaos/api/pci/Command.cpp \
+  llamaos/api/pci/PCI.cpp \
+  llamaos/api/pci/Status.cpp
 
 BINARY = llamaos.a
 OBJECTS = $(SOURCES:%.cpp=$(OBJDIR)/%.o)

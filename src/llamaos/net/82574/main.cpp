@@ -30,11 +30,12 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 #include <iostream>
 
-#include <llamaos/api/PCI.h>
+#include <llamaos/api/pci/PCI.h>
 #include <llamaos/api/sleep.h>
 
 using namespace std;
 using namespace llamaos::api;
+using namespace llamaos::api::pci;
 
 int main (int /* argc */, char ** /* argv [] */)
 {
@@ -48,7 +49,19 @@ int main (int /* argc */, char ** /* argv [] */)
    cout << "PCI config:" << endl;
    cout << pci << endl;
 
-//   pci.print_config ();
+   uint16_t vendor_id = pci.read_config_word (0);
+   uint16_t device_id = pci.read_config_word (2);
+   uint32_t class_code = (pci.read_config_byte (11) << 16) | (pci.read_config_byte (10) << 8) | pci.read_config_byte(9);
+   uint16_t subvendor_id = pci.read_config_word (44);
+
+   if (   (vendor_id != 0x8086)
+       || (device_id != 0x10D3)
+       || (class_code != 0x020000)
+       || (subvendor_id != 0x8086))
+   {
+      cout << "PCI hardware detected is not 82574" << endl;
+      return -1;
+   }
 
    return 0;
 }

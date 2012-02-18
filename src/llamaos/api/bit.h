@@ -28,38 +28,51 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#ifndef llamaos_api_pci_bar_h_
-#define llamaos_api_pci_bar_h_
+#ifndef llamaos_api_bit_h_
+#define llamaos_api_bit_h_
 
 #include <cstdint>
 
-#include <ostream>
-
 namespace llamaos {
 namespace api {
-namespace pci {
 
-class BAR
+template <typename T>
+bool test_bit (const T &value, unsigned long index)
 {
-public:
-   BAR (uint32_t value);
+   return !!(value & (1 << index));
+}
 
-   operator uint32_t () const;
+template <typename T>
+void set_bit (T &value, unsigned long index)
+{
+   value |= (1 << index);
+}
 
-   bool Memory () const;
+template <typename T>
+void reset_bit (T &value, unsigned long index)
+{
+   value &= ~(1 << index);
+}
 
-   bool Type64 () const;
+template <typename T>
+void flip_bit (T &value, unsigned long index)
+{
+   value ^= (1 << index);
+}
 
-   bool Prefetch () const;
+template <typename T>
+void edit_bit (T &value, unsigned long index, bool flag)
+{
+   if (flag)
+   {
+      set_bit (value, index);
+   }
+   else
+   {
+      reset_bit (value, index);
+   }
+}
 
-   uint32_t Address () const;
+} }
 
-private:
-   uint32_t value;
-};
-
-std::ostream &operator<< (std::ostream &, const BAR &);
-
-} } }
-
-#endif  // llamaos_api_pci_bar_h_
+#endif  // llamaos_api_bit_h_

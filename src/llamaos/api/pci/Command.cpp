@@ -28,38 +28,87 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#ifndef llamaos_api_pci_bar_h_
-#define llamaos_api_pci_bar_h_
+#include <llamaos/api/bit.h>
+#include <llamaos/api/pci/Command.h>
 
-#include <cstdint>
+using namespace std;
+using namespace llamaos::api;
+using namespace llamaos::api::pci;
 
-#include <ostream>
-
-namespace llamaos {
-namespace api {
-namespace pci {
-
-class BAR
+Command::Command (uint16_t value)
+   :  value(value)
 {
-public:
-   BAR (uint32_t value);
 
-   operator uint32_t () const;
+}
 
-   bool Memory () const;
+Command::operator uint16_t () const
+{
+   return value;
+}
 
-   bool Type64 () const;
+bool Command::IO_enable () const
+{
+   return test_bit (value, 0);
+}
 
-   bool Prefetch () const;
+void Command::IO_enable (bool flag)
+{
+   edit_bit (value, 0, flag);
+}
 
-   uint32_t Address () const;
+bool Command::Memory_enable () const
+{
+   return test_bit (value, 1);
+}
 
-private:
-   uint32_t value;
-};
+void Command::Memory_enable (bool flag)
+{
+   edit_bit (value, 1, flag);
+}
 
-std::ostream &operator<< (std::ostream &, const BAR &);
+bool Command::Mastering_enable () const
+{
+   return test_bit (value, 2);
+}
 
-} } }
+void Command::Mastering_enable (bool flag)
+{
+   edit_bit (value, 2, flag);
+}
 
-#endif  // llamaos_api_pci_bar_h_
+bool Command::Interrupt_disable () const
+{
+   return test_bit (value, 10);
+}
+
+void Command::Interrupt_disable (bool flag)
+{
+   edit_bit (value, 10, flag);
+}
+
+ostream &llamaos::api::pci::operator<< (ostream &out, const Command &cmd)
+{
+   out << "Command Register: " << hex << static_cast<uint16_t>(cmd) << endl;
+
+   if (cmd.IO_enable ())
+   {
+      out << "  I/O access enable" << endl;
+   }
+
+   if (cmd.Memory_enable ())
+   {
+      out << "  Memory access enable" << endl;
+   }
+
+   if (cmd.Mastering_enable ())
+   {
+      out << "  Mastering LAN enable" << endl;
+   }
+
+   if (cmd.Interrupt_disable ())
+   {
+      out << "  Interrupt disable" << endl;
+   }
+
+   return out;
+}

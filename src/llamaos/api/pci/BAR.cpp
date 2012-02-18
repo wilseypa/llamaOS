@@ -28,38 +28,58 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#ifndef llamaos_api_pci_bar_h_
-#define llamaos_api_pci_bar_h_
+#include <llamaos/api/bit.h>
+#include <llamaos/api/pci/BAR.h>
 
-#include <cstdint>
+using namespace std;
+using namespace llamaos::api;
+using namespace llamaos::api::pci;
 
-#include <ostream>
-
-namespace llamaos {
-namespace api {
-namespace pci {
-
-class BAR
+BAR::BAR (uint32_t value)
+   :  value(value)
 {
-public:
-   BAR (uint32_t value);
 
-   operator uint32_t () const;
+}
 
-   bool Memory () const;
+BAR::operator uint32_t () const
+{
+   return value;
+}
 
-   bool Type64 () const;
+bool BAR::Memory () const
+{
+   return test_bit (value, 0);
+}
 
-   bool Prefetch () const;
+bool BAR::Type64 () const
+{
+   return test_bit (value, 2);
+}
 
-   uint32_t Address () const;
+bool BAR::Prefetch () const
+{
+   return test_bit (value, 3);
+}
 
-private:
-   uint32_t value;
-};
+uint32_t BAR::Address () const
+{
+   return value & (Memory () ? 0xFFFFFFF0 : 0xFFFFFFFC);
+}
 
-std::ostream &operator<< (std::ostream &, const BAR &);
+ostream &llamaos::api::pci::operator<< (ostream &out, const BAR &bar)
+{
+   out << "BAR: " << hex << static_cast<uint32_t>(bar) << endl;
 
-} } }
+   if (bar.Memory ())
+   {
+      out << "  Memory " << (bar.Type64 () ? "64" : "32") << "-bit (" << (bar.Prefetch () ? "P" : "Non-p") << "refetchable)" << endl;
+   }
+   else
+   {
+      out << "  I/O space" << endl;
+   }
 
-#endif  // llamaos_api_pci_bar_h_
+   out << " Address: " << hex << bar.Address () << endl;
+
+   return out;
+}
