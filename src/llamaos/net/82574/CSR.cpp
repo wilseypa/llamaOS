@@ -31,7 +31,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <iostream>
 
 #include <llamaos/memory/memory.h>
-#include <llamaos/net/e1000e/CSR.h>
+#include <llamaos/net/82574/CSR.h>
 #include <llamaos/net/e1000e/IO.h>
 #include <llamaos/xen/Hypercall.h>
 #include <llamaos/config.h>
@@ -39,18 +39,13 @@ either expressed or implied, of the copyright holder(s) or contributors.
 using namespace std;
 using namespace llamaos;
 using namespace llamaos::memory;
-using namespace llamaos::net::e1000e;
+using namespace llamaos::net::i82574;
 using namespace llamaos::xen;
 
-CSR::CSR (uint64_t machine_address, uint64_t virtual_address)
+CSR::CSR (uint64_t virtual_address)
    :  pointer(address_to_pointer<uint8_t>(virtual_address))
 {
-   // mapping 128k
-   for (uint64_t i = 0; i < 32; i++)
-   {
-      uint64_t offset = (i * PAGE_SIZE);
-      Hypercall::update_va_mapping_nocache (virtual_address + offset, machine_address + offset);
-   }
+
 }
 
 CSR::~CSR ()

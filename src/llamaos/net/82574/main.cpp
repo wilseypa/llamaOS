@@ -35,20 +35,23 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <llamaos/api/pci/PCI.h>
 #include <llamaos/api/pci/Status.h>
 #include <llamaos/api/sleep.h>
+#include <llamaos/memory/memory.h>
+#include <llamaos/config.h>
 
 using namespace std;
+using namespace llamaos;
 using namespace llamaos::api;
 using namespace llamaos::api::pci;
+using namespace llamaos::memory;
 
 int main (int /* argc */, char ** /* argv [] */)
 {
    cout << "running 82574 llamaNET domain...\n" << endl;
-
    cout << "waiting..." << endl;
    sleep (3);
 
    PCI pci;
-
+   sleep (1);
    cout << "PCI config:" << endl;
    cout << pci << endl;
 
@@ -81,6 +84,27 @@ int main (int /* argc */, char ** /* argv [] */)
 
    BAR bar0 = pci.read_config_dword (16);
    cout << bar0 << endl;
+
+   uint64_t machine_address = bar0.Address ();
+
+   // also a hack, get an open address in the second half of the reserved area
+   uint64_t virtual_address = get_reserved_virtual_address () + (512 * PAGE_SIZE);
+   virtual_address &= ~(PAGE_SIZE-1);
+
+   // mapping 128k
+   for (uint64_t i = 0; i < 32; i++)
+   {
+      uint64_t offset = (i * PAGE_SIZE);
+      Hypercall::update_va_mapping_nocache (virtual_address + offset, machine_address + offset);
+   }
+
+//   CSR csr (virtual_address);
+
+//   CTRL ctrl = csr.read_CTRL ();
+//   STATUS status = csr.read_STATUS ();
+
+//   cout << "CSR CTRL: " << hex << ctrl << endl;
+//   cout << "CSR STATUS: " << hex << status << endl;
 
    return 0;
 }

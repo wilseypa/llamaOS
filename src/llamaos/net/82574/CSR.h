@@ -28,8 +28,8 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#ifndef llamaos_net_e1000e_csr_h_
-#define llamaos_net_e1000e_csr_h_
+#ifndef llamaos_net_i82574_csr_h_
+#define llamaos_net_i82574_csr_h_
 
 #include <cstdint>
 
@@ -41,12 +41,12 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 namespace llamaos {
 namespace net {
-namespace e1000e {
+namespace i82574 {
 
 class CSR
 {
 public:
-   CSR (uint64_t machine_address, uint64_t virtual_address);
+   CSR (uint64_t virtual_address);
    virtual ~CSR ();
 
    uint32_t read (uint64_t offset) const;
@@ -74,4 +74,4 @@ private:
 
 } } }
 
-#endif  // llamaos_net_e1000e_pci_h_
+#endif  // llamaos_net_i82574_csr_h_
