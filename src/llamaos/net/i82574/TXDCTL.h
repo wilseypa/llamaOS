@@ -28,66 +28,41 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#ifndef llamaos_net_i82574_csr_h_
-#define llamaos_net_i82574_csr_h_
+#ifndef llamaos_net_i82574_txdctl_h_
+#define llamaos_net_i82574_txdctl_h_
 
 #include <cstdint>
-
-#include <llamaos/net/i82574/CTRL.h>
-#include <llamaos/net/i82574/CTRL_EXT.h>
-#include <llamaos/net/i82574/EXTCNF_CTRL.h>
-#include <llamaos/net/i82574/GCR.h>
-#include <llamaos/net/i82574/IMC.h>
-#include <llamaos/net/i82574/IMS.h>
-#include <llamaos/net/i82574/STATUS.h>
-#include <llamaos/net/i82574/TCTL.h>
-#include <llamaos/net/i82574/TXDCTL.h>
 
 namespace llamaos {
 namespace net {
 namespace i82574 {
 
-class CSR
+class TXDCTL
 {
 public:
-   CSR (uint64_t virtual_address);
-   virtual ~CSR ();
+   TXDCTL (uint32_t value);
 
-   uint32_t read (uint64_t offset) const;
-   void write (uint64_t offset, uint32_t value);
+   operator uint32_t () const;
 
-   CTRL read_CTRL () const;
-   void write_CTRL (const CTRL &);
+   uint8_t PTHRESH () const;
+   void PTHRESH (uint8_t t);
 
-   STATUS read_STATUS () const;
+   uint8_t HTHRESH () const;
+   void HTHRESH (uint8_t t);
 
-   CTRL_EXT read_CTRL_EXT () const;
-   void write_CTRL_EXT (const CTRL_EXT &);
+   uint8_t WTHRESH () const;
+   void WTHRESH (uint8_t t);
 
-   IMS read_IMS () const;
-   void write_IMC (const IMC &);
+   bool GRAN () const;
+   void GRAN (bool flag);
 
-   EXTCNF_CTRL read_EXTCNF_CTRL () const;
-   void write_EXTCNF_CTRL (const EXTCNF_CTRL &);
-
-   GCR read_GCR () const;
-   void write_GCR (const GCR &);
-
-   TCTL read_TCTL () const;
-   void write_TCTL (const TCTL &);
-
-   TXDCTL read_TXDCTL () const;
-   void write_TXDCTL (const TXDCTL &);
+   uint8_t LWTHRESH () const;
+   void LWTHRESH (uint8_t t);
 
 private:
-   CSR ();
-   CSR (const CSR &);
-   CSR &operator= (const CSR &);
-
-   uint8_t *const pointer;
-
+   uint32_t value;
 };
 
 } } }
 
-#endif  // llamaos_net_i82574_csr_h_
+#endif  // llamaos_net_i82574_txdctl_h_

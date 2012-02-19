@@ -28,66 +28,61 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#ifndef llamaos_net_i82574_csr_h_
-#define llamaos_net_i82574_csr_h_
+#ifndef llamaos_net_i82574_tctl_h_
+#define llamaos_net_i82574_tctl_h_
 
 #include <cstdint>
-
-#include <llamaos/net/i82574/CTRL.h>
-#include <llamaos/net/i82574/CTRL_EXT.h>
-#include <llamaos/net/i82574/EXTCNF_CTRL.h>
-#include <llamaos/net/i82574/GCR.h>
-#include <llamaos/net/i82574/IMC.h>
-#include <llamaos/net/i82574/IMS.h>
-#include <llamaos/net/i82574/STATUS.h>
-#include <llamaos/net/i82574/TCTL.h>
-#include <llamaos/net/i82574/TXDCTL.h>
 
 namespace llamaos {
 namespace net {
 namespace i82574 {
 
-class CSR
+class TCTL
 {
 public:
-   CSR (uint64_t virtual_address);
-   virtual ~CSR ();
+   TCTL (uint32_t value);
 
-   uint32_t read (uint64_t offset) const;
-   void write (uint64_t offset, uint32_t value);
+   operator uint32_t () const;
 
-   CTRL read_CTRL () const;
-   void write_CTRL (const CTRL &);
+   bool EN () const;
+   void EN (bool flag);
 
-   STATUS read_STATUS () const;
+   bool PSP () const;
+   void PSP (bool flag);
 
-   CTRL_EXT read_CTRL_EXT () const;
-   void write_CTRL_EXT (const CTRL_EXT &);
+   uint8_t CT () const;
+   void CT (uint8_t n);
 
-   IMS read_IMS () const;
-   void write_IMC (const IMC &);
+   uint16_t COLD () const;
+   void COLD (uint16_t t);
 
-   EXTCNF_CTRL read_EXTCNF_CTRL () const;
-   void write_EXTCNF_CTRL (const EXTCNF_CTRL &);
+   bool SWXOFF () const;
+   void SWXOFF (bool flag);
 
-   GCR read_GCR () const;
-   void write_GCR (const GCR &);
+   bool PBE () const;
+   void PBE (bool flag);
 
-   TCTL read_TCTL () const;
-   void write_TCTL (const TCTL &);
+   bool RTLC () const;
+   void RTLC (bool flag);
 
-   TXDCTL read_TXDCTL () const;
-   void write_TXDCTL (const TXDCTL &);
+   bool UNORTX () const;
+   void UNORTX (bool flag);
+
+//   unsigned int TXDSCMT () const;
+//   void TXDSCMT (unsigned int t);
+
+   bool MULR () const;
+   void MULR (bool flag);
+
+   enum READ_REQUEST_THREAHOLD { THREASHOLD_2_LINES, THREASHOLD_4_LINES, THREASHOLD_8_LINES, THREASHOLD_NONE };
+
+   READ_REQUEST_THREAHOLD RRTHRESH () const;
+   void RRTHRESH (READ_REQUEST_THREAHOLD rrt);
 
 private:
-   CSR ();
-   CSR (const CSR &);
-   CSR &operator= (const CSR &);
-
-   uint8_t *const pointer;
-
+   uint32_t value;
 };
 
 } } }
 
-#endif  // llamaos_net_i82574_csr_h_
+#endif  // llamaos_net_i82574_tctl_h_

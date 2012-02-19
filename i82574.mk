@@ -18,10 +18,13 @@ SOURCES = \
   llamaos/net/i82574/CTRL.cpp \
   llamaos/net/i82574/CTRL_EXT.cpp \
   llamaos/net/i82574/EXTCNF_CTRL.cpp \
+  llamaos/net/i82574/GCR.cpp \
   llamaos/net/i82574/IMC.cpp \
   llamaos/net/i82574/IMS.cpp \
   llamaos/net/i82574/main.cpp \
-  llamaos/net/i82574/STATUS.cpp
+  llamaos/net/i82574/STATUS.cpp \
+  llamaos/net/i82574/TCTL.cpp \
+  llamaos/net/i82574/TXDCTL.cpp
 
 OBJECTS = $(SOURCES:%.cpp=$(OBJDIR)/%.o)
 DEPENDS = $(OBJECTS:%.o=%.d)

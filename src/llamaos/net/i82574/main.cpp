@@ -194,11 +194,29 @@ int main (int /* argc */, char ** /* argv [] */)
    status = csr.read_STATUS ();
    cout << "CSR STATUS: " << hex << status << endl;
 
-   cout << "GCR: " << hex << csr.read (0x05B00) << endl;
-   uint32_t gcr = csr.read (0x05B00);
-   gcr |= (1 << 22);
-   csr.write(0x05B00, gcr);
-   cout << "GCR: " << hex << csr.read (0x05B00) << endl;
+   // from manual 4.6.2: "GCR bit 22 should be set to 1b by software during initialization."
+   GCR gcr = csr.read_GCR ();
+   gcr.INITIALIZE (true);
+   csr.write_GCR (gcr);
+   uint32_t gcr2 = csr.read (0x05B64);
+   gcr2 |= 1;
+   csr.write (0x05B64, gcr2);
+
+   cout << "initialize transmitter..." << endl;
+   TXDCTL txdctl (0);
+   txdctl.GRAN (true);
+   txdctl.WTHRESH (1);
+   csr.write_TXDCTL (txdctl);
+
+   TCTL tctl (0);
+   tctl.CT (16);
+   tctl.COLD (0x3F);
+   tctl.PSP (true);
+   tctl.EN (true);
+   csr.write_TCTL (tctl);
+
+   // loop forever
+   for (;;);
 
    return 0;
 }

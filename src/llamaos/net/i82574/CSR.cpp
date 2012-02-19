@@ -105,3 +105,33 @@ void CSR::write_EXTCNF_CTRL (const EXTCNF_CTRL &reg)
 {
    writel (reg, pointer + 0x00F00);
 }
+
+GCR CSR::read_GCR () const
+{
+   return GCR (readl (pointer + 0x05B00));
+}
+
+void CSR::write_GCR (const GCR &reg)
+{
+   writel (reg, pointer + 0x05B00);
+}
+
+TCTL CSR::read_TCTL () const
+{
+   return TCTL (readl (pointer + 0x00400));
+}
+
+void CSR::write_TCTL (const TCTL &reg)
+{
+   writel (reg, pointer + 0x00400);
+}
+
+TXDCTL CSR::read_TXDCTL () const
+{
+   return TXDCTL (readl (pointer + 0x03828));
+}
+
+void CSR::write_TXDCTL (const TXDCTL &reg)
+{
+   writel (reg, pointer + 0x03828);
+}

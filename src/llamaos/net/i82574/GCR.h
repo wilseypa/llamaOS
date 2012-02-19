@@ -28,66 +28,81 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#ifndef llamaos_net_i82574_csr_h_
-#define llamaos_net_i82574_csr_h_
+#ifndef llamaos_net_i82574_gcr_h_
+#define llamaos_net_i82574_gcr_h_
 
 #include <cstdint>
 
-#include <llamaos/net/i82574/CTRL.h>
-#include <llamaos/net/i82574/CTRL_EXT.h>
-#include <llamaos/net/i82574/EXTCNF_CTRL.h>
-#include <llamaos/net/i82574/GCR.h>
-#include <llamaos/net/i82574/IMC.h>
-#include <llamaos/net/i82574/IMS.h>
-#include <llamaos/net/i82574/STATUS.h>
-#include <llamaos/net/i82574/TCTL.h>
-#include <llamaos/net/i82574/TXDCTL.h>
+#include <ostream>
 
 namespace llamaos {
 namespace net {
 namespace i82574 {
 
-class CSR
+class GCR
 {
 public:
-   CSR (uint64_t virtual_address);
-   virtual ~CSR ();
+   GCR (uint32_t value);
 
-   uint32_t read (uint64_t offset) const;
-   void write (uint64_t offset, uint32_t value);
+   operator uint32_t () const;
 
-   CTRL read_CTRL () const;
-   void write_CTRL (const CTRL &);
+   enum L1_ENTRY_LATENCY { LATENCY_2USEC, LATENCY_8USEC, LATENCY_16USEC, LATENCY_32USEC, LATENCY_64USEC, LATENCY_256USEC, LATENCY_1MSEC, LATENCY_4MSEC };
 
-   STATUS read_STATUS () const;
+   bool RXD_NOSNOOP () const;
+   void RXD_NOSNOOP (bool flag);
 
-   CTRL_EXT read_CTRL_EXT () const;
-   void write_CTRL_EXT (const CTRL_EXT &);
+   bool RXDSCW_NOSNOOP () const;
+   void RXDSCW_NOSNOOP (bool flag);
 
-   IMS read_IMS () const;
-   void write_IMC (const IMC &);
+   bool RXDSCR_NOSNOOP () const;
+   void RXDSCR_NOSNOOP (bool flag);
 
-   EXTCNF_CTRL read_EXTCNF_CTRL () const;
-   void write_EXTCNF_CTRL (const EXTCNF_CTRL &);
+   bool TXD_NOSNOOP () const;
+   void TXD_NOSNOOP (bool flag);
 
-   GCR read_GCR () const;
-   void write_GCR (const GCR &);
+   bool TXDSCW_NOSNOOP () const;
+   void TXDSCW_NOSNOOP (bool flag);
 
-   TCTL read_TCTL () const;
-   void write_TCTL (const TCTL &);
+   bool TXDSCR_NOSNOOP () const;
+   void TXDSCR_NOSNOOP (bool flag);
 
-   TXDCTL read_TXDCTL () const;
-   void write_TXDCTL (const TXDCTL &);
+   bool RX_L0S_ADJUST () const;
+   void RX_L0S_ADJUST (bool flag);
+
+   bool PBA_CL_DEAS () const;
+   void PBA_CL_DEAS (bool flag);
+
+   bool HEADER_LOG_ORDER () const;
+   void HEADER_LOG_ORDER (bool flag);
+
+   bool INITIALIZE () const;
+   void INITIALIZE (bool flag);
+
+   L1_ENTRY_LATENCY L1_ENTRY_LAT () const;
+   void L1_ENTRY_LAT (L1_ENTRY_LATENCY usec);
+
+   bool L0S_ENTRY_LAT () const;
+   void L0S_ENTRY_LAT (bool flag);
+
+   bool L1_ACT_WITHOUT_L0S_RX () const;
+   void L1_ACT_WITHOUT_L0S_RX (bool flag);
+
+   bool GIO_DIS_RD_ERR () const;
+   void GIO_DIS_RD_ERR (bool flag);
+
+   bool GIO_GOOD_L0S () const;
+   void GIO_GOOD_L0S (bool flag);
+
+   bool SELF_TEST_RESULT () const;
+   void SELF_TEST_RESULT (bool flag);
+
+   bool DISABLE_TIMEOUT () const;
+   void DISABLE_TIMEOUT (bool flag);
 
 private:
-   CSR ();
-   CSR (const CSR &);
-   CSR &operator= (const CSR &);
-
-   uint8_t *const pointer;
-
+   uint32_t value;
 };
 
 } } }
 
-#endif  // llamaos_net_i82574_csr_h_
+#endif  // llamaos_net_i82574_gcr_h_

@@ -28,66 +28,78 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#ifndef llamaos_net_i82574_csr_h_
-#define llamaos_net_i82574_csr_h_
-
-#include <cstdint>
-
-#include <llamaos/net/i82574/CTRL.h>
-#include <llamaos/net/i82574/CTRL_EXT.h>
-#include <llamaos/net/i82574/EXTCNF_CTRL.h>
-#include <llamaos/net/i82574/GCR.h>
-#include <llamaos/net/i82574/IMC.h>
-#include <llamaos/net/i82574/IMS.h>
-#include <llamaos/net/i82574/STATUS.h>
-#include <llamaos/net/i82574/TCTL.h>
+#include <llamaos/api/bit.h>
 #include <llamaos/net/i82574/TXDCTL.h>
 
-namespace llamaos {
-namespace net {
-namespace i82574 {
+using namespace llamaos::api;
+using namespace llamaos::net::i82574;
 
-class CSR
+TXDCTL::TXDCTL (uint32_t value)
+   :  value(value)
 {
-public:
-   CSR (uint64_t virtual_address);
-   virtual ~CSR ();
 
-   uint32_t read (uint64_t offset) const;
-   void write (uint64_t offset, uint32_t value);
+}
 
-   CTRL read_CTRL () const;
-   void write_CTRL (const CTRL &);
+TXDCTL::operator uint32_t () const
+{
+   // Rsv 22 0x0 Reserved. Must be set to 1b for proper operation.
+   return value | (1 << 22);
+}
 
-   STATUS read_STATUS () const;
+uint8_t TXDCTL::PTHRESH () const
+{
+   return static_cast<uint8_t>(value & 0x3F);
+}
 
-   CTRL_EXT read_CTRL_EXT () const;
-   void write_CTRL_EXT (const CTRL_EXT &);
+void TXDCTL::PTHRESH (uint8_t t)
+{
+   value &= 0xFFFFFFC0;
+   t &= 0x3F;
+   value |= t;
+}
 
-   IMS read_IMS () const;
-   void write_IMC (const IMC &);
+uint8_t TXDCTL::HTHRESH () const
+{
+   return static_cast<uint8_t>((value >> 8) & 0x3F);
+}
 
-   EXTCNF_CTRL read_EXTCNF_CTRL () const;
-   void write_EXTCNF_CTRL (const EXTCNF_CTRL &);
+void TXDCTL::HTHRESH (uint8_t t)
+{
+   value &= 0xFFFFC0FF;
+   t &= 0x3F;
+   value |= (t << 8);
+}
 
-   GCR read_GCR () const;
-   void write_GCR (const GCR &);
+uint8_t TXDCTL::WTHRESH () const
+{
+   return static_cast<uint8_t>((value >> 16) & 0x3F);
+}
 
-   TCTL read_TCTL () const;
-   void write_TCTL (const TCTL &);
+void TXDCTL::WTHRESH (uint8_t t)
+{
+   value &= 0xFFC0FFFF;
+   t &= 0x3F;
+   value |= (t << 16);
+}
 
-   TXDCTL read_TXDCTL () const;
-   void write_TXDCTL (const TXDCTL &);
+bool TXDCTL::GRAN () const
+{
+   return test_bit (value, 24);
+}
 
-private:
-   CSR ();
-   CSR (const CSR &);
-   CSR &operator= (const CSR &);
+void TXDCTL::GRAN (bool flag)
+{
+   edit_bit (value, 24, flag);
+}
 
-   uint8_t *const pointer;
+uint8_t TXDCTL::LWTHRESH () const
+{
+   return static_cast<uint8_t>((value >> 25) & 0x7F);
+}
 
-};
-
-} } }
-
-#endif  // llamaos_net_i82574_csr_h_
+void TXDCTL::LWTHRESH (uint8_t t)
+{
+   value &= 0x1FFFFFF;
+   t &= 0x7F;
+   value |= (t << 25);
+}
