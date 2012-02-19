@@ -28,6 +28,8 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
+#include <malloc.h>
+
 #include <iostream>
 
 #include <llamaos/api/pci/BAR.h>
@@ -49,6 +51,17 @@ using namespace llamaos::api::pci;
 using namespace llamaos::memory;
 using namespace llamaos::net::i82574;
 
+struct __attribute__ ((__packed__)) tx_desc_t
+{
+   uint64_t buffer;
+   uint16_t length;
+   uint8_t CSO;
+   uint8_t CMD;
+   uint8_t STA;
+   uint8_t CSS;
+   uint16_t VLAN;
+};
+
 int main (int /* argc */, char ** /* argv [] */)
 {
    cout << "running 82574 llamaNET domain...\n" << endl;
@@ -58,8 +71,10 @@ int main (int /* argc */, char ** /* argv [] */)
    PCI pci;
    sleep (1);
    cout << "PCI config:" << endl;
-   cout << pci << endl;
+   //cout << pci << endl;
 
+   sleep (10);
+   cout << "checking PCI config for valid 82574..." << endl;
    uint16_t vendor_id = pci.read_config_word (0);
    uint16_t device_id = pci.read_config_word (2);
    uint32_t class_code = (pci.read_config_byte (11) << 16) | (pci.read_config_byte (10) << 8) | pci.read_config_byte(9);
@@ -70,9 +85,14 @@ int main (int /* argc */, char ** /* argv [] */)
        || (class_code != 0x020000)
        || (subvendor_id != 0x8086))
    {
-      cout << "PCI hardware detected is not 82574" << endl;
+      cout << "PCI hardware detected is NOT 82574" << endl;
       return -1;
    }
+   cout << "PCI hardware detected is82574" << endl;
+   cout.flush ();
+
+   sleep (1);
+   cout << "enabling PCI access and creating CSR register class..." << endl;
 
    Command config_command = pci.read_config_word (4);
    Status config_status =  pci.read_config_word (6);
@@ -215,8 +235,115 @@ int main (int /* argc */, char ** /* argv [] */)
    tctl.EN (true);
    csr.write_TCTL (tctl);
 
-   // loop forever
-   for (;;);
+   cout.flush();
+   cout <<  "TCTL: " << csr.read_TCTL () << endl;
+   cout <<  "TXDCTL: " << csr.read_TXDCTL () << endl;
+   cout << "setup transmit descript table..." << endl;
+   cout << "sizeof(tx_desc_t): " << sizeof(tx_desc_t) << endl;
+   cout.flush();
+   struct tx_desc_t *tx_desc = static_cast<struct tx_desc_t *>(memalign (PAGE_SIZE, PAGE_SIZE));
+   uint64_t tx_desc_machine_address = virtual_pointer_to_machine_address(tx_desc);
+   Hypercall::update_va_mapping_nocache (pointer_to_address (tx_desc), tx_desc_machine_address);
+   csr.write_TDBA (tx_desc_machine_address);
+   csr.write_TDLEN (256);
+   cout << "TDBA: " << hex << csr.read_TDBA() << ", " << tx_desc_machine_address << endl;
+
+   char *buffer = static_cast<char *>(memalign (PAGE_SIZE, PAGE_SIZE));
+   uint64_t buffer_machine_address = virtual_pointer_to_machine_address(buffer);
+   Hypercall::update_va_mapping_nocache (pointer_to_address (buffer), buffer_machine_address);
+
+   // 00:24:be:45:0a:7d
+   buffer [0] = 0x00;
+   buffer [1] = 0x24;
+   buffer [2] = 0xbe;
+   buffer [3] = 0x45;
+   buffer [4] = 0x0a;
+   buffer [5] = 0x7d;
+
+   buffer [6] = 0x00;
+   buffer [7] = 0x01;
+   buffer [8] = 0x02;
+   buffer [9] = 0x03;
+   buffer [10] = 0x04;
+   buffer [11] = 0x05;
+
+   buffer [12] = 0x90;
+   buffer [13] = 0xcc;
+
+   buffer [14] = 0x00;
+   buffer [15] = 0x01;
+   buffer [16] = 0x02;
+   buffer [17] = 0x03;
+   buffer [18] = 0x04;
+   buffer [19] = 0x05;
+   buffer [20] = 0x06;
+   buffer [21] = 0x07;
+   buffer [22] = 0x08;
+   buffer [23] = 0x09;
+   buffer [24] = 0x0a;
+   buffer [25] = 0x0b;
+   buffer [26] = 0x0c;
+   buffer [27] = 0x0d;
+   buffer [28] = 0x0e;
+   buffer [29] = 0x0f;
+   buffer [30] = 0x10;
+   buffer [31] = 0x11;
+   buffer [32] = 0x12;
+   buffer [33] = 0x13;
+   buffer [34] = 0x14;
+   buffer [35] = 0x15;
+   buffer [36] = 0x16;
+   buffer [37] = 0x17;
+   buffer [38] = 0x18;
+   buffer [39] = 0x19;
+   buffer [40] = 0x1a;
+   buffer [41] = 0x1b;
+   buffer [42] = 0x1c;
+   buffer [43] = 0x1d;
+   buffer [44] = 0x1e;
+   buffer [45] = 0x1f;
+   buffer [46] = 0x20;
+   buffer [47] = 0x21;
+   buffer [48] = 0x22;
+   buffer [49] = 0x23;
+   buffer [50] = 0x24;
+   buffer [51] = 0x25;
+   buffer [52] = 0x26;
+   buffer [53] = 0x27;
+   buffer [54] = 0x28;
+   buffer [55] = 0x29;
+   buffer [56] = 0x2a;
+   buffer [57] = 0x2b;
+   buffer [58] = 0x2c;
+   buffer [59] = 0x2d;
+
+   buffer [60] = 0x00;
+   buffer [61] = 0x00;
+   buffer [62] = 0x00;
+   buffer [63] = 0x00;
+
+   tx_desc->buffer = buffer_machine_address;
+   tx_desc->length = 60;
+   tx_desc->CSO = 0;
+   tx_desc->CMD = 0x0B;
+   tx_desc->STA = 0;
+   tx_desc->CSS = 0;
+   tx_desc->VLAN = 0;
+
+   cout << "buffer is ready to send, incrementing tail now..." << endl;
+   cout << "TDH: " << csr.read_TDH () << endl;
+   cout << "TDT: " << csr.read_TDT () << endl;
+   csr.write_TDT (1);
+
+   cout << "waiting 2 sec..." << endl;
+   sleep (2);
+   cout << "TDH: " << csr.read_TDH () << endl;
+   cout << "TDT: " << csr.read_TDT () << endl;
+   cout << "tx_desc->STA: " << static_cast<unsigned int>(tx_desc->STA) << endl;
+
+   cout << "waiting 5 sec, then exit..." << endl;
+   cout.flush ();
+   sleep (5);
 
    return 0;
 }

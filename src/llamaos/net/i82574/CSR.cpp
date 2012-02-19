@@ -141,7 +141,7 @@ uint64_t CSR::read_TDBA () const
    return (static_cast<uint64_t>(readl (pointer + 0x03804)) << 32) | readl (pointer + 0x03800);
 }
 
-void CSR::read_TDBA (uint64_t address) const
+void CSR::write_TDBA (uint64_t address) const
 {
    writel (static_cast<uint32_t>(address), pointer + 0x03800);
    writel (static_cast<uint32_t>(address >> 32), pointer + 0x03804);
@@ -152,7 +152,7 @@ uint32_t CSR::read_TDLEN () const
    return readl (pointer + 0x03808);
 }
 
-void CSR::read_TDLEN (uint32_t length) const
+void CSR::write_TDLEN (uint32_t length) const
 {
    writel (length & 0xFFF80, pointer + 0x03808);
 }
@@ -162,7 +162,12 @@ uint16_t CSR::read_TDH () const
    return readl (pointer + 0x03810);
 }
 
-void CSR::read_TDT (uint16_t tail) const
+uint16_t CSR::read_TDT () const
+{
+   return readl (pointer + 0x03818);
+}
+
+void CSR::write_TDT (uint16_t tail) const
 {
    writel (tail & 0xFFFF, pointer + 0x03818);
 }

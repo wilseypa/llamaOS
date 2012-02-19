@@ -96,6 +96,12 @@ inline uint64_t virtual_pointer_to_machine_page (T *pointer)
    return pseudo_page_to_machine_page (address_to_page (virtual_to_pseudo (pointer_to_address(pointer))));
 }
 
+template <typename T>
+inline uint64_t virtual_pointer_to_machine_address (T *pointer)
+{
+   return page_to_address (pseudo_page_to_machine_page (address_to_page (virtual_to_pseudo (pointer_to_address(pointer)))));
+}
+
 void create_table_entry (uint64_t CR3_virtual_address,
                          uint64_t table_virtual_address,
                          uint64_t table_machine_address);

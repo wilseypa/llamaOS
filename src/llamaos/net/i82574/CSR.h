@@ -80,13 +80,15 @@ public:
    void write_TXDCTL (const TXDCTL &);
 
    uint64_t read_TDBA () const;
-   void read_TDBA (uint64_t address) const;
+   void write_TDBA (uint64_t address) const;
 
    uint32_t read_TDLEN () const;
-   void read_TDLEN (uint32_t length) const;
+   void write_TDLEN (uint32_t length) const;
 
    uint16_t read_TDH () const;
-   void read_TDT (uint16_t tail) const;
+
+   uint16_t read_TDT () const;
+   void write_TDT (uint16_t tail) const;
 
 private:
    CSR ();

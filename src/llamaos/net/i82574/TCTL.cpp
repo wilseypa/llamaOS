@@ -47,12 +47,12 @@ TCTL::operator uint32_t () const
 
 bool TCTL::EN () const
 {
-   return test_bit (value, 0);
+   return test_bit (value, 1);
 }
 
 void TCTL::EN (bool flag)
 {
-   edit_bit (value, 0, flag);
+   edit_bit (value, 1, flag);
 }
 
 bool TCTL::PSP () const
