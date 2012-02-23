@@ -39,6 +39,8 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <llamaos/net/i82574/GCR.h>
 #include <llamaos/net/i82574/IMC.h>
 #include <llamaos/net/i82574/IMS.h>
+#include <llamaos/net/i82574/RCTL.h>
+#include <llamaos/net/i82574/RXDCTL.h>
 #include <llamaos/net/i82574/STATUS.h>
 #include <llamaos/net/i82574/TCTL.h>
 #include <llamaos/net/i82574/TXDCTL.h>
@@ -72,6 +74,23 @@ public:
 
    GCR read_GCR () const;
    void write_GCR (const GCR &);
+
+   RCTL read_RCTL () const;
+   void write_RCTL (const RCTL &);
+
+   RXDCTL read_RXDCTL () const;
+   void write_RXDCTL (const RXDCTL &);
+
+   uint64_t read_RDBA () const;
+   void write_RDBA (uint64_t address) const;
+
+   uint32_t read_RDLEN () const;
+   void write_RDLEN (uint32_t length) const;
+
+   uint16_t read_RDH () const;
+
+   uint16_t read_RDT () const;
+   void write_RDT (uint16_t tail) const;
 
    TCTL read_TCTL () const;
    void write_TCTL (const TCTL &);

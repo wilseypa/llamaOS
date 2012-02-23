@@ -116,6 +116,62 @@ void CSR::write_GCR (const GCR &reg)
    writel (reg, pointer + 0x05B00);
 }
 
+RCTL CSR::read_RCTL () const
+{
+   return RCTL (readl (pointer + 0x00100));
+}
+
+void CSR::write_RCTL (const RCTL &reg)
+{
+   writel (reg, pointer + 0x00100);
+}
+
+RXDCTL CSR::read_RXDCTL () const
+{
+   return RXDCTL (readl (pointer + 0x02828));
+}
+
+void CSR::write_RXDCTL (const RXDCTL &reg)
+{
+   writel (reg, pointer + 0x02828);
+}
+
+uint64_t CSR::read_RDBA () const
+{
+   return (static_cast<uint64_t>(readl (pointer + 0x02804)) << 32) | readl (pointer + 0x02800);
+}
+
+void CSR::write_RDBA (uint64_t address) const
+{
+   writel (static_cast<uint32_t>(address), pointer + 0x02800);
+   writel (static_cast<uint32_t>(address >> 32), pointer + 0x02804);
+}
+
+uint32_t CSR::read_RDLEN () const
+{
+   return readl (pointer + 0x02808);
+}
+
+void CSR::write_RDLEN (uint32_t length) const
+{
+   writel (length & 0xFFF80, pointer + 0x02808);
+}
+
+uint16_t CSR::read_RDH () const
+{
+   return readl (pointer + 0x02810);
+}
+
+uint16_t CSR::read_RDT () const
+{
+   return readl (pointer + 0x02818);
+}
+
+void CSR::write_RDT (uint16_t tail) const
+{
+   writel (tail & 0xFFFF, pointer + 0x02818);
+}
+
 TCTL CSR::read_TCTL () const
 {
    return TCTL (readl (pointer + 0x00400));

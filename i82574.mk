@@ -22,6 +22,8 @@ SOURCES = \
   llamaos/net/i82574/IMC.cpp \
   llamaos/net/i82574/IMS.cpp \
   llamaos/net/i82574/main.cpp \
+  llamaos/net/i82574/RCTL.cpp \
+  llamaos/net/i82574/RXDCTL.cpp \
   llamaos/net/i82574/STATUS.cpp \
   llamaos/net/i82574/TCTL.cpp \
   llamaos/net/i82574/TXDCTL.cpp

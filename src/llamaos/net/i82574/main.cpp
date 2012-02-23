@@ -51,6 +51,16 @@ using namespace llamaos::api::pci;
 using namespace llamaos::memory;
 using namespace llamaos::net::i82574;
 
+struct __attribute__ ((__packed__)) rx_desc_t
+{
+   uint64_t buffer;
+   uint16_t length;
+   uint16_t checksum;
+   uint8_t status;
+   uint8_t error;
+   uint16_t vlan;
+};
+
 struct __attribute__ ((__packed__)) tx_desc_t
 {
    uint64_t buffer;
@@ -222,6 +232,54 @@ int main (int /* argc */, char ** /* argv [] */)
    gcr2 |= 1;
    csr.write (0x05B64, gcr2);
 
+   cout << "initialize receiver..." << endl;
+   RXDCTL rxdctl (0);
+   rxdctl.GRAN (true);
+   rxdctl.WTHRESH (1);
+   csr.write_RXDCTL (rxdctl);
+
+   cout.flush();
+   cout <<  "RCTL: " << csr.read_RCTL () << endl;
+   cout <<  "RXDCTL: " << csr.read_RXDCTL () << endl;
+   cout << "setup receive descript table..." << endl;
+   cout << "sizeof(rx_desc_t): " << sizeof(rx_desc_t) << endl;
+   cout.flush();
+   struct rx_desc_t *rx_desc = static_cast<struct rx_desc_t *>(memalign (PAGE_SIZE, PAGE_SIZE));
+   uint64_t rx_desc_machine_address = virtual_pointer_to_machine_address(rx_desc);
+   Hypercall::update_va_mapping_nocache (pointer_to_address (rx_desc), rx_desc_machine_address);
+   csr.write_TDBA (rx_desc_machine_address);
+   csr.write_TDLEN (256);
+   cout << "RDBA: " << hex << csr.read_RDBA() << ", " << rx_desc_machine_address << endl;
+
+   cout << "inserting receive buffer..." << endl;
+   char *rx_buffer = static_cast<char *>(memalign (PAGE_SIZE, PAGE_SIZE));
+   uint64_t rx_buffer_machine_address = virtual_pointer_to_machine_address(rx_buffer);
+   Hypercall::update_va_mapping_nocache (pointer_to_address (rx_buffer), rx_buffer_machine_address);
+   rx_desc->buffer = rx_buffer_machine_address;
+   rx_desc->length = 0;
+   rx_desc->checksum = 0;
+   rx_desc->status = 0;
+   rx_desc->error = 0;
+   rx_desc->vlan = 0;
+   csr.write_RDT (1);
+
+   cout << "enabling receiver..." << endl;
+   RCTL rctl (0);
+   rctl.EN (true);
+   csr.write_RCTL (rctl);
+
+   cout << "waiting for packet arrival..." << endl;
+   while (0 == rx_desc->status);
+
+   cout << "RD Status: " << static_cast<unsigned int>(rx_desc->status) << endl;
+   cout << "RD data[]:";
+
+   for (int i = 0; i < rx_desc->length; i++)
+   {
+      cout << " " << hex << static_cast<unsigned int>(rx_buffer [i]);
+   }
+
+   cout << endl;
    cout << "initialize transmitter..." << endl;
    TXDCTL txdctl (0);
    txdctl.GRAN (true);
