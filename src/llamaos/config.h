@@ -39,7 +39,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #define LLAMAOS_VERSION_MINOR 1
 #define LLAMAOS_VERSION_TEXT  "llamaOS-" STR(LLAMAOS_VERSION_MAJOR) "." STR(LLAMAOS_VERSION_MINOR)
 
-#define LLAMAOS_STACK_SIZE     0x2000
+#define LLAMAOS_STACK_SIZE     0x10000
 #define LLAMAOS_IRQ_STACK_SIZE 0x2000
 
 #define LLAMAOS_PAGE_SIZE      0x1000
