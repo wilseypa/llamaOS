@@ -26,7 +26,7 @@ NETS = \
 # list of standard llamaOS apps
 APPS = \
   hello \
-  latency
+  latency-tcp-linux
 
 # include list of custom llamaOS apps
 -include apps.mk

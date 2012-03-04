@@ -28,6 +28,54 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
+#include <iostream>
+
+#include "Experiment.h"
+
+using namespace std;
+using namespace latency;
+
+int main (int argc, char *argv [])
+{
+   // most implementations will require more
+   if (argc < 3)
+   {
+      cout << "too few program arguments." << endl;
+   }
+   else
+   {
+      Experiment *experiment = Experiment_factory::create (argc, argv);
+
+      if (nullptr == experiment)
+      {
+         cout << "failed to create experiment instance." << endl;
+      }
+      // run once to test and sync multiple nodes
+      else if (!experiment->verify ())
+      {
+         cout << "failed to verify experiment data (first trial)." << endl;
+      }
+      else if (!experiment->run_trials ())
+      {
+         cout << "failed to complete all trials." << endl;
+      }
+      // run again to ensure valid
+      else if (!experiment->verify ())
+      {
+         cout << "failed to verify experiment data (last trial)." << endl;
+      }
+      else
+      {
+         delete experiment;
+         return 0;
+      }
+   }
+
+   return -1;
+}
+
+
+#if 0
 #include <climits>
 #include <cmath>
 #include <cstdio>
@@ -36,14 +84,11 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 #include <iostream>
 
-#include <llamaos/trace.h>
-
 #include "latency.h"
 #include "latency_data.h"
 #include "latency_time.h"
 
 using namespace std;
-using namespace llamaos;
 
 // global/shared vars
 static LATENCY_PARAM param;
@@ -135,30 +180,6 @@ static int verify_experiment (void)
 
 static int run_experiment (int trial)
 {
-   // master initiates the trial
-   if (param.master)
-   {
-      // send/recv mesg, check first "int" in buffer is the trial number just
-      // as a low cost sanity check to verify both machines are in sync
-      if (   (latency_send_msg (&param))
-          && (latency_recv_msg (&param))
-          && (*((int *)param.data) == trial))
-      {
-         return LATENCY_SUCCESS;
-      }
-   }
-   else
-   {
-      // wait for message to arrive
-      if (latency_recv_msg (&param))
-      {
-         // place trial number in first "int" for master to verify
-         *((int *)param.data) = trial;
-         return latency_send_msg (&param);
-      }
-   }
-
-   return LATENCY_FAILURE;
 }
 
 static int run_experiments (void)
@@ -327,3 +348,4 @@ int main (int argc, char *argv [])
    latency_exit (&param);
    return error;
 }
+#endif

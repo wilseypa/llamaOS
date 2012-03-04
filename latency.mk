@@ -11,11 +11,13 @@ CPPFLAGS += -Wall -Wextra -Weffc++ \
 
 VPATH = src
 
+#  llamaos/apps/latency/latency_data.cpp \
+#  llamaos/apps/latency/latency_null.cpp \
+#  llamaos/apps/latency/latency_time.cpp \
+
 SOURCES = \
-  llamaos/apps/latency/latency_data.cpp \
-  llamaos/apps/latency/latency_null.cpp \
-  llamaos/apps/latency/latency_time.cpp \
-  llamaos/apps/latency/main.cpp
+  llamaos/apps/latency/main.cpp \
+  llamaos/apps/latency/Param.cpp
 
 OBJECTS = $(SOURCES:%.cpp=$(OBJDIR)/%.o)
 DEPENDS = $(OBJECTS:%.o=%.d)
