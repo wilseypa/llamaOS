@@ -43,6 +43,11 @@ clean:
 	@echo removing: $(LIBDIR)
 	@rm -rf $(LIBDIR)
 
+.PHONY: check
+check:
+	@echo running cppcheck on src
+	@cppcheck src
+
 .PHONY: syslibs
 syslibs:
 	@$(MAKE) $(SYSLIBS)

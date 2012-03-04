@@ -160,7 +160,7 @@ Experiment_tcp::Experiment_tcp (int argc, char **argv)
 
 Experiment_tcp::~Experiment_tcp ()
 {
-   delete buffer;
+   delete[] buffer;
 }
 
 bool Experiment_tcp::verify ()
