@@ -42,7 +42,7 @@ RXDCTL::RXDCTL (uint32_t value)
 
 RXDCTL::operator uint32_t () const
 {
-
+   return value;
 }
 
 uint8_t RXDCTL::PTHRESH () const
