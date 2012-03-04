@@ -244,7 +244,7 @@ int main (int /* argc */, char ** /* argv [] */)
    cout << "setup receive descript table..." << endl;
    cout << "sizeof(rx_desc_t): " << sizeof(rx_desc_t) << endl;
    cout.flush();
-   struct rx_desc_t *rx_desc = static_cast<struct rx_desc_t *>(memalign (PAGE_SIZE, PAGE_SIZE));
+   volatile struct rx_desc_t *rx_desc = static_cast<struct rx_desc_t *>(memalign (PAGE_SIZE, PAGE_SIZE));
    uint64_t rx_desc_machine_address = virtual_pointer_to_machine_address(rx_desc);
    Hypercall::update_va_mapping_nocache (pointer_to_address (rx_desc), rx_desc_machine_address);
    csr.write_TDBA (rx_desc_machine_address);
@@ -265,11 +265,20 @@ int main (int /* argc */, char ** /* argv [] */)
 
    cout << "enabling receiver..." << endl;
    RCTL rctl (0);
+   rctl.MPE(true);
+   rctl.UPE(true);
    rctl.EN (true);
    csr.write_RCTL (rctl);
 
    cout << "waiting for packet arrival..." << endl;
-   while (0 == rx_desc->status);
+   while (0 == rx_desc->status)
+   {
+      if (csr.read_RDH() > 0)
+      {
+         cout << "RDH is non-zero!" << endl;
+         break;
+      }
+   }
 
    cout << "RD Status: " << static_cast<unsigned int>(rx_desc->status) << endl;
    cout << "RD data[]:";
