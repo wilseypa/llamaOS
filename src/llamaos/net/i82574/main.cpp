@@ -29,6 +29,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 */
 
 #include <malloc.h>
+#include <string.h>
 
 #include <iostream>
 
@@ -196,6 +197,7 @@ int main (int /* argc */, char ** /* argv [] */)
    CTRL_EXT ctrl_ext = csr.read_CTRL_EXT ();
    cout << "CSR CTRL_EXT: " << hex << ctrl_ext << endl;
    ctrl_ext.SPD_BYPS (true);
+   ctrl_ext.DRV_LOAD(true);
    csr.write_CTRL_EXT (ctrl_ext);
    cout << "CSR CTRL_EXT: " << hex << ctrl_ext << endl;
 
@@ -244,29 +246,33 @@ int main (int /* argc */, char ** /* argv [] */)
    cout << "setup receive descript table..." << endl;
    cout << "sizeof(rx_desc_t): " << sizeof(rx_desc_t) << endl;
    cout.flush();
-   volatile struct rx_desc_t *rx_desc = static_cast<struct rx_desc_t *>(memalign (PAGE_SIZE, PAGE_SIZE));
+   struct rx_desc_t *rx_desc = static_cast<struct rx_desc_t *>(memalign (PAGE_SIZE, PAGE_SIZE));
+   memset(rx_desc, 0, PAGE_SIZE);
    uint64_t rx_desc_machine_address = virtual_pointer_to_machine_address(rx_desc);
    Hypercall::update_va_mapping_nocache (pointer_to_address (rx_desc), rx_desc_machine_address);
-   csr.write_TDBA (rx_desc_machine_address);
-   csr.write_TDLEN (256);
+   csr.write_RDBA (rx_desc_machine_address);
+   csr.write_RDLEN (256);
    cout << "RDBA: " << hex << csr.read_RDBA() << ", " << rx_desc_machine_address << endl;
 
-   cout << "inserting receive buffer..." << endl;
-   char *rx_buffer = static_cast<char *>(memalign (PAGE_SIZE, PAGE_SIZE));
-   uint64_t rx_buffer_machine_address = virtual_pointer_to_machine_address(rx_buffer);
-   Hypercall::update_va_mapping_nocache (pointer_to_address (rx_buffer), rx_buffer_machine_address);
-   rx_desc->buffer = rx_buffer_machine_address;
-   rx_desc->length = 0;
-   rx_desc->checksum = 0;
-   rx_desc->status = 0;
-   rx_desc->error = 0;
-   rx_desc->vlan = 0;
-   csr.write_RDT (1);
+   cout << "inserting receive buffers..." << endl;
+   char *rx_buffer [64];
+
+   for (unsigned int i = 0; i < 64; i++)
+   {
+      rx_buffer [i] = static_cast<char *>(memalign (PAGE_SIZE, PAGE_SIZE));
+      memset(rx_buffer [i], 0, PAGE_SIZE);
+      uint64_t rx_buffer_machine_address = virtual_pointer_to_machine_address(rx_buffer [i]);
+      Hypercall::update_va_mapping_nocache (pointer_to_address (rx_buffer [i]), rx_buffer_machine_address);
+      rx_desc [i].buffer = rx_buffer_machine_address;
+   }
+
+   csr.write_RDT (64);
 
    cout << "enabling receiver..." << endl;
    RCTL rctl (0);
    rctl.MPE(true);
    rctl.UPE(true);
+   rctl.BAM(true);
    rctl.EN (true);
    csr.write_RCTL (rctl);
 
@@ -278,14 +284,49 @@ int main (int /* argc */, char ** /* argv [] */)
          cout << "RDH is non-zero!" << endl;
          break;
       }
+
+#if 0
+      if (csr.read(0x04074) > 0)
+      {
+         cout << "Received Good" << endl;
+         char *data = rx_buffer [0];
+         cout << static_cast<unsigned int>(data [0]) << " ";
+         cout << static_cast<unsigned int>(data [0]) << " ";
+         cout << static_cast<unsigned int>(data [2]) << " ";
+         cout << static_cast<unsigned int>(data [3]) << " ";
+         cout << static_cast<unsigned int>(data [4]) << " ";
+         cout << static_cast<unsigned int>(data [5]) << " ";
+         cout << static_cast<unsigned int>(data [6]) << " ";
+         cout << static_cast<unsigned int>(data [7]) << " ";
+         cout << static_cast<unsigned int>(data [8]) << " ";
+         cout << static_cast<unsigned int>(data [9]) << " ";
+         cout << static_cast<unsigned int>(data [10]) << " ";
+         cout << static_cast<unsigned int>(data [11]) << " ";
+         cout << static_cast<unsigned int>(data [12]) << " ";
+         cout << static_cast<unsigned int>(data [13]) << " ";
+         cout << static_cast<unsigned int>(data [14]) << " ";
+         cout << static_cast<unsigned int>(data [15]) << " ";
+         cout << static_cast<unsigned int>(data [16]) << endl;
+      }
+#endif
+
+      cout << "DESC status: " << rx_desc->status << endl;
+      cout << "FIFO head: " << (csr.read(0x02410) & 0x1FFF) << endl;
+      cout << "FIFO tail: " << (csr.read(0x02418) & 0x1FFF) << endl;
+      cout << "Missed: " << csr.read(0x04010) << endl;
+      cout << "Good: " << csr.read(0x04074) << endl;
+      cout << "Broadcasst: " << csr.read(0x04078) << endl;
+      cout << "Multicast: " << csr.read(0x0407C) << endl;
+      sleep (1);
    }
 
    cout << "RD Status: " << static_cast<unsigned int>(rx_desc->status) << endl;
-   cout << "RD data[]:";
+   cout << "RD data[]:" << endl;
 
    for (int i = 0; i < rx_desc->length; i++)
    {
-      cout << " " << hex << static_cast<unsigned int>(rx_buffer [i]);
+         char *data = rx_buffer [0];
+         cout << hex << (static_cast<unsigned int>(data [i]) & 0xFF) << " ";
    }
 
    cout << endl;
