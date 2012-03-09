@@ -30,8 +30,10 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 #include <malloc.h>
 #include <string.h>
+#include <cstdint>
 
 #include <iostream>
+#include <queue>
 
 #include <llamaos/api/pci/BAR.h>
 #include <llamaos/api/pci/Command.h>
@@ -43,6 +45,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <llamaos/net/i82574/CTRL.h>
 #include <llamaos/net/i82574/EXTCNF_CTRL.h>
 #include <llamaos/net/i82574/STATUS.h>
+#include <llamaos/xen/Hypervisor.h>
 #include <llamaos/config.h>
 
 using namespace std;
@@ -51,6 +54,131 @@ using namespace llamaos::api;
 using namespace llamaos::api::pci;
 using namespace llamaos::memory;
 using namespace llamaos::net::i82574;
+
+static void mark_data_alpha (unsigned char *buffer, unsigned long length)
+{
+   unsigned long j = 0;
+
+   // put alpha data (A B C D ...)
+   for (unsigned long i = 0; i < length; i++)
+   {
+      buffer [i] = ('A' + (++j % 26));
+   }
+}
+
+static bool verify_data_alpha (const unsigned char *buffer, unsigned long length)
+{
+   unsigned long j = 0;
+   unsigned char c;
+
+   for (unsigned long i = 0; i < length; i++)
+   {
+      c = 'A' + (++j % 26);
+
+      if (buffer [i] != c)
+      {
+         cout << "verify alpha failed (" << buffer [i] << " != " << c << ") @ index " << i << endl;
+         return false;
+      }
+   }
+
+   return true;
+}
+
+static void mark_data_numeric (unsigned char *buffer, unsigned long length)
+{
+   unsigned long j = 0;
+
+   // put num data (0 1 2 3 ...)
+   for (unsigned long i = 0; i < length; i++)
+   {
+      buffer [i] = ('0' + (++j % 10));
+   }
+}
+
+static bool verify_data_numeric (const unsigned char *buffer, unsigned long length)
+{
+   unsigned long j = 0;
+   unsigned char c;
+
+   for (unsigned long i = 0; i < length; i++)
+   {
+      c = '0' + (++j % 10);
+
+      if (buffer [i] != c)
+      {
+         cout << "verify numeric failed (" << buffer [i] << " != " << c << ") @ index " << i << endl;
+         return false;
+      }
+   }
+
+   return true;
+}
+
+static void compute_statistics (unsigned long trials, unsigned long *results)
+{
+   double mean = 0.0;
+   double variance = 0.0;
+   unsigned long latency = 0UL;
+   unsigned long min_latency = 0xFFFFFFFFFFFFFFFFUL;
+   unsigned long max_latency = 0UL;
+
+   // iterate to compute mean
+   for (unsigned long i = 0; i < trials; i++)
+   {
+      latency = results [i];
+
+      mean += latency;
+
+      min_latency = (latency < min_latency) ? latency : min_latency;
+      max_latency = (latency > max_latency) ? latency : max_latency;
+   }
+
+   mean /= trials;
+
+   // iterate to compute variance
+   for (unsigned long i = 0; i < trials; i++)
+   {
+      latency = results [i];
+
+      variance += ((latency - mean) * (latency - mean));
+   }
+
+   variance /= trials;
+
+   cout << dec;
+   cout << "  mean: " << mean << ", var: " << variance << ", [" << min_latency << ", " << max_latency << "]" << endl;
+}
+
+static inline uint64_t rdtsc ()
+{
+   uint32_t lo, hi;
+
+   asm volatile ("rdtsc" : "=a" (lo), "=d" (hi));
+
+   return (static_cast<uint64_t>(hi) << 32) | lo;
+}
+
+static inline uint64_t tsc_to_ns (uint64_t tsc)
+{
+   const vcpu_time_info_t *time_info = &Hypervisor::get_instance()->shared_info->vcpu_info [0].time;
+   const uint64_t overflow = UINT64_MAX / time_info->tsc_to_system_mul;
+   uint64_t time_ns = 0UL;
+
+   uint64_t stsc = (time_info->tsc_shift < 0)
+                 ? (tsc >> -time_info->tsc_shift) : (tsc << time_info->tsc_shift);
+
+   // mul will overflow 64 bits
+   while (stsc > overflow)
+   {
+      time_ns += ((overflow * time_info->tsc_to_system_mul) >> 32);
+      stsc -= overflow;
+   }
+
+   time_ns += (stsc * time_info->tsc_to_system_mul) >> 32;
+
+   return time_ns;
+}
 
 struct __attribute__ ((__packed__)) rx_desc_t
 {
@@ -73,6 +201,340 @@ struct __attribute__ ((__packed__)) tx_desc_t
    uint16_t VLAN;
 };
 
+struct buffer_entry
+{
+   unsigned char *pointer;
+   uint64_t address;
+};
+
+static void embedded_latency (CSR &csr)
+{
+   struct tx_desc_t *tx_desc = static_cast<struct tx_desc_t *>(memalign (PAGE_SIZE, PAGE_SIZE));
+   memset(tx_desc, 0, PAGE_SIZE);
+   uint64_t tx_desc_machine_address = virtual_pointer_to_machine_address(tx_desc);
+   Hypercall::update_va_mapping_nocache (pointer_to_address (tx_desc), tx_desc_machine_address);
+
+   csr.write_TDBA (tx_desc_machine_address);
+   csr.write_TDLEN (1024);
+   cout << "TDBA: " << hex << csr.read_TDBA() << ", " << tx_desc_machine_address << endl;
+
+   buffer_entry tx_buffers [64];
+   queue<buffer_entry> tx_hw;
+   queue<buffer_entry> tx_sw;
+
+   for (unsigned int i = 0; i < 64; i++)
+   {
+      tx_buffers [i].pointer = static_cast<unsigned char *>(memalign (PAGE_SIZE, PAGE_SIZE));
+      tx_buffers [i].address = virtual_pointer_to_machine_address(tx_buffers [i].pointer);
+      Hypercall::update_va_mapping_nocache (pointer_to_address (tx_buffers [i].pointer), tx_buffers [i].address);
+
+      tx_sw.push(tx_buffers [i]);
+   }
+
+   unsigned int tx_head = 0;
+   unsigned int tx_tail = 0;
+
+   struct rx_desc_t *rx_desc = static_cast<struct rx_desc_t *>(memalign (PAGE_SIZE, PAGE_SIZE));
+   memset(rx_desc, 0, PAGE_SIZE);
+   uint64_t rx_desc_machine_address = virtual_pointer_to_machine_address(rx_desc);
+   Hypercall::update_va_mapping_nocache (pointer_to_address (rx_desc), rx_desc_machine_address);
+
+   csr.write_RDBA (rx_desc_machine_address);
+   csr.write_RDLEN (1024);
+   cout << "RDBA: " << hex << csr.read_RDBA() << ", " << rx_desc_machine_address << endl;
+
+   buffer_entry rx_buffers [64];
+   queue<buffer_entry> rx_hw;
+
+   for (unsigned int i = 0; i < 64; i++)
+   {
+      rx_buffers [i].pointer = static_cast<unsigned char *>(memalign (PAGE_SIZE, PAGE_SIZE));
+      rx_buffers [i].address = virtual_pointer_to_machine_address(rx_buffers [i].pointer);
+      Hypercall::update_va_mapping_nocache (pointer_to_address (rx_buffers [i].pointer), rx_buffers [i].address);
+
+      rx_desc [i].buffer = rx_buffers [i].address;
+      rx_desc [i].status = 0;
+      rx_hw.push(rx_buffers [i]);
+   }
+
+   uint16_t rx_head = 0;
+   uint16_t rx_tail = 64;
+   csr.write_RDT (rx_tail);
+
+#define TRIALS 500
+#define LENGTH 1024
+   // struct timeval tv1;
+   // struct timeval tv2;
+   // unsigned long usec1;
+   // unsigned long usec2;
+   uint64_t tsc1;
+   uint64_t tsc2;
+   unsigned long results [TRIALS];
+
+// dalai 00-1b-21-d5-66-ef
+// redpj 68-05-ca-01-f7-db
+#if 0
+// server
+
+   cout << "waiting for client message..." << endl;
+   while (rx_head == csr.read_RDH());
+
+   buffer_entry rx_buffer = rx_hw.front();
+   rx_hw.pop ();
+   rx_head++;
+   rx_head %= 64;
+
+   cout << "received client message..." << endl;
+   verify_data_alpha (&rx_buffer.pointer [14], LENGTH);
+
+   rx_desc [rx_tail].buffer = rx_buffer.address;
+   rx_desc [rx_tail].status = 0;
+   rx_hw.push(rx_buffer);
+   rx_tail++;
+   rx_tail %= 64;
+   csr.write_RDT (rx_tail);
+
+   buffer_entry tx_buffer = tx_sw.front();
+   tx_sw.pop ();
+   tx_hw.push(tx_buffer);
+
+   tx_buffer.pointer [0] = 0x00;
+   tx_buffer.pointer [1] = 0x1b;
+   tx_buffer.pointer [2] = 0x21;
+   tx_buffer.pointer [3] = 0xd5;
+   tx_buffer.pointer [4] = 0x66;
+   tx_buffer.pointer [5] = 0xef;
+   tx_buffer.pointer [6] = 0x68;
+   tx_buffer.pointer [7] = 0x05;
+   tx_buffer.pointer [8] = 0xca;
+   tx_buffer.pointer [9] = 0x01;
+   tx_buffer.pointer [10] = 0xf7;
+   tx_buffer.pointer [11] = 0xdb;
+   tx_buffer.pointer [12] = 0x09;
+   tx_buffer.pointer [13] = 0x0c;
+
+   // marks all bytes with numerals and send
+   mark_data_numeric (&tx_buffer.pointer [14], LENGTH);
+
+   cout << "sending server message..." << endl;
+   tx_desc [tx_tail].buffer = tx_buffer.address;
+   tx_desc [tx_tail].length = 14 + LENGTH + 4;
+   tx_desc [tx_tail].CSO = 0;
+   tx_desc [tx_tail].CMD = 0x0B;
+   tx_desc [tx_tail].STA = 0;
+   tx_desc [tx_tail].CSS = 0;
+   tx_desc [tx_tail].VLAN = 0;
+
+   tx_tail++;
+   tx_tail %= 64;
+   csr.write_TDT (tx_tail);
+
+   for (unsigned long i = 0; i < TRIALS; i++)
+   {
+      // wait for message
+      while (rx_head == csr.read_RDH())
+      {
+         // cleanup tx while waiting
+         if (tx_head != csr.read_TDH())
+         {
+            tx_sw.push(tx_hw.front());
+            tx_hw.pop();
+            tx_head++;
+            tx_head %= 64;
+         }
+      }
+
+      // send response
+      buffer_entry tx_buffer = tx_sw.front();
+      tx_sw.pop ();
+      tx_hw.push(tx_buffer);
+
+      tx_buffer.pointer [0] = 0x00;
+      tx_buffer.pointer [1] = 0x1b;
+      tx_buffer.pointer [2] = 0x21;
+      tx_buffer.pointer [3] = 0xd5;
+      tx_buffer.pointer [4] = 0x66;
+      tx_buffer.pointer [5] = 0xef;
+      tx_buffer.pointer [6] = 0x68;
+      tx_buffer.pointer [7] = 0x05;
+      tx_buffer.pointer [8] = 0xca;
+      tx_buffer.pointer [9] = 0x01;
+      tx_buffer.pointer [10] = 0xf7;
+      tx_buffer.pointer [11] = 0xdb;
+      tx_buffer.pointer [12] = 0x09;
+      tx_buffer.pointer [13] = 0x0c;
+
+      // place trial number in first "int" for master to verify
+      *(reinterpret_cast<unsigned long *>(&tx_buffer.pointer [14])) = i;
+
+      tx_desc [tx_tail].buffer = tx_buffer.address;
+      tx_desc [tx_tail].length = 14 + LENGTH;
+      tx_desc [tx_tail].CSO = 0;
+      tx_desc [tx_tail].CMD = 0x0B;
+      tx_desc [tx_tail].STA = 0;
+      tx_desc [tx_tail].CSS = 0;
+      tx_desc [tx_tail].VLAN = 0;
+
+      tx_tail++;
+      tx_tail %= 64;
+      csr.write_TDT (tx_tail);
+
+      // replace the rx buffer
+      buffer_entry rx_buffer = rx_hw.front();
+      rx_hw.pop ();
+      rx_head++;
+      rx_head %= 64;
+
+      rx_desc [rx_tail].buffer = rx_buffer.address;
+      rx_desc [rx_tail].status = 0;
+      rx_hw.push(rx_buffer);
+      rx_tail++;
+      rx_tail %= 64;
+      csr.write_RDT (rx_tail);
+   }
+
+#else
+
+   buffer_entry tx_buffer = tx_sw.front();
+   tx_sw.pop ();
+   tx_hw.push(tx_buffer);
+
+   tx_buffer.pointer [0] = 0x68;
+   tx_buffer.pointer [1] = 0x05;
+   tx_buffer.pointer [2] = 0xca;
+   tx_buffer.pointer [3] = 0x01;
+   tx_buffer.pointer [4] = 0xf7;
+   tx_buffer.pointer [5] = 0xdb;
+   tx_buffer.pointer [6] = 0x00;
+   tx_buffer.pointer [7] = 0x1b;
+   tx_buffer.pointer [8] = 0x21;
+   tx_buffer.pointer [9] = 0xd5;
+   tx_buffer.pointer [10] = 0x66;
+   tx_buffer.pointer [11] = 0xef;
+   tx_buffer.pointer [12] = 0x09;
+   tx_buffer.pointer [13] = 0x0c;
+
+   // marks all bytes with alpha chars (a,b,c,...)
+   mark_data_alpha (&tx_buffer.pointer [14], LENGTH);
+
+   // send/recv and verify the data has been changed to numerals (1,2,3,...)
+   tx_desc [tx_tail].buffer = tx_buffer.address;
+   tx_desc [tx_tail].length = 14 + LENGTH;
+   tx_desc [tx_tail].CSO = 0;
+   tx_desc [tx_tail].CMD = 0x0B;
+   tx_desc [tx_tail].STA = 0;
+   tx_desc [tx_tail].CSS = 0;
+   tx_desc [tx_tail].VLAN = 0;
+
+   tx_tail++;
+   tx_tail %= 64;
+   cout << "sending client message..." << endl;
+   csr.write_TDT (tx_tail);
+
+   cout << "waiting for client message..." << endl;
+   while (rx_head == csr.read_RDH());
+
+   buffer_entry rx_buffer = rx_hw.front();
+   rx_hw.pop ();
+   rx_head++;
+   rx_head %= 64;
+
+   cout << "received client message..." << endl;
+   verify_data_numeric (&rx_buffer.pointer [14], LENGTH);
+
+   rx_desc [rx_tail].buffer = rx_buffer.address;
+   rx_desc [rx_tail].checksum = 0;
+   rx_desc [rx_tail].error = 0;
+   rx_desc [rx_tail].length = 0;
+   rx_desc [rx_tail].status = 0;
+   rx_desc [rx_tail].vlan = 0;
+   rx_hw.push(rx_buffer);
+   rx_tail++;
+   rx_tail %= 64;
+   csr.write_RDT (rx_tail);
+
+   for (unsigned long i = 0; i < TRIALS; i++)
+   {
+      // get initial timestamp
+      tsc1 = rdtsc ();
+
+      // send message
+      buffer_entry tx_buffer = tx_sw.front();
+      tx_sw.pop ();
+      tx_hw.push(tx_buffer);
+
+      tx_buffer.pointer [0] = 0x68;
+      tx_buffer.pointer [1] = 0x05;
+      tx_buffer.pointer [2] = 0xca;
+      tx_buffer.pointer [3] = 0x01;
+      tx_buffer.pointer [4] = 0xf7;
+      tx_buffer.pointer [5] = 0xdb;
+      tx_buffer.pointer [6] = 0x00;
+      tx_buffer.pointer [7] = 0x1b;
+      tx_buffer.pointer [8] = 0x21;
+      tx_buffer.pointer [9] = 0xd5;
+      tx_buffer.pointer [10] = 0x66;
+      tx_buffer.pointer [11] = 0xef;
+      tx_buffer.pointer [12] = 0x09;
+      tx_buffer.pointer [13] = 0x0c;
+
+      tx_desc [tx_tail].buffer = tx_buffer.address;
+      tx_desc [tx_tail].length = 14 + LENGTH;
+      tx_desc [tx_tail].CSO = 0;
+      tx_desc [tx_tail].CMD = 0x0B;
+      tx_desc [tx_tail].STA = 0;
+      tx_desc [tx_tail].CSS = 0;
+      tx_desc [tx_tail].VLAN = 0;
+
+      tx_tail++;
+      tx_tail %= 64;
+      csr.write_TDT (tx_tail);
+
+      // wait for response
+      while (rx_head == csr.read_RDH())
+      {
+         // cleanup tx while waiting
+         if (tx_head != csr.read_TDH())
+         {
+            tx_sw.push(tx_hw.front());
+            tx_hw.pop();
+            tx_head++;
+            tx_head %= 64;
+         }
+      }
+
+      // check sequence number in response
+      buffer_entry rx_buffer = rx_hw.front();
+      rx_hw.pop ();
+      rx_head++;
+      rx_head %= 64;
+
+      if (*(reinterpret_cast<unsigned long *>(&rx_buffer.pointer[14])) != i)
+      {
+         cout << "invalid trial number: " << i << " != " << *(reinterpret_cast<unsigned long *>(&rx_buffer.pointer[14])) << endl;
+      }
+
+      tsc2 = rdtsc ();
+      results [i] = tsc_to_ns(tsc2 - tsc1) / 1000;
+
+      // replace rx_buffer
+      rx_desc [rx_tail].buffer = rx_buffer.address;
+      rx_desc [rx_tail].checksum = 0;
+      rx_desc [rx_tail].error = 0;
+      rx_desc [rx_tail].length = 0;
+      rx_desc [rx_tail].status = 0;
+      rx_desc [rx_tail].vlan = 0;
+      rx_hw.push(rx_buffer);
+      rx_tail++;
+      rx_tail %= 64;
+      csr.write_RDT (rx_tail);
+   }
+
+   compute_statistics (TRIALS, results);
+
+#endif
+}
+
 int main (int /* argc */, char ** /* argv [] */)
 {
    cout << "running 82574 llamaNET domain...\n" << endl;
@@ -82,9 +544,9 @@ int main (int /* argc */, char ** /* argv [] */)
    PCI pci;
    sleep (1);
    cout << "PCI config:" << endl;
-   //cout << pci << endl;
+//   cout << pci << endl;
 
-   sleep (10);
+   sleep (1);
    cout << "checking PCI config for valid 82574..." << endl;
    uint16_t vendor_id = pci.read_config_word (0);
    uint16_t device_id = pci.read_config_word (2);
@@ -184,7 +646,7 @@ int main (int /* argc */, char ** /* argv [] */)
    ctrl.PHY_RST(true);
    csr.write_CTRL(ctrl);
 
-   sleep (2);
+   sleep (1);
 
    cout << "masking interrupts..." << endl;
    cout << csr.read_IMS () << endl;
@@ -210,18 +672,18 @@ int main (int /* argc */, char ** /* argv [] */)
    ctrl.ADVD3WUC (true);
    csr.write_CTRL (ctrl);
 
-   sleep (2);
+   sleep (1);
 
    status = csr.read_STATUS ();
    cout << "CSR STATUS: " << hex << status << endl;
 
-   sleep (5);
+   sleep (2);
 
    cout << "setting link up..." << endl;
    ctrl.SLU (true);
    csr.write_CTRL (ctrl);
 
-   sleep (2);
+   sleep (1);
 
    status = csr.read_STATUS ();
    cout << "CSR STATUS: " << hex << status << endl;
@@ -234,39 +696,24 @@ int main (int /* argc */, char ** /* argv [] */)
    gcr2 |= 1;
    csr.write (0x05B64, gcr2);
 
+   cout << "initialize transmitter..." << endl;
+   TXDCTL txdctl (0);
+   txdctl.GRAN (true);
+   txdctl.WTHRESH (1);
+   csr.write_TXDCTL (txdctl);
+
+   TCTL tctl (0);
+   tctl.CT (16);
+   tctl.COLD (0x3F);
+   tctl.PSP (true);
+   tctl.EN (true);
+   csr.write_TCTL (tctl);
+
    cout << "initialize receiver..." << endl;
    RXDCTL rxdctl (0);
    rxdctl.GRAN (true);
    rxdctl.WTHRESH (1);
    csr.write_RXDCTL (rxdctl);
-
-   cout.flush();
-   cout <<  "RCTL: " << csr.read_RCTL () << endl;
-   cout <<  "RXDCTL: " << csr.read_RXDCTL () << endl;
-   cout << "setup receive descript table..." << endl;
-   cout << "sizeof(rx_desc_t): " << sizeof(rx_desc_t) << endl;
-   cout.flush();
-   struct rx_desc_t *rx_desc = static_cast<struct rx_desc_t *>(memalign (PAGE_SIZE, PAGE_SIZE));
-   memset(rx_desc, 0, PAGE_SIZE);
-   uint64_t rx_desc_machine_address = virtual_pointer_to_machine_address(rx_desc);
-   Hypercall::update_va_mapping_nocache (pointer_to_address (rx_desc), rx_desc_machine_address);
-   csr.write_RDBA (rx_desc_machine_address);
-   csr.write_RDLEN (256);
-   cout << "RDBA: " << hex << csr.read_RDBA() << ", " << rx_desc_machine_address << endl;
-
-   cout << "inserting receive buffers..." << endl;
-   char *rx_buffer [64];
-
-   for (unsigned int i = 0; i < 64; i++)
-   {
-      rx_buffer [i] = static_cast<char *>(memalign (PAGE_SIZE, PAGE_SIZE));
-      memset(rx_buffer [i], 0, PAGE_SIZE);
-      uint64_t rx_buffer_machine_address = virtual_pointer_to_machine_address(rx_buffer [i]);
-      Hypercall::update_va_mapping_nocache (pointer_to_address (rx_buffer [i]), rx_buffer_machine_address);
-      rx_desc [i].buffer = rx_buffer_machine_address;
-   }
-
-   csr.write_RDT (64);
 
    cout << "enabling receiver..." << endl;
    RCTL rctl (0);
@@ -276,6 +723,278 @@ int main (int /* argc */, char ** /* argv [] */)
    rctl.EN (true);
    csr.write_RCTL (rctl);
 
+   embedded_latency (csr);
+
+#if 0
+   cout.flush();
+   cout <<  "TCTL: " << csr.read_TCTL () << endl;
+   cout <<  "TXDCTL: " << csr.read_TXDCTL () << endl;
+   cout << "setup transmit descript table..." << endl;
+   cout << "sizeof(tx_desc_t): " << sizeof(tx_desc_t) << endl;
+   cout.flush();
+
+   struct tx_desc_t *tx_desc = static_cast<struct tx_desc_t *>(memalign (PAGE_SIZE, PAGE_SIZE));
+   uint64_t tx_desc_machine_address = virtual_pointer_to_machine_address(tx_desc);
+   Hypercall::update_va_mapping_nocache (pointer_to_address (tx_desc), tx_desc_machine_address);
+   csr.write_TDBA (tx_desc_machine_address);
+   csr.write_TDLEN (256);
+   cout << "TDBA: " << hex << csr.read_TDBA() << ", " << tx_desc_machine_address << endl;
+
+   unsigned char *tx_buffer = static_cast<unsigned char *>(memalign (PAGE_SIZE, PAGE_SIZE));
+   uint64_t buffer_machine_address = virtual_pointer_to_machine_address(tx_buffer);
+   Hypercall::update_va_mapping_nocache (pointer_to_address (tx_buffer), buffer_machine_address);
+
+   unsigned long tx_tail = 0;
+
+
+   cout.flush();
+   cout <<  "RCTL: " << csr.read_RCTL () << endl;
+   cout <<  "RXDCTL: " << csr.read_RXDCTL () << endl;
+   cout << "setup receive descript table..." << endl;
+   cout << "sizeof(rx_desc_t): " << sizeof(rx_desc_t) << endl;
+   cout.flush();
+
+   struct rx_desc_t *rx_desc = static_cast<struct rx_desc_t *>(memalign (PAGE_SIZE, PAGE_SIZE));
+   memset(rx_desc, 0, PAGE_SIZE);
+   uint64_t rx_desc_machine_address = virtual_pointer_to_machine_address(rx_desc);
+   Hypercall::update_va_mapping_nocache (pointer_to_address (rx_desc), rx_desc_machine_address);
+   csr.write_RDBA (rx_desc_machine_address);
+   csr.write_RDLEN (256);
+   cout << "RDBA: " << hex << csr.read_RDBA() << ", " << rx_desc_machine_address << endl;
+
+   cout << "inserting receive buffers..." << endl;
+   unsigned char *rx_buffer;
+   unsigned long rx_head = 0;
+   unsigned long rx_tail = 0;
+
+   rx_buffer = static_cast<unsigned char *>(memalign (PAGE_SIZE, PAGE_SIZE));
+   memset(rx_buffer, 0, PAGE_SIZE);
+   uint64_t rx_buffer_machine_address = virtual_pointer_to_machine_address(rx_buffer);
+   Hypercall::update_va_mapping_nocache (pointer_to_address (rx_buffer), rx_buffer_machine_address);
+   rx_desc [rx_head].buffer = rx_buffer_machine_address;
+   rx_desc [rx_head+1].buffer = rx_buffer_machine_address;
+   rx_desc [rx_head+2].buffer = rx_buffer_machine_address;
+   rx_desc [rx_head+3].buffer = rx_buffer_machine_address;
+   rx_desc [rx_head+4].buffer = rx_buffer_machine_address;
+
+   csr.write_RDT (rx_tail+4);
+
+
+#define TRIALS 100
+#define LENGTH 1024
+
+// dalai 00-1b-21-d5-66-ef
+// redpj 68-05-ca-01-f7-db
+#if 1
+// server
+
+   tx_buffer [0] = 0x00;
+   tx_buffer [1] = 0x1b;
+   tx_buffer [2] = 0x21;
+   tx_buffer [3] = 0xd5;
+   tx_buffer [4] = 0x66;
+   tx_buffer [5] = 0xef;
+   tx_buffer [6] = 0x68;
+   tx_buffer [7] = 0x05;
+   tx_buffer [8] = 0xca;
+   tx_buffer [9] = 0x01;
+   tx_buffer [10] = 0xf7;
+   tx_buffer [11] = 0xdb;
+   tx_buffer [12] = 0x09;
+   tx_buffer [13] = 0x0c;
+
+   cout << "waiting for client message..." << endl;
+   // wait for mesg and verify alpha chars
+   //while (0 == rx_desc [rx_head].status);
+   while (rx_head == csr.read_RDH ());
+   verify_data_alpha (&rx_buffer [14], LENGTH);
+
+   cout << "received client message..." << endl;
+
+   rx_head++;
+   rx_head %= 256;
+   rx_desc [rx_head].buffer = rx_buffer_machine_address;
+   rx_desc [rx_head].status = 0;
+   rx_tail++;
+   rx_tail %= 256;
+   csr.write_RDT (rx_tail);
+
+   // marks all bytes with numerals and send
+   mark_data_numeric (&tx_buffer [14], LENGTH);
+
+   tx_desc [tx_tail].buffer = buffer_machine_address;
+   tx_desc [tx_tail].length = 14 + LENGTH + 4;
+   tx_desc [tx_tail].CSO = 0;
+   tx_desc [tx_tail].CMD = 0x0B;
+   tx_desc [tx_tail].STA = 0;
+   tx_desc [tx_tail].CSS = 0;
+   tx_desc [tx_tail].VLAN = 0;
+
+   tx_tail++;
+   tx_tail %= 256;
+   cout << "sending server message..." << endl;
+   csr.write_TDT (tx_tail);
+
+   for (unsigned long i = 0; i < TRIALS; i++)
+   {
+      // wait for message to arrive
+      while (0 == rx_desc [rx_head].status);
+
+      rx_head++;
+      rx_head %= 256;
+      rx_desc [rx_head].buffer = rx_buffer_machine_address;
+      rx_desc [rx_head].status = 0;
+      rx_tail++;
+      rx_tail %= 256;
+      csr.write_RDT (rx_tail);
+
+      // place trial number in first "int" for master to verify
+      *(reinterpret_cast<unsigned long *>(&tx_buffer [14])) = i;
+      tx_desc [tx_tail].buffer = buffer_machine_address;
+      tx_desc [tx_tail].length = 14 + LENGTH + 4;
+      tx_desc [tx_tail].CSO = 0;
+      tx_desc [tx_tail].CMD = 0x0B;
+      tx_desc [tx_tail].STA = 0;
+      tx_desc [tx_tail].CSS = 0;
+      tx_desc [tx_tail].VLAN = 0;
+
+      tx_tail++;
+      tx_tail %= 256;
+      csr.write_TDT (tx_tail);
+   }
+
+   // wait for mesg and verify alpha chars
+   while (0 == rx_desc [rx_head].status);
+   verify_data_alpha (&rx_buffer [14], LENGTH);
+
+   // marks all bytes with numerals and send
+   mark_data_numeric (&tx_buffer [14], LENGTH);
+
+   tx_desc [tx_tail].buffer = buffer_machine_address;
+   tx_desc [tx_tail].length = 14 + LENGTH + 4;
+   tx_desc [tx_tail].CSO = 0;
+   tx_desc [tx_tail].CMD = 0x0B;
+   tx_desc [tx_tail].STA = 0;
+   tx_desc [tx_tail].CSS = 0;
+   tx_desc [tx_tail].VLAN = 0;
+
+   tx_tail++;
+   tx_tail %= 256;
+   csr.write_TDT (tx_tail);
+
+#else
+   tx_buffer [0] = 0x68;
+   tx_buffer [1] = 0x05;
+   tx_buffer [2] = 0xca;
+   tx_buffer [3] = 0x01;
+   tx_buffer [4] = 0xf7;
+   tx_buffer [5] = 0xdb;
+   tx_buffer [6] = 0x00;
+   tx_buffer [7] = 0x1b;
+   tx_buffer [8] = 0x21;
+   tx_buffer [9] = 0xd5;
+   tx_buffer [10] = 0x66;
+   tx_buffer [11] = 0xef;
+   tx_buffer [12] = 0x09;
+   tx_buffer [13] = 0x0c;
+
+   // marks all bytes with alpha chars (a,b,c,...)
+   mark_data_alpha (&tx_buffer [14], LENGTH);
+
+   // send/recv and verify the data has been changed to numerals (1,2,3,...)
+   tx_desc [tx_tail].buffer = buffer_machine_address;
+   tx_desc [tx_tail].length = 14 + LENGTH + 4;
+   tx_desc [tx_tail].CSO = 0;
+   tx_desc [tx_tail].CMD = 0x0B;
+   tx_desc [tx_tail].STA = 0;
+   tx_desc [tx_tail].CSS = 0;
+   tx_desc [tx_tail].VLAN = 0;
+
+   tx_tail++;
+   tx_tail %= 256;
+   cout << "sending client message..." << endl;
+   csr.write_TDT (tx_tail);
+
+   cout << "waiting for server message..." << endl;
+   while (0 == rx_desc [rx_head].status);
+   cout << "received server message..." << endl;
+
+   verify_data_numeric (&rx_buffer [14], LENGTH);
+
+   rx_head++;
+   rx_head %= 256;
+   rx_desc [rx_head].buffer = rx_buffer_machine_address;
+   rx_desc [rx_head].status = 0;
+   rx_tail++;
+   rx_tail %= 256;
+   csr.write_RDT (rx_tail);
+
+   for (unsigned long i = 0; i < TRIALS; i++)
+   {
+      // send/recv mesg, check first "int" in buffer is the trial number just
+      // as a low cost sanity check to verify both machines are in sync
+      tx_desc [tx_tail].buffer = buffer_machine_address;
+      tx_desc [tx_tail].length = 14 + LENGTH + 4;
+      tx_desc [tx_tail].CSO = 0;
+      tx_desc [tx_tail].CMD = 0x0B;
+      tx_desc [tx_tail].STA = 0;
+      tx_desc [tx_tail].CSS = 0;
+      tx_desc [tx_tail].VLAN = 0;
+
+      tx_tail++;
+      tx_tail %= 256;
+      csr.write_TDT (tx_tail);
+
+      while (0 == rx_desc [rx_head].status);
+
+      if (*(reinterpret_cast<unsigned long *>(&rx_buffer[14])) != i)
+      {
+         cout << "invalid trial number: " << i << endl;
+      }
+
+      rx_head++;
+      rx_head %= 256;
+      rx_desc [rx_head].buffer = rx_buffer_machine_address;
+      rx_desc [rx_head].status = 0;
+      rx_tail++;
+      rx_tail %= 256;
+      csr.write_RDT (rx_tail);
+   }
+
+   // marks all bytes with alpha chars (a,b,c,...)
+   mark_data_alpha (&tx_buffer [14], LENGTH);
+
+   // send/recv and verify the data has been changed to numerals (1,2,3,...)
+   tx_desc [tx_tail].buffer = buffer_machine_address;
+   tx_desc [tx_tail].length = 14 + LENGTH + 4;
+   tx_desc [tx_tail].CSO = 0;
+   tx_desc [tx_tail].CMD = 0x0B;
+   tx_desc [tx_tail].STA = 0;
+   tx_desc [tx_tail].CSS = 0;
+   tx_desc [tx_tail].VLAN = 0;
+
+   tx_tail++;
+   tx_tail %= 256;
+   csr.write_TDT (tx_tail);
+
+   while (0 == rx_desc [rx_head].status);
+
+   verify_data_numeric (&rx_buffer [14], LENGTH);
+
+   rx_head++;
+   rx_head %= 256;
+   rx_desc [rx_head].buffer = rx_buffer_machine_address;
+   rx_desc [rx_head].status = 0;
+   rx_tail++;
+   rx_tail %= 256;
+   csr.write_RDT (rx_tail);
+
+#endif
+
+
+
+
+#if 0
    cout << "waiting for packet arrival..." << endl;
    while (0 == rx_desc->status)
    {
@@ -284,31 +1003,6 @@ int main (int /* argc */, char ** /* argv [] */)
          cout << "RDH is non-zero!" << endl;
          break;
       }
-
-#if 0
-      if (csr.read(0x04074) > 0)
-      {
-         cout << "Received Good" << endl;
-         char *data = rx_buffer [0];
-         cout << static_cast<unsigned int>(data [0]) << " ";
-         cout << static_cast<unsigned int>(data [0]) << " ";
-         cout << static_cast<unsigned int>(data [2]) << " ";
-         cout << static_cast<unsigned int>(data [3]) << " ";
-         cout << static_cast<unsigned int>(data [4]) << " ";
-         cout << static_cast<unsigned int>(data [5]) << " ";
-         cout << static_cast<unsigned int>(data [6]) << " ";
-         cout << static_cast<unsigned int>(data [7]) << " ";
-         cout << static_cast<unsigned int>(data [8]) << " ";
-         cout << static_cast<unsigned int>(data [9]) << " ";
-         cout << static_cast<unsigned int>(data [10]) << " ";
-         cout << static_cast<unsigned int>(data [11]) << " ";
-         cout << static_cast<unsigned int>(data [12]) << " ";
-         cout << static_cast<unsigned int>(data [13]) << " ";
-         cout << static_cast<unsigned int>(data [14]) << " ";
-         cout << static_cast<unsigned int>(data [15]) << " ";
-         cout << static_cast<unsigned int>(data [16]) << endl;
-      }
-#endif
 
       cout << "DESC status: " << rx_desc->status << endl;
       cout << "FIFO head: " << (csr.read(0x02410) & 0x1FFF) << endl;
@@ -330,105 +1024,7 @@ int main (int /* argc */, char ** /* argv [] */)
    }
 
    cout << endl;
-   cout << "initialize transmitter..." << endl;
-   TXDCTL txdctl (0);
-   txdctl.GRAN (true);
-   txdctl.WTHRESH (1);
-   csr.write_TXDCTL (txdctl);
 
-   TCTL tctl (0);
-   tctl.CT (16);
-   tctl.COLD (0x3F);
-   tctl.PSP (true);
-   tctl.EN (true);
-   csr.write_TCTL (tctl);
-
-   cout.flush();
-   cout <<  "TCTL: " << csr.read_TCTL () << endl;
-   cout <<  "TXDCTL: " << csr.read_TXDCTL () << endl;
-   cout << "setup transmit descript table..." << endl;
-   cout << "sizeof(tx_desc_t): " << sizeof(tx_desc_t) << endl;
-   cout.flush();
-   struct tx_desc_t *tx_desc = static_cast<struct tx_desc_t *>(memalign (PAGE_SIZE, PAGE_SIZE));
-   uint64_t tx_desc_machine_address = virtual_pointer_to_machine_address(tx_desc);
-   Hypercall::update_va_mapping_nocache (pointer_to_address (tx_desc), tx_desc_machine_address);
-   csr.write_TDBA (tx_desc_machine_address);
-   csr.write_TDLEN (256);
-   cout << "TDBA: " << hex << csr.read_TDBA() << ", " << tx_desc_machine_address << endl;
-
-   char *buffer = static_cast<char *>(memalign (PAGE_SIZE, PAGE_SIZE));
-   uint64_t buffer_machine_address = virtual_pointer_to_machine_address(buffer);
-   Hypercall::update_va_mapping_nocache (pointer_to_address (buffer), buffer_machine_address);
-
-   // 00:24:be:45:0a:7d
-   buffer [0] = 0x00;
-   buffer [1] = 0x24;
-   buffer [2] = 0xbe;
-   buffer [3] = 0x45;
-   buffer [4] = 0x0a;
-   buffer [5] = 0x7d;
-
-   buffer [6] = 0x00;
-   buffer [7] = 0x01;
-   buffer [8] = 0x02;
-   buffer [9] = 0x03;
-   buffer [10] = 0x04;
-   buffer [11] = 0x05;
-
-   buffer [12] = 0x90;
-   buffer [13] = 0xcc;
-
-   buffer [14] = 0x00;
-   buffer [15] = 0x01;
-   buffer [16] = 0x02;
-   buffer [17] = 0x03;
-   buffer [18] = 0x04;
-   buffer [19] = 0x05;
-   buffer [20] = 0x06;
-   buffer [21] = 0x07;
-   buffer [22] = 0x08;
-   buffer [23] = 0x09;
-   buffer [24] = 0x0a;
-   buffer [25] = 0x0b;
-   buffer [26] = 0x0c;
-   buffer [27] = 0x0d;
-   buffer [28] = 0x0e;
-   buffer [29] = 0x0f;
-   buffer [30] = 0x10;
-   buffer [31] = 0x11;
-   buffer [32] = 0x12;
-   buffer [33] = 0x13;
-   buffer [34] = 0x14;
-   buffer [35] = 0x15;
-   buffer [36] = 0x16;
-   buffer [37] = 0x17;
-   buffer [38] = 0x18;
-   buffer [39] = 0x19;
-   buffer [40] = 0x1a;
-   buffer [41] = 0x1b;
-   buffer [42] = 0x1c;
-   buffer [43] = 0x1d;
-   buffer [44] = 0x1e;
-   buffer [45] = 0x1f;
-   buffer [46] = 0x20;
-   buffer [47] = 0x21;
-   buffer [48] = 0x22;
-   buffer [49] = 0x23;
-   buffer [50] = 0x24;
-   buffer [51] = 0x25;
-   buffer [52] = 0x26;
-   buffer [53] = 0x27;
-   buffer [54] = 0x28;
-   buffer [55] = 0x29;
-   buffer [56] = 0x2a;
-   buffer [57] = 0x2b;
-   buffer [58] = 0x2c;
-   buffer [59] = 0x2d;
-
-   buffer [60] = 0x00;
-   buffer [61] = 0x00;
-   buffer [62] = 0x00;
-   buffer [63] = 0x00;
 
    tx_desc->buffer = buffer_machine_address;
    tx_desc->length = 60;
@@ -448,6 +1044,9 @@ int main (int /* argc */, char ** /* argv [] */)
    cout << "TDH: " << csr.read_TDH () << endl;
    cout << "TDT: " << csr.read_TDT () << endl;
    cout << "tx_desc->STA: " << static_cast<unsigned int>(tx_desc->STA) << endl;
+#endif
+
+#endif
 
    cout << "waiting 5 sec, then exit..." << endl;
    cout.flush ();
