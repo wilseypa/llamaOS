@@ -9,3 +9,10 @@ obj/
 ###################
 custom.mk
 apps.mk
+
+# KDevelop files #
+# ############## #
+.kdev4/
+.kdev_include_paths
+
+
