@@ -262,7 +262,7 @@ static void embedded_latency (CSR &csr)
    csr.write_RDT (rx_tail);
 
 #define TRIALS 500
-#define LENGTH 1024
+#define LENGTH 100
    // struct timeval tv1;
    // struct timeval tv2;
    // unsigned long usec1;
@@ -455,9 +455,6 @@ static void embedded_latency (CSR &csr)
 
    for (unsigned long i = 0; i < TRIALS; i++)
    {
-      // get initial timestamp
-      tsc1 = rdtsc ();
-
       // send message
       buffer_entry tx_buffer = tx_sw.front();
       tx_sw.pop ();
@@ -488,7 +485,13 @@ static void embedded_latency (CSR &csr)
 
       tx_tail++;
       tx_tail %= 64;
+
+      // get initial timestamp
+      tsc1 = rdtsc ();
       csr.write_TDT (tx_tail);
+
+      while (tx_tail != csr.read_TDH())
+      tsc2 = rdtsc ();
 
       // wait for response
       while (rx_head == csr.read_RDH())
@@ -514,7 +517,6 @@ static void embedded_latency (CSR &csr)
          cout << "invalid trial number: " << i << " != " << *(reinterpret_cast<unsigned long *>(&rx_buffer.pointer[14])) << endl;
       }
 
-      tsc2 = rdtsc ();
       results [i] = tsc_to_ns(tsc2 - tsc1) / 1000;
 
       // replace rx_buffer
