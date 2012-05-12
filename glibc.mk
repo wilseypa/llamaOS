@@ -121,6 +121,7 @@ SOURCES = \
   glibc/locale/mb_cur_max.c \
   glibc/locale/setlocale.c \
   glibc/locale/SYS_libc.c \
+  glibc/locale/uselocale.c \
   glibc/locale/xlocale.c \
   glibc/malloc/malloc.c \
   glibc/malloc/morecore.c \

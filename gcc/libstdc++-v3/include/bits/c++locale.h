@@ -72,9 +72,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
 		   const int __size __attribute__ ((__unused__)),
 		   const char* __fmt, ...)
   {
-// !BAM
-#if 0
-// #if __GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ > 2)
+#if __GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ > 2)
     __c_locale __old = __gnu_cxx::__uselocale(__cloc);
 #else
     char* __old = std::setlocale(LC_NUMERIC, 0);
@@ -99,9 +97,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
 
     __builtin_va_end(__args);
 
-// !BAM
-#if 0
-// #if __GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ > 2)
+#if __GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ > 2)
     __gnu_cxx::__uselocale(__old);
 #else
     if (__sav)
