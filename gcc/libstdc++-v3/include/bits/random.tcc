@@ -1,6 +1,6 @@
 // random number generation (out of line) -*- C++ -*-
 
-// Copyright (C) 2009, 2010, 2011 Free Software Foundation, Inc.
+// Copyright (C) 2009, 2010, 2011, 2012 Free Software Foundation, Inc.
 //
 // This file is part of the GNU ISO C++ Library.  This library is free
 // software; you can redistribute it and/or modify it under the
@@ -48,6 +48,8 @@ namespace std _GLIBCXX_VISIBILITY(default)
     // kindly elides any unreachable paths.
     //
     // Preconditions:  a > 0, m > 0.
+    //
+    // XXX FIXME: as-is, only works correctly for __m % __a < __m / __a. 
     //
     template<typename _Tp, _Tp __m, _Tp __a, _Tp __c, bool>
       struct _Mod
@@ -471,9 +473,9 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
       __os.flags(__ios_base::dec | __ios_base::fixed | __ios_base::left);
       __os.fill(__space);
 
-      for (size_t __i = 0; __i < __n - 1; ++__i)
+      for (size_t __i = 0; __i < __n; ++__i)
 	__os << __x._M_x[__i] << __space;
-      __os << __x._M_x[__n - 1];
+      __os << __x._M_p;
 
       __os.flags(__flags);
       __os.fill(__fill);
@@ -498,6 +500,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
 
       for (size_t __i = 0; __i < __n; ++__i)
 	__is >> __x._M_x[__i];
+      __is >> __x._M_p;
 
       __is.flags(__flags);
       return __is;
@@ -627,7 +630,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
 
       for (size_t __i = 0; __i < __r; ++__i)
 	__os << __x._M_x[__i] << __space;
-      __os << __x._M_carry;
+      __os << __x._M_carry << __space << __x._M_p;
 
       __os.flags(__flags);
       __os.fill(__fill);
@@ -649,6 +652,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
       for (size_t __i = 0; __i < __r; ++__i)
 	__is >> __x._M_x[__i];
       __is >> __x._M_carry;
+      __is >> __x._M_p;
 
       __is.flags(__flags);
       return __is;
@@ -1075,7 +1079,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
       return __is;
     }
 
-
+  // This is Leger's algorithm, also in Devroye, Ch. X, Example 1.5.
   template<typename _IntType>
     template<typename _UniformRandomNumberGenerator>
       typename negative_binomial_distribution<_IntType>::result_type
@@ -2769,8 +2773,8 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
 			 ^ __begin[(__k + __p) % __n]
 			 ^ __begin[(__k - 1) % __n]);
 	  _Type __r1 = __arg ^ (__arg >> 27);
-	  __r1 = __detail::__mod<_Type, __detail::_Shift<_Type, 32>::__value,
-	                         1664525u, 0u>(__r1);
+	  __r1 = __detail::__mod<_Type,
+		    __detail::_Shift<_Type, 32>::__value>(1664525u * __r1);
 	  _Type __r2 = __r1;
 	  if (__k == 0)
 	    __r2 += __s;
@@ -2791,8 +2795,8 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
 			 + __begin[(__k + __p) % __n]
 			 + __begin[(__k - 1) % __n]);
 	  _Type __r3 = __arg ^ (__arg >> 27);
-	  __r3 = __detail::__mod<_Type, __detail::_Shift<_Type, 32>::__value,
-	                         1566083941u, 0u>(__r3);
+	  __r3 = __detail::__mod<_Type,
+		   __detail::_Shift<_Type, 32>::__value>(1566083941u * __r3);
 	  _Type __r4 = __r3 - __k % __n;
 	  __r4 = __detail::__mod<_Type,
 	           __detail::_Shift<_Type, 32>::__value>(__r4);

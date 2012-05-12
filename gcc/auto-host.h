@@ -48,7 +48,7 @@
 
 /* Define if building with C++. */
 #ifndef USED_FOR_TARGET
-/* #undef ENABLE_BUILD_WITH_CXX */
+#define ENABLE_BUILD_WITH_CXX 1
 #endif
 
 
@@ -267,6 +267,12 @@
 #endif
 
 
+/* Define if your assembler supports FMAF, HPC, and VIS 3.0 instructions. */
+#ifndef USED_FOR_TARGET
+/* #undef HAVE_AS_FMAF_HPC_VIS3 */
+#endif
+
+
 /* Define if your assembler supports fprnd. */
 #ifndef USED_FOR_TARGET
 /* #undef HAVE_AS_FPRND */
@@ -349,6 +355,18 @@
 /* Define if your assembler supports the swap suffix. */
 #ifndef USED_FOR_TARGET
 #define HAVE_AS_IX86_SWAP 1
+#endif
+
+
+/* Define if your assembler and linker support @tlsgdplt. */
+#ifndef USED_FOR_TARGET
+/* #undef HAVE_AS_IX86_TLSGDPLT */
+#endif
+
+
+/* Define if your assembler and linker support @tlsldmplt. */
+#ifndef USED_FOR_TARGET
+/* #undef HAVE_AS_IX86_TLSLDMPLT */
 #endif
 
 
@@ -736,6 +754,13 @@
 #endif
 
 
+/* Define to 1 if we found a declaration for 'madvise', otherwise define to 0.
+   */
+#ifndef USED_FOR_TARGET
+#define HAVE_DECL_MADVISE 1
+#endif
+
+
 /* Define to 1 if we found a declaration for 'malloc', otherwise define to 0.
    */
 #ifndef USED_FOR_TARGET
@@ -788,6 +813,13 @@
    0. */
 #ifndef USED_FOR_TARGET
 #define HAVE_DECL_SNPRINTF 1
+#endif
+
+
+/* Define to 1 if we found a declaration for 'stpcpy', otherwise define to 0.
+   */
+#ifndef USED_FOR_TARGET
+#define HAVE_DECL_STPCPY 1
 #endif
 
 
@@ -847,7 +879,7 @@
 
 /* Define to 1 if you have the <ext/hash_map> header file. */
 #ifndef USED_FOR_TARGET
-#define HAVE_EXT_HASH_MAP 1
+/* #undef HAVE_EXT_HASH_MAP */
 #endif
 
 
@@ -998,6 +1030,12 @@
 #endif
 
 
+/* Define if your assembler supports specifying the section flag e. */
+#ifndef USED_FOR_TARGET
+/* #undef HAVE_GAS_SECTION_EXCLUDE */
+#endif
+
+
 /* Define 0/1 if your assembler supports marking sections with SHF_MERGE flag.
    */
 #ifndef USED_FOR_TARGET
@@ -1033,12 +1071,6 @@
 /* Define to 1 if you have the `getc_unlocked' function. */
 #ifndef USED_FOR_TARGET
 #define HAVE_GETC_UNLOCKED 1
-#endif
-
-
-/* Define if _Unwind_GetIPInfo is available. */
-#ifndef USED_FOR_TARGET
-#define HAVE_GETIPINFO 1
 #endif
 
 
@@ -1092,7 +1124,7 @@
 
 /* Define .init_array/.fini_array sections are available and working. */
 #ifndef USED_FOR_TARGET
-#define HAVE_INITFINI_ARRAY 1
+/* #undef HAVE_INITFINI_ARRAY_SUPPORT */
 #endif
 
 
@@ -1158,7 +1190,7 @@
 
 /* Define if your linker supports --demangle option. */
 #ifndef USED_FOR_TARGET
-/* #undef HAVE_LD_DEMANGLE */
+#define HAVE_LD_DEMANGLE 1
 #endif
 
 
@@ -1253,9 +1285,15 @@
 #endif
 
 
-/* Define if your linker supports plugin. */
+/* Define to the level of your linker's plugin support. */
 #ifndef USED_FOR_TARGET
-#define HAVE_LTO_PLUGIN 1
+#define HAVE_LTO_PLUGIN 2
+#endif
+
+
+/* Define to 1 if you have the `madvise' function. */
+#ifndef USED_FOR_TARGET
+#define HAVE_MADVISE 1
 #endif
 
 
@@ -1408,6 +1446,9 @@
 #define HAVE_SYS_RESOURCE_H 1
 #endif
 
+
+/* Define if your target C library provides sys/sdt.h */
+/* #undef HAVE_SYS_SDT_H */
 
 /* Define to 1 if you have the <sys/stat.h> header file. */
 #ifndef USED_FOR_TARGET
@@ -1578,6 +1619,12 @@
 #endif
 
 
+/* The linker hash style */
+#ifndef USED_FOR_TARGET
+/* #undef LINKER_HASH_STYLE */
+#endif
+
+
 /* Define to the name of the LTO plugin DSO that must be passed to the
    linker's -plugin=LIB option. */
 #ifndef USED_FOR_TARGET
@@ -1654,7 +1701,7 @@
 
 /* Define to PREFIX/include if cpp should also search that directory. */
 #ifndef USED_FOR_TARGET
-#define PREFIX_INCLUDE_DIR "/opt/gcc-4.6.2/include"
+#define PREFIX_INCLUDE_DIR "/opt/gcc-4.7.0/include"
 #endif
 
 

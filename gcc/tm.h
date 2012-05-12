@@ -27,10 +27,12 @@
 # include "config/dbxelf.h"
 # include "config/elfos.h"
 # include "config/gnu-user.h"
-# include "config/linux.h"
 # include "config/glibc-stdint.h"
 # include "config/i386/x86-64.h"
+# include "config/i386/gnu-user64.h"
+# include "config/linux.h"
 # include "config/i386/linux64.h"
+# include "config/initfini-array.h"
 #endif
 #if defined IN_GCC && !defined GENERATOR_FILE && !defined USED_FOR_TARGET
 # include "insn-flags.h"

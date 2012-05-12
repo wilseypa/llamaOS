@@ -32,7 +32,7 @@
 #define _GLIBCXX_CXX_CONFIG_H 1
 
 // The current version of the C++ library in compressed ISO date format.
-#define __GLIBCXX__ 20111026
+#define __GLIBCXX__ 20120322
 
 // Macros for various attributes.
 //   _GLIBCXX_PURE
@@ -52,10 +52,9 @@
 # define _GLIBCXX_NORETURN __attribute__ ((__noreturn__))
 #endif
 
+// See below for C++
 #ifndef _GLIBCXX_NOTHROW
-# ifdef __cplusplus
-#  define _GLIBCXX_NOTHROW throw()
-# else
+# ifndef __cplusplus
 #  define _GLIBCXX_NOTHROW __attribute__((__nothrow__))
 # endif
 #endif
@@ -99,6 +98,23 @@
 # endif
 #endif
 
+// Macro for noexcept, to support in mixed 03/0x mode.
+#ifndef _GLIBCXX_NOEXCEPT
+# ifdef __GXX_EXPERIMENTAL_CXX0X__
+#  define _GLIBCXX_NOEXCEPT noexcept
+#  define _GLIBCXX_USE_NOEXCEPT noexcept
+#  define _GLIBCXX_THROW(_EXC)
+# else
+#  define _GLIBCXX_NOEXCEPT
+#  define _GLIBCXX_USE_NOEXCEPT throw()
+#  define _GLIBCXX_THROW(_EXC) throw(_EXC)
+# endif
+#endif
+
+#ifndef _GLIBCXX_NOTHROW
+# define _GLIBCXX_NOTHROW _GLIBCXX_USE_NOEXCEPT
+#endif
+
 // Macro for extern template, ie controling template linkage via use
 // of extern keyword on template declaration. As documented in the g++
 // manual, it inhibits all implicit instantiations and is used
@@ -132,6 +148,8 @@
       namespace __detail { }
     }
 
+    namespace tr2 { }
+    
     namespace decimal { }
 
     namespace chrono { }
@@ -180,6 +198,9 @@ namespace std
     namespace regex_constants { inline namespace __7 { } }
     namespace __detail { inline namespace __7 { } }
   }
+
+  namespace tr2
+  { inline namespace __7 { } }
 
   namespace decimal { inline namespace __7 { } }
 
@@ -493,6 +514,9 @@ namespace std
 /* Define if ECANCELED exists. */
 #define _GLIBCXX_HAVE_ECANCELED 1
 
+/* Define if ECHILD exists. */
+#define _GLIBCXX_HAVE_ECHILD 1
+
 /* Define if EIDRM exists. */
 #define _GLIBCXX_HAVE_EIDRM 1
 
@@ -504,6 +528,9 @@ namespace std
 
 /* Define if ENOLINK exists. */
 #define _GLIBCXX_HAVE_ENOLINK 1
+
+/* Define if ENOSPC exists. */
+#define _GLIBCXX_HAVE_ENOSPC 1
 
 /* Define if ENOSR exists. */
 #define _GLIBCXX_HAVE_ENOSR 1
@@ -523,14 +550,23 @@ namespace std
 /* Define if EOWNERDEAD exists. */
 #define _GLIBCXX_HAVE_EOWNERDEAD 1
 
+/* Define if EPERM exists. */
+#define _GLIBCXX_HAVE_EPERM 1
+
 /* Define if EPROTO exists. */
 #define _GLIBCXX_HAVE_EPROTO 1
 
 /* Define if ETIME exists. */
 #define _GLIBCXX_HAVE_ETIME 1
 
+/* Define if ETIMEDOUT exists. */
+#define _GLIBCXX_HAVE_ETIMEDOUT 1
+
 /* Define if ETXTBSY exists. */
 #define _GLIBCXX_HAVE_ETXTBSY 1
+
+/* Define if EWOULDBLOCK exists. */
+#define _GLIBCXX_HAVE_EWOULDBLOCK 1
 
 /* Define to 1 if you have the <execinfo.h> header file. */
 #define _GLIBCXX_HAVE_EXECINFO_H 1
@@ -589,9 +625,8 @@ namespace std
 /* Define if _Unwind_GetIPInfo is available. */
 #define _GLIBCXX_HAVE_GETIPINFO 1
 
-/* Define if gthr-default.h exists (meaning that threading support is
-   enabled). */
-/* #undef _GLIBCXX_HAVE_GTHR_DEFAULT */
+/* Define if gets is available in <stdio.h>. */
+#define _GLIBCXX_HAVE_GETS 1
 
 /* Define to 1 if you have the `hypot' function. */
 #define _GLIBCXX_HAVE_HYPOT 1
@@ -752,6 +787,9 @@ namespace std
 /* Define to 1 if you have the `sqrtl' function. */
 #define _GLIBCXX_HAVE_SQRTL 1
 
+/* Define to 1 if you have the <stdalign.h> header file. */
+#define _GLIBCXX_HAVE_STDALIGN_H 1
+
 /* Define to 1 if you have the <stdbool.h> header file. */
 #define _GLIBCXX_HAVE_STDBOOL_H 1
 
@@ -812,6 +850,9 @@ namespace std
 
 /* Define to 1 if you have the <sys/stat.h> header file. */
 #define _GLIBCXX_HAVE_SYS_STAT_H 1
+
+/* Define to 1 if you have the <sys/sysinfo.h> header file. */
+#define _GLIBCXX_HAVE_SYS_SYSINFO_H 1
 
 /* Define to 1 if you have the <sys/time.h> header file. */
 #define _GLIBCXX_HAVE_SYS_TIME_H 1
@@ -1105,25 +1146,15 @@ namespace std
 /* Version number of package */
 /* #undef _GLIBCXX_VERSION */
 
-/* Define if builtin atomic operations for bool are supported on this host. */
-#define _GLIBCXX_ATOMIC_BUILTINS_1 1
-
-/* Define if builtin atomic operations for short are supported on this host.
-   */
-#define _GLIBCXX_ATOMIC_BUILTINS_2 1
-
-/* Define if builtin atomic operations for int are supported on this host. */
-#define _GLIBCXX_ATOMIC_BUILTINS_4 1
-
-/* Define if builtin atomic operations for long long are supported on this
-   host. */
-#define _GLIBCXX_ATOMIC_BUILTINS_8 1
+/* Define if the compiler supports C++11 atomics. */
+#define _GLIBCXX_ATOMIC_BUILTINS 1
 
 /* Define to use concept checking code from the boost libraries. */
 /* #undef _GLIBCXX_CONCEPT_CHECKS */
 
-/* Define if a fully dynamic basic_string is wanted. */
-/* #undef _GLIBCXX_FULLY_DYNAMIC_STRING */
+/* Define to 1 if a fully dynamic basic_string is wanted, 0 to disable,
+   undefined for platform defaults */
+#define _GLIBCXX_FULLY_DYNAMIC_STRING 0
 
 /* Define if gthreads library is available. */
 /* #undef _GLIBCXX_HAS_GTHREADS */
@@ -1221,8 +1252,17 @@ namespace std
    this host. */
 #define _GLIBCXX_USE_DECIMAL_FLOAT 1
 
+/* Define if __float128 is supported on this host. */
+#define _GLIBCXX_USE_FLOAT128 1
+
 /* Defined if gettimeofday is available. */
 #define _GLIBCXX_USE_GETTIMEOFDAY 1
+
+/* Define if get_nprocs is available in <sys/sysinfo.h>. */
+#define _GLIBCXX_USE_GET_NPROCS 1
+
+/* Define if __int128 is supported on this host. */
+#define _GLIBCXX_USE_INT128 1
 
 /* Define if LFS support is available. */
 #define _GLIBCXX_USE_LFS 1
@@ -1236,6 +1276,9 @@ namespace std
 /* Define if NLS translations are to be used. */
 #define _GLIBCXX_USE_NLS 1
 
+/* Define if pthreads_num_processors_np is available in <pthread.h>. */
+/* #undef _GLIBCXX_USE_PTHREADS_NUM_PROCESSORS_NP */
+
 /* Define if /dev/random and /dev/urandom are available for the random_device
    of TR1 (Chapter 5.1). */
 #define _GLIBCXX_USE_RANDOM_TR1 1
@@ -1243,8 +1286,35 @@ namespace std
 /* Defined if sched_yield is available. */
 /* #undef _GLIBCXX_USE_SCHED_YIELD */
 
+/* Define if _SC_NPROCESSORS_ONLN is available in <unistd.h>. */
+#define _GLIBCXX_USE_SC_NPROCESSORS_ONLN 1
+
+/* Define if _SC_NPROC_ONLN is available in <unistd.h>. */
+/* #undef _GLIBCXX_USE_SC_NPROC_ONLN */
+
+/* Define if sysctl(), CTL_HW and HW_NCPU are available in <sys/sysctl.h>. */
+/* #undef _GLIBCXX_USE_SYSCTL_HW_NCPU */
+
 /* Define if code specialized for wchar_t should be used. */
 #define _GLIBCXX_USE_WCHAR_T 1
+
+/* Define to 1 if mutex_timedlock is available. */
+#define _GTHREAD_USE_MUTEX_TIMEDLOCK 1
+
+/* Define if all C++ overloads are available in <math.h>.  */
+#if __cplusplus >= 199711L
+/* #undef __CORRECT_ISO_CPP_MATH_H_PROTO1 */
+#endif
+
+/* Define if only double std::abs(double) is available in <math.h>.  */
+#if __cplusplus >= 199711L
+/* #undef __CORRECT_ISO_CPP_MATH_H_PROTO2 */
+#endif
+
+/* Define if all C++ overloads are available in <stdlib.h>.  */
+#if __cplusplus >= 199711L
+/* #undef __CORRECT_ISO_CPP_STDLIB_H_PROTO */
+#endif
 
 #if defined (_GLIBCXX_HAVE__ACOSF) && ! defined (_GLIBCXX_HAVE_ACOSF)
 # define _GLIBCXX_HAVE_ACOSF 1

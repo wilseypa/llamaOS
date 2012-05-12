@@ -1,6 +1,6 @@
 // future -*- C++ -*-
 
-// Copyright (C) 2009, 2010, 2011 Free Software Foundation, Inc.
+// Copyright (C) 2009, 2010, 2011, 2012 Free Software Foundation, Inc.
 //
 // This file is part of the GNU ISO C++ Library.  This library is free
 // software; you can redistribute it and/or modify it under the
@@ -28,10 +28,8 @@ namespace
 {
   struct future_error_category : public std::error_category
   {
-    future_error_category() {}
-
     virtual const char*
-    name() const 
+    name() const noexcept
     { return "future"; }
 
     virtual std::string message(int __ec) const
@@ -60,7 +58,7 @@ namespace
   };
 
   const future_error_category&
-  __future_category_instance()
+  __future_category_instance() noexcept
   {
     static const future_error_category __fec;
     return __fec;
@@ -71,21 +69,29 @@ namespace std _GLIBCXX_VISIBILITY(default)
 {
 _GLIBCXX_BEGIN_NAMESPACE_VERSION
 
-  const error_category& future_category()
+  const error_category& future_category() noexcept
   { return __future_category_instance(); }
 
-  future_error::~future_error() throw() { }
+  future_error::~future_error() noexcept { }
 
-  const char* 
-  future_error::what() const throw() { return _M_code.message().c_str(); }
+  const char*
+  future_error::what() const noexcept { return _M_code.message().c_str(); }
 
 #if defined(_GLIBCXX_HAS_GTHREADS) && defined(_GLIBCXX_USE_C99_STDINT_TR1) \
-  && defined(_GLIBCXX_ATOMIC_BUILTINS_4)
+  && (ATOMIC_INT_LOCK_FREE > 1)
   __future_base::_Result_base::_Result_base() = default;
 
   __future_base::_Result_base::~_Result_base() = default;
 
   __future_base::_State_base::~_State_base() = default;
+
+#ifdef _GLIBCXX_HAVE_TLS
+  __future_base::_Async_state_common::~_Async_state_common() { _M_join(); }
+
+  // Explicit instantiation due to -fno-implicit-instantiation.
+  template void call_once(once_flag&, void (thread::*&&)(), reference_wrapper<thread>&&);
+  template _Bind_simple_helper<void (thread::*)(), reference_wrapper<thread>>::__type __bind_simple(void (thread::*&&)(), reference_wrapper<thread>&&);
+#endif
 #endif
 
 _GLIBCXX_END_NAMESPACE_VERSION

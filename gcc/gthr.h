@@ -1,6 +1,7 @@
 /* Threads compatibility routines for libgcc2.  */
 /* Compile this one with gcc.  */
-/* Copyright (C) 1997, 1998, 2004, 2008, 2009 Free Software Foundation, Inc.
+/* Copyright (C) 1997, 1998, 2004, 2008, 2009, 2011
+   Free Software Foundation, Inc.
 
 This file is part of GCC.
 
@@ -131,40 +132,22 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
                                              __gthread_recursive_mutex_t *mutex,
                                              const __gthread_time_t *abs_time)
 
-   Currently supported threads packages are
-     TPF threads with -D__tpf__
-     POSIX/Unix98 threads with -D_PTHREADS
-     POSIX/Unix95 threads with -D_PTHREADS95
-     DCE threads with -D_DCE_THREADS
-     Solaris/UI threads with -D_SOLARIS_THREADS
-
 */
 
-/* Check first for thread specific defines.  */
-#if defined (__tpf__)
-#include "gthr-tpf.h"
-#elif _PTHREADS
-#include "gthr-posix.h"
-#elif _PTHREADS95
-#include "gthr-posix95.h"
-#elif _DCE_THREADS
-#include "gthr-dce.h"
-#elif _SOLARIS_THREADS
-#include "gthr-solaris.h"
-
-/* Include GTHREAD_FILE if one is defined.  */
-#elif defined(HAVE_GTHR_DEFAULT)
 #if SUPPORTS_WEAK
+/* The pe-coff weak support isn't fully compatible to ELF's weak.
+   For static libraries it might would work, but as we need to deal
+   with shared versions too, we disable it for mingw-targets.  */
+#ifdef __MINGW32__
+#undef GTHREAD_USE_WEAK
+#define GTHREAD_USE_WEAK 0
+#endif
+
 #ifndef GTHREAD_USE_WEAK
 #define GTHREAD_USE_WEAK 1
 #endif
 #endif
 #include "gthr-default.h"
-
-/* Fallback to single thread definitions.  */
-#else
-#include "gthr-single.h"
-#endif
 
 #ifndef HIDE_EXPORTS
 #pragma GCC visibility pop
