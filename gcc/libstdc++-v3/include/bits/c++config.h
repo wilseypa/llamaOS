@@ -1274,7 +1274,8 @@ namespace std
 /* #undef _GLIBCXX_USE_NANOSLEEP */
 
 /* Define if NLS translations are to be used. */
-#define _GLIBCXX_USE_NLS 1
+// !BAM
+// #define _GLIBCXX_USE_NLS 1
 
 /* Define if pthreads_num_processors_np is available in <pthread.h>. */
 /* #undef _GLIBCXX_USE_PTHREADS_NUM_PROCESSORS_NP */

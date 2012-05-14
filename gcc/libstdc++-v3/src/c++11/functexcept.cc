@@ -33,13 +33,12 @@
 #include <functional>
 #include <regex>
 
-// !BAM
-// #ifdef _GLIBCXX_USE_NLS
-// # include <libintl.h>
-// # define _(msgid)   gettext (msgid)
-// #else
+#ifdef _GLIBCXX_USE_NLS
+# include <libintl.h>
+# define _(msgid)   gettext (msgid)
+#else
 # define _(msgid)   (msgid)
-// #endif
+#endif
 
 namespace std _GLIBCXX_VISIBILITY(default)
 {

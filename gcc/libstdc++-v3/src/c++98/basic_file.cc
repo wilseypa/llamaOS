@@ -217,6 +217,8 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
     __basic_file* __ret = NULL;
 // !BAM
 // for some reason, fdopen just refuses to link with glibc
+// this behaves exactly the same wether the file iofdopen.c is compiled into glibc or not
+// maybe this will go away if I quit building archives
 #if 0
     const char* __c_mode = fopen_mode(__mode);
     if (__c_mode && !this->is_open() && (_M_cfile = fdopen(__fd, __c_mode)))
