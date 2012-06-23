@@ -261,8 +261,8 @@ static void embedded_latency (CSR &csr)
    uint16_t rx_tail = 64;
    csr.write_RDT (rx_tail);
 
-#define TRIALS 100000
-#define LENGTH 100
+#define TRIALS 250000
+#define LENGTH 1280
    // struct timeval tv1;
    // struct timeval tv2;
    // unsigned long usec1;

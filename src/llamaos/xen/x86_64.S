@@ -56,7 +56,7 @@ OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 SUCH DAMAGE.
 */
 
-#include <xen/features.h>
+#include <xen/include/public/features.h>
 
 #include <llamaos/config.h>
 

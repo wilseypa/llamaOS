@@ -35,6 +35,9 @@ include common.mk
 include entry-xen.mk
 include llamaOS-xen.mk
 
+ASMFLAGS = -I ../xsrc/xen-4.1.2 -I ../src
+CPPFLAGS = -I ../xsrc/gcc-4.7.1/libstdc++-v3/include/std -I ../xsrc/xen-4.1.2 -I ../src
+
 VPATH = ../src
 
 SOURCES = \
