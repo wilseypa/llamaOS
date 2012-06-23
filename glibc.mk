@@ -112,7 +112,6 @@ SOURCES = \
   glibc/locale/C_name.c \
   glibc/locale/coll-lookup.c \
   glibc/locale/findlocale.c \
-  glibc/locale/fpathconf.c \
   glibc/locale/global-locale.c \
   glibc/locale/lc-ctype.c \
   glibc/locale/loadarchive.c \
@@ -135,6 +134,7 @@ SOURCES = \
   glibc/misc/tsearch.c \
   glibc/posix/confstr.c \
   glibc/posix/environ.c \
+  glibc/posix/fpathconf.c \
   glibc/posix/getegid.c \
   glibc/posix/geteuid.c \
   glibc/posix/getgid.c \
@@ -273,6 +273,7 @@ SOURCES = \
   glibc/sysdeps/llamaos/pathconf.c \
   glibc/sysdeps/llamaos/poll.c \
   glibc/sysdeps/llamaos/read.c \
+  glibc/sysdeps/llamaos/std-lock.c \
   glibc/sysdeps/llamaos/write.c \
   glibc/sysdeps/llamaos/writev.c \
   glibc/sysdeps/wordsize-64/strtol.c \

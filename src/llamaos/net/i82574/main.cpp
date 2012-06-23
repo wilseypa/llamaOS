@@ -261,7 +261,7 @@ static void embedded_latency (CSR &csr)
    uint16_t rx_tail = 64;
    csr.write_RDT (rx_tail);
 
-#define TRIALS 500
+#define TRIALS 100000
 #define LENGTH 100
    // struct timeval tv1;
    // struct timeval tv2;
@@ -563,7 +563,7 @@ int main (int /* argc */, char ** /* argv [] */)
       cout << "PCI hardware detected is NOT 82574" << endl;
       return -1;
    }
-   cout << "PCI hardware detected is82574" << endl;
+   cout << "PCI hardware detected is 82574" << endl;
    cout.flush ();
 
    sleep (1);

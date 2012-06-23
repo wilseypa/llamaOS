@@ -28,25 +28,13 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <cstdio>
-
 #include <iostream>
 
-#include <llamaos/trace.h>
-
 using namespace std;
-using namespace llamaos;
 
 // simple guest instance should just output text to console
 int main (int argc, char *argv [])
 {
-   trace ("application main (%d,", argc);
-   for (int i = 0; i < argc; i++)
-   {
-      trace (" %s", argv [i]);
-   }
-   trace (")\n");
-
    cout << endl << "hello llamaOS" << endl;
    cout.flush ();
 

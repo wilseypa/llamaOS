@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012, William Magato
+Copyright (c) 2011, William Magato
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,32 +28,14 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <iostream>
+#include <iolibio.h>
 
-#include <gtest/gtest.h>
-
-#include <llamaos/api/sleep.h>
-
-using namespace std;
-
-TEST(Default,Test1)
+void _IO_acquire_lock (_IO_FILE **p)
 {
-   int x = 0;
-
-   EXPECT_EQ(0, x);
+   
 }
 
-int main (int argc, char *argv [])
+void _IO_release_lock (_IO_FILE **p)
 {
-   cout << "running test-xen..." << endl;
-
-   ::testing::InitGoogleTest(&argc, argv);
-
-   cout << "  RUN_ALL_TESTS: " << RUN_ALL_TESTS() << endl << endl;
-
-   cout << "waiting 20 sec, then exit..." << endl;
-   cout.flush ();
-   llamaos::api::sleep (20);
-
-   return 0;
+   
 }

@@ -32,28 +32,29 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 #include <gtest/gtest.h>
 
-#include <llamaos/api/sleep.h>
-
 using namespace std;
 
-TEST(Default,Test1)
+TEST(Console, MassiveEntries)
 {
-   int x = 0;
+   for (int i = 0; i < 100000; i++)
+   {
+      cout << "Testing console output..." << endl;
+   }
 
-   EXPECT_EQ(0, x);
+   EXPECT_EQ(0, 0);
 }
 
-int main (int argc, char *argv [])
+TEST(Console, MassiveDataPerEntry)
 {
-   cout << "running test-xen..." << endl;
+   stringstream ss;
 
-   ::testing::InitGoogleTest(&argc, argv);
+   for (int i = 1; i < 100000; i++)
+   {
+      ss << "test word" << i << " ";
+   }
 
-   cout << "  RUN_ALL_TESTS: " << RUN_ALL_TESTS() << endl << endl;
+   ss << "test word100000";
+   cout << ss.str() << endl;
 
-   cout << "waiting 20 sec, then exit..." << endl;
-   cout.flush ();
-   llamaos::api::sleep (20);
-
-   return 0;
+   EXPECT_EQ(0, 0);
 }

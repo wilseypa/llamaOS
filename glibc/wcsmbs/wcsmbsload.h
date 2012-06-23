@@ -75,7 +75,6 @@ get_gconv_fcts (struct __locale_data *data)
 	return &__wcsmbs_gconv_fcts_c;
       __wcsmbs_load_conv (data);
     }
-
   return data->private.ctype;
 }
 

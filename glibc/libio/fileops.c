@@ -596,17 +596,17 @@ _IO_new_file_underflow (fp)
 	 not be line buffered.  So we do just that here
 	 explicitly.  --drepper */
 // !BAM
-#ifdef _IO_MTSAFE_IO
+// #ifdef _IO_MTSAFE_IO
       _IO_acquire_lock (_IO_stdout);
-#endif
+// #endif
       if ((_IO_stdout->_flags & (_IO_LINKED | _IO_NO_WRITES | _IO_LINE_BUF))
 	  == (_IO_LINKED | _IO_LINE_BUF))
 	_IO_OVERFLOW (_IO_stdout, EOF);
 
 // !BAM
-#ifdef _IO_MTSAFE_IO
+// #ifdef _IO_MTSAFE_IO
       _IO_release_lock (_IO_stdout);
-#endif
+// #endif
 #endif
     }
 
