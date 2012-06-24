@@ -28,14 +28,17 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
+#include <cstdint>
+
+#include <xen/include/public/xen.h>
+
 #include <llamaos/config.h>
 
 // runtime stack memory
 char RUNTIME_STACK [2 * llamaos::STACK_SIZE];
 
 extern "C"
-void kernel (void *)
-// void kernel (start_info_t *start_info)
+void kernel (start_info_t *start_info)
 {
 
 }

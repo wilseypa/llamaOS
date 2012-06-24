@@ -35,8 +35,17 @@ include common.mk
 include entry-xen.mk
 include llamaOS-xen.mk
 
-ASMFLAGS = -I ../xsrc/xen-4.1.2 -I ../src
-CPPFLAGS = -I ../xsrc/gcc-4.7.1/libstdc++-v3/include/std -I ../xsrc/xen-4.1.2 -I ../src
+ASMFLAGS += -I ../xsrc/xen-4.1.2 -I ../src
+CPPFLAGS += \
+  -I ../xsrc/glibc-2.15/sysdeps/x86_64 \
+  -I ../xsrc/glibc-2.15/sysdeps/generic \
+  -I ../xsrc/glibc-2.15/include \
+  -I ../xsrc/glibc-2.15 \
+  -I ../xsrc/gcc-4.7.1/libstdc++-v3/include \
+  -I ../xsrc/gcc-4.7.1/libstdc++-v3/include/c_global \
+  -I ../xsrc/gcc-4.7.1/libstdc++-v3/include/std \
+  -I ../xsrc/xen-4.1.2 -I ../src \
+  -include ../xsrc/glibc-2.15/include/libc-symbols.h
 
 VPATH = ../src
 
@@ -47,7 +56,7 @@ OBJECTS = $(SOURCES:%.cpp=$(OBJDIR)/%.o)
 DEPENDS += $(OBJECTS:%.o=%.d)
 
 # the entry object must be the first object listed here or the guest will crash!
-$(BINDIR)/hello: $(ENTRY_OBJECTS) $(OBJECTS) $(LLAMAOS_OBJECTS)
+$(BINDIR)/hello-xen: $(ENTRY_OBJECTS) $(OBJECTS) $(LLAMAOS_OBJECTS)
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
 	@$(LD) $(LDFLAGS) -T $(ENTRY_LDS) -o $@ $^
