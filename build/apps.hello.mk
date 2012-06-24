@@ -35,17 +35,18 @@ include common.mk
 include entry-xen.mk
 include llamaOS-xen.mk
 
-ASMFLAGS += -I ../xsrc/xen-4.1.2 -I ../src
+ASMFLAGS += -I ../src/xen-4.1.2 -I ../src
 CPPFLAGS += \
-  -I ../xsrc/glibc-2.15/sysdeps/x86_64 \
-  -I ../xsrc/glibc-2.15/sysdeps/generic \
-  -I ../xsrc/glibc-2.15/include \
-  -I ../xsrc/glibc-2.15 \
-  -I ../xsrc/gcc-4.7.1/libstdc++-v3/include \
-  -I ../xsrc/gcc-4.7.1/libstdc++-v3/include/c_global \
-  -I ../xsrc/gcc-4.7.1/libstdc++-v3/include/std \
-  -I ../xsrc/xen-4.1.2 -I ../src \
-  -include ../xsrc/glibc-2.15/include/libc-symbols.h
+  -I ../src/glibc-2.15/sysdeps/x86_64 \
+  -I ../src/glibc-2.15/sysdeps/generic \
+  -I ../src/glibc-2.15/include \
+  -I ../src/glibc-2.15 \
+  -I ../src/gcc-4.7.1/libstdc++-v3/include \
+  -I ../src/gcc-4.7.1/libstdc++-v3/include/c_global \
+  -I ../src/gcc-4.7.1/libstdc++-v3/include/std \
+  -I ../src/gcc-4.7.1/gcc/ginclude \
+  -I ../src/xen-4.1.2 -I ../src \
+  -include ../src/glibc-2.15/include/libc-symbols.h
 
 VPATH = ../src
 

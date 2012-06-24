@@ -29,6 +29,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 */
 
 #include <cstdint>
+#include <cstring>
 
 #include <xen/include/public/xen.h>
 
@@ -37,8 +38,22 @@ either expressed or implied, of the copyright holder(s) or contributors.
 // runtime stack memory
 char RUNTIME_STACK [2 * llamaos::STACK_SIZE];
 
+static bool verify_magic (const start_info_t *start_info)
+{
+   if (   (nullptr != start_info)
+       && (0 == strncmp (start_info->magic, "xen-", 4)))
+   {
+      return true;
+   }
+
+   return false;
+}
+
 extern "C"
 void kernel (start_info_t *start_info)
 {
-
+   if (verify_magic (start_info))
+   {
+      
+   }
 }
