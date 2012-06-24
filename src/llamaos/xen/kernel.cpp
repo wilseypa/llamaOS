@@ -28,15 +28,14 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-//#include <iostream>
+#include <llamaos/config.h>
 
-//using namespace std;
+// runtime stack memory
+char RUNTIME_STACK [2 * llamaos::STACK_SIZE];
 
-// simple guest instance should just output text to console
-int main (int argc, char *argv [])
+extern "C"
+void kernel (void *)
+// void kernel (start_info_t *start_info)
 {
-//   cout << endl << "hello llamaOS" << endl;
-//   cout.flush ();
 
-   return 0;
 }

@@ -79,7 +79,7 @@ _start:
    movq stack_start(%rip), %rsp         /* Setup the runtime stack position */
    andq $(~(LLAMAOS_STACK_SIZE-1)), %rsp      /* Align stack pointer */
    movq %rsi, %rdi                      /* Pass the start_info pointer to start_kernel */
-   call start                     /* call the main kernel function */
+   call kernel                     /* call the kernel entry function */
 
 stack_start:
    .quad RUNTIME_STACK+(2*LLAMAOS_STACK_SIZE)

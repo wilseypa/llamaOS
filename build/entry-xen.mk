@@ -30,7 +30,7 @@
 # contributors.
 #
 
-ENTRY_OBJECTS = $(OBJDIR)/llamaos/xen/x86_64.o
+ENTRY_OBJECTS = $(OBJDIR)/llamaos/xen/entry-x86_64.o
 DEPENDS += $(ENTRY_OBJECTS:%.o=%.d)
 
 ENTRY_LDS = x86_64.lds

@@ -30,4 +30,7 @@
 # contributors.
 #
 
-LLAMAOS_OBJECTS = 
+LLAMAOS_SOURCES = \
+  llamaos/xen/kernel.cpp
+
+LLAMAOS_OBJECTS = $(LLAMAOS_SOURCES:%.cpp=$(OBJDIR)/%.o)
