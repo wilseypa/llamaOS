@@ -30,7 +30,12 @@
 # contributors.
 #
 
-LLAMAOS_SOURCES = \
-  llamaos/xen/kernel.cpp
+LLAMAOS_SOURCES_C = \
+  glibc-2.15/stdio-common/snprintf.c
 
-LLAMAOS_OBJECTS = $(LLAMAOS_SOURCES:%.cpp=$(OBJDIR)/%.o)
+LLAMAOS_SOURCES_CPP = \
+  llamaos/xen/kernel.cpp \
+  llamaos/xen/trace.cpp
+
+LLAMAOS_OBJECTS  = $(LLAMAOS_SOURCES_C:%.c=$(OBJDIR)/%.o)
+LLAMAOS_OBJECTS += $(LLAMAOS_SOURCES_CPP:%.cpp=$(OBJDIR)/%.o)

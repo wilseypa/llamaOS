@@ -34,6 +34,11 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <xen/include/public/xen.h>
 
 #include <llamaos/config.h>
+#include <llamaos/trace.h>
+
+using namespace std;
+using namespace llamaos;
+// using namespace llamaos::xen;
 
 // runtime stack memory
 char RUNTIME_STACK [2 * llamaos::STACK_SIZE];
@@ -49,11 +54,39 @@ static bool verify_magic (const start_info_t *start_info)
    return false;
 }
 
+static void trace_start_info (const start_info_t *start_info)
+{
+   trace ("\n\n\n*********************************\n");
+   trace (      "****  starting llamaOS (Xen)  ***\n");
+   trace (      "*********************************\n\n\n");
+
+   trace ("%s\n\n", VERSION_TEXT);
+
+   trace ("=== start_info ===\n");
+   trace ("  magic: %s\n", start_info->magic);
+   trace ("  nr_pages: %x\n", start_info->nr_pages);
+   trace ("  shared_info: %x\n", start_info->shared_info);
+   trace ("  flags: %x\n", start_info->flags);
+   trace ("  store_mfn: %x\n", start_info->store_mfn);
+   trace ("  store_evtchn: %x\n", start_info->store_evtchn);
+   trace ("  console.domU.mfn: %x\n", start_info->console.domU.mfn);
+   trace ("  console.domU.evtchn: %x\n", start_info->console.domU.evtchn);
+   trace ("  pt_base: %x\n", start_info->pt_base);
+   trace ("  nr_pt_frames: %x\n", start_info->nr_pt_frames);
+   trace ("  mfn_list: %x\n", start_info->mfn_list);
+   trace ("  mod_start: %x\n", start_info->mod_start);
+   trace ("  mod_len: %x\n", start_info->mod_len);
+   trace ("  cmd_line: %s\n", start_info->cmd_line);
+   trace ("  first_p2m_pfn: %x\n", start_info->first_p2m_pfn);
+   trace ("  nr_p2m_frames: %x\n", start_info->nr_p2m_frames);
+   trace ("\n");
+}
+
 extern "C"
 void kernel (start_info_t *start_info)
 {
    if (verify_magic (start_info))
    {
-      
+      trace_start_info (start_info);
    }
 }
