@@ -33,10 +33,10 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 #include <cstdint>
 
-#include <xen/xen.h>
-#include <xen/event_channel.h>
-// #include <xen/include/public/xen.h>
-// #include <xen/include/public/event_channel.h>
+// #include <xen/xen.h>
+// #include <xen/event_channel.h>
+#include <xen/include/public/xen.h>
+#include <xen/include/public/event_channel.h>
 
 namespace llamaos {
 namespace xen {

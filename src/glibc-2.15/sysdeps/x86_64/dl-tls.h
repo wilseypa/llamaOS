@@ -1,4 +1,5 @@
-/* Copyright (C) 1991, 1994, 1996, 1997 Free Software Foundation, Inc.
+/* Thread-local storage handling in the ELF dynamic linker.  x86-64 version.
+   Copyright (C) 2002, 2005, 2011 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -16,34 +17,16 @@
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
 
-/* This file defines the `errno' constants.  */
 
-#if !defined __Emath_defined && (defined _ERRNO_H || defined __need_Emath)
-#undef	__need_Emath
-#define	__Emath_defined	1
+/* Type used for the representation of TLS information in the GOT.  */
+typedef struct dl_tls_index
+{
+  unsigned long int ti_module;
+  unsigned long int ti_offset;
+} tls_index;
 
-// # define EDOM	XXX	<--- fill in what is actually needed
-// # define EILSEQ	XXX	<--- fill in what is actually needed
-// # define ERANGE	XXX	<--- fill in what is actually needed
 
-# define EDOM	0
-# define EILSEQ	0
-# define ERANGE	0
+extern void *__tls_get_addr (tls_index *ti);
 
-#endif
-
-#ifdef	_ERRNO_H
-// # error "Define here all the missing error messages for the port.  These"
-// # error "must match the numbers of the kernel."
-// # define Exxxx	XXX
-
-#define ESPIPE 0
-#define EINVAL 0
-#define EBADF 0
-#define ENOSYS 0
-#define ENOMEM 0
-#define EINTR 0
-#define ENOENT 0
-#define EACCES 0
-
-#endif
+/* Value used for dtv entries for which the allocation is delayed.  */
+#define TLS_DTV_UNALLOCATED	((void *) -1l)

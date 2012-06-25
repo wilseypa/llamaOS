@@ -1,4 +1,4 @@
-/* Copyright (C) 1991, 1994, 1996, 1997 Free Software Foundation, Inc.
+/* Copyright (C) 1991,1995,1996,1997,1998,2002 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -16,34 +16,26 @@
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
 
-/* This file defines the `errno' constants.  */
+#include <errno.h>
+#include <unistd.h>
+#include <sys/uio.h>
 
-#if !defined __Emath_defined && (defined _ERRNO_H || defined __need_Emath)
-#undef	__need_Emath
-#define	__Emath_defined	1
+/* Write data pointed by the buffers described by VECTOR, which
+   is a vector of COUNT `struct iovec's, to file descriptor FD.
+   The data is written in the order specified.
+   Operates just like `write' (see <unistd.h>) except that the data
+   are taken from VECTOR instead of a contiguous buffer.  */
+ssize_t
+__libc_writev (fd, vector, count)
+     int fd;
+     const struct iovec *vector;
+     int count;
+{
+  __set_errno (ENOSYS);
+  return -1;
+}
+strong_alias (__libc_writev, __writev)
+weak_alias (__libc_writev, writev)
 
-// # define EDOM	XXX	<--- fill in what is actually needed
-// # define EILSEQ	XXX	<--- fill in what is actually needed
-// # define ERANGE	XXX	<--- fill in what is actually needed
-
-# define EDOM	0
-# define EILSEQ	0
-# define ERANGE	0
-
-#endif
-
-#ifdef	_ERRNO_H
-// # error "Define here all the missing error messages for the port.  These"
-// # error "must match the numbers of the kernel."
-// # define Exxxx	XXX
-
-#define ESPIPE 0
-#define EINVAL 0
-#define EBADF 0
-#define ENOSYS 0
-#define ENOMEM 0
-#define EINTR 0
-#define ENOENT 0
-#define EACCES 0
-
-#endif
+stub_warning (writev)
+#include <stub-tag.h>

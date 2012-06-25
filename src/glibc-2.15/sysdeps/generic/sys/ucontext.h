@@ -1,4 +1,5 @@
-/* Copyright (C) 1991, 1994, 1996, 1997 Free Software Foundation, Inc.
+/* Data structures for user-level context switching.  Generic version.
+   Copyright (C) 1997,98,99,2001 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -16,34 +17,29 @@
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
 
-/* This file defines the `errno' constants.  */
+/* This file's definitions suffice for any platform where all
+   the machine-specific state is described in `struct sigcontext'.  */
 
-#if !defined __Emath_defined && (defined _ERRNO_H || defined __need_Emath)
-#undef	__need_Emath
-#define	__Emath_defined	1
+#ifndef _SYS_UCONTEXT_H
+#define _SYS_UCONTEXT_H	1
 
-// # define EDOM	XXX	<--- fill in what is actually needed
-// # define EILSEQ	XXX	<--- fill in what is actually needed
-// # define ERANGE	XXX	<--- fill in what is actually needed
+#include <features.h>
+#include <signal.h>
 
-# define EDOM	0
-# define EILSEQ	0
-# define ERANGE	0
+/* We need the signal context definitions even if they are not used
+   included in <signal.h>.  */
+#include <bits/sigcontext.h>
 
-#endif
+typedef struct sigcontext mcontext_t;
 
-#ifdef	_ERRNO_H
-// # error "Define here all the missing error messages for the port.  These"
-// # error "must match the numbers of the kernel."
-// # define Exxxx	XXX
+/* Userlevel context.  */
+typedef struct ucontext
+  {
+    unsigned long int uc_flags;
+    struct ucontext *uc_link;
+    stack_t uc_stack;
+    mcontext_t uc_mcontext;
+    __sigset_t uc_sigmask;
+  } ucontext_t;
 
-#define ESPIPE 0
-#define EINVAL 0
-#define EBADF 0
-#define ENOSYS 0
-#define ENOMEM 0
-#define EINTR 0
-#define ENOENT 0
-#define EACCES 0
-
-#endif
+#endif /* sys/ucontext.h */

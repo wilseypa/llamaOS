@@ -1,4 +1,5 @@
-/* Copyright (C) 1991, 1994, 1996, 1997 Free Software Foundation, Inc.
+/* Structure describing state saved while handling a signal.  Stub version.
+   Copyright (C) 1991, 1994, 1997 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -16,34 +17,17 @@
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
 
-/* This file defines the `errno' constants.  */
-
-#if !defined __Emath_defined && (defined _ERRNO_H || defined __need_Emath)
-#undef	__need_Emath
-#define	__Emath_defined	1
-
-// # define EDOM	XXX	<--- fill in what is actually needed
-// # define EILSEQ	XXX	<--- fill in what is actually needed
-// # define ERANGE	XXX	<--- fill in what is actually needed
-
-# define EDOM	0
-# define EILSEQ	0
-# define ERANGE	0
-
+#ifndef _SIGNAL_H
+# error "Never use <bits/sigcontext.h> directly; include <signal.h> instead."
 #endif
 
-#ifdef	_ERRNO_H
-// # error "Define here all the missing error messages for the port.  These"
-// # error "must match the numbers of the kernel."
-// # define Exxxx	XXX
+/* State of this thread when the signal was taken.  */
+struct sigcontext
+  {
+    int sc_onstack;
+    __sigset_t sc_mask;
 
-#define ESPIPE 0
-#define EINVAL 0
-#define EBADF 0
-#define ENOSYS 0
-#define ENOMEM 0
-#define EINTR 0
-#define ENOENT 0
-#define EACCES 0
+    /* Registers and such.  */
+  };
 
-#endif
+/* Signal subcodes should be defined here.  */

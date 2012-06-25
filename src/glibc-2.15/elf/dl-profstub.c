@@ -1,5 +1,7 @@
-/* Copyright (C) 1991, 1994, 1996, 1997 Free Software Foundation, Inc.
+/* Helper definitions for profiling of shared libraries.
+   Copyright (C) 1998, 2000, 2002, 2004 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
+   Contributed by Ulrich Drepper <drepper@cygnus.com>, 1997.
 
    The GNU C Library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -16,34 +18,25 @@
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
 
-/* This file defines the `errno' constants.  */
+#include <dlfcn.h>
+#include <elf.h>
+#include <ldsodefs.h>
 
-#if !defined __Emath_defined && (defined _ERRNO_H || defined __need_Emath)
-#undef	__need_Emath
-#define	__Emath_defined	1
+/* This is the map for the shared object we profile.  It is defined here
+   only because we test for this value being NULL or not.  */
 
-// # define EDOM	XXX	<--- fill in what is actually needed
-// # define EILSEQ	XXX	<--- fill in what is actually needed
-// # define ERANGE	XXX	<--- fill in what is actually needed
 
-# define EDOM	0
-# define EILSEQ	0
-# define ERANGE	0
+void
+_dl_mcount_wrapper (void *selfpc)
+{
+  GLRO(dl_mcount) ((ElfW(Addr)) RETURN_ADDRESS (0), (ElfW(Addr)) selfpc);
+}
 
-#endif
 
-#ifdef	_ERRNO_H
-// # error "Define here all the missing error messages for the port.  These"
-// # error "must match the numbers of the kernel."
-// # define Exxxx	XXX
-
-#define ESPIPE 0
-#define EINVAL 0
-#define EBADF 0
-#define ENOSYS 0
-#define ENOMEM 0
-#define EINTR 0
-#define ENOENT 0
-#define EACCES 0
-
-#endif
+void
+_dl_mcount_wrapper_check (void *selfpc)
+{
+  if (GL(dl_profile_map) != NULL)
+    GLRO(dl_mcount) ((ElfW(Addr)) RETURN_ADDRESS (0), (ElfW(Addr)) selfpc);
+}
+libc_hidden_def (_dl_mcount_wrapper_check)

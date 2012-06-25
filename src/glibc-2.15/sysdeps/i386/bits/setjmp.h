@@ -1,4 +1,5 @@
-/* Copyright (C) 1991, 1994, 1996, 1997 Free Software Foundation, Inc.
+/* Copyright (C) 1997,1998,2000,2001,2003,2005,2006
+	Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -16,34 +17,16 @@
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
 
-/* This file defines the `errno' constants.  */
+/* Define the machine-dependent type `jmp_buf'.  Intel 386 version.  */
+#ifndef _BITS_SETJMP_H
+#define _BITS_SETJMP_H	1
 
-#if !defined __Emath_defined && (defined _ERRNO_H || defined __need_Emath)
-#undef	__need_Emath
-#define	__Emath_defined	1
-
-// # define EDOM	XXX	<--- fill in what is actually needed
-// # define EILSEQ	XXX	<--- fill in what is actually needed
-// # define ERANGE	XXX	<--- fill in what is actually needed
-
-# define EDOM	0
-# define EILSEQ	0
-# define ERANGE	0
-
+#if !defined _SETJMP_H && !defined _PTHREAD_H
+# error "Never include <bits/setjmp.h> directly; use <setjmp.h> instead."
 #endif
 
-#ifdef	_ERRNO_H
-// # error "Define here all the missing error messages for the port.  These"
-// # error "must match the numbers of the kernel."
-// # define Exxxx	XXX
-
-#define ESPIPE 0
-#define EINVAL 0
-#define EBADF 0
-#define ENOSYS 0
-#define ENOMEM 0
-#define EINTR 0
-#define ENOENT 0
-#define EACCES 0
-
+#ifndef	_ASM
+typedef int __jmp_buf[6];
 #endif
+
+#endif	/* bits/setjmp.h */

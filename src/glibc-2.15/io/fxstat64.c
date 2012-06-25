@@ -1,4 +1,4 @@
-/* Copyright (C) 1991, 1994, 1996, 1997 Free Software Foundation, Inc.
+/* Copyright (C) 1991, 1995, 1996, 1997, 2002 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -16,34 +16,34 @@
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
 
-/* This file defines the `errno' constants.  */
+#include <errno.h>
+#include <stddef.h>
+#include <sys/stat.h>
 
-#if !defined __Emath_defined && (defined _ERRNO_H || defined __need_Emath)
-#undef	__need_Emath
-#define	__Emath_defined	1
+/* Get information about the file descriptor FD in BUF.  */
+int
+__fxstat64 (int vers, int fd, struct stat64 *buf)
+{
+  if (vers != _STAT_VER)
+    {
+      __set_errno (EINVAL);
+      return -1;
+    }
 
-// # define EDOM	XXX	<--- fill in what is actually needed
-// # define EILSEQ	XXX	<--- fill in what is actually needed
-// # define ERANGE	XXX	<--- fill in what is actually needed
+  if (fd < 0)
+    {
+      __set_errno (EBADF);
+      return -1;
+    }
+  else if (buf == NULL)
+    {
+      __set_errno (EINVAL);
+      return -1;
+    }
 
-# define EDOM	0
-# define EILSEQ	0
-# define ERANGE	0
-
-#endif
-
-#ifdef	_ERRNO_H
-// # error "Define here all the missing error messages for the port.  These"
-// # error "must match the numbers of the kernel."
-// # define Exxxx	XXX
-
-#define ESPIPE 0
-#define EINVAL 0
-#define EBADF 0
-#define ENOSYS 0
-#define ENOMEM 0
-#define EINTR 0
-#define ENOENT 0
-#define EACCES 0
-
-#endif
+  __set_errno (ENOSYS);
+  return -1;
+}
+hidden_def (__fxstat64)
+stub_warning (fstat64)
+#include <stub-tag.h>

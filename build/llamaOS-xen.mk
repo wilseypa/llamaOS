@@ -31,12 +31,28 @@
 #
 
 LLAMAOS_SOURCES_C = \
+  glibc-2.15/csu/libc-tls.c \
   glibc-2.15/debug/fortify_fail.c \
+  glibc-2.15/elf/dl-debug.c \
+  glibc-2.15/elf/dl-error.c \
+  glibc-2.15/elf/dl-load.c \
+  glibc-2.15/elf/dl-misc.c \
+  glibc-2.15/elf/dl-object.c \
+  glibc-2.15/elf/dl-profile.c \
+  glibc-2.15/elf/dl-profstub.c \
+  glibc-2.15/elf/dl-support.c \
+  glibc-2.15/elf/dl-tls.c \
+  glibc-2.15/gmon/prof-freq.c \
+  glibc-2.15/gmon/profil.c \
   glibc-2.15/io/close.c \
   glibc-2.15/io/fxstat.c \
+  glibc-2.15/io/fxstat64.c \
+  glibc-2.15/io/isatty.c \
   glibc-2.15/io/open.c \
   glibc-2.15/io/read.c \
   glibc-2.15/io/write.c \
+  glibc-2.15/io/xstat.c \
+  glibc-2.15/io/xstat64.c \
   glibc-2.15/libio/filedoalloc.c \
   glibc-2.15/libio/fileops.c \
   glibc-2.15/libio/genops.c \
@@ -60,6 +76,8 @@ LLAMAOS_SOURCES_C = \
   glibc-2.15/misc/mmap.c \
   glibc-2.15/misc/munmap.c \
   glibc-2.15/misc/sbrk.c \
+  glibc-2.15/misc/writev.c \
+  glibc-2.15/posix/getpid.c \
   glibc-2.15/stdio-common/_itoa.c \
   glibc-2.15/stdio-common/_itowa.c \
   glibc-2.15/stdio-common/asprintf.c \
@@ -69,6 +87,9 @@ LLAMAOS_SOURCES_C = \
   glibc-2.15/stdio-common/itowa-digits.c \
   glibc-2.15/stdio-common/snprintf.c \
   glibc-2.15/stdio-common/vfprintf.c \
+  glibc-2.15/stdlib/exit.c \
+  glibc-2.15/stdlib/getenv.c \
+  glibc-2.15/stdlib/setenv.c \
   glibc-2.15/stdlib/strtol.c \
   glibc-2.15/stdlib/strtol_l.c \
   glibc-2.15/string/_strerror.c \
@@ -83,6 +104,7 @@ LLAMAOS_SOURCES_C = \
   glibc-2.15/string/memrchr.c \
   glibc-2.15/string/memset.c \
   glibc-2.15/string/rawmemchr.c \
+  glibc-2.15/string/stpcpy.c \
   glibc-2.15/string/strcasecmp.c \
   glibc-2.15/string/strcasecmp_l.c \
   glibc-2.15/string/strcasestr.c \

@@ -41,8 +41,10 @@ CFLAGS += \
   -D_IO_MTSAFE_IO \
   -I ../src/glibc-2.15/sysdeps/llamaos \
   -I ../src/glibc-2.15/sysdeps/x86_64 \
+  -I ../src/glibc-2.15/sysdeps/i386 \
   -I ../src/glibc-2.15/sysdeps/generic \
   -I ../src/glibc-2.15/include \
+  -I ../src/glibc-2.15/elf \
   -I ../src/glibc-2.15/libio \
   -I ../src/glibc-2.15/wcsmbs \
   -I ../src/glibc-2.15 \

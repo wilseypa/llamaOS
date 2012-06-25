@@ -1,4 +1,4 @@
-/* Copyright (C) 1991, 1994, 1996, 1997 Free Software Foundation, Inc.
+/* Copyright (C) 1992, 1995, 1997, 2002, 2004 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -16,34 +16,40 @@
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
 
-/* This file defines the `errno' constants.  */
-
-#if !defined __Emath_defined && (defined _ERRNO_H || defined __need_Emath)
-#undef	__need_Emath
-#define	__Emath_defined	1
-
-// # define EDOM	XXX	<--- fill in what is actually needed
-// # define EILSEQ	XXX	<--- fill in what is actually needed
-// # define ERANGE	XXX	<--- fill in what is actually needed
-
-# define EDOM	0
-# define EILSEQ	0
-# define ERANGE	0
-
+#ifdef HAVE_CONFIG_H
+# include <config.h>
 #endif
 
-#ifdef	_ERRNO_H
-// # error "Define here all the missing error messages for the port.  These"
-// # error "must match the numbers of the kernel."
-// # define Exxxx	XXX
+#include <string.h>
 
-#define ESPIPE 0
-#define EINVAL 0
-#define EBADF 0
-#define ENOSYS 0
-#define ENOMEM 0
-#define EINTR 0
-#define ENOENT 0
-#define EACCES 0
+#undef __stpcpy
+#undef stpcpy
 
+#ifndef weak_alias
+# define __stpcpy stpcpy
+#endif
+
+/* Copy SRC to DEST, returning the address of the terminating '\0' in DEST.  */
+char *
+__stpcpy (dest, src)
+     char *dest;
+     const char *src;
+{
+  register char *d = dest;
+  register const char *s = src;
+
+  do
+    *d++ = *s;
+  while (*s++ != '\0');
+
+  return d - 1;
+}
+#ifdef libc_hidden_def
+libc_hidden_def (__stpcpy)
+#endif
+#ifdef weak_alias
+weak_alias (__stpcpy, stpcpy)
+#endif
+#ifdef libc_hidden_builtin_def
+libc_hidden_builtin_def (stpcpy)
 #endif
