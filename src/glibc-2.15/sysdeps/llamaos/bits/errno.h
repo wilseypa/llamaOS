@@ -22,9 +22,14 @@
 #undef	__need_Emath
 #define	__Emath_defined	1
 
-# define EDOM	XXX	<--- fill in what is actually needed
-# define EILSEQ	XXX	<--- fill in what is actually needed
-# define ERANGE	XXX	<--- fill in what is actually needed
+// # define EDOM	XXX	<--- fill in what is actually needed
+// # define EILSEQ	XXX	<--- fill in what is actually needed
+// # define ERANGE	XXX	<--- fill in what is actually needed
+
+# define EDOM	0
+# define EILSEQ	0
+# define ERANGE	0
+
 #endif
 
 #ifdef	_ERRNO_H
@@ -32,5 +37,10 @@
 // # error "must match the numbers of the kernel."
 // # define Exxxx	XXX
 
+#define ESPIPE 0
+#define EINVAL 0
+#define EBADF 0
+#define ENOSYS 0
+#define ENOMEM 0
 
 #endif

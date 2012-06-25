@@ -38,15 +38,18 @@ include llamaOS-xen.mk
 ASMFLAGS += -I ../src/xen-4.1.2 -I ../src
 
 CFLAGS += \
+  -D_IO_MTSAFE_IO \
   -I ../src/glibc-2.15/sysdeps/llamaos \
   -I ../src/glibc-2.15/sysdeps/x86_64 \
   -I ../src/glibc-2.15/sysdeps/generic \
   -I ../src/glibc-2.15/include \
   -I ../src/glibc-2.15/libio \
+  -I ../src/glibc-2.15/wcsmbs \
   -I ../src/glibc-2.15 \
   -I ../src/gcc-4.7.1/gcc/ginclude \
   -I ../src/gcc-4.7.1/gcc/include-fixed \
-  -include ../src/glibc-2.15/include/libc-symbols.h
+  -include ../src/glibc-2.15/include/libc-symbols.h \
+  -include ../src/gcc-4.7.1/gcc/ginclude/stdbool.h
 
 CPPFLAGS += \
   -I ../src/glibc-2.15/sysdeps/llamaos \

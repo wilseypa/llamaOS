@@ -56,7 +56,8 @@ OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 SUCH DAMAGE.
 */
 
-#include <xen/include/public/features.h>
+#include <xen/features.h>
+// #include <xen/include/public/features.h>
 
 #include <llamaos/config.h>
 
@@ -79,7 +80,7 @@ _start:
    movq stack_start(%rip), %rsp         /* Setup the runtime stack position */
    andq $(~(LLAMAOS_STACK_SIZE-1)), %rsp      /* Align stack pointer */
    movq %rsi, %rdi                      /* Pass the start_info pointer to start_kernel */
-   call kernel                     /* call the kernel entry function */
+   call start                     /* call the kernel entry function */
 
 stack_start:
    .quad RUNTIME_STACK+(2*LLAMAOS_STACK_SIZE)
