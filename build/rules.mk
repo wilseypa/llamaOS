@@ -30,6 +30,8 @@
 # contributors.
 #
 
+MAKEFILE_SOURCES += rules.mk
+# $(MAKEFILE_SOURCES)
 $(OBJDIR)/%.o : %.S $(MAKEFILE_SOURCES)
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo compiling: $<

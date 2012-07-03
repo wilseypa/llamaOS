@@ -28,13 +28,13 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <cstdint>
-#include <cstring>
+// #include <cstdint>
+// #include <cstring>
 
-#include <xen/include/public/xen.h>
+// #include <xen/include/public/xen.h>
 
 #include <llamaos/config.h>
-#include <llamaos/trace.h>
+// #include <llamaos/trace.h>
 
 using namespace std;
 using namespace llamaos;
@@ -43,6 +43,7 @@ using namespace llamaos;
 // runtime stack memory
 char RUNTIME_STACK [2 * llamaos::STACK_SIZE];
 
+#if 0
 static bool verify_magic (const start_info_t *start_info)
 {
    if (   (nullptr != start_info)
@@ -81,12 +82,14 @@ static void trace_start_info (const start_info_t *start_info)
    trace ("  nr_p2m_frames: %x\n", start_info->nr_p2m_frames);
    trace ("\n");
 }
+#endif
 
 extern "C"
-void kernel (start_info_t *start_info)
+// void kernel (start_info_t *start_info)
+void kernel (void *)
 {
-   if (verify_magic (start_info))
-   {
-      trace_start_info (start_info);
-   }
+//   if (verify_magic (start_info))
+//   {
+//      trace_start_info (start_info);
+//   }
 }

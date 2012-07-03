@@ -35,40 +35,15 @@ include common.mk
 include entry-xen.mk
 include llamaOS-xen.mk
 
-ASMFLAGS += -I ../src/xen-4.1.2 -I ../src
+MAKEFILE_SOURCES += apps.hello.mk
 
-CFLAGS += \
-  -D_IO_MTSAFE_IO \
-  -I ../src/glibc-2.15/sysdeps/llamaos \
-  -I ../src/glibc-2.15/sysdeps/x86_64 \
-  -I ../src/glibc-2.15/sysdeps/i386 \
-  -I ../src/glibc-2.15/sysdeps/generic \
-  -I ../src/glibc-2.15/include \
-  -I ../src/glibc-2.15/elf \
-  -I ../src/glibc-2.15/libio \
-  -I ../src/glibc-2.15/wcsmbs \
-  -I ../src/glibc-2.15 \
-  -I ../src/gcc-4.7.1/gcc/ginclude \
-  -I ../src/gcc-4.7.1/gcc/include-fixed \
-  -include ../src/glibc-2.15/include/libc-symbols.h \
-  -include ../src/gcc-4.7.1/gcc/ginclude/stdbool.h
+ASMFLAGS += 
 
-CPPFLAGS += \
-  -I ../src/glibc-2.15/sysdeps/llamaos \
-  -I ../src/glibc-2.15/sysdeps/x86_64 \
-  -I ../src/glibc-2.15/sysdeps/generic \
-  -I ../src/glibc-2.15/include \
-  -I ../src/glibc-2.15/libio \
-  -I ../src/glibc-2.15 \
-  -I ../src/gcc-4.7.1/libstdc++-v3/include \
-  -I ../src/gcc-4.7.1/libstdc++-v3/include/c_global \
-  -I ../src/gcc-4.7.1/libstdc++-v3/include/std \
-  -I ../src/gcc-4.7.1/gcc/ginclude \
-  -I ../src/xen-4.1.2 \
-  -I ../src \
-  -include ../src/glibc-2.15/include/libc-symbols.h
+CFLAGS += 
 
-VPATH = ../src
+CPPFLAGS += 
+
+VPATH = $(SRCDIR)
 
 SOURCES = \
   llamaos/apps/hello/main.cpp
@@ -93,12 +68,6 @@ clean:
 	@rm -rf $(BINDIR)
 	@echo removing: $(LIBDIR)
 	@rm -rf $(LIBDIR)
-
-$(OBJDIR)/%.o: %.S
-	@echo creating: $@ from $<
-
-$(OBJDIR)/%.d : %.S
-	@echo creating: $@ from $<
 
 include rules.mk
 

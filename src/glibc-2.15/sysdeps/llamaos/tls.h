@@ -45,9 +45,6 @@ typedef struct
 
 #define TLS_INIT_TP(tcb, firstcall) 0
 
-/* Alignment requirements for the TCB.  */
-# define TLS_TCB_ALIGN 0
-
 /* Install the dtv pointer.  The pointer passed is to the element with
    index -1 which contain the length.  */
 # define INSTALL_DTV(descr, dtvp)
@@ -58,5 +55,8 @@ typedef struct
 
   /* Return the address of the dtv for the current thread.  */
 # define THREAD_DTV() 0
+
+# define THREAD_GSCOPE_WAIT() \
+  GL(dl_wait_lookup_done) ()
 
 #endif  //  llamaos_tls_h

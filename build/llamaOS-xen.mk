@@ -30,126 +30,182 @@
 # contributors.
 #
 
-LLAMAOS_SOURCES_C = \
-  glibc-2.15/csu/libc-tls.c \
-  glibc-2.15/debug/fortify_fail.c \
-  glibc-2.15/elf/dl-debug.c \
-  glibc-2.15/elf/dl-error.c \
-  glibc-2.15/elf/dl-load.c \
-  glibc-2.15/elf/dl-misc.c \
-  glibc-2.15/elf/dl-object.c \
-  glibc-2.15/elf/dl-profile.c \
-  glibc-2.15/elf/dl-profstub.c \
-  glibc-2.15/elf/dl-support.c \
-  glibc-2.15/elf/dl-tls.c \
-  glibc-2.15/gmon/prof-freq.c \
-  glibc-2.15/gmon/profil.c \
-  glibc-2.15/io/close.c \
-  glibc-2.15/io/fxstat.c \
-  glibc-2.15/io/fxstat64.c \
-  glibc-2.15/io/isatty.c \
-  glibc-2.15/io/open.c \
-  glibc-2.15/io/read.c \
-  glibc-2.15/io/write.c \
-  glibc-2.15/io/xstat.c \
-  glibc-2.15/io/xstat64.c \
-  glibc-2.15/libio/filedoalloc.c \
-  glibc-2.15/libio/fileops.c \
-  glibc-2.15/libio/genops.c \
-  glibc-2.15/libio/iofflush.c \
-  glibc-2.15/libio/iofwide.c \
-  glibc-2.15/libio/iovsprintf.c \
-  glibc-2.15/libio/stdfiles.c \
-  glibc-2.15/libio/stdio.c \
-  glibc-2.15/libio/strops.c \
-  glibc-2.15/libio/vsnprintf.c \
-  glibc-2.15/libio/wfileops.c \
-  glibc-2.15/libio/wgenops.c \
-  glibc-2.15/locale/xlocale.c \
-  glibc-2.15/malloc/malloc.c \
-  glibc-2.15/malloc/morecore.c \
-  glibc-2.15/misc/brk.c \
-  glibc-2.15/misc/getpagesize.c \
-  glibc-2.15/misc/init-misc.c \
-  glibc-2.15/misc/lseek.c \
-  glibc-2.15/misc/madvise.c \
-  glibc-2.15/misc/mmap.c \
-  glibc-2.15/misc/munmap.c \
-  glibc-2.15/misc/sbrk.c \
-  glibc-2.15/misc/writev.c \
-  glibc-2.15/posix/getpid.c \
-  glibc-2.15/stdio-common/_itoa.c \
-  glibc-2.15/stdio-common/_itowa.c \
-  glibc-2.15/stdio-common/asprintf.c \
-  glibc-2.15/stdio-common/fxprintf.c \
-  glibc-2.15/stdio-common/itoa-digits.c \
-  glibc-2.15/stdio-common/itoa-udigits.c \
-  glibc-2.15/stdio-common/itowa-digits.c \
-  glibc-2.15/stdio-common/snprintf.c \
-  glibc-2.15/stdio-common/vfprintf.c \
-  glibc-2.15/stdlib/exit.c \
-  glibc-2.15/stdlib/getenv.c \
-  glibc-2.15/stdlib/setenv.c \
-  glibc-2.15/stdlib/strtol.c \
-  glibc-2.15/stdlib/strtol_l.c \
-  glibc-2.15/string/_strerror.c \
-  glibc-2.15/string/memccpy.c \
-  glibc-2.15/string/memchr.c \
-  glibc-2.15/string/memcmp.c \
-  glibc-2.15/string/memcpy.c \
-  glibc-2.15/string/memfrob.c \
-  glibc-2.15/string/memmem.c \
-  glibc-2.15/string/memmove.c \
-  glibc-2.15/string/mempcpy.c \
-  glibc-2.15/string/memrchr.c \
-  glibc-2.15/string/memset.c \
-  glibc-2.15/string/rawmemchr.c \
-  glibc-2.15/string/stpcpy.c \
-  glibc-2.15/string/strcasecmp.c \
-  glibc-2.15/string/strcasecmp_l.c \
-  glibc-2.15/string/strcasestr.c \
-  glibc-2.15/string/strcat.c \
-  glibc-2.15/string/strchr.c \
-  glibc-2.15/string/strchrnul.c \
-  glibc-2.15/string/strcmp.c \
-  glibc-2.15/string/strcoll.c \
-  glibc-2.15/string/strcoll_l.c \
-  glibc-2.15/string/strcpy.c \
-  glibc-2.15/string/strcspn.c \
-  glibc-2.15/string/strdup.c \
-  glibc-2.15/string/strerror.c \
-  glibc-2.15/string/strerror_l.c \
-  glibc-2.15/string/strlen.c \
-  glibc-2.15/string/strerror.c \
-  glibc-2.15/string/strncase.c \
-  glibc-2.15/string/strncase_l.c \
-  glibc-2.15/string/strncat.c \
-  glibc-2.15/string/strncmp.c \
-  glibc-2.15/string/strncpy.c \
-  glibc-2.15/string/strndup.c \
-  glibc-2.15/string/strnlen.c \
-  glibc-2.15/string/strpbrk.c \
-  glibc-2.15/string/strrchr.c \
-  glibc-2.15/string/strspn.c \
-  glibc-2.15/string/strstr.c \
-  glibc-2.15/string/strtok.c \
-  glibc-2.15/string/strtok_r.c \
-  glibc-2.15/string/wordcopy.c \
-  glibc-2.15/sysdeps/llamaos/assert.c \
-  glibc-2.15/sysdeps/llamaos/errno.c \
-  glibc-2.15/sysdeps/llamaos/flockfile.c \
-  glibc-2.15/sysdeps/llamaos/funlockfile.c \
-  glibc-2.15/wcsmbs/wcsmbsload.c \
-  glibc-2.15/wcsmbs/wmemchr.c \
-  glibc-2.15/wcsmbs/wmemcmp.c \
-  glibc-2.15/wcsmbs/wmemcpy.c \
-  glibc-2.15/wcsmbs/wmemmove.c \
-  glibc-2.15/wcsmbs/wmempcpy.c \
-  glibc-2.15/wcsmbs/wmemset.c
+MAKEFILE_SOURCES += llamaOS-xen.mk
+
+#  glibc-2.15/elf/dl-cache.c \
+#  glibc-2.15/elf/dl-close.c \
+#  glibc-2.15/elf/dl-debug.c \
+#  glibc-2.15/elf/dl-error.c \
+#  glibc-2.15/elf/dl-fini.c \
+#  glibc-2.15/elf/dl-libc.c \
+#  glibc-2.15/elf/dl-load.c \
+#  glibc-2.15/elf/dl-lookup.c \
+#  glibc-2.15/elf/dl-misc.c \
+#  glibc-2.15/elf/dl-object.c \
+#  glibc-2.15/elf/dl-open.c \
+#  glibc-2.15/elf/dl-origin.c \
+#  glibc-2.15/elf/dl-profile.c \
+#  glibc-2.15/elf/dl-profstub.c \
+#  glibc-2.15/elf/dl-scope.c \
+#  glibc-2.15/elf/dl-support.c \
+#  glibc-2.15/elf/dl-tls.c \
+#  glibc-2.15/elf/enbl-secure.c \
+
+#  glibc-2.15/csu/libc-tls.c \
+#  glibc-2.15/debug/fortify_fail.c \
+#  glibc-2.15/gmon/prof-freq.c \
+#  glibc-2.15/gmon/profil.c \
+#  glibc-2.15/io/close.c \
+#  glibc-2.15/io/fxstat.c \
+#  glibc-2.15/io/fxstat64.c \
+#  glibc-2.15/io/isatty.c \
+#  glibc-2.15/io/open.c \
+#  glibc-2.15/io/read.c \
+#  glibc-2.15/io/write.c \
+#  glibc-2.15/io/xstat.c \
+#  glibc-2.15/io/xstat64.c \
+#  glibc-2.15/libio/filedoalloc.c \
+#  glibc-2.15/libio/fileops.c \
+#  glibc-2.15/libio/genops.c \
+#  glibc-2.15/libio/iofflush.c \
+#  glibc-2.15/libio/iofwide.c \
+#  glibc-2.15/libio/iovsprintf.c \
+#  glibc-2.15/libio/stdfiles.c \
+#  glibc-2.15/libio/stdio.c \
+#  glibc-2.15/libio/strops.c \
+#  glibc-2.15/libio/vsnprintf.c \
+#  glibc-2.15/libio/wfileops.c \
+#  glibc-2.15/libio/wgenops.c \
+#  glibc-2.15/locale/xlocale.c \
+#  glibc-2.15/malloc/malloc.c \
+#  glibc-2.15/malloc/morecore.c \
+#  glibc-2.15/misc/brk.c \
+#  glibc-2.15/misc/getpagesize.c \
+#  glibc-2.15/misc/init-misc.c \
+#  glibc-2.15/misc/lseek.c \
+#  glibc-2.15/misc/madvise.c \
+#  glibc-2.15/misc/mmap.c \
+#  glibc-2.15/misc/mprotect.c \
+#  glibc-2.15/misc/munmap.c \
+#  glibc-2.15/misc/sbrk.c \
+#  glibc-2.15/misc/writev.c \
+#  glibc-2.15/posix/getpid.c \
+#  glibc-2.15/setjmp/longjmp.c \
+#  glibc-2.15/setjmp/setjmp.c \
+#  glibc-2.15/stdio-common/_itoa.c \
+#  glibc-2.15/stdio-common/_itowa.c \
+#  glibc-2.15/stdio-common/asprintf.c \
+#  glibc-2.15/stdio-common/fxprintf.c \
+#  glibc-2.15/stdio-common/itoa-digits.c \
+#  glibc-2.15/stdio-common/itoa-udigits.c \
+#  glibc-2.15/stdio-common/itowa-digits.c \
+#  glibc-2.15/stdio-common/snprintf.c \
+#  glibc-2.15/stdio-common/vfprintf.c \
+#  glibc-2.15/stdlib/exit.c \
+#  glibc-2.15/stdlib/getenv.c \
+#  glibc-2.15/stdlib/setenv.c \
+#  glibc-2.15/stdlib/strtol.c \
+#  glibc-2.15/stdlib/strtol_l.c \
+#  glibc-2.15/string/_strerror.c \
+#  glibc-2.15/string/memccpy.c \
+#  glibc-2.15/string/memchr.c \
+#  glibc-2.15/string/memcmp.c \
+#  glibc-2.15/string/memcpy.c \
+#  glibc-2.15/string/memfrob.c \
+#  glibc-2.15/string/memmem.c \
+#  glibc-2.15/string/memmove.c \
+#  glibc-2.15/string/mempcpy.c \
+#  glibc-2.15/string/memrchr.c \
+#  glibc-2.15/string/memset.c \
+#  glibc-2.15/string/rawmemchr.c \
+#  glibc-2.15/string/stpcpy.c \
+#  glibc-2.15/string/strcasecmp.c \
+#  glibc-2.15/string/strcasecmp_l.c \
+#  glibc-2.15/string/strcasestr.c \
+#  glibc-2.15/string/strcat.c \
+#  glibc-2.15/string/strchr.c \
+#  glibc-2.15/string/strchrnul.c \
+#  glibc-2.15/string/strcmp.c \
+#  glibc-2.15/string/strcoll.c \
+#  glibc-2.15/string/strcoll_l.c \
+#  glibc-2.15/string/strcpy.c \
+#  glibc-2.15/string/strcspn.c \
+#  glibc-2.15/string/strdup.c \
+#  glibc-2.15/string/strerror.c \
+#  glibc-2.15/string/strerror_l.c \
+#  glibc-2.15/string/strlen.c \
+#  glibc-2.15/string/strerror.c \
+#  glibc-2.15/string/strncase.c \
+#  glibc-2.15/string/strncase_l.c \
+#  glibc-2.15/string/strncat.c \
+#  glibc-2.15/string/strncmp.c \
+#  glibc-2.15/string/strncpy.c \
+#  glibc-2.15/string/strndup.c \
+#  glibc-2.15/string/strnlen.c \
+#  glibc-2.15/string/strpbrk.c \
+#  glibc-2.15/string/strrchr.c \
+#  glibc-2.15/string/strsep.c \
+#  glibc-2.15/string/strspn.c \
+#  glibc-2.15/string/strstr.c \
+#  glibc-2.15/string/strtok.c \
+#  glibc-2.15/string/strtok_r.c \
+#  glibc-2.15/string/wordcopy.c \
+#  glibc-2.15/sysdeps/llamaos/assert.c \
+#  glibc-2.15/sysdeps/llamaos/errno.c \
+#  glibc-2.15/sysdeps/llamaos/flockfile.c \
+#  glibc-2.15/sysdeps/llamaos/funlockfile.c \
+#  glibc-2.15/sysdeps/llamaos/init-first.c \
+#  glibc-2.15/sysdeps/posix/libc_fatal.c \
+#  glibc-2.15/wcsmbs/wcsmbsload.c \
+#  glibc-2.15/wcsmbs/wmemchr.c \
+#  glibc-2.15/wcsmbs/wmemcmp.c \
+#  glibc-2.15/wcsmbs/wmemcpy.c \
+#  glibc-2.15/wcsmbs/wmemmove.c \
+#  glibc-2.15/wcsmbs/wmempcpy.c \
+#  glibc-2.15/wcsmbs/wmemset.c
+
+ASMFLAGS += 
+#  -I ../src
+
+CFLAGS += 
+#  -D_IO_MTSAFE_IO \
+#  -DSYSCONFDIR="" \
+#  -I ../src/glibc-2.15/sysdeps/llamaos \
+#  -I ../src/glibc-2.15/sysdeps/x86_64 \
+#  -I ../src/glibc-2.15/sysdeps/i386 \
+#  -I ../src/glibc-2.15/sysdeps/generic \
+#  -I ../src/glibc-2.15/include \
+#  -I ../src/glibc-2.15/elf \
+#  -I ../src/glibc-2.15/libio \
+#  -I ../src/glibc-2.15/wcsmbs \
+#  -I ../src/glibc-2.15 \
+#  -I ../src/gcc-4.7.1/gcc/ginclude \
+#  -I ../src/gcc-4.7.1/gcc/include-fixed \
+#  -include ../src/glibc-2.15/include/libc-symbols.h \
+#  -include ../src/gcc-4.7.1/gcc/ginclude/stdbool.h
+
+CPPFLAGS += \
+  -I $(SRCDIR)
+
+#  -I ../src/glibc-2.15/sysdeps/llamaos \
+#  -I ../src/glibc-2.15/sysdeps/x86_64 \
+#  -I ../src/glibc-2.15/sysdeps/generic \
+#  -I ../src/glibc-2.15/include \
+#  -I ../src/glibc-2.15/libio \
+#  -I ../src/glibc-2.15 \
+#  -I ../src/gcc-4.7.1/libstdc++-v3/include \
+#  -I ../src/gcc-4.7.1/libstdc++-v3/include/c_global \
+#  -I ../src/gcc-4.7.1/libstdc++-v3/include/std \
+#  -I ../src/gcc-4.7.1/gcc/ginclude \
+#  -I ../src/xen-4.1.2 \
+#  -I ../src \
+#  -include ../src/glibc-2.15/include/libc-symbols.h
+
+LLAMAOS_SOURCES_C = 
 
 LLAMAOS_SOURCES_CPP = \
-  llamaos/xen/kernel.cpp \
-  llamaos/xen/trace.cpp
+  llamaos/xen/kernel.cpp
+#  llamaos/xen/trace.cpp
 
 LLAMAOS_OBJECTS  = $(LLAMAOS_SOURCES_C:%.c=$(OBJDIR)/%.o)
 LLAMAOS_OBJECTS += $(LLAMAOS_SOURCES_CPP:%.cpp=$(OBJDIR)/%.o)

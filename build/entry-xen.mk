@@ -30,6 +30,10 @@
 # contributors.
 #
 
+MAKEFILE_SOURCES += entry-xen.mk
+
+ASMFLAGS += -I $(SRCDIR)
+
 ENTRY_OBJECTS = $(OBJDIR)/llamaos/xen/entry-x86_64.o
 DEPENDS += $(ENTRY_OBJECTS:%.o=%.d)
 
