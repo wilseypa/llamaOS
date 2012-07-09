@@ -33,6 +33,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <cstdio>
 #include <cstring>
 
+#include <llamaos/trace.h>
 #include <llamaos/xen/Hypercall.h>
 
 namespace llamaos {
@@ -45,7 +46,7 @@ int trace (const char *format, ...)
 
    // copy formatted output to buffer
    char buffer [256] = { '\0' };
-   int count = vsnprintf (buffer, sizeof(buffer)-1, format, arg);
+   int count = 0;//vsnprintf (buffer, sizeof(buffer)-1, format, arg);
 
    // term variable arguments
    va_end (arg);
@@ -55,6 +56,12 @@ int trace (const char *format, ...)
 
    // return the number characters written
    return count;
+}
+
+void trace (const std::string &text)
+{
+   // write string to system output/log
+   xen::Hypercall::console_io (text);
 }
 
 }

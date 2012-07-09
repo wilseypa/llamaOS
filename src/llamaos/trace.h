@@ -31,9 +31,13 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #ifndef llamaos_trace_h_
 #define llamaos_trace_h_
 
+#include <string>
+
 namespace llamaos {
 
 int trace (const char *format, ...);
+
+void trace (const std::string &);
 
 }
 

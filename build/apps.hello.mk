@@ -32,8 +32,10 @@
 
 # include common variables
 include common.mk
+
+ifeq ($(MAKECMDGOALS),xen)
 include entry-xen.mk
-include llamaOS-xen.mk
+endif
 
 MAKEFILE_SOURCES += apps.hello.mk
 
@@ -41,7 +43,8 @@ ASMFLAGS +=
 
 CFLAGS += 
 
-CPPFLAGS += 
+CPPFLAGS += \
+  -I $(INCDIR)
 
 VPATH = $(SRCDIR)
 
@@ -51,8 +54,11 @@ SOURCES = \
 OBJECTS = $(SOURCES:%.cpp=$(OBJDIR)/%.o)
 DEPENDS += $(OBJECTS:%.o=%.d)
 
+.PHONY: xen
+xen : $(BINDIR)/xen/hello
+
 # the entry object must be the first object listed here or the guest will crash!
-$(BINDIR)/hello-xen: $(ENTRY_OBJECTS) $(OBJECTS) $(LLAMAOS_OBJECTS)
+$(BINDIR)/xen/hello: $(ENTRY_OBJECTS) $(OBJECTS) $(LIBDIR)/xen/llamaOS.a
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
 	@$(LD) $(LDFLAGS) -T $(ENTRY_LDS) -o $@ $^
@@ -60,18 +66,7 @@ $(BINDIR)/hello-xen: $(ENTRY_OBJECTS) $(OBJECTS) $(LLAMAOS_OBJECTS)
 	@echo successfully built: $@
 	@echo
 
-.PHONY: clean
-clean:
-	@echo removing: $(OBJDIR)
-	@rm -rf $(OBJDIR)
-	@echo removing: $(BINDIR)
-	@rm -rf $(BINDIR)
-	@echo removing: $(LIBDIR)
-	@rm -rf $(LIBDIR)
-
 include rules.mk
 
 # include auto-generated dependencies
-ifneq ($(MAKECMDGOALS),clean)
 -include $(DEPENDS)
-endif

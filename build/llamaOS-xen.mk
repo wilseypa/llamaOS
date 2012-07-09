@@ -165,7 +165,6 @@ MAKEFILE_SOURCES += llamaOS-xen.mk
 #  glibc-2.15/wcsmbs/wmemset.c
 
 ASMFLAGS += 
-#  -I ../src
 
 CFLAGS += 
 #  -D_IO_MTSAFE_IO \
@@ -185,27 +184,40 @@ CFLAGS +=
 #  -include ../src/gcc-4.7.1/gcc/ginclude/stdbool.h
 
 CPPFLAGS += \
-  -I $(SRCDIR)
+  -I $(GLIBCDIR)/include/public \
+  -I $(GCCDIR)/include/public \
+  -I $(XENDIR) \
+  -I $(SRCDIR) \
+  -D__XEN_INTERFACE_VERSION__=0x0003020a
 
-#  -I ../src/glibc-2.15/sysdeps/llamaos \
-#  -I ../src/glibc-2.15/sysdeps/x86_64 \
-#  -I ../src/glibc-2.15/sysdeps/generic \
-#  -I ../src/glibc-2.15/include \
-#  -I ../src/glibc-2.15/libio \
-#  -I ../src/glibc-2.15 \
-#  -I ../src/gcc-4.7.1/libstdc++-v3/include \
-#  -I ../src/gcc-4.7.1/libstdc++-v3/include/c_global \
-#  -I ../src/gcc-4.7.1/libstdc++-v3/include/std \
-#  -I ../src/gcc-4.7.1/gcc/ginclude \
-#  -I ../src/xen-4.1.2 \
-#  -I ../src \
-#  -include ../src/glibc-2.15/include/libc-symbols.h
+#  -I $(GLIBCDIR)/sysdeps/llamaos \
+#  -I $(GLIBCDIR)/sysdeps/x86_64 \
+#  -I $(GLIBCDIR)/sysdeps/x86 \
+#  -I $(GLIBCDIR)/sysdeps/generic \
+#  -I $(GLIBCDIR)/include \
+#  -I $(GLIBCDIR)/libio \
+#  -I $(GLIBCDIR) \
+#  -I $(GCCDIR)/libstdc++-v3/include \
+#  -I $(GCCDIR)/libstdc++-v3/include/c_global \
+#  -I $(GCCDIR)/libstdc++-v3/include/std \
+#  -I $(GCCDIR)/libstdc++-v3/libsupc++ \
+#  -I $(GCCDIR)/gcc/ginclude \
+#  -I $(GCCDIR)/gcc/include-fixed \
+#  -I $(XENDIR) \
+#  -I $(SRCDIR) \
+#  -include $(GLIBCDIR)/include/libc-symbols.h \
+#  -DNOT_IN_libc \
+#  -D__XEN_INTERFACE_VERSION__=0x0003020a
+
+LLAMAOS_SOURCES_ASM = 
 
 LLAMAOS_SOURCES_C = 
 
 LLAMAOS_SOURCES_CPP = \
-  llamaos/xen/kernel.cpp
-#  llamaos/xen/trace.cpp
+  llamaos/xen/Hypercall.cpp \
+  llamaos/xen/kernel.cpp \
+  llamaos/xen/trace.cpp
 
-LLAMAOS_OBJECTS  = $(LLAMAOS_SOURCES_C:%.c=$(OBJDIR)/%.o)
+LLAMAOS_OBJECTS  = $(LLAMAOS_SOURCES_ASM:%.S=$(OBJDIR)/%.o)
+LLAMAOS_OBJECTS += $(LLAMAOS_SOURCES_C:%.c=$(OBJDIR)/%.o)
 LLAMAOS_OBJECTS += $(LLAMAOS_SOURCES_CPP:%.cpp=$(OBJDIR)/%.o)

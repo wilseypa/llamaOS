@@ -33,10 +33,10 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 #include <cstdint>
 
-// #include <xen/xen.h>
-// #include <xen/event_channel.h>
-#include <xen/include/public/xen.h>
-#include <xen/include/public/event_channel.h>
+#include <string>
+
+#include <xen/xen.h>
+#include <xen/event_channel.h>
 
 namespace llamaos {
 namespace xen {
@@ -49,6 +49,23 @@ class Hypercall
 {
 public:
 
+   /**
+    * @brief
+    *
+    * @param string
+    *
+    */
+//   static bool console_io (const char *string);
+
+   /**
+    * @brief
+    *
+    * @param string
+    *
+    */
+   static bool console_io (const std::string &string);
+
+#if 0
    /**
     * @brief
     *
@@ -129,13 +146,6 @@ public:
     */
    static void xen_version (int &major, int &minor);
 
-   /**
-    * @brief
-    *
-    * @param string
-    *
-    */
-   static bool console_io (const char *string);
 
    // llamaOS UNSUPPORTED CALLS
    //   __HYPERVISOR_physdev_op_compat    19 /* compat since 0x00030202 */
@@ -201,6 +211,7 @@ public:
    //   __HYPERVISOR_domctl               36
    //   __HYPERVISOR_kexec_op             37
    //   __HYPERVISOR_tmem_op              38
+#endif
 
 };
 
