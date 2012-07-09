@@ -39,6 +39,8 @@ include glibc-obj-$(GLIBC_VERSION).mk
 MAKEFILE_SOURCES += glibc-$(GLIBC_VERSION).mk
 
 CFLAGS += \
+  -I $(SRCDIR)/gcc-$(GCC_VERSION)/gcc/include-fixed \
+  -I $(SRCDIR)/gcc-$(GCC_VERSION)/gcc/ginclude \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/sysdeps/llamaos \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/sysdeps/x86_64 \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/sysdeps/x86 \
@@ -48,7 +50,6 @@ CFLAGS += \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/sysdeps/generic \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/include \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION) \
-  -I $(SRCDIR)/gcc-$(GCC_VERSION)/gcc/ginclude \
   -include $(SRCDIR)/glibc-$(GLIBC_VERSION)/include/libc-symbols.h
 
 HEADERS = \
@@ -99,6 +100,7 @@ HEADERS = \
   $(INCDIR)/sys/cdefs.h \
   $(INCDIR)/sys/sysmacros.h \
   $(INCDIR)/sys/select.h \
+  $(INCDIR)/sys/syscall.h \
   $(INCDIR)/sys/time.h \
   $(INCDIR)/sys/types.h \
   $(INCDIR)/sys/ucontext.h \
@@ -124,6 +126,7 @@ HEADERS = \
   $(INCDIR)/stdio.h \
   $(INCDIR)/stdlib.h \
   $(INCDIR)/string.h \
+  $(INCDIR)/syscall.h \
   $(INCDIR)/unistd.h \
   $(INCDIR)/time.h \
   $(INCDIR)/wchar.h \

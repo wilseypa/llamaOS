@@ -40,6 +40,7 @@ GCC_SOURCES_C = \
   gcc-$(GCC_VERSION)/libgcc/unwind-dw2.c
 
 GCC_SOURCES_CC = \
+  gcc-$(GCC_VERSION)/libstdc++-v3/libsupc++/array_type_info.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/libsupc++/bad_alloc.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/libsupc++/bad_cast.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/libsupc++/bad_typeid.cc \
@@ -48,16 +49,38 @@ GCC_SOURCES_CC = \
   gcc-$(GCC_VERSION)/libstdc++-v3/libsupc++/del_opnt.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/libsupc++/del_opv.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/libsupc++/del_opvnt.cc \
+  gcc-$(GCC_VERSION)/libstdc++-v3/libsupc++/dyncast.cc \
+  gcc-$(GCC_VERSION)/libstdc++-v3/libsupc++/eh_alloc.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/libsupc++/eh_call.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/libsupc++/eh_catch.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/libsupc++/eh_exception.cc \
+  gcc-$(GCC_VERSION)/libstdc++-v3/libsupc++/eh_globals.cc \
+  gcc-$(GCC_VERSION)/libstdc++-v3/libsupc++/eh_ptr.cc \
+  gcc-$(GCC_VERSION)/libstdc++-v3/libsupc++/eh_term_handler.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/libsupc++/eh_personality.cc \
+  gcc-$(GCC_VERSION)/libstdc++-v3/libsupc++/eh_terminate.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/libsupc++/eh_throw.cc \
+  gcc-$(GCC_VERSION)/libstdc++-v3/libsupc++/eh_tm.cc \
+  gcc-$(GCC_VERSION)/libstdc++-v3/libsupc++/eh_type.cc \
+  gcc-$(GCC_VERSION)/libstdc++-v3/libsupc++/eh_unex_handler.cc \
+  gcc-$(GCC_VERSION)/libstdc++-v3/libsupc++/enum_type_info.cc \
+  gcc-$(GCC_VERSION)/libstdc++-v3/libsupc++/function_type_info.cc \
+  gcc-$(GCC_VERSION)/libstdc++-v3/libsupc++/fundamental_type_info.cc \
+  gcc-$(GCC_VERSION)/libstdc++-v3/libsupc++/hash_bytes.cc \
+  gcc-$(GCC_VERSION)/libstdc++-v3/libsupc++/nested_exception.cc \
+  gcc-$(GCC_VERSION)/libstdc++-v3/libsupc++/new_handler.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/libsupc++/new_op.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/libsupc++/new_opnt.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/libsupc++/new_opv.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/libsupc++/new_opvnt.cc \
+  gcc-$(GCC_VERSION)/libstdc++-v3/libsupc++/pointer_type_info.cc \
+  gcc-$(GCC_VERSION)/libstdc++-v3/libsupc++/pure.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/libsupc++/si_class_type_info.cc \
+  gcc-$(GCC_VERSION)/libstdc++-v3/libsupc++/tinfo.cc \
+  gcc-$(GCC_VERSION)/libstdc++-v3/libsupc++/tinfo2.cc \
+  gcc-$(GCC_VERSION)/libstdc++-v3/libsupc++/vec.cc \
+  gcc-$(GCC_VERSION)/libstdc++-v3/libsupc++/vmi_class_type_info.cc \
+  gcc-$(GCC_VERSION)/libstdc++-v3/libsupc++/vterminate.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++11/chrono.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++11/debug.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++11/fstream-inst.cc \

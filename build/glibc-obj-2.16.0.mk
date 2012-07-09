@@ -36,7 +36,15 @@
 MAKEFILE_SOURCES += glibc-obj-$(GLIBC_VERSION).mk
 
 GLIBC_SOURCES_C = \
+  glibc-$(GLIBC_VERSION)/string/memccpy.c \
+  glibc-$(GLIBC_VERSION)/string/memchr.c \
+  glibc-$(GLIBC_VERSION)/string/memcmp.c \
   glibc-$(GLIBC_VERSION)/string/memcpy.c \
+  glibc-$(GLIBC_VERSION)/string/memmem.c \
+  glibc-$(GLIBC_VERSION)/string/memmove.c \
+  glibc-$(GLIBC_VERSION)/string/mempcpy.c \
+  glibc-$(GLIBC_VERSION)/string/memrchr.c \
+  glibc-$(GLIBC_VERSION)/string/memset.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/abort.c
 
 GLIBC_OBJECTS  = $(GLIBC_SOURCES_C:%.c=$(OBJDIR)/%.o)
