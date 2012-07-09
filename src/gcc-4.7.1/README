@@ -32,4 +32,7 @@ gcc/tconfig.h -> ~/builds/gcc-4.7.1/gcc/tconfig.h
 
 libgcc/md-unwind-support.h -> libgcc/config/i386/linux-unwind.h
 
+libstdc++-v3/include/bits/cxxabi_tweaks.h -> libstdc++-v3/config/cpu/generic/cxxabi_tweaks.h
+libstdc++-v3/include/bits/error_constants.h -> libstdc++-v3/config/os/generic/error_constants.h
+
 

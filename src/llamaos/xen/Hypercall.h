@@ -65,6 +65,14 @@ public:
     */
    static bool console_io (const std::string &string);
 
+   /**
+    * @brief Halt execution of this domain (all VCPUs) and notify the system controller.
+    *
+    * @param reason
+    *
+    */
+   static bool sched_op_shutdown (unsigned int reason = 0);
+
 #if 0
    /**
     * @brief

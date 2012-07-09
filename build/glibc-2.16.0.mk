@@ -43,9 +43,12 @@ CFLAGS += \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/sysdeps/x86_64 \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/sysdeps/x86 \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/sysdeps/i386 \
+  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/sysdeps/ieee754/ldbl-128 \
+  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/sysdeps/ieee754 \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/sysdeps/generic \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/include \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION) \
+  -I $(SRCDIR)/gcc-$(GCC_VERSION)/gcc/ginclude \
   -include $(SRCDIR)/glibc-$(GLIBC_VERSION)/include/libc-symbols.h
 
 HEADERS = \
@@ -55,8 +58,16 @@ HEADERS = \
   $(INCDIR)/bits/endian.h \
   $(INCDIR)/bits/environments.h \
   $(INCDIR)/bits/errno.h \
+  $(INCDIR)/bits/huge_val.h \
+  $(INCDIR)/bits/huge_valf.h \
+  $(INCDIR)/bits/huge_vall.h \
+  $(INCDIR)/bits/inf.h \
   $(INCDIR)/bits/local_lim.h \
   $(INCDIR)/bits/locale.h \
+  $(INCDIR)/bits/mathcalls.h \
+  $(INCDIR)/bits/mathdef.h \
+  $(INCDIR)/bits/mathinline.h \
+  $(INCDIR)/bits/nan.h \
   $(INCDIR)/bits/posix_opt.h \
   $(INCDIR)/bits/posix1_lim.h \
   $(INCDIR)/bits/posix2_lim.h \
@@ -66,6 +77,8 @@ HEADERS = \
   $(INCDIR)/bits/stdio_lim.h \
   $(INCDIR)/bits/sys_errlist.h \
   $(INCDIR)/bits/time.h \
+  $(INCDIR)/bits/sched.h \
+  $(INCDIR)/bits/setjmp.h \
   $(INCDIR)/bits/sigaction.h \
   $(INCDIR)/bits/sigcontext.h \
   $(INCDIR)/bits/siginfo.h \
@@ -86,18 +99,25 @@ HEADERS = \
   $(INCDIR)/sys/cdefs.h \
   $(INCDIR)/sys/sysmacros.h \
   $(INCDIR)/sys/select.h \
+  $(INCDIR)/sys/time.h \
   $(INCDIR)/sys/types.h \
   $(INCDIR)/sys/ucontext.h \
   $(INCDIR)/_G_config.h \
   $(INCDIR)/alloca.h \
+  $(INCDIR)/assert.h \
   $(INCDIR)/ctype.h \
   $(INCDIR)/errno.h \
   $(INCDIR)/endian.h \
   $(INCDIR)/features.h \
   $(INCDIR)/getopt.h \
+  $(INCDIR)/libintl.h \
   $(INCDIR)/libio.h \
   $(INCDIR)/limits.h \
   $(INCDIR)/locale.h \
+  $(INCDIR)/math.h \
+  $(INCDIR)/pthread.h \
+  $(INCDIR)/sched.h \
+  $(INCDIR)/setjmp.h \
   $(INCDIR)/signal.h \
   $(INCDIR)/stdc-predef.h \
   $(INCDIR)/stdint.h \
@@ -108,12 +128,28 @@ HEADERS = \
   $(INCDIR)/time.h \
   $(INCDIR)/wchar.h \
   $(INCDIR)/wctype.h \
-  $(INCDIR)/xlocale.h
+  $(INCDIR)/xlocale.h \
+  include-fixed/limits.h
 
 .PHONY: all
 all : $(GLIBC_OBJECTS) $(HEADERS)
 
 $(INCDIR)/% : $(SRCDIR)/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/%
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo copying: $@ from $<
+	cp $< $@
+
+$(INCDIR)/% : $(SRCDIR)/glibc-$(GLIBC_VERSION)/sysdeps/ieee754/ldbl-128/%
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo copying: $@ from $<
+	cp $< $@
+
+$(INCDIR)/% : $(SRCDIR)/glibc-$(GLIBC_VERSION)/sysdeps/ieee754/%
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo copying: $@ from $<
+	cp $< $@
+
+$(INCDIR)/% : $(SRCDIR)/glibc-$(GLIBC_VERSION)/sysdeps/x86/fpu/%
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo copying: $@ from $<
 	cp $< $@
@@ -133,7 +169,18 @@ $(INCDIR)/% : $(SRCDIR)/glibc-$(GLIBC_VERSION)/sysdeps/generic/%
 	@echo copying: $@ from $<
 	cp $< $@
 
+$(INCDIR)/% : $(SRCDIR)/glibc-$(GLIBC_VERSION)/assert/%
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo copying: $@ from $<
+	cp $< $@
+
+
 $(INCDIR)/% : $(SRCDIR)/glibc-$(GLIBC_VERSION)/ctype/%
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo copying: $@ from $<
+	cp $< $@
+
+$(INCDIR)/% : $(SRCDIR)/glibc-$(GLIBC_VERSION)/intl/%
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo copying: $@ from $<
 	cp $< $@
@@ -148,7 +195,23 @@ $(INCDIR)/% : $(SRCDIR)/glibc-$(GLIBC_VERSION)/locale/%
 	@echo copying: $@ from $<
 	cp $< $@
 
+$(INCDIR)/% : $(SRCDIR)/glibc-$(GLIBC_VERSION)/math/%
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo copying: $@ from $<
+	cp $< $@
+
+
 $(INCDIR)/% : $(SRCDIR)/glibc-$(GLIBC_VERSION)/misc/%
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo copying: $@ from $<
+	cp $< $@
+
+$(INCDIR)/% : $(SRCDIR)/glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS/x86/%
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo copying: $@ from $<
+	cp $< $@
+
+$(INCDIR)/% : $(SRCDIR)/glibc-$(GLIBC_VERSION)/nptl/sysdeps/pthread/%
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo copying: $@ from $<
 	cp $< $@
@@ -158,11 +221,15 @@ $(INCDIR)/% : $(SRCDIR)/glibc-$(GLIBC_VERSION)/posix/%
 	@echo copying: $@ from $<
 	cp $< $@
 
-$(INCDIR)/% : $(SRCDIR)/glibc-$(GLIBC_VERSION)/signal/%
+$(INCDIR)/% : $(SRCDIR)/glibc-$(GLIBC_VERSION)/setjmp/%
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo copying: $@ from $<
 	cp $< $@
 
+$(INCDIR)/% : $(SRCDIR)/glibc-$(GLIBC_VERSION)/signal/%
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo copying: $@ from $<
+	cp $< $@
 
 $(INCDIR)/% : $(SRCDIR)/glibc-$(GLIBC_VERSION)/stdlib/%
 	@[ -d $(@D) ] || (mkdir -p $(@D))
@@ -195,6 +262,11 @@ $(INCDIR)/% : $(SRCDIR)/glibc-$(GLIBC_VERSION)/%
 	cp $< $@
 
 $(INCDIR)/% : $(SRCDIR)/glibc-$(GLIBC_VERSION)/include/%
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo copying: $@ from $<
+	cp $< $@
+
+include-fixed/% : $(SRCDIR)/gcc-$(GCC_VERSION)/gcc/include-fixed/%
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo copying: $@ from $<
 	cp $< $@

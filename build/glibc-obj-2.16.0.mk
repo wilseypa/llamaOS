@@ -30,12 +30,13 @@
 # contributors.
 #
 
-# include common variables
-include common.mk
+# requires this to already be included
+# include common.mk
 
 MAKEFILE_SOURCES += glibc-obj-$(GLIBC_VERSION).mk
 
 GLIBC_SOURCES_C = \
+  glibc-$(GLIBC_VERSION)/string/memcpy.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/abort.c
 
 GLIBC_OBJECTS  = $(GLIBC_SOURCES_C:%.c=$(OBJDIR)/%.o)

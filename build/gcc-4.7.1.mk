@@ -39,15 +39,23 @@ include gcc-obj-$(GCC_VERSION).mk
 MAKEFILE_SOURCES += gcc-$(GCC_VERSION).mk
 
 CFLAGS += \
-  -I $(INCDIR) \
   -I $(SRCDIR)/gcc-$(GCC_VERSION)/gcc \
   -I $(SRCDIR)/gcc-$(GCC_VERSION)/gcc/ginclude \
   -I $(SRCDIR)/gcc-$(GCC_VERSION)/gcc/include \
   -I $(SRCDIR)/gcc-$(GCC_VERSION)/gcc/include-fixed \
   -I $(SRCDIR)/gcc-$(GCC_VERSION)/include \
+  -I $(INCDIR) \
   -DFIRST_PSEUDO_REGISTER=53
 
 CPPFLAGS += \
+  -I $(SRCDIR)/gcc-$(GCC_VERSION)/libstdc++-v3/include/backward \
+  -I $(SRCDIR)/gcc-$(GCC_VERSION)/libstdc++-v3/include/c_global \
+  -I $(SRCDIR)/gcc-$(GCC_VERSION)/libstdc++-v3/include/std \
+  -I $(SRCDIR)/gcc-$(GCC_VERSION)/libstdc++-v3/include \
+  -I $(SRCDIR)/gcc-$(GCC_VERSION)/libstdc++-v3/libsupc++ \
+  -I $(SRCDIR)/gcc-$(GCC_VERSION)/gcc/include-fixed \
+  -I $(SRCDIR)/gcc-$(GCC_VERSION)/gcc/ginclude \
+  -I $(SRCDIR)/gcc-$(GCC_VERSION)/include \
   -I $(INCDIR)
 
 HEADERS = \
@@ -105,6 +113,7 @@ HEADERS = \
   $(INCDIR)/ext/numeric_traits.h \
   $(INCDIR)/ext/string_conversions.h \
   $(INCDIR)/ext/type_traits.h \
+  $(INCDIR)/cassert \
   $(INCDIR)/cctype \
   $(INCDIR)/cerrno \
   $(INCDIR)/clocale \
@@ -146,7 +155,7 @@ HEADERS = \
 #  $(INCDIR)/locale \
 
 .PHONY: all
-all : $(GCC_OBJECTS) $(HEADERS) 
+all : $(GCC_OBJECTS) $(HEADERS)
 
 $(INCDIR)/% : $(SRCDIR)/gcc-$(GCC_VERSION)/libstdc++-v3/include/c_global/%
 	@[ -d $(@D) ] || (mkdir -p $(@D))

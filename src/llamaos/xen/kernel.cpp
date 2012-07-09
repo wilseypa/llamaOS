@@ -35,12 +35,13 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 #include <xen/xen.h>
 
+#include <llamaos/xen/Hypercall.h>
 #include <llamaos/config.h>
 #include <llamaos/trace.h>
 
 using namespace std;
 using namespace llamaos;
-// using namespace llamaos::xen;
+using namespace llamaos::xen;
 
 // runtime stack memory
 char RUNTIME_STACK [2 * llamaos::STACK_SIZE];
@@ -102,5 +103,7 @@ void kernel (start_info_t *start_info)
       argv [1] = nullptr;
 
       main (1, argv);
+
+      Hypercall::sched_op_shutdown ();
    }
 }

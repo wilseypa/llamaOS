@@ -39,6 +39,7 @@ HEADERS = \
   $(INCDIR)/xen/arch-x86/xen-x86_64.h \
   $(INCDIR)/xen/arch-x86/xen.h \
   $(INCDIR)/xen/event_channel.h \
+  $(INCDIR)/xen/sched.h \
   $(INCDIR)/xen/xen-compat.h \
   $(INCDIR)/xen/xen.h
 

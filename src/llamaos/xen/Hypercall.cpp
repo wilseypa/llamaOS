@@ -35,14 +35,14 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #error __XEN_INTERFACE_VERSION__ not defined!!!
 #endif
 
-//#include <xen/include/public/xen.h>
+#include <xen/xen.h>
 //#include <xen/include/public/grant_table.h>
-//#include <xen/include/public/sched.h>
+#include <xen/sched.h>
 //#include <xen/include/public/version.h>
 
 #include <llamaos/xen/Hypercall.h>
 #include <llamaos/config.h>
-//#include <llamaos/trace.h>
+#include <llamaos/trace.h>
 
 using namespace llamaos;
 using namespace llamaos::xen;
@@ -187,6 +187,22 @@ bool Hypercall::console_io (const std::string &string)
                            reinterpret_cast<uint64_t>(string.c_str ())))
    {
       // probably nothing can be done here since trace would just recall this
+      return false;
+   }
+
+   return true;
+}
+
+bool Hypercall::sched_op_shutdown (unsigned int reason)
+{
+   sched_shutdown_t arg;
+   arg.reason = reason;
+
+   if (0 != hypercall<int>(__HYPERVISOR_sched_op,
+                           SCHEDOP_shutdown,
+			   reinterpret_cast<uint64_t>(&arg)))
+   {
+      trace ("HYPERVISOR_sched_op (SCHEDOP_shutdown, reason: %u) FAILED\n", reason);
       return false;
    }
 
