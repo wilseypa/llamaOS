@@ -33,7 +33,20 @@
 # include common variables
 include common.mk
 
+# include the glibc object list
+include glibc-obj-$(GLIBC_VERSION).mk
+
 MAKEFILE_SOURCES += glibc-$(GLIBC_VERSION).mk
+
+CFLAGS += \
+  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/sysdeps/llamaos \
+  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/sysdeps/x86_64 \
+  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/sysdeps/x86 \
+  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/sysdeps/i386 \
+  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/sysdeps/generic \
+  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/include \
+  -I $(SRCDIR)/glibc-$(GLIBC_VERSION) \
+  -include $(SRCDIR)/glibc-$(GLIBC_VERSION)/include/libc-symbols.h
 
 HEADERS = \
   $(INCDIR)/bits/byteswap.h \
@@ -185,3 +198,5 @@ $(INCDIR)/% : $(SRCDIR)/glibc-$(GLIBC_VERSION)/include/%
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo copying: $@ from $<
 	cp $< $@
+
+include rules.mk

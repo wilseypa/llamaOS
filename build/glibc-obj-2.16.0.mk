@@ -35,3 +35,7 @@ include common.mk
 
 MAKEFILE_SOURCES += glibc-obj-$(GLIBC_VERSION).mk
 
+GLIBC_SOURCES_C = \
+  glibc-$(GLIBC_VERSION)/sysdeps/llamaos/abort.c
+
+GLIBC_OBJECTS  = $(GLIBC_SOURCES_C:%.c=$(OBJDIR)/%.o)

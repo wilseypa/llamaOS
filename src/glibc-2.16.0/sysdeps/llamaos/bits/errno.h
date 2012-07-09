@@ -36,5 +36,6 @@
 // # error "must match the numbers of the kernel."
 // # define Exxxx	XXX
 
+#define ENOSYS 0
 
 #endif

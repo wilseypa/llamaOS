@@ -174,7 +174,3 @@ $(INCDIR)/% : $(SRCDIR)/gcc-$(GCC_VERSION)/libstdc++-v3/include/%
 	cp $< $@
 
 include rules.mk
-
-# include auto-generated dependencies
-DEPENDS = $(GCC_OBJECTS:%.o=%.d)
--include $(DEPENDS)
