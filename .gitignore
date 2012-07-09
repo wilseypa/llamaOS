@@ -1,6 +1,10 @@
 
 # Generated binaries and dependency files #
 ###########################################
+build/bin/
+build/include/
+build/lib/
+build/obj/
 bin/
 lib/
 obj/
