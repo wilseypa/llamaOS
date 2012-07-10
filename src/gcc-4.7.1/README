@@ -35,4 +35,19 @@ libgcc/md-unwind-support.h -> libgcc/config/i386/linux-unwind.h
 libstdc++-v3/include/bits/cxxabi_tweaks.h -> libstdc++-v3/config/cpu/generic/cxxabi_tweaks.h
 libstdc++-v3/include/bits/error_constants.h -> libstdc++-v3/config/os/generic/error_constants.h
 
+atomicity.cc -> /usr/src/gcc-4.7.1/libstdc++-v3/config/cpu/generic/atomicity_builtins/atomicity.h
+basic_file.cc -> /usr/src/gcc-4.7.1/libstdc++-v3/config/io/basic_file_stdio.cc
+c++locale.cc -> /usr/src/gcc-4.7.1/libstdc++-v3/config/locale/generic/c_locale.cc
+codecvt_members.cc -> /usr/src/gcc-4.7.1/libstdc++-v3/config/locale/generic/codecvt_members.cc
+collate_members.cc -> /usr/src/gcc-4.7.1/libstdc++-v3/config/locale/generic/collate_members.cc
+ctype_configure_char.cc -> /usr/src/gcc-4.7.1/libstdc++-v3/config/os/generic/ctype_configure_char.cc
+ctype_members.cc -> /usr/src/gcc-4.7.1/libstdc++-v3/config/locale/generic/ctype_members.cc
+messages_members.cc -> /usr/src/gcc-4.7.1/libstdc++-v3/config/locale/generic/messages_members.cc
+monetary_members.cc -> /usr/src/gcc-4.7.1/libstdc++-v3/config/locale/generic/monetary_members.cc
+numeric_members.cc -> /usr/src/gcc-4.7.1/libstdc++-v3/config/locale/generic/numeric_members.cc
+time_members.cc -> /usr/src/gcc-4.7.1/libstdc++-v3/config/locale/generic/time_members.cc
+
+
+
+
 

@@ -94,12 +94,19 @@ GCC_SOURCES_CC = \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++11/string-inst.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++11/system_error.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++11/wstring-inst.cc \
+  gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/atomicity.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/allocator-inst.cc \
+  gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/basic_file.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/bitmap_allocator.cc \
+  gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/c++locale.cc \
+  gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/codecvt_members.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/codecvt.cc \
+  gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/collate_members.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/compatibility-ldbl.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/complex_io.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/concept-inst.cc \
+  gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/ctype_configure_char.cc \
+  gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/ctype_members.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/ctype.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/ext-inst.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/globals_io.cc \
@@ -117,13 +124,17 @@ GCC_SOURCES_CC = \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/locale_facets.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/locale_init.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/localename.cc \
+  gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/messages_members.cc \
+  gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/monetary_members.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/misc-inst.cc \
+  gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/numeric_members.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/ostream-inst.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/sstream-inst.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/stdexcept.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/streambuf-inst.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/streambuf.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/strstream.cc \
+  gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/time_members.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/tree.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/valarray.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/locale-inst.cc

@@ -53,15 +53,18 @@ CFLAGS += \
   -include $(SRCDIR)/glibc-$(GLIBC_VERSION)/include/libc-symbols.h
 
 HEADERS = \
+  $(INCDIR)/bits/confname.h \
   $(INCDIR)/bits/byteswap.h \
   $(INCDIR)/bits/byteswap-16.h \
-  $(INCDIR)/bits/confname.h \
   $(INCDIR)/bits/endian.h \
   $(INCDIR)/bits/environments.h \
   $(INCDIR)/bits/errno.h \
+  $(INCDIR)/bits/fcntl.h \
   $(INCDIR)/bits/huge_val.h \
   $(INCDIR)/bits/huge_valf.h \
   $(INCDIR)/bits/huge_vall.h \
+  $(INCDIR)/bits/ioctl-types.h \
+  $(INCDIR)/bits/ioctls.h \
   $(INCDIR)/bits/inf.h \
   $(INCDIR)/bits/local_lim.h \
   $(INCDIR)/bits/locale.h \
@@ -69,47 +72,56 @@ HEADERS = \
   $(INCDIR)/bits/mathdef.h \
   $(INCDIR)/bits/mathinline.h \
   $(INCDIR)/bits/nan.h \
+  $(INCDIR)/bits/poll.h \
   $(INCDIR)/bits/posix_opt.h \
   $(INCDIR)/bits/posix1_lim.h \
   $(INCDIR)/bits/posix2_lim.h \
   $(INCDIR)/bits/pthreadtypes.h \
-  $(INCDIR)/bits/select.h \
-  $(INCDIR)/bits/sigset.h \
-  $(INCDIR)/bits/stdio_lim.h \
-  $(INCDIR)/bits/sys_errlist.h \
-  $(INCDIR)/bits/time.h \
   $(INCDIR)/bits/sched.h \
+  $(INCDIR)/bits/select.h \
+  $(INCDIR)/bits/stdio_lim.h \
   $(INCDIR)/bits/setjmp.h \
   $(INCDIR)/bits/sigaction.h \
   $(INCDIR)/bits/sigcontext.h \
   $(INCDIR)/bits/siginfo.h \
   $(INCDIR)/bits/signum.h \
+  $(INCDIR)/bits/sigset.h \
   $(INCDIR)/bits/sigstack.h \
   $(INCDIR)/bits/sigthread.h \
+  $(INCDIR)/bits/stat.h \
   $(INCDIR)/bits/stdio.h \
   $(INCDIR)/bits/string.h \
   $(INCDIR)/bits/string2.h \
+  $(INCDIR)/bits/sys_errlist.h \
+  $(INCDIR)/bits/time.h \
   $(INCDIR)/bits/types.h \
   $(INCDIR)/bits/typesizes.h \
+  $(INCDIR)/bits/uio.h \
   $(INCDIR)/bits/waitflags.h \
   $(INCDIR)/bits/waitstatus.h \
-  $(INCDIR)/bits/wordsize.h \
   $(INCDIR)/bits/wchar.h \
+  $(INCDIR)/bits/wordsize.h \
   $(INCDIR)/bits/xopen_lim.h \
   $(INCDIR)/gnu/stubs.h \
   $(INCDIR)/sys/cdefs.h \
+  $(INCDIR)/sys/ioctl.h \
+  $(INCDIR)/sys/poll.h \
   $(INCDIR)/sys/sysmacros.h \
   $(INCDIR)/sys/select.h \
+  $(INCDIR)/sys/stat.h \
   $(INCDIR)/sys/syscall.h \
   $(INCDIR)/sys/time.h \
+  $(INCDIR)/sys/ttydefaults.h \
   $(INCDIR)/sys/types.h \
   $(INCDIR)/sys/ucontext.h \
+  $(INCDIR)/sys/uio.h \
   $(INCDIR)/_G_config.h \
   $(INCDIR)/alloca.h \
   $(INCDIR)/assert.h \
   $(INCDIR)/ctype.h \
   $(INCDIR)/errno.h \
   $(INCDIR)/endian.h \
+  $(INCDIR)/fcntl.h \
   $(INCDIR)/features.h \
   $(INCDIR)/getopt.h \
   $(INCDIR)/libintl.h \
@@ -117,6 +129,7 @@ HEADERS = \
   $(INCDIR)/limits.h \
   $(INCDIR)/locale.h \
   $(INCDIR)/math.h \
+  $(INCDIR)/poll.h \
   $(INCDIR)/pthread.h \
   $(INCDIR)/sched.h \
   $(INCDIR)/setjmp.h \
@@ -177,8 +190,12 @@ $(INCDIR)/% : $(SRCDIR)/glibc-$(GLIBC_VERSION)/assert/%
 	@echo copying: $@ from $<
 	cp $< $@
 
-
 $(INCDIR)/% : $(SRCDIR)/glibc-$(GLIBC_VERSION)/ctype/%
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo copying: $@ from $<
+	cp $< $@
+
+$(INCDIR)/% : $(SRCDIR)/glibc-$(GLIBC_VERSION)/io/%
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo copying: $@ from $<
 	cp $< $@
@@ -202,7 +219,6 @@ $(INCDIR)/% : $(SRCDIR)/glibc-$(GLIBC_VERSION)/math/%
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo copying: $@ from $<
 	cp $< $@
-
 
 $(INCDIR)/% : $(SRCDIR)/glibc-$(GLIBC_VERSION)/misc/%
 	@[ -d $(@D) ] || (mkdir -p $(@D))
@@ -264,7 +280,32 @@ $(INCDIR)/% : $(SRCDIR)/glibc-$(GLIBC_VERSION)/%
 	@echo copying: $@ from $<
 	cp $< $@
 
-$(INCDIR)/% : $(SRCDIR)/glibc-$(GLIBC_VERSION)/include/%
+#$(INCDIR)/% : $(SRCDIR)/glibc-$(GLIBC_VERSION)/include/%
+#	@[ -d $(@D) ] || (mkdir -p $(@D))
+#	@echo copying: $@ from $<
+#	cp $< $@
+
+$(INCDIR)/bits/xopen_lim.h : $(SRCDIR)/glibc-$(GLIBC_VERSION)/include/bits/xopen_lim.h
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo copying: $@ from $<
+	cp $< $@
+
+$(INCDIR)/gnu/stubs.h : $(SRCDIR)/glibc-$(GLIBC_VERSION)/include/gnu/stubs.h
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo copying: $@ from $<
+	cp $< $@
+
+$(INCDIR)/features.h : $(SRCDIR)/glibc-$(GLIBC_VERSION)/include/features.h
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo copying: $@ from $<
+	cp $< $@
+
+$(INCDIR)/limits.h : $(SRCDIR)/glibc-$(GLIBC_VERSION)/include/limits.h
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo copying: $@ from $<
+	cp $< $@
+
+$(INCDIR)/stdc-predef.h : $(SRCDIR)/glibc-$(GLIBC_VERSION)/include/stdc-predef.h
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo copying: $@ from $<
 	cp $< $@
