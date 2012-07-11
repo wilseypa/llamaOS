@@ -335,7 +335,8 @@ ASMFLAGS = $(XFLAGS)
 
 CFLAGS = $(XFLAGS) \
   -std=gnu11 \
-  -nostdinc
+  -nostdinc \
+  -std=gnu99 -fgnu89-inline
 #  -ffreestanding
 #  -std=gnu99 -fgnu89-inline
 

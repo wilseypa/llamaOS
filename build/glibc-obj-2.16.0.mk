@@ -36,6 +36,8 @@
 MAKEFILE_SOURCES += glibc-obj-$(GLIBC_VERSION).mk
 
 GLIBC_SOURCES_C = \
+  glibc-$(GLIBC_VERSION)/libio/stdio.c \
+  glibc-$(GLIBC_VERSION)/nptl/pthread_once.c \
   glibc-$(GLIBC_VERSION)/string/memccpy.c \
   glibc-$(GLIBC_VERSION)/string/memchr.c \
   glibc-$(GLIBC_VERSION)/string/memcmp.c \

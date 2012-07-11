@@ -41,6 +41,13 @@ MAKEFILE_SOURCES += glibc-$(GLIBC_VERSION).mk
 CFLAGS += \
   -I $(SRCDIR)/gcc-$(GCC_VERSION)/gcc/include-fixed \
   -I $(SRCDIR)/gcc-$(GCC_VERSION)/gcc/ginclude \
+  -I $(SRCDIR)/gcc-$(GCC_VERSION)/gcc/include \
+  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS/x86_64 \
+  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS/x86 \
+  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS \
+  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/nptl/sysdeps/x86_64 \
+  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/nptl/sysdeps/pthread \
+  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/nptl \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/sysdeps/llamaos \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/sysdeps/x86_64 \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/sysdeps/x86 \
@@ -49,6 +56,7 @@ CFLAGS += \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/sysdeps/ieee754 \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/sysdeps/generic \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/include \
+  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/libio \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION) \
   -include $(SRCDIR)/glibc-$(GLIBC_VERSION)/include/libc-symbols.h
 
@@ -132,6 +140,7 @@ HEADERS = \
   $(INCDIR)/math.h \
   $(INCDIR)/poll.h \
   $(INCDIR)/pthread.h \
+  $(INCDIR)/resolv.h \
   $(INCDIR)/sched.h \
   $(INCDIR)/setjmp.h \
   $(INCDIR)/signal.h \
@@ -237,6 +246,11 @@ $(INCDIR)/% : $(SRCDIR)/glibc-$(GLIBC_VERSION)/nptl/sysdeps/pthread/%
 	cp $< $@
 
 $(INCDIR)/% : $(SRCDIR)/glibc-$(GLIBC_VERSION)/posix/%
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo copying: $@ from $<
+	cp $< $@
+
+$(INCDIR)/% : $(SRCDIR)/glibc-$(GLIBC_VERSION)/resolv/%
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo copying: $@ from $<
 	cp $< $@
