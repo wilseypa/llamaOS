@@ -110,6 +110,7 @@ HEADERS = \
   $(INCDIR)/sys/select.h \
   $(INCDIR)/sys/stat.h \
   $(INCDIR)/sys/syscall.h \
+  $(INCDIR)/sys/sysinfo.h \
   $(INCDIR)/sys/time.h \
   $(INCDIR)/sys/ttydefaults.h \
   $(INCDIR)/sys/types.h \

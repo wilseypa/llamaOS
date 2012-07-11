@@ -40,11 +40,18 @@ GLIBC_SOURCES_C = \
   glibc-$(GLIBC_VERSION)/string/memchr.c \
   glibc-$(GLIBC_VERSION)/string/memcmp.c \
   glibc-$(GLIBC_VERSION)/string/memcpy.c \
+  glibc-$(GLIBC_VERSION)/string/memfrob.c \
   glibc-$(GLIBC_VERSION)/string/memmem.c \
   glibc-$(GLIBC_VERSION)/string/memmove.c \
   glibc-$(GLIBC_VERSION)/string/mempcpy.c \
   glibc-$(GLIBC_VERSION)/string/memrchr.c \
   glibc-$(GLIBC_VERSION)/string/memset.c \
-  glibc-$(GLIBC_VERSION)/sysdeps/llamaos/abort.c
+  glibc-$(GLIBC_VERSION)/sysdeps/llamaos/abort.c \
+  glibc-$(GLIBC_VERSION)/wcsmbs/wmemchr.c \
+  glibc-$(GLIBC_VERSION)/wcsmbs/wmemcmp.c \
+  glibc-$(GLIBC_VERSION)/wcsmbs/wmemcpy.c \
+  glibc-$(GLIBC_VERSION)/wcsmbs/wmemmove.c \
+  glibc-$(GLIBC_VERSION)/wcsmbs/wmempcpy.c \
+  glibc-$(GLIBC_VERSION)/wcsmbs/wmemset.c
 
 GLIBC_OBJECTS  = $(GLIBC_SOURCES_C:%.c=$(OBJDIR)/%.o)
