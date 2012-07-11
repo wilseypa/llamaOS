@@ -37,6 +37,7 @@ MAKEFILE_SOURCES += glibc-obj-$(GLIBC_VERSION).mk
 
 GLIBC_SOURCES_C = \
   glibc-$(GLIBC_VERSION)/libio/stdio.c \
+  glibc-$(GLIBC_VERSION)/locale/setlocale.c \
   glibc-$(GLIBC_VERSION)/nptl/pthread_once.c \
   glibc-$(GLIBC_VERSION)/string/memccpy.c \
   glibc-$(GLIBC_VERSION)/string/memchr.c \
@@ -48,6 +49,36 @@ GLIBC_SOURCES_C = \
   glibc-$(GLIBC_VERSION)/string/mempcpy.c \
   glibc-$(GLIBC_VERSION)/string/memrchr.c \
   glibc-$(GLIBC_VERSION)/string/memset.c \
+  glibc-$(GLIBC_VERSION)/string/stpcpy.c \
+  glibc-$(GLIBC_VERSION)/string/stpncpy.c \
+  glibc-$(GLIBC_VERSION)/string/strcasecmp.c \
+  glibc-$(GLIBC_VERSION)/string/strcasecmp_l.c \
+  glibc-$(GLIBC_VERSION)/string/strcasestr.c \
+  glibc-$(GLIBC_VERSION)/string/strcat.c \
+  glibc-$(GLIBC_VERSION)/string/strchr.c \
+  glibc-$(GLIBC_VERSION)/string/strchrnul.c \
+  glibc-$(GLIBC_VERSION)/string/strcmp.c \
+  glibc-$(GLIBC_VERSION)/string/strcoll.c \
+  glibc-$(GLIBC_VERSION)/string/strcoll_l.c \
+  glibc-$(GLIBC_VERSION)/string/strcpy.c \
+  glibc-$(GLIBC_VERSION)/string/strcspn.c \
+  glibc-$(GLIBC_VERSION)/string/strdup.c \
+  glibc-$(GLIBC_VERSION)/string/strfry.c \
+  glibc-$(GLIBC_VERSION)/string/strlen.c \
+  glibc-$(GLIBC_VERSION)/string/strncase.c \
+  glibc-$(GLIBC_VERSION)/string/strncase_l.c \
+  glibc-$(GLIBC_VERSION)/string/strncat.c \
+  glibc-$(GLIBC_VERSION)/string/strncmp.c \
+  glibc-$(GLIBC_VERSION)/string/strncpy.c \
+  glibc-$(GLIBC_VERSION)/string/strndup.c \
+  glibc-$(GLIBC_VERSION)/string/strnlen.c \
+  glibc-$(GLIBC_VERSION)/string/strpbrk.c \
+  glibc-$(GLIBC_VERSION)/string/strrchr.c \
+  glibc-$(GLIBC_VERSION)/string/strsep.c \
+  glibc-$(GLIBC_VERSION)/string/strspn.c \
+  glibc-$(GLIBC_VERSION)/string/strstr.c \
+  glibc-$(GLIBC_VERSION)/string/strtok.c \
+  glibc-$(GLIBC_VERSION)/string/strtok_r.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/abort.c \
   glibc-$(GLIBC_VERSION)/wcsmbs/wmemchr.c \
   glibc-$(GLIBC_VERSION)/wcsmbs/wmemcmp.c \
