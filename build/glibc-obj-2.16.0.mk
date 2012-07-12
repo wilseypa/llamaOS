@@ -36,7 +36,10 @@
 MAKEFILE_SOURCES += glibc-obj-$(GLIBC_VERSION).mk
 
 GLIBC_SOURCES_C = \
+  glibc-$(GLIBC_VERSION)/ctype/ctype-info.c \
+  glibc-$(GLIBC_VERSION)/ctype/ctype.c \
   glibc-$(GLIBC_VERSION)/libio/stdio.c \
+  glibc-$(GLIBC_VERSION)/libio/vsnprintf.c \
   glibc-$(GLIBC_VERSION)/locale/setlocale.c \
   glibc-$(GLIBC_VERSION)/nptl/pthread_once.c \
   glibc-$(GLIBC_VERSION)/string/memccpy.c \
@@ -80,11 +83,13 @@ GLIBC_SOURCES_C = \
   glibc-$(GLIBC_VERSION)/string/strtok.c \
   glibc-$(GLIBC_VERSION)/string/strtok_r.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/abort.c \
+  glibc-$(GLIBC_VERSION)/sysdeps/llamaos/init-first.c \
   glibc-$(GLIBC_VERSION)/wcsmbs/wmemchr.c \
   glibc-$(GLIBC_VERSION)/wcsmbs/wmemcmp.c \
   glibc-$(GLIBC_VERSION)/wcsmbs/wmemcpy.c \
   glibc-$(GLIBC_VERSION)/wcsmbs/wmemmove.c \
   glibc-$(GLIBC_VERSION)/wcsmbs/wmempcpy.c \
-  glibc-$(GLIBC_VERSION)/wcsmbs/wmemset.c
+  glibc-$(GLIBC_VERSION)/wcsmbs/wmemset.c \
+  glibc-$(GLIBC_VERSION)/wctype/wctype.c
 
 GLIBC_OBJECTS  = $(GLIBC_SOURCES_C:%.c=$(OBJDIR)/%.o)

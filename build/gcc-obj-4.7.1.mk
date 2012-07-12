@@ -67,6 +67,8 @@ GCC_SOURCES_CC = \
   gcc-$(GCC_VERSION)/libstdc++-v3/libsupc++/enum_type_info.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/libsupc++/function_type_info.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/libsupc++/fundamental_type_info.cc \
+  gcc-$(GCC_VERSION)/libstdc++-v3/libsupc++/guard.cc \
+  gcc-$(GCC_VERSION)/libstdc++-v3/libsupc++/guard_error.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/libsupc++/hash_bytes.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/libsupc++/nested_exception.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/libsupc++/new_handler.cc \
@@ -108,7 +110,13 @@ GCC_SOURCES_CC = \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/codecvt_members.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/codecvt.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/collate_members.cc \
+  gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/compatibility-debug_list-2.cc \
+  gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/compatibility-debug_list.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/compatibility-ldbl.cc \
+  gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/compatibility-list-2.cc \
+  gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/compatibility-list.cc \
+  gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/compatibility-parallel_list-2.cc \
+  gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/compatibility-parallel_list.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/compatibility.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/complex_io.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/concept-inst.cc \
@@ -147,7 +155,7 @@ GCC_SOURCES_CC = \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/time_members.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/tree.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/valarray.cc \
-  gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/locale-inst.cc
+  gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/wlocale-inst.cc
 
 GCC_OBJECTS  = $(GCC_SOURCES_C:%.c=$(OBJDIR)/%.o)
 GCC_OBJECTS += $(GCC_SOURCES_CC:%.cc=$(OBJDIR)/%.o)
