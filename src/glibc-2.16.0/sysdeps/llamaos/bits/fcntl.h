@@ -6,6 +6,7 @@
 
 // #include_next<bits/fcntl.h>
 
+#define O_RDONLY         0
 // #define O_LARGEFILE 0
 
 // #define __ASSUME_O_CLOEXEC

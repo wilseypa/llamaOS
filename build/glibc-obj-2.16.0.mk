@@ -55,7 +55,21 @@ GLIBC_SOURCES_C = \
   glibc-$(GLIBC_VERSION)/libio/stdfiles.c \
   glibc-$(GLIBC_VERSION)/libio/stdio.c \
   glibc-$(GLIBC_VERSION)/libio/vsnprintf.c \
+  glibc-$(GLIBC_VERSION)/locale/C-address.c \
+  glibc-$(GLIBC_VERSION)/locale/C-collate.c \
+  glibc-$(GLIBC_VERSION)/locale/C-ctype.c \
+  glibc-$(GLIBC_VERSION)/locale/C-identification.c \
+  glibc-$(GLIBC_VERSION)/locale/C-measurement.c \
+  glibc-$(GLIBC_VERSION)/locale/C-messages.c \
+  glibc-$(GLIBC_VERSION)/locale/C-monetary.c \
+  glibc-$(GLIBC_VERSION)/locale/C-name.c \
+  glibc-$(GLIBC_VERSION)/locale/C-numeric.c \
+  glibc-$(GLIBC_VERSION)/locale/C-paper.c \
+  glibc-$(GLIBC_VERSION)/locale/C-telephone.c \
+  glibc-$(GLIBC_VERSION)/locale/C-time.c \
   glibc-$(GLIBC_VERSION)/locale/setlocale.c \
+  glibc-$(GLIBC_VERSION)/locale/uselocale.c \
+  glibc-$(GLIBC_VERSION)/nptl/nptl-init.c \
   glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS/pthread_mutex_condition_lock.c \
   glibc-$(GLIBC_VERSION)/nptl/pthread_mutex_lock.c \
   glibc-$(GLIBC_VERSION)/nptl/pthread_mutex_unlock.c \
