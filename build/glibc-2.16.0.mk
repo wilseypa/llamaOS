@@ -48,6 +48,7 @@ CFLAGS += \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/nptl/sysdeps/x86_64 \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/nptl/sysdeps/pthread \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/nptl \
+  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/x86_64 \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/sysdeps/llamaos \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/sysdeps/x86_64 \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/sysdeps/x86 \
@@ -61,6 +62,9 @@ CFLAGS += \
   -include $(SRCDIR)/glibc-$(GLIBC_VERSION)/include/libc-symbols.h
 
 HEADERS = \
+  $(INCDIR)/asm/unistd.h \
+  $(INCDIR)/asm/unistd_32.h \
+  $(INCDIR)/asm/unistd_64.h \
   $(INCDIR)/bits/confname.h \
   $(INCDIR)/bits/byteswap.h \
   $(INCDIR)/bits/byteswap-16.h \
@@ -101,6 +105,7 @@ HEADERS = \
   $(INCDIR)/bits/string.h \
   $(INCDIR)/bits/string2.h \
   $(INCDIR)/bits/sys_errlist.h \
+  $(INCDIR)/bits/syscall.h \
   $(INCDIR)/bits/time.h \
   $(INCDIR)/bits/types.h \
   $(INCDIR)/bits/typesizes.h \
@@ -299,6 +304,11 @@ $(INCDIR)/% : $(SRCDIR)/glibc-$(GLIBC_VERSION)/%
 #	@[ -d $(@D) ] || (mkdir -p $(@D))
 #	@echo copying: $@ from $<
 #	cp $< $@
+
+$(INCDIR)/asm/% : $(SRCDIR)/glibc-$(GLIBC_VERSION)/include/asm/%
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo copying: $@ from $<
+	cp $< $@
 
 $(INCDIR)/bits/xopen_lim.h : $(SRCDIR)/glibc-$(GLIBC_VERSION)/include/bits/xopen_lim.h
 	@[ -d $(@D) ] || (mkdir -p $(@D))

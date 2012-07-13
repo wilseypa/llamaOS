@@ -38,9 +38,18 @@ MAKEFILE_SOURCES += glibc-obj-$(GLIBC_VERSION).mk
 GLIBC_SOURCES_C = \
   glibc-$(GLIBC_VERSION)/ctype/ctype-info.c \
   glibc-$(GLIBC_VERSION)/ctype/ctype.c \
+  glibc-$(GLIBC_VERSION)/libio/fseek.c \
+  glibc-$(GLIBC_VERSION)/libio/fseeko.c \
+  glibc-$(GLIBC_VERSION)/libio/fseeko64.c \
+  glibc-$(GLIBC_VERSION)/libio/ftello.c \
+  glibc-$(GLIBC_VERSION)/libio/ftello64.c \
+  glibc-$(GLIBC_VERSION)/libio/iofflush.c \
   glibc-$(GLIBC_VERSION)/libio/stdio.c \
   glibc-$(GLIBC_VERSION)/libio/vsnprintf.c \
   glibc-$(GLIBC_VERSION)/locale/setlocale.c \
+  glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS/pthread_mutex_condition_lock.c \
+  glibc-$(GLIBC_VERSION)/nptl/pthread_mutex_lock.c \
+  glibc-$(GLIBC_VERSION)/nptl/pthread_mutex_unlock.c \
   glibc-$(GLIBC_VERSION)/nptl/pthread_once.c \
   glibc-$(GLIBC_VERSION)/string/memccpy.c \
   glibc-$(GLIBC_VERSION)/string/memchr.c \
