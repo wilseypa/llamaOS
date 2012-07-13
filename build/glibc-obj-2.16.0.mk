@@ -43,7 +43,16 @@ GLIBC_SOURCES_C = \
   glibc-$(GLIBC_VERSION)/libio/fseeko64.c \
   glibc-$(GLIBC_VERSION)/libio/ftello.c \
   glibc-$(GLIBC_VERSION)/libio/ftello64.c \
+  glibc-$(GLIBC_VERSION)/libio/getc.c \
+  glibc-$(GLIBC_VERSION)/libio/getwc.c \
   glibc-$(GLIBC_VERSION)/libio/iofflush.c \
+  glibc-$(GLIBC_VERSION)/libio/iofread.c \
+  glibc-$(GLIBC_VERSION)/libio/iofwrite.c \
+  glibc-$(GLIBC_VERSION)/libio/ioungetc.c \
+  glibc-$(GLIBC_VERSION)/libio/ioungetwc.c \
+  glibc-$(GLIBC_VERSION)/libio/putc.c \
+  glibc-$(GLIBC_VERSION)/libio/putwc.c \
+  glibc-$(GLIBC_VERSION)/libio/stdfiles.c \
   glibc-$(GLIBC_VERSION)/libio/stdio.c \
   glibc-$(GLIBC_VERSION)/libio/vsnprintf.c \
   glibc-$(GLIBC_VERSION)/locale/setlocale.c \
@@ -92,7 +101,11 @@ GLIBC_SOURCES_C = \
   glibc-$(GLIBC_VERSION)/string/strtok.c \
   glibc-$(GLIBC_VERSION)/string/strtok_r.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/abort.c \
+  glibc-$(GLIBC_VERSION)/sysdeps/llamaos/errno.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/init-first.c \
+  glibc-$(GLIBC_VERSION)/time/strftime.c \
+  glibc-$(GLIBC_VERSION)/time/wcsftime.c \
+  glibc-$(GLIBC_VERSION)/wcsmbs/wcslen.c \
   glibc-$(GLIBC_VERSION)/wcsmbs/wmemchr.c \
   glibc-$(GLIBC_VERSION)/wcsmbs/wmemcmp.c \
   glibc-$(GLIBC_VERSION)/wcsmbs/wmemcpy.c \

@@ -39,6 +39,8 @@ include glibc-obj-$(GLIBC_VERSION).mk
 MAKEFILE_SOURCES += glibc-$(GLIBC_VERSION).mk
 
 CFLAGS += \
+  -D__EXCEPTIONS \
+  -D_IO_MTSAFE_IO \
   -I $(SRCDIR)/gcc-$(GCC_VERSION)/gcc/include-fixed \
   -I $(SRCDIR)/gcc-$(GCC_VERSION)/gcc/ginclude \
   -I $(SRCDIR)/gcc-$(GCC_VERSION)/gcc/include \
