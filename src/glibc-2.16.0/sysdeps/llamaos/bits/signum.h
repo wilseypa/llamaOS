@@ -69,4 +69,7 @@
 
 #define __SIGRTMIN     32
 
+// !BAM
+#define SIGPROF 0
+
 #endif  // llamaos_signum_h

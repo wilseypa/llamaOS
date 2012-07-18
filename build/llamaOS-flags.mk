@@ -327,8 +327,9 @@ LD = /opt/gcc-4.7.1/bin/gcc
 # COMMON FLAGS
 XFLAGS = \
   -m64 -g -O1 \
-  -Wall -Wextra -Wno-unused-parameter \
+  -Wall \
   -fno-common
+# -Wextra
 # -ffreestanding
 
 ASMFLAGS = $(XFLAGS)

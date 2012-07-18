@@ -32,9 +32,17 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <unistd.h>
 #include <sys/types.h>
 
+extern void __libc_init (int, char **, char **);
+
 /* Set nonzero if we have to be prepared for more then one libc being
    used in the process.  Safe assumption if initializer never runs.  */
 int __libc_multiple_libcs attribute_hidden = 1;
+
+/* Remember the command line argument and enviroment contents for
+   later calls of initializers for dynamic libraries.  */
+int __libc_argc attribute_hidden;
+char **__libc_argv attribute_hidden;
+
 
 void __libc_init_first (int argc, char *arg0, ...)
 {

@@ -38,9 +38,31 @@ include glibc-obj-$(GLIBC_VERSION).mk
 
 MAKEFILE_SOURCES += glibc-$(GLIBC_VERSION).mk
 
+ASMFLAGS += \
+  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS/x86_64 \
+  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS/x86 \
+  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS/i386 \
+  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS \
+  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/nptl/sysdeps/x86_64 \
+  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/nptl/sysdeps/pthread \
+  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/nptl \
+  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/x86_64 \
+  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/sysdeps/llamaos \
+  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/sysdeps/x86_64 \
+  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/sysdeps/x86 \
+  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/sysdeps/i386 \
+  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/sysdeps/ieee754/ldbl-128 \
+  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/sysdeps/ieee754 \
+  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/sysdeps/generic \
+  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/include \
+  -I $(SRCDIR)/glibc-$(GLIBC_VERSION) \
+  -include $(SRCDIR)/glibc-$(GLIBC_VERSION)/include/libc-symbols.h
+
 CFLAGS += \
+  -Wno-unused-parameter \
   -D__EXCEPTIONS \
   -D_IO_MTSAFE_IO \
+  -DHAVE_MREMAP=0 \
   -I $(SRCDIR)/gcc-$(GCC_VERSION)/gcc/include-fixed \
   -I $(SRCDIR)/gcc-$(GCC_VERSION)/gcc/ginclude \
   -I $(SRCDIR)/gcc-$(GCC_VERSION)/gcc/include \
@@ -61,6 +83,8 @@ CFLAGS += \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/sysdeps/generic \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/include \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/libio \
+  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/stdio-common \
+  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/wcsmbs \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION) \
   -include $(SRCDIR)/glibc-$(GLIBC_VERSION)/include/libc-symbols.h
 

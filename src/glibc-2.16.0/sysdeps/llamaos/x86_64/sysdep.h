@@ -4,6 +4,19 @@
 
 #include_next <sysdep.h>
 
+/* Define a macro which expands inline into the wrapper code for a system
+   call.  */
+# undef INLINE_SYSCALL
+# define INLINE_SYSCALL(name, nr, args...) \
+  ({									      \
+    unsigned long int resultvar = INTERNAL_SYSCALL (name, , nr, args);	      \
+    if (__builtin_expect (INTERNAL_SYSCALL_ERROR_P (resultvar, ), 0))	      \
+      {									      \
+	__set_errno (INTERNAL_SYSCALL_ERRNO (resultvar, ));		      \
+	resultvar = (unsigned long int) -1;				      \
+      }									      \
+    (long int) resultvar; })
+
 /* Define a macro with explicit types for arguments, which expands inline
    into the wrapper code for a system call.  It should be used when size
    of any argument > size of long int.  */
