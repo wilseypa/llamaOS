@@ -62,7 +62,10 @@ CFLAGS += \
   -Wno-unused-parameter \
   -D__EXCEPTIONS \
   -D_IO_MTSAFE_IO \
+  -D=HAVE_MMAP \
+  -D=HAVE_MUNMAP \
   -DHAVE_MREMAP=0 \
+  -D'LOCALEDIR=""' \
   -I $(SRCDIR)/gcc-$(GCC_VERSION)/gcc/include-fixed \
   -I $(SRCDIR)/gcc-$(GCC_VERSION)/gcc/ginclude \
   -I $(SRCDIR)/gcc-$(GCC_VERSION)/gcc/include \
@@ -83,6 +86,7 @@ CFLAGS += \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/sysdeps/generic \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/include \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/libio \
+  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/stdlib \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/stdio-common \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/wcsmbs \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION) \

@@ -36,20 +36,34 @@
 MAKEFILE_SOURCES += glibc-obj-$(GLIBC_VERSION).mk
 
 GLIBC_SOURCES_ASM = \
-  glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS/x86_64/lowlevellock.S
+  glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS/x86_64/lowlevellock.S \
+  glibc-$(GLIBC_VERSION)/sysdeps/x86_64/lshift.S \
+  glibc-$(GLIBC_VERSION)/sysdeps/x86_64/mul_1.S \
+  glibc-$(GLIBC_VERSION)/sysdeps/x86_64/rshift.S
 
 GLIBC_SOURCES_C = \
   glibc-$(GLIBC_VERSION)/assert/assert.c \
   glibc-$(GLIBC_VERSION)/csu/dso_handle.c \
   glibc-$(GLIBC_VERSION)/ctype/ctype-info.c \
   glibc-$(GLIBC_VERSION)/ctype/ctype.c \
+  glibc-$(GLIBC_VERSION)/debug/fortify_fail.c \
   glibc-$(GLIBC_VERSION)/debug/readonly-area.c \
   glibc-$(GLIBC_VERSION)/elf/enbl-secure.c \
+  glibc-$(GLIBC_VERSION)/intl/loadmsgcat.c \
   glibc-$(GLIBC_VERSION)/io/close.c \
+  glibc-$(GLIBC_VERSION)/io/fxstat.c \
+  glibc-$(GLIBC_VERSION)/io/fxstat64.c \
+  glibc-$(GLIBC_VERSION)/io/isatty.c \
+  glibc-$(GLIBC_VERSION)/io/lseek64.c \
   glibc-$(GLIBC_VERSION)/io/open.c \
+  glibc-$(GLIBC_VERSION)/io/poll.c \
   glibc-$(GLIBC_VERSION)/io/read.c \
   glibc-$(GLIBC_VERSION)/io/write.c \
+  glibc-$(GLIBC_VERSION)/io/xstat.c \
+  glibc-$(GLIBC_VERSION)/io/xstat64.c \
   glibc-$(GLIBC_VERSION)/libio/fcloseall.c \
+  glibc-$(GLIBC_VERSION)/libio/filedoalloc.c \
+  glibc-$(GLIBC_VERSION)/libio/fileno.c \
   glibc-$(GLIBC_VERSION)/libio/fileops.c \
   glibc-$(GLIBC_VERSION)/libio/fputc.c \
   glibc-$(GLIBC_VERSION)/libio/fputwc.c \
@@ -62,16 +76,21 @@ GLIBC_SOURCES_C = \
   glibc-$(GLIBC_VERSION)/libio/getc.c \
   glibc-$(GLIBC_VERSION)/libio/getwc.c \
   glibc-$(GLIBC_VERSION)/libio/iofclose.c \
+  glibc-$(GLIBC_VERSION)/libio/iofdopen.c \
   glibc-$(GLIBC_VERSION)/libio/iofflush.c \
   glibc-$(GLIBC_VERSION)/libio/iofopen.c \
+  glibc-$(GLIBC_VERSION)/libio/iofopen64.c \
   glibc-$(GLIBC_VERSION)/libio/iofputs.c \
   glibc-$(GLIBC_VERSION)/libio/iofputws.c \
   glibc-$(GLIBC_VERSION)/libio/iofread.c \
+  glibc-$(GLIBC_VERSION)/libio/iofread_u.c \
   glibc-$(GLIBC_VERSION)/libio/iofwide.c \
   glibc-$(GLIBC_VERSION)/libio/iofwrite.c \
   glibc-$(GLIBC_VERSION)/libio/iopadn.c \
+  glibc-$(GLIBC_VERSION)/libio/ioseekoff.c \
   glibc-$(GLIBC_VERSION)/libio/ioungetc.c \
   glibc-$(GLIBC_VERSION)/libio/ioungetwc.c \
+  glibc-$(GLIBC_VERSION)/libio/iovsscanf.c \
   glibc-$(GLIBC_VERSION)/libio/iowpadn.c \
   glibc-$(GLIBC_VERSION)/libio/putc.c \
   glibc-$(GLIBC_VERSION)/libio/putwc.c \
@@ -94,6 +113,9 @@ GLIBC_SOURCES_C = \
   glibc-$(GLIBC_VERSION)/locale/C-paper.c \
   glibc-$(GLIBC_VERSION)/locale/C-telephone.c \
   glibc-$(GLIBC_VERSION)/locale/C-time.c \
+  glibc-$(GLIBC_VERSION)/locale/C_name.c \
+  glibc-$(GLIBC_VERSION)/locale/findlocale.c \
+  glibc-$(GLIBC_VERSION)/locale/global-locale.c \
   glibc-$(GLIBC_VERSION)/locale/setlocale.c \
   glibc-$(GLIBC_VERSION)/locale/uselocale.c \
   glibc-$(GLIBC_VERSION)/locale/xlocale.c \
@@ -103,10 +125,13 @@ GLIBC_SOURCES_C = \
   glibc-$(GLIBC_VERSION)/misc/brk.c \
   glibc-$(GLIBC_VERSION)/misc/madvise.c \
   glibc-$(GLIBC_VERSION)/misc/init-misc.c \
+  glibc-$(GLIBC_VERSION)/misc/lseek.c \
   glibc-$(GLIBC_VERSION)/misc/mmap.c \
   glibc-$(GLIBC_VERSION)/misc/mprotect.c \
   glibc-$(GLIBC_VERSION)/misc/munmap.c \
+  glibc-$(GLIBC_VERSION)/misc/readv.c \
   glibc-$(GLIBC_VERSION)/misc/sbrk.c \
+  glibc-$(GLIBC_VERSION)/misc/writev.c \
   glibc-$(GLIBC_VERSION)/nptl/nptl-init.c \
   glibc-$(GLIBC_VERSION)/nptl/pthread_mutex_lock.c \
   glibc-$(GLIBC_VERSION)/nptl/pthread_mutex_unlock.c \
@@ -144,8 +169,19 @@ GLIBC_SOURCES_C = \
   glibc-$(GLIBC_VERSION)/stdio-common/vfwscanf.c \
   glibc-$(GLIBC_VERSION)/stdlib/abort.c \
   glibc-$(GLIBC_VERSION)/stdlib/exit.c \
+  glibc-$(GLIBC_VERSION)/stdlib/fpioconst.c \
   glibc-$(GLIBC_VERSION)/stdlib/getenv.c \
   glibc-$(GLIBC_VERSION)/stdlib/grouping.c \
+  glibc-$(GLIBC_VERSION)/stdlib/mul.c \
+  glibc-$(GLIBC_VERSION)/stdlib/mul_1.c \
+  glibc-$(GLIBC_VERSION)/stdlib/mul_n.c \
+  glibc-$(GLIBC_VERSION)/stdlib/strtod.c \
+  glibc-$(GLIBC_VERSION)/stdlib/strtod_l.c \
+  glibc-$(GLIBC_VERSION)/stdlib/strtof.c \
+  glibc-$(GLIBC_VERSION)/stdlib/strtof_l.c \
+  glibc-$(GLIBC_VERSION)/stdlib/strtold.c \
+  glibc-$(GLIBC_VERSION)/stdlib/strtold_l.c \
+  glibc-$(GLIBC_VERSION)/stdlib/tens_in_limb.c \
   glibc-$(GLIBC_VERSION)/string/_strerror.c \
   glibc-$(GLIBC_VERSION)/string/argz-addsep.c \
   glibc-$(GLIBC_VERSION)/string/argz-append.c \
@@ -201,6 +237,7 @@ GLIBC_SOURCES_C = \
   glibc-$(GLIBC_VERSION)/string/strstr.c \
   glibc-$(GLIBC_VERSION)/string/strtok.c \
   glibc-$(GLIBC_VERSION)/string/strtok_r.c \
+  glibc-$(GLIBC_VERSION)/sysdeps/ieee754/dbl-64/mpn2dbl.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/abort.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/dl-support.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/errno.c \
@@ -210,7 +247,9 @@ GLIBC_SOURCES_C = \
   glibc-$(GLIBC_VERSION)/sysdeps/wordsize-64/strtol_l.c \
   glibc-$(GLIBC_VERSION)/sysdeps/wordsize-64/strtoul.c \
   glibc-$(GLIBC_VERSION)/sysdeps/wordsize-64/strtoul_l.c \
+  glibc-$(GLIBC_VERSION)/time/localtime.c \
   glibc-$(GLIBC_VERSION)/time/mktime.c \
+  glibc-$(GLIBC_VERSION)/time/offtime.c \
   glibc-$(GLIBC_VERSION)/time/strftime.c \
   glibc-$(GLIBC_VERSION)/time/strftime_l.c \
   glibc-$(GLIBC_VERSION)/time/tzfile.c \
@@ -218,14 +257,18 @@ GLIBC_SOURCES_C = \
   glibc-$(GLIBC_VERSION)/time/wcsftime.c \
   glibc-$(GLIBC_VERSION)/time/wcsftime_l.c \
   glibc-$(GLIBC_VERSION)/wcsmbs/btowc.c \
+  glibc-$(GLIBC_VERSION)/wcsmbs/mbrlen.c \
+  glibc-$(GLIBC_VERSION)/wcsmbs/mbrtowc.c \
   glibc-$(GLIBC_VERSION)/wcsmbs/mbsnrtowcs.c \
   glibc-$(GLIBC_VERSION)/wcsmbs/mbsrtowcs.c \
+  glibc-$(GLIBC_VERSION)/wcsmbs/mbsrtowcs_l.c \
   glibc-$(GLIBC_VERSION)/wcsmbs/wcrtomb.c \
   glibc-$(GLIBC_VERSION)/wcsmbs/wcscat.c \
   glibc-$(GLIBC_VERSION)/wcsmbs/wcschr.c \
   glibc-$(GLIBC_VERSION)/wcsmbs/wcschrnul.c \
   glibc-$(GLIBC_VERSION)/wcsmbs/wcscmp.c \
   glibc-$(GLIBC_VERSION)/wcsmbs/wcscoll.c \
+  glibc-$(GLIBC_VERSION)/wcsmbs/wcscoll_l.c \
   glibc-$(GLIBC_VERSION)/wcsmbs/wcscpy.c \
   glibc-$(GLIBC_VERSION)/wcsmbs/wcscspn.c \
   glibc-$(GLIBC_VERSION)/wcsmbs/wcsdup.c \
@@ -237,6 +280,11 @@ GLIBC_SOURCES_C = \
   glibc-$(GLIBC_VERSION)/wcsmbs/wcsnlen.c \
   glibc-$(GLIBC_VERSION)/wcsmbs/wcsnrtombs.c \
   glibc-$(GLIBC_VERSION)/wcsmbs/wcsrtombs.c \
+  glibc-$(GLIBC_VERSION)/wcsmbs/wcstol.c \
+  glibc-$(GLIBC_VERSION)/wcsmbs/wcstol_l.c \
+  glibc-$(GLIBC_VERSION)/wcsmbs/wcstoll.c \
+  glibc-$(GLIBC_VERSION)/wcsmbs/wcstoll_l.c \
+  glibc-$(GLIBC_VERSION)/wcsmbs/wctob.c \
   glibc-$(GLIBC_VERSION)/wcsmbs/wmemchr.c \
   glibc-$(GLIBC_VERSION)/wcsmbs/wmemcmp.c \
   glibc-$(GLIBC_VERSION)/wcsmbs/wmemcpy.c \
