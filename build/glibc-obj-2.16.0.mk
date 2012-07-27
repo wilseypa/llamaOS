@@ -141,11 +141,16 @@ GLIBC_SOURCES_C = \
   glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS/pthread_mutex_condition_lock.c \
   glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS/register-atfork.c \
   glibc-$(GLIBC_VERSION)/posix/environ.c \
+  glibc-$(GLIBC_VERSION)/posix/getegid.c \
+  glibc-$(GLIBC_VERSION)/posix/geteuid.c \
+  glibc-$(GLIBC_VERSION)/posix/getgid.c \
+  glibc-$(GLIBC_VERSION)/posix/getuid.c \
   glibc-$(GLIBC_VERSION)/signal/raise.c \
   glibc-$(GLIBC_VERSION)/signal/sigaction.c \
   glibc-$(GLIBC_VERSION)/signal/sigprocmask.c \
   glibc-$(GLIBC_VERSION)/stdio-common/_itoa.c \
   glibc-$(GLIBC_VERSION)/stdio-common/_itowa.c \
+  glibc-$(GLIBC_VERSION)/stdio-common/asprintf.c \
   glibc-$(GLIBC_VERSION)/stdio-common/fprintf.c \
   glibc-$(GLIBC_VERSION)/stdio-common/funlockfile.c \
   glibc-$(GLIBC_VERSION)/stdio-common/fxprintf.c \
@@ -168,10 +173,17 @@ GLIBC_SOURCES_C = \
   glibc-$(GLIBC_VERSION)/stdio-common/vfwprintf.c \
   glibc-$(GLIBC_VERSION)/stdio-common/vfwscanf.c \
   glibc-$(GLIBC_VERSION)/stdlib/abort.c \
+  glibc-$(GLIBC_VERSION)/stdlib/abs.c \
+  glibc-$(GLIBC_VERSION)/stdlib/add_n.c \
+  glibc-$(GLIBC_VERSION)/stdlib/addmul_1.c \
+  glibc-$(GLIBC_VERSION)/stdlib/cmp.c \
+  glibc-$(GLIBC_VERSION)/stdlib/cxa_atexit.c \
+  glibc-$(GLIBC_VERSION)/stdlib/divmod_1.c \
   glibc-$(GLIBC_VERSION)/stdlib/exit.c \
   glibc-$(GLIBC_VERSION)/stdlib/fpioconst.c \
   glibc-$(GLIBC_VERSION)/stdlib/getenv.c \
   glibc-$(GLIBC_VERSION)/stdlib/grouping.c \
+  glibc-$(GLIBC_VERSION)/stdlib/mp_clz_tab.c \
   glibc-$(GLIBC_VERSION)/stdlib/mul.c \
   glibc-$(GLIBC_VERSION)/stdlib/mul_1.c \
   glibc-$(GLIBC_VERSION)/stdlib/mul_n.c \
@@ -181,6 +193,8 @@ GLIBC_SOURCES_C = \
   glibc-$(GLIBC_VERSION)/stdlib/strtof_l.c \
   glibc-$(GLIBC_VERSION)/stdlib/strtold.c \
   glibc-$(GLIBC_VERSION)/stdlib/strtold_l.c \
+  glibc-$(GLIBC_VERSION)/stdlib/sub_n.c \
+  glibc-$(GLIBC_VERSION)/stdlib/submul_1.c \
   glibc-$(GLIBC_VERSION)/stdlib/tens_in_limb.c \
   glibc-$(GLIBC_VERSION)/string/_strerror.c \
   glibc-$(GLIBC_VERSION)/string/argz-addsep.c \
@@ -238,6 +252,13 @@ GLIBC_SOURCES_C = \
   glibc-$(GLIBC_VERSION)/string/strtok.c \
   glibc-$(GLIBC_VERSION)/string/strtok_r.c \
   glibc-$(GLIBC_VERSION)/sysdeps/ieee754/dbl-64/mpn2dbl.c \
+  glibc-$(GLIBC_VERSION)/sysdeps/ieee754/dbl-64/s_isinf.c \
+  glibc-$(GLIBC_VERSION)/sysdeps/ieee754/dbl-64/s_isnan.c \
+  glibc-$(GLIBC_VERSION)/sysdeps/ieee754/dbl-64/s_signbit.c \
+  glibc-$(GLIBC_VERSION)/sysdeps/ieee754/flt-32/mpn2flt.c \
+  glibc-$(GLIBC_VERSION)/sysdeps/ieee754/ldbl-128/s_isinfl.c \
+  glibc-$(GLIBC_VERSION)/sysdeps/ieee754/ldbl-128/s_isnanl.c \
+  glibc-$(GLIBC_VERSION)/sysdeps/ieee754/ldbl-128/s_signbitl.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/abort.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/dl-support.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/errno.c \
