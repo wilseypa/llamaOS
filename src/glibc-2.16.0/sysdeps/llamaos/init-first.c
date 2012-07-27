@@ -49,7 +49,8 @@ void __libc_init_first (int argc, char *arg0, ...)
   char **argv = &arg0, **envp = &argv[argc + 1];
 
   __environ = envp;
-  __libc_init (argc, argv, envp);
+// !BAM
+//  __libc_init (argc, argv, envp);
 
 #ifdef USE_NONOPTION_FLAGS
   /* This is a hack to make the special getopt in GNU libc working.  */

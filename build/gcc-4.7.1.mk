@@ -37,6 +37,7 @@ include common.mk
 include gcc-obj-$(GCC_VERSION).mk
 
 MAKEFILE_SOURCES += gcc-$(GCC_VERSION).mk
+MAKEFILE_SOURCES += gcc-obj-$(GCC_VERSION).mk
 
 CFLAGS += \
   -I $(SRCDIR)/gcc-$(GCC_VERSION)/gcc \

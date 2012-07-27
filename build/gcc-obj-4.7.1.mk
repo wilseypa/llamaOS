@@ -33,7 +33,7 @@
 # requires this to already be included
 # include common.mk
 
-MAKEFILE_SOURCES += gcc-obj-$(GCC_VERSION).mk
+# MAKEFILE_SOURCES += gcc-obj-$(GCC_VERSION).mk
 
 GCC_SOURCES_C = \
   gcc-$(GCC_VERSION)/libgcc/unwind-dw2-fde.c \

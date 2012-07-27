@@ -17,6 +17,18 @@
 
 /* This file defines the `errno' constants.  */
 
+#ifdef _ERRNO_H
+# ifndef __ASSEMBLER__
+/* Function to get address of global `errno' variable.  */
+extern int *__errno_location (void) __THROW __attribute__ ((__const__));
+
+#  if !defined _LIBC || defined _LIBC_REENTRANT
+/* When using threads, errno is a per-thread value.  */
+#   define errno (*__errno_location ())
+#  endif
+# endif /* !__ASSEMBLER__ */
+#endif /* _ERRNO_H */
+
 #if !defined __Emath_defined && (defined _ERRNO_H || defined __need_Emath)
 #undef	__need_Emath
 #define	__Emath_defined	1
@@ -29,6 +41,14 @@
 #define EILSEQ 0
 #define ERANGE 0
 
+#endif
+
+#ifndef errno
+#  ifndef NOT_IN_libc
+#   define errno __libc_errno
+#  else
+#   define errno errno		/* For #ifndef errno tests.  */
+#  endif
 #endif
 
 #ifdef	_ERRNO_H
@@ -116,5 +136,7 @@
 #define ELOOP 0
 #define EOVERFLOW 0
 #define EPROTOTYPE 0
+#define ETIMEDOUT 0
+#define EINVAL 0
 
 #endif

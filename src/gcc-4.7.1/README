@@ -47,6 +47,7 @@ monetary_members.cc -> /usr/src/gcc-4.7.1/libstdc++-v3/config/locale/generic/mon
 numeric_members.cc -> /usr/src/gcc-4.7.1/libstdc++-v3/config/locale/generic/numeric_members.cc
 time_members.cc -> /usr/src/gcc-4.7.1/libstdc++-v3/config/locale/generic/time_members.cc
 
+cp-demangle.c -> /usr/src/gcc-4.7.1/libstdc++-v3/../libiberty/cp-demangle.c
 
 
 

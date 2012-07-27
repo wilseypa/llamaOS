@@ -10,6 +10,9 @@
 #define MAXSYMLINKS  1
 #define MAXPATHLEN   256
 
+// !BAM
+#define EXEC_PAGESIZE 4096
+
 /* Macros for min/max.  */
 #define MIN(a,b) (((a)<(b))?(a):(b))
 #define MAX(a,b) (((a)>(b))?(a):(b))

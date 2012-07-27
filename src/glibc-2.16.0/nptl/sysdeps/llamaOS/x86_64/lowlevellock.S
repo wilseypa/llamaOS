@@ -16,6 +16,8 @@
    License along with the GNU C Library; if not, see
    <http://www.gnu.org/licenses/>.  */
 
+#include <asm/unistd.h>
+
 #include <sysdep.h>
 #include <pthread-errnos.h>
 #include <kernel-features.h>

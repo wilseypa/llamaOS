@@ -37,8 +37,10 @@ include common.mk
 include glibc-obj-$(GLIBC_VERSION).mk
 
 MAKEFILE_SOURCES += glibc-$(GLIBC_VERSION).mk
+MAKEFILE_SOURCES += glibc-obj-$(GLIBC_VERSION).mk
 
 ASMFLAGS += \
+  -D__ASSUME_PRIVATE_FUTEX \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS/x86_64 \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS/x86 \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS/i386 \
@@ -66,9 +68,14 @@ CFLAGS += \
   -D=HAVE_MUNMAP \
   -DHAVE_MREMAP=0 \
   -D'LOCALEDIR=""' \
+  -D'LOCALE_ALIAS_PATH=""' \
+  -D'GCONV_DIR=""' \
+  -D'GCONV_PATH=""' \
+  -D__NR_futex=0 \
   -I $(SRCDIR)/gcc-$(GCC_VERSION)/gcc/include-fixed \
   -I $(SRCDIR)/gcc-$(GCC_VERSION)/gcc/ginclude \
   -I $(SRCDIR)/gcc-$(GCC_VERSION)/gcc/include \
+  -I $(SRCDIR)/gcc-$(GCC_VERSION)/include \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS/x86_64 \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS/x86 \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS/i386 \
@@ -85,6 +92,9 @@ CFLAGS += \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/sysdeps/ieee754 \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/sysdeps/generic \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/include \
+  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/csu \
+  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/elf \
+  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/iconv \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/libio \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/stdlib \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/stdio-common \
