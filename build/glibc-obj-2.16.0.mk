@@ -35,17 +35,44 @@
 
 # MAKEFILE_SOURCES += glibc-obj-$(GLIBC_VERSION).mk
 
+#  glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS/x86_64/lowlevellock.S \
+#  glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS/x86_64/lowlevelrobustlock.S \
+
+#  glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS/libc_multiple_threads.c \
+#  glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS/lowlevellock.c \
+#  glibc-$(GLIBC_VERSION)/nptl/pthread_mutex_lock.c \
+#  glibc-$(GLIBC_VERSION)/nptl/pthread_mutex_unlock.c \
+#  glibc-$(GLIBC_VERSION)/nptl/pthread_once.c \
+#  glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS/x86_64/fork.c \
+#  glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS/pthread_mutex_condition_lock.c \
+#  glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS/register-atfork.c \
+#  glibc-$(GLIBC_VERSION)/nptl/nptl-init.c \
+#  glibc-$(GLIBC_VERSION)/nptl/tpp.c \
+#  glibc-$(GLIBC_VERSION)/nptl/vars.c \
+
 GLIBC_SOURCES_ASM = \
-  glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS/x86_64/lowlevellock.S \
   glibc-$(GLIBC_VERSION)/sysdeps/x86_64/lshift.S \
   glibc-$(GLIBC_VERSION)/sysdeps/x86_64/mul_1.S \
   glibc-$(GLIBC_VERSION)/sysdeps/x86_64/rshift.S
 
 #  glibc-$(GLIBC_VERSION)/sysdeps/x86_64/__longjmp.S \
 #  glibc-$(GLIBC_VERSION)/sysdeps/x86_64/setjmp.S
-#  glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS/x86_64/lowlevelrobustlock.S \
 #  glibc-$(GLIBC_VERSION)/elf/dl-load.c \
 #  glibc-$(GLIBC_VERSION)/csu/libc-tls.c \
+
+#  glibc-$(GLIBC_VERSION)/dlfcn/dlerror.c \
+#  glibc-$(GLIBC_VERSION)/dlfcn/dlopen.c \
+#  glibc-$(GLIBC_VERSION)/elf/dl-close.c \
+#  glibc-$(GLIBC_VERSION)/elf/dl-error.c \
+#  glibc-$(GLIBC_VERSION)/elf/dl-execstack.c \
+#  glibc-$(GLIBC_VERSION)/elf/dl-libc.c \
+#  glibc-$(GLIBC_VERSION)/elf/dl-lookup.c \
+#  glibc-$(GLIBC_VERSION)/elf/dl-misc.c \
+#  glibc-$(GLIBC_VERSION)/elf/dl-open.c \
+#  glibc-$(GLIBC_VERSION)/elf/dl-profile.c \
+#  glibc-$(GLIBC_VERSION)/elf/dl-profstub.c \
+#  glibc-$(GLIBC_VERSION)/elf/dl-reloc.c \
+#  glibc-$(GLIBC_VERSION)/elf/dl-support.c \
 
 GLIBC_SOURCES_C = \
   glibc-$(GLIBC_VERSION)/assert/assert.c \
@@ -56,18 +83,6 @@ GLIBC_SOURCES_C = \
   glibc-$(GLIBC_VERSION)/ctype/ctype.c \
   glibc-$(GLIBC_VERSION)/debug/fortify_fail.c \
   glibc-$(GLIBC_VERSION)/debug/readonly-area.c \
-  glibc-$(GLIBC_VERSION)/dlfcn/dlerror.c \
-  glibc-$(GLIBC_VERSION)/dlfcn/dlopen.c \
-  glibc-$(GLIBC_VERSION)/elf/dl-close.c \
-  glibc-$(GLIBC_VERSION)/elf/dl-error.c \
-  glibc-$(GLIBC_VERSION)/elf/dl-execstack.c \
-  glibc-$(GLIBC_VERSION)/elf/dl-libc.c \
-  glibc-$(GLIBC_VERSION)/elf/dl-lookup.c \
-  glibc-$(GLIBC_VERSION)/elf/dl-open.c \
-  glibc-$(GLIBC_VERSION)/elf/dl-profile.c \
-  glibc-$(GLIBC_VERSION)/elf/dl-profstub.c \
-  glibc-$(GLIBC_VERSION)/elf/dl-reloc.c \
-  glibc-$(GLIBC_VERSION)/elf/dl-support.c \
   glibc-$(GLIBC_VERSION)/elf/enbl-secure.c \
   glibc-$(GLIBC_VERSION)/gmon/prof-freq.c \
   glibc-$(GLIBC_VERSION)/gmon/profil.c \
@@ -212,16 +227,6 @@ GLIBC_SOURCES_C = \
   glibc-$(GLIBC_VERSION)/misc/syscall.c \
   glibc-$(GLIBC_VERSION)/misc/tsearch.c \
   glibc-$(GLIBC_VERSION)/misc/writev.c \
-  glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS/x86_64/fork.c \
-  glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS/libc_multiple_threads.c \
-  glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS/pthread_mutex_condition_lock.c \
-  glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS/register-atfork.c \
-  glibc-$(GLIBC_VERSION)/nptl/nptl-init.c \
-  glibc-$(GLIBC_VERSION)/nptl/pthread_mutex_lock.c \
-  glibc-$(GLIBC_VERSION)/nptl/pthread_mutex_unlock.c \
-  glibc-$(GLIBC_VERSION)/nptl/pthread_once.c \
-  glibc-$(GLIBC_VERSION)/nptl/tpp.c \
-  glibc-$(GLIBC_VERSION)/nptl/vars.c \
   glibc-$(GLIBC_VERSION)/posix/_exit.c \
   glibc-$(GLIBC_VERSION)/posix/environ.c \
   glibc-$(GLIBC_VERSION)/posix/fpathconf.c \
@@ -367,11 +372,14 @@ GLIBC_SOURCES_C = \
   glibc-$(GLIBC_VERSION)/sysdeps/ieee754/ldbl-128/s_isnanl.c \
   glibc-$(GLIBC_VERSION)/sysdeps/ieee754/ldbl-128/s_signbitl.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/abort.c \
+  glibc-$(GLIBC_VERSION)/sysdeps/llamaos/dl-libc.c \
+  glibc-$(GLIBC_VERSION)/sysdeps/llamaos/dl-profstub.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/dl-support.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/errlist.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/errno.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/init-first.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/libc-fatal.c \
+  glibc-$(GLIBC_VERSION)/sysdeps/llamaos/libc_open.c \
   glibc-$(GLIBC_VERSION)/sysdeps/posix/sysconf.c \
   glibc-$(GLIBC_VERSION)/sysdeps/wordsize-64/strtol.c \
   glibc-$(GLIBC_VERSION)/sysdeps/wordsize-64/strtol_l.c \
@@ -438,8 +446,7 @@ GLIBC_SOURCES_C = \
   glibc-$(GLIBC_VERSION)/wctype/wctrans.c \
   glibc-$(GLIBC_VERSION)/wctype/wctrans_l.c \
   glibc-$(GLIBC_VERSION)/wctype/wctype.c \
-  glibc-$(GLIBC_VERSION)/wctype/wctype_l.c \
-  gcc-$(GCC_VERSION)/libiberty/cp-demangle.c
+  glibc-$(GLIBC_VERSION)/wctype/wctype_l.c
 
 
 GLIBC_OBJECTS  = $(GLIBC_SOURCES_ASM:%.S=$(OBJDIR)/%.o)

@@ -72,6 +72,8 @@ CFLAGS += \
   -D'GCONV_DIR=""' \
   -D'GCONV_PATH=""' \
   -D__NR_futex=0 \
+  -D__NR_writev=0 \
+  -D__NR_pause=0 \
   -I $(SRCDIR)/gcc-$(GCC_VERSION)/gcc/include-fixed \
   -I $(SRCDIR)/gcc-$(GCC_VERSION)/gcc/ginclude \
   -I $(SRCDIR)/gcc-$(GCC_VERSION)/gcc/include \

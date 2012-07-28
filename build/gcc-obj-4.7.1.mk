@@ -37,7 +37,8 @@
 
 GCC_SOURCES_C = \
   gcc-$(GCC_VERSION)/libgcc/unwind-dw2-fde.c \
-  gcc-$(GCC_VERSION)/libgcc/unwind-dw2.c
+  gcc-$(GCC_VERSION)/libgcc/unwind-dw2.c \
+  gcc-$(GCC_VERSION)/libiberty/cp-demangle.c
 
 GCC_SOURCES_CC = \
   gcc-$(GCC_VERSION)/libstdc++-v3/libsupc++/array_type_info.cc \
