@@ -3,6 +3,7 @@
 ###########################################
 build/bin/
 build/include/
+build/include-fixed/
 build/lib/
 build/obj/
 bin/

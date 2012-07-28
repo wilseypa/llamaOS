@@ -60,6 +60,12 @@ ASMFLAGS += \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION) \
   -include $(SRCDIR)/glibc-$(GLIBC_VERSION)/include/libc-symbols.h
 
+#  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS/x86_64 \
+#  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS/x86 \
+#  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS/i386 \
+#  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/nptl/sysdeps/x86_64 \
+#  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/nptl \
+
 CFLAGS += \
   -Wno-unused-parameter \
   -D__EXCEPTIONS \
@@ -78,12 +84,12 @@ CFLAGS += \
   -I $(SRCDIR)/gcc-$(GCC_VERSION)/gcc/ginclude \
   -I $(SRCDIR)/gcc-$(GCC_VERSION)/gcc/include \
   -I $(SRCDIR)/gcc-$(GCC_VERSION)/include \
+  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/include \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS/x86_64 \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS/x86 \
-  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS/i386 \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS \
-  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/nptl/sysdeps/x86_64 \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/nptl/sysdeps/pthread \
+  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/nptl/sysdeps/x86_64 \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/nptl \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/x86_64 \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/sysdeps/llamaos \
@@ -93,7 +99,6 @@ CFLAGS += \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/sysdeps/ieee754/ldbl-128 \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/sysdeps/ieee754 \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/sysdeps/generic \
-  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/include \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/csu \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/elf \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/iconv \
