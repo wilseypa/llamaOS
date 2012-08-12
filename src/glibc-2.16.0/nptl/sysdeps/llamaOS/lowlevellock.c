@@ -28,35 +28,49 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#ifndef glibc_nptl_sysdeps_llamaOS_bits_local_lim_h_
-#define glibc_nptl_sysdeps_llamaOS_bits_local_lim_h_
+#include <errno.h>
 
-// glibc-2.16.0/nptl/sysdeps/unix/sysv/linux/bits/local_lim.h
+int lll_trylock (int *futex)
+{
+   __set_errno (ENOSYS);
+   return 0;
+}
+libc_hidden_def (lll_trylock)
 
-/* Minimum guaranteed maximum values for system limits.  Linux version.
-   Copyright (C) 1993-1998,2000,2002-2004,2008 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
+void lll_lock (int *futex, int private)
+{
+   __set_errno (ENOSYS);
+}
+libc_hidden_def (lll_lock)
 
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public License as
-   published by the Free Software Foundation; either version 2.1 of the
-   License, or (at your option) any later version.
+void lll_robust_lock (int *futex, int id, int private)
+{
+   __set_errno (ENOSYS);
+}
+libc_hidden_def (lll_robust_lock)
 
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
+void lll_unlock (int *futex, int private)
+{
+   __set_errno (ENOSYS);
+}
+libc_hidden_def (lll_unlock)
 
-   You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; see the file COPYING.LIB.  If
-   not, see <http://www.gnu.org/licenses/>.  */
+void lll_robust_unlock (int *futex, int private)
+{
+   __set_errno (ENOSYS);
+}
+libc_hidden_def (lll_robust_unlock)
 
-/* The number of data keys per process.  */
-#define _POSIX_THREAD_KEYS_MAX	128
-/* This is the value this implementation supports.  */
-#define PTHREAD_KEYS_MAX	1024
+int lll_futex_wait (int *futex, int val, int private)
+{
+   __set_errno (ENOSYS);
 
-/* Minimum size for a thread.  We are free to choose a reasonable value.  */
-#define PTHREAD_STACK_MIN	16384
+   return -1;
+}
+libc_hidden_def (lll_futex_wait)
 
-#endif	// glibc_nptl_sysdeps_llamaOS_bits_local_lim_h_
+void lll_futex_wake (int *futex, int nr, int private)
+{
+   __set_errno (ENOSYS);
+}
+libc_hidden_def (lll_futex_wake)

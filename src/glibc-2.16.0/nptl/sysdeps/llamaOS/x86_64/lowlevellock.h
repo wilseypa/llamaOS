@@ -77,4 +77,42 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #define LLL_PRIVATE	0
 #define LLL_SHARED	FUTEX_PRIVATE_FLAG
 
+#ifndef __ASSEMBLER__
+
+#if !defined NOT_IN_libc || defined IS_IN_rtld
+/* In libc.so or ld.so all futexes are private.  */
+# ifdef __ASSUME_PRIVATE_FUTEX
+#  define __lll_private_flag(fl, private) \
+  ((fl) | FUTEX_PRIVATE_FLAG)
+# else
+#  define __lll_private_flag(fl, private) \
+  ((fl) | THREAD_GETMEM (THREAD_SELF, header.private_futex))
+# endif
+#else
+# ifdef __ASSUME_PRIVATE_FUTEX
+#  define __lll_private_flag(fl, private) \
+  (((fl) | FUTEX_PRIVATE_FLAG) ^ (private))
+# else
+#  define __lll_private_flag(fl, private) \
+  (__builtin_constant_p (private)					      \
+   ? ((private) == 0							      \
+      ? ((fl) | THREAD_GETMEM (THREAD_SELF, header.private_futex))	      \
+      : (fl))								      \
+   : ({ unsigned int __fl = ((private) ^ FUTEX_PRIVATE_FLAG);		      \
+	asm ("andl %%fs:%P1, %0" : "+r" (__fl)				      \
+	     : "i" (offsetof (struct pthread, header.private_futex)));	      \
+	__fl | (fl); }))
+# endif
+#endif
+
+/* Initializer for lock.  */
+#define LLL_LOCK_INITIALIZER		(0)
+#define LLL_LOCK_INITIALIZER_LOCKED	(1)
+#define LLL_LOCK_INITIALIZER_WAITERS	(2)
+
+#define lll_islocked(futex) \
+  (futex != LLL_LOCK_INITIALIZER)
+
+#endif  /* !__ASSEMBLER__ */
+
 #endif	// glibc_nptl_sysdeps_llamaos_x86_64_lowlevellock_h_

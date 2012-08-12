@@ -28,12 +28,12 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#ifndef glibc_nptl_sysdeps_llamaos_internaltypes_h_
-#define glibc_nptl_sysdeps_llamaos_internaltypes_h_
+#ifndef glibc_nptl_sysdeps_llamaos_fork_h_
+#define glibc_nptl_sysdeps_llamaos_fork_h_
 
-// glibc-2.16.0/nptl/sysdeps/unix/sysv/linux/internaltypes.h
+// glibc-2.16.0/nptl/sysdeps/unix/sysv/linux/fork.h
 
-/* Copyright (C) 2002, 2003, 2004, 2007 Free Software Foundation, Inc.
+/* Copyright (C) 2002, 2003, 2006, 2007 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -51,31 +51,19 @@ either expressed or implied, of the copyright holder(s) or contributors.
    License along with the GNU C Library; if not, see
    <http://www.gnu.org/licenses/>.  */
 
-#define ATTR_FLAG_DETACHSTATE		0x0001
-#define ATTR_FLAG_NOTINHERITSCHED	0x0002
-#define ATTR_FLAG_SCOPEPROCESS		0x0004
-#define ATTR_FLAG_STACKADDR		0x0008
-#define ATTR_FLAG_OLDATTR		0x0010
-#define ATTR_FLAG_SCHED_SET		0x0020
-#define ATTR_FLAG_POLICY_SET		0x0040
-
-/* Thread-local data handling.  */
-struct pthread_key_struct
+/* Elements of the fork handler lists.  */
+struct fork_handler
 {
-  /* Sequence numbers.  Even numbers indicated vacant entries.  Note
-     that zero is even.  We use uintptr_t to not require padding on
-     32- and 64-bit machines.  On 64-bit machines it helps to avoid
-     wrapping, too.  */
-  uintptr_t seq;
-
-  /* Destructor for the data.  */
-  void (*destr) (void *);
+  struct fork_handler *next;
+  void (*prepare_handler) (void);
+  void (*parent_handler) (void);
+  void (*child_handler) (void);
+  void *dso_handle;
+  unsigned int refcntr;
+  int need_signal;
 };
 
-/* Compatibility type for old conditional variable interfaces.  */
-typedef struct
-{
-  pthread_cond_t *cond;
-} pthread_cond_2_0_t;
+/* The single linked list of all currently registered for handlers.  */
+extern struct fork_handler *__fork_handlers attribute_hidden;
 
-#endif	// glibc_nptl_sysdeps_llamaos_internaltypes_h_
+#endif	// glibc_nptl_sysdeps_llamaos_fork_h_

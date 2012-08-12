@@ -40,9 +40,6 @@
 
 #  glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS/libc_multiple_threads.c \
 #  glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS/lowlevellock.c \
-#  glibc-$(GLIBC_VERSION)/nptl/pthread_mutex_lock.c \
-#  glibc-$(GLIBC_VERSION)/nptl/pthread_mutex_unlock.c \
-#  glibc-$(GLIBC_VERSION)/nptl/pthread_once.c \
 #  glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS/x86_64/fork.c \
 #  glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS/pthread_mutex_condition_lock.c \
 #  glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS/register-atfork.c \
@@ -158,6 +155,7 @@ GLIBC_SOURCES_C = \
   glibc-$(GLIBC_VERSION)/libio/iosetvbuf.c \
   glibc-$(GLIBC_VERSION)/libio/ioungetc.c \
   glibc-$(GLIBC_VERSION)/libio/ioungetwc.c \
+  glibc-$(GLIBC_VERSION)/libio/iovsprintf.c \
   glibc-$(GLIBC_VERSION)/libio/iovsscanf.c \
   glibc-$(GLIBC_VERSION)/libio/iowpadn.c \
   glibc-$(GLIBC_VERSION)/libio/putc.c \
@@ -227,6 +225,15 @@ GLIBC_SOURCES_C = \
   glibc-$(GLIBC_VERSION)/misc/syscall.c \
   glibc-$(GLIBC_VERSION)/misc/tsearch.c \
   glibc-$(GLIBC_VERSION)/misc/writev.c \
+  glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS/lowlevellock.c \
+  glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS/register-atfork.c \
+  glibc-$(GLIBC_VERSION)/nptl/sysdeps/pthread/flockfile.c \
+  glibc-$(GLIBC_VERSION)/nptl/sysdeps/pthread/funlockfile.c \
+  glibc-$(GLIBC_VERSION)/nptl/pthread_mutex_lock.c \
+  glibc-$(GLIBC_VERSION)/nptl/pthread_mutex_unlock.c \
+  glibc-$(GLIBC_VERSION)/nptl/pthread_once.c \
+  glibc-$(GLIBC_VERSION)/nptl/tpp.c \
+  glibc-$(GLIBC_VERSION)/nptl/vars.c \
   glibc-$(GLIBC_VERSION)/posix/_exit.c \
   glibc-$(GLIBC_VERSION)/posix/environ.c \
   glibc-$(GLIBC_VERSION)/posix/fpathconf.c \

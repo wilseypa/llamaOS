@@ -46,7 +46,8 @@ CFLAGS += \
   -I $(SRCDIR)/gcc-$(GCC_VERSION)/gcc/include-fixed \
   -I $(SRCDIR)/gcc-$(GCC_VERSION)/include \
   -I $(INCDIR) \
-  -DFIRST_PSEUDO_REGISTER=53
+  -DFIRST_PSEUDO_REGISTER=53 \
+  -DIN_GLIBCPP_V3
 
 CPPFLAGS += \
   -I $(SRCDIR)/gcc-$(GCC_VERSION)/libstdc++-v3/include/backward \
