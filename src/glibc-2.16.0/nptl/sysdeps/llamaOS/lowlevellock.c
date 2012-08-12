@@ -30,38 +30,39 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 #include <errno.h>
 
-int lll_trylock (int *futex)
+int lll_trylock (int futex)
 {
    __set_errno (ENOSYS);
    return 0;
 }
 libc_hidden_def (lll_trylock)
 
-void lll_lock (int *futex, int private)
+void lll_lock (int futex, int private)
 {
    __set_errno (ENOSYS);
 }
 libc_hidden_def (lll_lock)
 
-void lll_robust_lock (int *futex, int id, int private)
+int lll_robust_lock (int futex, int id, int private)
 {
    __set_errno (ENOSYS);
+   return 0;
 }
 libc_hidden_def (lll_robust_lock)
 
-void lll_unlock (int *futex, int private)
+void lll_unlock (int futex, int private)
 {
    __set_errno (ENOSYS);
 }
 libc_hidden_def (lll_unlock)
 
-void lll_robust_unlock (int *futex, int private)
+void lll_robust_unlock (int futex, int private)
 {
    __set_errno (ENOSYS);
 }
 libc_hidden_def (lll_robust_unlock)
 
-int lll_futex_wait (int *futex, int val, int private)
+int lll_futex_wait (int futex, int val, int private)
 {
    __set_errno (ENOSYS);
 
@@ -69,7 +70,7 @@ int lll_futex_wait (int *futex, int val, int private)
 }
 libc_hidden_def (lll_futex_wait)
 
-void lll_futex_wake (int *futex, int nr, int private)
+void lll_futex_wake (int futex, int nr, int private)
 {
    __set_errno (ENOSYS);
 }

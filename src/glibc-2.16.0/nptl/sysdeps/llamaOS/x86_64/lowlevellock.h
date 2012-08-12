@@ -113,6 +113,17 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #define lll_islocked(futex) \
   (futex != LLL_LOCK_INITIALIZER)
 
+// !BAM
+int lll_trylock (int futex);
+void lll_lock (int futex, int private);
+int lll_robust_lock (int futex, int id, int private);
+
+void lll_unlock (int futex, int private);
+void lll_robust_unlock (int futex, int private);
+
+//int lll_futex_wait (int futex, int val, int private);
+//void lll_futex_wake (int futex, int nr, int private);
+
 #endif  /* !__ASSEMBLER__ */
 
 #endif	// glibc_nptl_sysdeps_llamaos_x86_64_lowlevellock_h_

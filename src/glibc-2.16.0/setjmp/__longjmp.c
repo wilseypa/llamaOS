@@ -29,6 +29,9 @@ __longjmp (__jmp_buf env, int val)
 
   __set_errno (ENOSYS);
   /* No way to signal failure.	*/
+
+  // noreturn function
+  for (;;);
 }
 
 stub_warning (longjmp)
