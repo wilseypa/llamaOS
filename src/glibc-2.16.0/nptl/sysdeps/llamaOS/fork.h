@@ -66,4 +66,6 @@ struct fork_handler
 /* The single linked list of all currently registered for handlers.  */
 extern struct fork_handler *__fork_handlers attribute_hidden;
 
+extern void __linkin_atfork (struct fork_handler *newp) attribute_hidden;
+
 #endif	// glibc_nptl_sysdeps_llamaos_fork_h_

@@ -66,6 +66,10 @@ ASMFLAGS += \
 #  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/nptl/sysdeps/x86_64 \
 #  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/nptl \
 
+#  -D__NR_futex=0 \
+#  -D__NR_writev=0 \
+#  -D__NR_pause=0 \
+
 CFLAGS += \
   -Wno-unused-parameter \
   -D__EXCEPTIONS \
@@ -77,9 +81,6 @@ CFLAGS += \
   -D'LOCALE_ALIAS_PATH=""' \
   -D'GCONV_DIR=""' \
   -D'GCONV_PATH=""' \
-  -D__NR_futex=0 \
-  -D__NR_writev=0 \
-  -D__NR_pause=0 \
   -I $(SRCDIR)/gcc-$(GCC_VERSION)/gcc/include-fixed \
   -I $(SRCDIR)/gcc-$(GCC_VERSION)/gcc/ginclude \
   -I $(SRCDIR)/gcc-$(GCC_VERSION)/gcc/include \

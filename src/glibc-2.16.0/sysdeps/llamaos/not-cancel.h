@@ -57,3 +57,7 @@
 # define pause_not_cancel() \
   __pause_nocancel ()
 #endif
+
+/* Uncancelable sigsuspend.  */
+#define sigsuspend_not_cancel(set) \
+  __sigsuspend_nocancel (set)

@@ -121,8 +121,8 @@ int lll_robust_lock (int futex, int id, int private);
 void lll_unlock (int futex, int private);
 void lll_robust_unlock (int futex, int private);
 
-//int lll_futex_wait (int futex, int val, int private);
-//void lll_futex_wake (int futex, int nr, int private);
+int lll_futex_wait (int *futex, int val, int private);
+void lll_futex_wake (int *futex, int nr, int private);
 
 #endif  /* !__ASSEMBLER__ */
 

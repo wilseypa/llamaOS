@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012, William Magato
+Copyright (c) 2011, William Magato
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -29,49 +29,17 @@ either expressed or implied, of the copyright holder(s) or contributors.
 */
 
 #include <errno.h>
+#include <signal.h>
 
-int lll_trylock (int futex)
+
+int __sigsuspend_nocancel (const sigset_t *set)
 {
-   __set_errno (ENOSYS);
-   return 0;
+  __set_errno (ENOSYS);
+  return -1;
 }
-libc_hidden_def (lll_trylock)
+libc_hidden_def (__sigsuspend_nocancel)
+weak_alias (__sigsuspend_nocancel, sigsuspend_nocancel)
 
-void lll_lock (int futex, int private)
-{
-   __set_errno (ENOSYS);
-}
-libc_hidden_def (lll_lock)
-
-int lll_robust_lock (int futex, int id, int private)
-{
-   __set_errno (ENOSYS);
-   return 0;
-}
-libc_hidden_def (lll_robust_lock)
-
-void lll_unlock (int futex, int private)
-{
-   __set_errno (ENOSYS);
-}
-libc_hidden_def (lll_unlock)
-
-void lll_robust_unlock (int futex, int private)
-{
-   __set_errno (ENOSYS);
-}
-libc_hidden_def (lll_robust_unlock)
-
-int lll_futex_wait (int *futex, int val, int private)
-{
-   __set_errno (ENOSYS);
-
-   return -1;
-}
-libc_hidden_def (lll_futex_wait)
-
-void lll_futex_wake (int *futex, int nr, int private)
-{
-   __set_errno (ENOSYS);
-}
-libc_hidden_def (lll_futex_wake)
+stub_warning (sigsuspend_nocancel)
+stub_warning (__sigsuspend_nocancel)
+#include <stub-tag.h>

@@ -257,6 +257,7 @@ GLIBC_SOURCES_C = \
   glibc-$(GLIBC_VERSION)/signal/raise.c \
   glibc-$(GLIBC_VERSION)/signal/sigaction.c \
   glibc-$(GLIBC_VERSION)/signal/sigprocmask.c \
+  glibc-$(GLIBC_VERSION)/signal/sigsuspend.c \
   glibc-$(GLIBC_VERSION)/stdio-common/_itoa.c \
   glibc-$(GLIBC_VERSION)/stdio-common/_itowa.c \
   glibc-$(GLIBC_VERSION)/stdio-common/asprintf.c \
@@ -387,6 +388,8 @@ GLIBC_SOURCES_C = \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/init-first.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/libc-fatal.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/libc_open.c \
+  glibc-$(GLIBC_VERSION)/sysdeps/llamaos/sigsuspend.c \
+  glibc-$(GLIBC_VERSION)/sysdeps/posix/pause.c \
   glibc-$(GLIBC_VERSION)/sysdeps/posix/sysconf.c \
   glibc-$(GLIBC_VERSION)/sysdeps/wordsize-64/strtol.c \
   glibc-$(GLIBC_VERSION)/sysdeps/wordsize-64/strtol_l.c \
