@@ -214,6 +214,7 @@ LLAMAOS_SOURCES_ASM =
 LLAMAOS_SOURCES_C = 
 
 LLAMAOS_SOURCES_CPP = \
+  llamaos/xen/glibc_export.cpp \
   llamaos/xen/Hypercall.cpp \
   llamaos/xen/kernel.cpp \
   llamaos/xen/trace.cpp
