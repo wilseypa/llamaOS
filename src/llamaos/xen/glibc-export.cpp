@@ -28,10 +28,23 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
+#include <sys/poll.h>
+
 #include <llamaos/trace.h>
 
 using namespace llamaos;
 // using namespace llamaos::xen;
+
+/* Define ALIASNAME as a strong alias for NAME.  */
+# define strong_alias(name, aliasname) _strong_alias(name, aliasname)
+# define _strong_alias(name, aliasname) \
+  extern "C" __typeof (name) aliasname __attribute__ ((alias (#name)));
+
+  /* Define ALIASNAME as a weak alias for NAME.
+   If weak aliases are not available, this defines a strong alias.  */
+# define weak_alias(name, aliasname) _weak_alias (name, aliasname)
+# define _weak_alias(name, aliasname) \
+  extern "C" __typeof (name) aliasname __attribute__ ((weak, alias (#name)));
 
 extern "C"
 int madvise (__ptr_t addr, size_t len, int advice)
@@ -39,6 +52,200 @@ int madvise (__ptr_t addr, size_t len, int advice)
    trace ("glibc calling madvise (%lx, %d, %d)\n", addr, len, advice);
    return 0;
 }
+
+/**
+ * @brief char * __getcwd (char *buf, size_t size)
+ *
+ */
+extern "C"
+char *__getcwd (char *buf, size_t size)
+{
+   trace ("glibc calling getcwd (%lx, %d)\n", buf, size);
+
+   if (size >= 2)
+   {
+      buf [0] = '/';
+      buf [1] = '\0';
+
+      return buf;
+   }
+
+   return 0;
+}
+weak_alias (__getcwd, getcwd)
+
+/**
+ * @brief off64_t __libc_lseek64 (int fd, off64_t offset, int whence)
+ *
+ */
+extern "C"
+off64_t lseek64 (int fd, off64_t offset, int whence)
+{
+   trace ("glibc calling lseek64 (%d, %lu, %d)\n", fd, offset, whence);
+
+   return 0;
+}
+
+extern "C"
+int poll (struct pollfd *fds, nfds_t nfds, int timeout)
+{
+   trace ("glibc calling poll (%lx, %lx, %d)\n", fds, nfds, timeout);
+
+   return -1;
+}
+
+extern "C"
+ssize_t __read (int fd, void *buf, size_t nbytes)
+{
+   trace ("glibc calling read (%d, %lx, %lx)\n", fd, buf, nbytes);
+
+   return -1;
+}
+weak_alias (__read, read)
+
+extern "C"
+ssize_t __libc_write (int fd, const void *buf, size_t nbytes)
+{
+//   trace ("glibc calling __libc_write (fd: %d, buf: ", fd);
+
+//   for (unsigned int i = 0; i < nbytes; i++)
+//   {
+//      trace ("%c", static_cast<const char *>(buf) [i]);
+//   }
+
+//   trace (", nbytes: %d)\n", nbytes);
+
+//   if (stdout->_fileno == fd)
+//   {
+//      Hypervisor::get_instance ()->console.write (static_cast<const char *>(buf), nbytes);
+//      return nbytes;
+//   }
+
+//   return 0;
+   return -1;
+}
+weak_alias (__libc_write, __write)
+weak_alias (__libc_write, write)
+
+extern "C"
+int __get_nprocs_conf ()
+{
+   trace ("glibc calling __get_nprocs_conf ()\n");
+
+   /* We don't know how to determine the number.  Simply return always 1.  */
+   return 1;
+}
+weak_alias (__get_nprocs_conf, get_nprocs_conf)
+
+extern "C"
+int __get_nprocs ()
+{
+   trace ("glibc calling get_nprocs ()\n");
+
+   /* We don't know how to determine the number.  Simply return always 1.  */
+   return 1;
+}
+weak_alias (__get_nprocs, get_nprocs)
+
+extern "C"
+long int __get_phys_pages ()
+{
+   trace ("glibc calling __get_phys_pages ()\n");
+
+   return -1;
+}
+weak_alias (__get_phys_pages, get_phys_pages)
+
+extern "C"
+long int __get_avphys_pages ()
+{
+   trace ("glibc calling __get_avphys_pages ()\n");
+
+   return -1;
+}
+weak_alias (__get_avphys_pages, get_avphys_pages)
+
+extern "C"
+long int syscall (long int callno)
+{
+   trace ("glibc calling syscall (%ld)\n", callno);
+
+   return -1;
+}
+
+extern "C"
+ssize_t __libc_writev (int fd, const struct iovec *vector, int count)
+{
+  return -1;
+}
+strong_alias (__libc_writev, __writev)
+weak_alias (__libc_writev, writev)
+
+extern "C"
+void _exit (int status)
+{
+   trace ("glibc calling _exit (%d)\n", status);
+
+   abort ();
+}
+weak_alias (_exit, _Exit)
+
+extern "C"
+long int __pathconf (const char *path, int name)
+{
+   trace ("glibc calling __pathconf (%s, %d)\n", path, name);
+
+   return -1;
+}
+
+weak_alias (__pathconf, pathconf)
+
+extern "C"
+/* Get maximum priority value for a scheduler.  */
+int __sched_get_priority_max (int algorithm)
+{
+   trace ("glibc calling __sched_get_priority_max (%d)\n", algorithm);
+
+   return -1;
+}
+weak_alias (__sched_get_priority_max, sched_get_priority_max)
+
+extern "C"
+/* Get minimum priority value for a scheduler.  */
+int __sched_get_priority_min (int algorithm)
+{
+   trace ("glibc calling __sched_get_priority_min (%d)\n", algorithm);
+
+   return -1;
+}
+weak_alias (__sched_get_priority_min, sched_get_priority_min)
+
+extern "C"
+int raise (int sig)
+{
+   trace ("glibc calling raise (%d)\n", sig);
+
+   return -1;
+}
+weak_alias (raise, gsignal)
+
+extern "C"
+int __sigsuspend (const sigset_t *set)
+{
+   trace ("glibc calling __sigsuspend (%lx)\n", set);
+
+   return -1;
+}
+weak_alias (__sigsuspend, sigsuspend)
+
+extern "C"
+int __sigsuspend_nocancel (const sigset_t *set)
+{
+   trace ("glibc calling __sigsuspend_nocancel (%lx)\n", set);
+
+   return -1;
+}
+weak_alias (__sigsuspend_nocancel, sigsuspend_nocancel)
 
 #if 0
 /*

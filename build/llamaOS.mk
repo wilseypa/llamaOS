@@ -54,7 +54,7 @@ LLAMAOS_SOURCES_CPP =
 # xen specific source files
 ifeq ($(MAKECMDGOALS),xen)
 LLAMAOS_SOURCES_CPP += \
-  llamaos/xen/glibc_export.cpp \
+  llamaos/xen/glibc-export.cpp \
   llamaos/xen/Hypercall.cpp \
   llamaos/xen/kernel.cpp \
   llamaos/xen/trace.cpp

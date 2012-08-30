@@ -109,14 +109,9 @@ GLIBC_SOURCES_C = \
   glibc-$(GLIBC_VERSION)/io/fcntl.c \
   glibc-$(GLIBC_VERSION)/io/fxstat.c \
   glibc-$(GLIBC_VERSION)/io/fxstat64.c \
-  glibc-$(GLIBC_VERSION)/io/getcwd.c \
   glibc-$(GLIBC_VERSION)/io/isatty.c \
-  glibc-$(GLIBC_VERSION)/io/lseek64.c \
   glibc-$(GLIBC_VERSION)/io/open.c \
   glibc-$(GLIBC_VERSION)/io/open64.c \
-  glibc-$(GLIBC_VERSION)/io/poll.c \
-  glibc-$(GLIBC_VERSION)/io/read.c \
-  glibc-$(GLIBC_VERSION)/io/write.c \
   glibc-$(GLIBC_VERSION)/io/xstat.c \
   glibc-$(GLIBC_VERSION)/io/xstat64.c \
   glibc-$(GLIBC_VERSION)/libio/fcloseall.c \
@@ -212,8 +207,6 @@ GLIBC_SOURCES_C = \
   glibc-$(GLIBC_VERSION)/misc/getclktck.c \
   glibc-$(GLIBC_VERSION)/misc/getdtsz.c \
   glibc-$(GLIBC_VERSION)/misc/getpagesize.c \
-  glibc-$(GLIBC_VERSION)/misc/getsysstats.c \
-  glibc-$(GLIBC_VERSION)/misc/madvise.c \
   glibc-$(GLIBC_VERSION)/misc/init-misc.c \
   glibc-$(GLIBC_VERSION)/misc/lseek.c \
   glibc-$(GLIBC_VERSION)/misc/mmap.c \
@@ -222,9 +215,7 @@ GLIBC_SOURCES_C = \
   glibc-$(GLIBC_VERSION)/misc/munmap.c \
   glibc-$(GLIBC_VERSION)/misc/readv.c \
   glibc-$(GLIBC_VERSION)/misc/sbrk.c \
-  glibc-$(GLIBC_VERSION)/misc/syscall.c \
   glibc-$(GLIBC_VERSION)/misc/tsearch.c \
-  glibc-$(GLIBC_VERSION)/misc/writev.c \
   glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS/lowlevellock.c \
   glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS/register-atfork.c \
   glibc-$(GLIBC_VERSION)/nptl/sysdeps/pthread/flockfile.c \
@@ -234,7 +225,6 @@ GLIBC_SOURCES_C = \
   glibc-$(GLIBC_VERSION)/nptl/pthread_once.c \
   glibc-$(GLIBC_VERSION)/nptl/tpp.c \
   glibc-$(GLIBC_VERSION)/nptl/vars.c \
-  glibc-$(GLIBC_VERSION)/posix/_exit.c \
   glibc-$(GLIBC_VERSION)/posix/environ.c \
   glibc-$(GLIBC_VERSION)/posix/fpathconf.c \
   glibc-$(GLIBC_VERSION)/posix/get_child_max.c \
@@ -242,22 +232,17 @@ GLIBC_SOURCES_C = \
   glibc-$(GLIBC_VERSION)/posix/geteuid.c \
   glibc-$(GLIBC_VERSION)/posix/getgid.c \
   glibc-$(GLIBC_VERSION)/posix/getuid.c \
-  glibc-$(GLIBC_VERSION)/posix/pathconf.c \
   glibc-$(GLIBC_VERSION)/posix/pause.c \
   glibc-$(GLIBC_VERSION)/posix/sched_getp.c \
   glibc-$(GLIBC_VERSION)/posix/sched_gets.c \
-  glibc-$(GLIBC_VERSION)/posix/sched_primax.c \
-  glibc-$(GLIBC_VERSION)/posix/sched_primin.c \
   glibc-$(GLIBC_VERSION)/posix/sched_setp.c \
   glibc-$(GLIBC_VERSION)/posix/sched_sets.c \
   glibc-$(GLIBC_VERSION)/setjmp/__longjmp.c \
   glibc-$(GLIBC_VERSION)/setjmp/longjmp.c \
   glibc-$(GLIBC_VERSION)/setjmp/setjmp.c \
   glibc-$(GLIBC_VERSION)/setjmp/sigjmp.c \
-  glibc-$(GLIBC_VERSION)/signal/raise.c \
   glibc-$(GLIBC_VERSION)/signal/sigaction.c \
   glibc-$(GLIBC_VERSION)/signal/sigprocmask.c \
-  glibc-$(GLIBC_VERSION)/signal/sigsuspend.c \
   glibc-$(GLIBC_VERSION)/stdio-common/_itoa.c \
   glibc-$(GLIBC_VERSION)/stdio-common/_itowa.c \
   glibc-$(GLIBC_VERSION)/stdio-common/asprintf.c \
@@ -388,7 +373,6 @@ GLIBC_SOURCES_C = \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/init-first.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/libc-fatal.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/libc_open.c \
-  glibc-$(GLIBC_VERSION)/sysdeps/llamaos/sigsuspend.c \
   glibc-$(GLIBC_VERSION)/sysdeps/posix/pause.c \
   glibc-$(GLIBC_VERSION)/sysdeps/posix/sysconf.c \
   glibc-$(GLIBC_VERSION)/sysdeps/wordsize-64/strtol.c \
@@ -458,6 +442,23 @@ GLIBC_SOURCES_C = \
   glibc-$(GLIBC_VERSION)/wctype/wctype.c \
   glibc-$(GLIBC_VERSION)/wctype/wctype_l.c
 
+# These have been moved to llamaOS implementation
+#  glibc-$(GLIBC_VERSION)/io/getcwd.c \
+#  glibc-$(GLIBC_VERSION)/io/lseek64.c \
+#  glibc-$(GLIBC_VERSION)/io/poll.c \
+#  glibc-$(GLIBC_VERSION)/io/read.c \
+#  glibc-$(GLIBC_VERSION)/io/write.c \
+#  glibc-$(GLIBC_VERSION)/misc/getsysstats.c \
+#  glibc-$(GLIBC_VERSION)/misc/madvise.c \
+#  glibc-$(GLIBC_VERSION)/misc/syscall.c \
+#  glibc-$(GLIBC_VERSION)/misc/writev.c \
+#  glibc-$(GLIBC_VERSION)/posix/_exit.c \
+#  glibc-$(GLIBC_VERSION)/posix/pathconf.c \
+#  glibc-$(GLIBC_VERSION)/posix/sched_primax.c \
+#  glibc-$(GLIBC_VERSION)/posix/sched_primin.c \
+#  glibc-$(GLIBC_VERSION)/signal/raise.c \
+#  glibc-$(GLIBC_VERSION)/signal/sigsuspend.c \
+#  glibc-$(GLIBC_VERSION)/sysdeps/llamaos/sigsuspend.c \
 
 GLIBC_OBJECTS  = $(GLIBC_SOURCES_ASM:%.S=$(OBJDIR)/%.o)
 GLIBC_OBJECTS += $(GLIBC_SOURCES_C:%.c=$(OBJDIR)/%.o)
