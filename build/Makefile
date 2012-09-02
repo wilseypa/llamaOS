@@ -30,24 +30,19 @@
 # contributors.
 #
 
-# include common flag variables
-include llamaOS-flags.mk
+# include common variables
+include common.mk
 
-MAKEFILE_SOURCES = common.mk llamaOS-flags.mk
+MAKEFILE_SOURCES += Makefile
 
-# shared common paths
-BINDIR = bin
-LIBDIR = lib
-OBJDIR = obj
-INCDIR = include
+.PHONY: all
+all:
+	@$(MAKE) -f xen-$(XEN_VERSION).mk
+	@$(MAKE) -f minimal.mk xen
+#	@$(MAKE) -C build -f llamaOS.mk xen
+#	@$(MAKE) -C build -f apps.hello.mk xen
 
-SRCDIR = ../src
-VPATH = $(SRCDIR)
-
-GLIBC_VERSION = 2.16.0
-GCC_VERSION = 4.7.1
-# XEN_VERSION = 4.1.2
-XEN_VERSION = unstable
-
-# auto dependency generation
-DEPENDS = 
+.PHONY: clean
+clean:
+	@echo cleaning build folder...
+	@$(MAKE) -f clean.mk

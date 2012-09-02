@@ -38,7 +38,7 @@ int main (int argc, char *argv [])
 //   cout << endl << "hello llamaOS" << endl;
 //   cout.flush ();
 
-//   for (;;);
+   for (;;);
 
    return 0;
 }

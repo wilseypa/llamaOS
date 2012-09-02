@@ -37,7 +37,7 @@ namespace llamaos {
 
 int trace (const char *format, ...);
 
-void trace (const std::string &);
+//void trace (const std::string &);
 
 }
 

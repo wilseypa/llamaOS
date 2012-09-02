@@ -30,24 +30,49 @@
 # contributors.
 #
 
-# include common flag variables
-include llamaOS-flags.mk
+# include common variables
+include common.mk
 
-MAKEFILE_SOURCES = common.mk llamaOS-flags.mk
+MAKEFILE_SOURCES += minimal.mk
 
-# shared common paths
-BINDIR = bin
-LIBDIR = lib
-OBJDIR = obj
-INCDIR = include
+ASMFLAGS += \
+  -I $(INCDIR) -I $(SRCDIR)
 
-SRCDIR = ../src
+CFLAGS += \
+  -I $(INCDIR) -I $(SRCDIR)
+
+CPPFLAGS += 
+
 VPATH = $(SRCDIR)
 
-GLIBC_VERSION = 2.16.0
-GCC_VERSION = 4.7.1
-# XEN_VERSION = 4.1.2
-XEN_VERSION = unstable
+ifeq ($(MAKECMDGOALS),xen)
 
-# auto dependency generation
-DEPENDS = 
+ASM_SOURCES = \
+  llamaos/xen/Entry-minimal.S
+
+C_SOURCES = \
+  llamaos/xen/Minimal.c
+
+endif
+
+OBJECTS  = $(ASM_SOURCES:%.S=$(OBJDIR)/%.o)
+OBJECTS += $(C_SOURCES:%.c=$(OBJDIR)/%.o)
+DEPENDS += $(OBJECTS:%.o=%.d)
+
+.PHONY: xen
+xen : $(BINDIR)/xen/minimal
+
+# the entry object must be the first object listed here or the guest will crash!
+$(BINDIR)/xen/minimal: $(OBJECTS)
+	@echo $(OBJECTS)
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo linking: $@
+	@$(LD) $(LDFLAGS) -T minimal.lds -o $@ $^
+	@gzip -c -f --best $@ >$@.gz
+	@echo successfully built: $@
+	@echo
+
+include rules.mk
+
+# include auto-generated dependencies
+-include $(DEPENDS)

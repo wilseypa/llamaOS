@@ -34,34 +34,38 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <cstring>
 
 #include <llamaos/trace.h>
-#include <llamaos/xen/Hypercall.h>
+#include <llamaos/xen/Hypercall-macros.h>
 
 namespace llamaos {
 
+static char buffer [512] = { '\0' };
+
 int trace (const char *format, ...)
 {
+   HYPERVISOR_console_io(CONSOLEIO_write, strlen(format), (char *)format);
+
    // prep variable arguments
    va_list arg;
    va_start (arg, format);
 
    // copy formatted output to buffer
-   char buffer [256] = { '\0' };
-   int count = 0;//vsnprintf (buffer, sizeof(buffer)-1, format, arg);
+   int count = vsnprintf (buffer, sizeof(buffer)-1, format, arg);
 
    // term variable arguments
    va_end (arg);
 
    // write buffer to system output/log
-   xen::Hypercall::console_io (buffer);
+   // xen::Hypercall::console_io (buffer);
+   HYPERVISOR_console_io(CONSOLEIO_write, strlen(buffer), buffer);
 
    // return the number characters written
    return count;
 }
 
-void trace (const std::string &text)
-{
-   // write string to system output/log
-   xen::Hypercall::console_io (text);
-}
+//void trace (const std::string &text)
+//{
+//   // write string to system output/log
+//   xen::Hypercall::console_io (text);
+//}
 
 }

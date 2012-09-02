@@ -36,9 +36,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #endif
 
 #include <xen/xen.h>
-//#include <xen/include/public/grant_table.h>
 #include <xen/sched.h>
-//#include <xen/include/public/version.h>
 
 #include <llamaos/xen/Hypercall.h>
 #include <llamaos/config.h>
@@ -47,7 +45,74 @@ either expressed or implied, of the copyright holder(s) or contributors.
 using namespace llamaos;
 using namespace llamaos::xen;
 
-extern char hypercall_page[PAGE_SIZE];
+// extern char hypercall_page[PAGE_SIZE];
+
+extern struct { char _entry[32]; } hypercall_page[];
+
+#define __HYPERCALL		"call hypercall_page+%c[offset]"
+#define __HYPERCALL_ENTRY(x)						\
+	[offset] "i" (__HYPERVISOR_##x * sizeof(hypercall_page[0]))
+
+#ifdef CONFIG_X86_32
+#define __HYPERCALL_RETREG	"eax"
+#define __HYPERCALL_ARG1REG	"ebx"
+#define __HYPERCALL_ARG2REG	"ecx"
+#define __HYPERCALL_ARG3REG	"edx"
+#define __HYPERCALL_ARG4REG	"esi"
+#define __HYPERCALL_ARG5REG	"edi"
+#else
+#define __HYPERCALL_RETREG	"rax"
+#define __HYPERCALL_ARG1REG	"rdi"
+#define __HYPERCALL_ARG2REG	"rsi"
+#define __HYPERCALL_ARG3REG	"rdx"
+#define __HYPERCALL_ARG4REG	"r10"
+#define __HYPERCALL_ARG5REG	"r8"
+#endif
+
+#define __HYPERCALL_DECLS						\
+	register unsigned long __res  asm(__HYPERCALL_RETREG);		\
+	register unsigned long __arg1 asm(__HYPERCALL_ARG1REG) = __arg1; \
+	register unsigned long __arg2 asm(__HYPERCALL_ARG2REG) = __arg2; \
+	register unsigned long __arg3 asm(__HYPERCALL_ARG3REG) = __arg3; \
+	register unsigned long __arg4 asm(__HYPERCALL_ARG4REG) = __arg4; \
+	register unsigned long __arg5 asm(__HYPERCALL_ARG5REG) = __arg5;
+
+#define __HYPERCALL_0PARAM	"=r" (__res)
+#define __HYPERCALL_1PARAM	__HYPERCALL_0PARAM, "+r" (__arg1)
+#define __HYPERCALL_2PARAM	__HYPERCALL_1PARAM, "+r" (__arg2)
+#define __HYPERCALL_3PARAM	__HYPERCALL_2PARAM, "+r" (__arg3)
+#define __HYPERCALL_4PARAM	__HYPERCALL_3PARAM, "+r" (__arg4)
+#define __HYPERCALL_5PARAM	__HYPERCALL_4PARAM, "+r" (__arg5)
+
+#define __HYPERCALL_0ARG()
+#define __HYPERCALL_1ARG(a1)						\
+	__HYPERCALL_0ARG()		__arg1 = (unsigned long)(a1);
+#define __HYPERCALL_2ARG(a1,a2)						\
+	__HYPERCALL_1ARG(a1)		__arg2 = (unsigned long)(a2);
+#define __HYPERCALL_3ARG(a1,a2,a3)					\
+	__HYPERCALL_2ARG(a1,a2)		__arg3 = (unsigned long)(a3);
+#define __HYPERCALL_4ARG(a1,a2,a3,a4)					\
+	__HYPERCALL_3ARG(a1,a2,a3)	__arg4 = (unsigned long)(a4);
+#define __HYPERCALL_5ARG(a1,a2,a3,a4,a5)				\
+	__HYPERCALL_4ARG(a1,a2,a3,a4)	__arg5 = (unsigned long)(a5);
+
+#define __HYPERCALL_CLOBBER5	"memory"
+#define __HYPERCALL_CLOBBER4	__HYPERCALL_CLOBBER5, __HYPERCALL_ARG5REG
+#define __HYPERCALL_CLOBBER3	__HYPERCALL_CLOBBER4, __HYPERCALL_ARG4REG
+#define __HYPERCALL_CLOBBER2	__HYPERCALL_CLOBBER3, __HYPERCALL_ARG3REG
+#define __HYPERCALL_CLOBBER1	__HYPERCALL_CLOBBER2, __HYPERCALL_ARG2REG
+#define __HYPERCALL_CLOBBER0	__HYPERCALL_CLOBBER1, __HYPERCALL_ARG1REG
+
+#define _hypercall3(type, name, a1, a2, a3)				\
+({									\
+	__HYPERCALL_DECLS;						\
+	__HYPERCALL_3ARG(a1, a2, a3);					\
+	asm volatile (__HYPERCALL					\
+		      : __HYPERCALL_3PARAM				\
+		      : __HYPERCALL_ENTRY(name)				\
+		      : __HYPERCALL_CLOBBER3);				\
+	(type)__res;							\
+})
 
 template <typename T> 
 static T hypercall (uint64_t index)
@@ -98,23 +163,56 @@ static T hypercall (uint64_t index,
 }
 
 template <typename T> 
-static inline T hypercall (uint64_t index,
+T hypercall3(int index, unsigned long a1, unsigned long a2, unsigned long a3)
+{
+   register unsigned long __res  asm("rax");
+   register unsigned long __arg1 asm("rdi") = __arg1;
+   register unsigned long __arg2 asm("rsi") = __arg2;
+   register unsigned long __arg3 asm("rdx") = __arg3;
+//   register unsigned long __arg4 asm("r10") = __arg4;
+//   register unsigned long __arg5 asm("r8") = __arg5;
+
+   __arg1 = (unsigned long)(a1);
+   __arg2 = (unsigned long)(a2);
+   __arg3 = (unsigned long)(a3);
+
+	asm volatile ("call hypercall_page+%[offset]"
+		      : "=r" (__res), "+r" (__arg1), "+r" (__arg2), "+r" (__arg3)
+		      : [offset] "m" (index)
+		      : "memory", "r8", "r10");
+
+   return (T)__res;
+}
+
+template <typename T> 
+static inline T hypercallt3 (//uint64_t index,
                            uint64_t a1,
                            uint64_t a2,
                            uint64_t a3)
 {
-   register uint64_t result asm("rax");
-   register uint64_t arg1 asm("rdi") = a1;
-   register uint64_t arg2 asm("rsi") = a2;
-   register uint64_t arg3 asm("rdx") = a3;
+//   register uint64_t result asm("rax");
+//   register uint64_t arg1 asm("rdi") = a1;
+//   register uint64_t arg2 asm("rsi") = a2;
+//   register uint64_t arg3 asm("rdx") = a3;
+
+   register unsigned long __res  asm("rax");
+   register unsigned long __arg1 asm("rdi") = __arg1;
+   register unsigned long __arg2 asm("rsi") = __arg2;
+   register unsigned long __arg3 asm("rdx") = __arg3;
+   register unsigned long __arg4 asm("r10") = __arg4;
+   register unsigned long __arg5 asm("r8") = __arg5;
+
+   __arg1 = (unsigned long)(a1);
+   __arg2 = (unsigned long)(a2);
+   __arg3 = (unsigned long)(a3);
 
    asm volatile ("call hypercall_page + %c[offset]"
-                 : "=r"(result), "+r"(arg1), "+r"(arg2), "+r"(arg3)
-                 : [offset] "i" (index * 32)
-                 : "r10", "r8", "memory"
+                 : "=r"(__res), "+r"(__arg1), "+r"(__arg2), "+r"(__arg3)
+                 : [offset] "i" (__HYPERVISOR_console_io * sizeof(hypercall_page[0])) // (index * 32)
+                 : "memory", "r8", "r10"  
                 );
 
-   return static_cast<T>(result);
+   return static_cast<T>(__res);
 }
 
 template <typename T> 
@@ -163,13 +261,15 @@ static inline T hypercall (uint64_t index,
    return static_cast<T>(result);
 }
 
-#if 0
-bool Hypercall::console_io (const char *string)
+bool Hypercall::console_io (char *stringx)
 {
-   if (0 != hypercall<int>(__HYPERVISOR_console_io,
+//   int length = strlen (stringx);
+//   _hypercall3(int, console_io, CONSOLEIO_write, length, stringx);
+//   if (0 != hypercallt3<int>(//__HYPERVISOR_console_io,
+   if (0 != hypercall3<int>(__HYPERVISOR_console_io,
                            CONSOLEIO_write,
-                           strlen (string),
-                           reinterpret_cast<uint64_t>(string)))
+                           strlen (stringx),
+                           reinterpret_cast<unsigned long>(stringx)))
    {
       // probably nothing can be done here since trace would just recall this
       return false;
@@ -177,21 +277,20 @@ bool Hypercall::console_io (const char *string)
 
    return true;
 }
-#endif
 
-bool Hypercall::console_io (const std::string &string)
-{
-   if (0 != hypercall<int>(__HYPERVISOR_console_io,
-                           CONSOLEIO_write,
-                           string.size (),
-                           reinterpret_cast<uint64_t>(string.c_str ())))
-   {
-      // probably nothing can be done here since trace would just recall this
-      return false;
-   }
-
-   return true;
-}
+//bool Hypercall::console_io (const std::string &string)
+//{
+//   if (0 != hypercall<int>(__HYPERVISOR_console_io,
+//                           CONSOLEIO_write,
+//                           string.size (),
+//                           reinterpret_cast<uint64_t>(string.c_str ())))
+//   {
+//      // probably nothing can be done here since trace would just recall this
+//      return false;
+//   }
+//
+//   return true;
+//}
 
 bool Hypercall::sched_op_shutdown (unsigned int reason)
 {

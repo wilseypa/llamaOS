@@ -28,67 +28,48 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#ifndef llamaos_config_h_
-#define llamaos_config_h_
+//#include <stdint>
+// no stdlib so just define these here
+typedef char int8_t;
+typedef unsigned char uint8_t;
+typedef short int16_t;
+typedef unsigned short uint16_t;
+typedef int int32_t;
+typedef unsigned int uint32_t;
+typedef long int64_t;
+typedef unsigned long uint64_t;
 
-#define __STR(x) #x
-#define STR(x) __STR(x)
+#include <xen/xen.h>
 
-// llamaOS version
-#define LLAMAOS_VERSION_MAJOR 1
-#define LLAMAOS_VERSION_MINOR 0
-#define LLAMAOS_VERSION_TEXT  "llamaOS-" STR(LLAMAOS_VERSION_MAJOR) "." STR(LLAMAOS_VERSION_MINOR)
+#include <llamaos/xen/Hypercall-macros.h>
+#include <llamaos/config.h>
 
-#define LLAMAOS_STACK_SIZE     0x800000  // 8MB
-#define LLAMAOS_IRQ_STACK_SIZE 0x400000  // 4MB
-//#define LLAMAOS_STACK_SIZE     0x1E00000
-//#define LLAMAOS_IRQ_STACK_SIZE 0x10000
+// runtime stack memory
+char RUNTIME_STACK [2 * LLAMAOS_STACK_SIZE];
 
-#define LLAMAOS_PAGE_SIZE      0x1000  // 4KB
+static int verify_magic (const start_info_t *start_info)
+{
+   if (   (0 != start_info)
+       && ('x' == start_info->magic [0])
+       && ('e' == start_info->magic [1])
+       && ('n' == start_info->magic [2])
+       && ('-' == start_info->magic [3]))
+   {
+      return 1;
+   }
 
-#ifdef __cplusplus
-
-namespace llamaos {
-
-/**
- * @brief llamaOS major version number.
- *
- */
-static const unsigned int VERSION_MAJOR = LLAMAOS_VERSION_MAJOR;
-
-/**
- * @brief llamaOS minor version number.
- *
- */
-static const unsigned int VERSION_MINOR = LLAMAOS_VERSION_MINOR;
-
-/**
- * @brief llamaOS version text.
- *
- */
-static const char VERSION_TEXT[] = LLAMAOS_VERSION_TEXT;
-
-/**
- * @brief General system stack size.
- *
- */
-// be sure to make this a power-of-2 number
-static const unsigned long STACK_SIZE = LLAMAOS_STACK_SIZE;
-
-/**
- * @brief Interrupt context stack size.
- *
- */
-// be sure to make this a power-of-2 number
-static const unsigned long IRQ_STACK_SIZE = LLAMAOS_IRQ_STACK_SIZE;
-
-/**
- * @brief System memory page size.
- *
- */
-static const unsigned long PAGE_SIZE = LLAMAOS_PAGE_SIZE;
-
+   return 0;
 }
 
-#endif  // __cplusplus
-#endif  // llamaos_config_h_
+void minimal_kernel (start_info_t *start_info)
+{
+   if (verify_magic (start_info))
+   {
+      HYPERVISOR_console_io(CONSOLEIO_write, 32, "\n\nStarting minimal Xen guest...\n\n");
+
+      // loop forever
+      for (;;);
+   }
+
+   // error finding memory, so just leave
+}

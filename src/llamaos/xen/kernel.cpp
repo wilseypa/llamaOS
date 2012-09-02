@@ -35,13 +35,13 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 #include <xen/xen.h>
 
-#include <llamaos/xen/Hypercall.h>
+#include <llamaos/xen/Hypercall-macros.h>
 #include <llamaos/config.h>
 #include <llamaos/trace.h>
 
 using namespace std;
 using namespace llamaos;
-using namespace llamaos::xen;
+// using namespace llamaos::xen;
 
 // runtime stack memory
 char RUNTIME_STACK [2 * llamaos::STACK_SIZE];
@@ -64,7 +64,7 @@ static void trace_start_info (const start_info_t *start_info)
    trace (      "*********************************\n\n\n");
 
    trace ("%s\n\n", VERSION_TEXT);
-
+return;
    trace ("=== start_info ===\n");
    trace ("  magic: %s\n", start_info->magic);
    trace ("  nr_pages: %x\n", start_info->nr_pages);
@@ -87,12 +87,41 @@ static void trace_start_info (const start_info_t *start_info)
 
 int main(int argc, char **argv);
 
+void recurse_stack(int i)
+{
+   if ((i % 200) == 0)
+   {
+      HYPERVISOR_console_io(CONSOLEIO_write, strlen(".\n"), ".\n");
+   }
+   else
+   {
+      HYPERVISOR_console_io(CONSOLEIO_write, strlen("."), ".");
+   }
+   recurse_stack(i + 1);
+}
+
 extern "C"
 void kernel (start_info_t *start_info)
 {
    if (verify_magic (start_info))
    {
+
+      static char hello[] = "Bootstrapping...\n";
+
+      HYPERVISOR_console_io(CONSOLEIO_write, strlen(hello), hello);
+
+      HYPERVISOR_console_io(CONSOLEIO_write, strlen("12345\n"), "12345\n");
+      HYPERVISOR_console_io(CONSOLEIO_write, strlen("67890\n"), "67890\n");
+
+   recurse_stack(1);
+//      xen::Hypercall::console_io (hello);
+goto label;
+      trace("from trace\n");
+label:
+      HYPERVISOR_console_io(CONSOLEIO_write, strlen(hello), hello);
       trace_start_info (start_info);
+
+for(;;);
 
       // initialize libstdc++
       ios_base::Init ios_base_init;
@@ -104,6 +133,6 @@ void kernel (start_info_t *start_info)
 
       main (1, argv);
 
-      Hypercall::sched_op_shutdown ();
+//      Hypercall::sched_op_shutdown ();
    }
 }
