@@ -28,21 +28,33 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#ifndef llamaos_trace_h_
-#define llamaos_trace_h_
+#include <errno.h>
+#include <unistd.h>
 
-int trace (const char *format, ...);
+// define function pointer
+typedef char *(*llamaos_exit_t) (int);
 
-#ifdef __cplusplus
+// function pointer variable
+static llamaos_exit_t llamaos_exit = 0;
 
-namespace llamaos {
-
-// int trace (const char *format, ...);
-
-//void trace (const std::string &);
-
+// function called by llamaOS to register pointer
+void register_llamaos_exit (llamaos_exit_t exit)
+{
+   llamaos_exit = exit;
 }
 
-#endif  // __cplusplus
+/* The function `_exit' should take a status argument and simply
+   terminate program execution, using the low-order 8 bits of the
+   given integer as status.  */
+void _exit (int status)
+{
+   if (0 != llamaos_exit)
+   {
+      llamaos_exit (status & 0xff);
+   }
 
-#endif  //  llamaos_trace_h_
+   __set_errno (ENOSYS);
+   abort ();
+}
+libc_hidden_def (_exit)
+weak_alias (_exit, _Exit)

@@ -28,21 +28,32 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#ifndef llamaos_trace_h_
-#define llamaos_trace_h_
+#include <sys/types.h>
+#include <sys/mman.h>
+#include <errno.h>
 
-int trace (const char *format, ...);
+// define function pointer
+typedef int (*llamaos_madvise_t) (__ptr_t, size_t, int);
 
-#ifdef __cplusplus
+// function pointer variable
+static llamaos_madvise_t llamaos_madvise = 0;
 
-namespace llamaos {
-
-// int trace (const char *format, ...);
-
-//void trace (const std::string &);
-
+// function called by llamaOS to register pointer
+void register_llamaos_madvise (llamaos_madvise_t madvise)
+{
+   llamaos_madvise = madvise;
 }
 
-#endif  // __cplusplus
+/* Advise the system about particular usage patterns the program follows
+   for the region starting at ADDR and extending LEN bytes.  */
+int madvise (__ptr_t addr, size_t len, int advice)
+{
+   if (0 != llamaos_madvise)
+   {
+      return llamaos_madvise (addr, len, advice);
+   }
 
-#endif  //  llamaos_trace_h_
+   __set_errno (ENOSYS);
+  return -1;
+}
+libc_hidden_def (madvise)

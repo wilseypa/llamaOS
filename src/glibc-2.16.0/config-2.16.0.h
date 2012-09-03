@@ -177,7 +177,7 @@
 #define USE_MULTIARCH 1
 
 /* Define if `.ctors' and `.dtors' sections shouldn't be used.  */
-#define NO_CTORS_DTORS_SECTIONS 1
+/* #undef NO_CTORS_DTORS_SECTIONS */
 
 /* Define if obsolete RPC code should be made available for user-level code
    to link against.  */

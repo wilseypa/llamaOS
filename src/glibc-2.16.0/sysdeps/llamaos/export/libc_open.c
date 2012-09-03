@@ -28,21 +28,27 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#ifndef llamaos_trace_h_
-#define llamaos_trace_h_
+#include <errno.h>
 
-int trace (const char *format, ...);
+// define function pointer
+typedef int (*llamaos_libc_open_t) (const char *, int);
 
-#ifdef __cplusplus
+// function pointer variable
+static llamaos_libc_open_t llamaos_libc_open = 0;
 
-namespace llamaos {
-
-// int trace (const char *format, ...);
-
-//void trace (const std::string &);
-
+// function called by llamaOS to register pointer
+void register_llamaos_libc_open (llamaos_libc_open_t libc_open)
+{
+   llamaos_libc_open = libc_open;
 }
 
-#endif  // __cplusplus
+int __libc_open (const char *file, int oflag, ...)
+{
+   if (0 != llamaos_libc_open)
+   {
+      return llamaos_libc_open (file, oflag);
+   }
 
-#endif  //  llamaos_trace_h_
+   __set_errno (ENOSYS);
+   return 0;
+}

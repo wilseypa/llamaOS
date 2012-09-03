@@ -33,18 +33,46 @@
 # include common variables
 include common.mk
 
-MAKEFILE_SOURCES += Makefile
+MAKEFILE_SOURCES += minimal-c.mk
 
-.PHONY: all
-all:
-	@$(MAKE) -f glibc-$(GLIBC_VERSION).mk
-	@$(MAKE) -f xen-$(XEN_VERSION).mk
-	@$(MAKE) -f minimal.mk xen
-	@$(MAKE) -f minimal-c.mk xen
-#	@$(MAKE) -C build -f llamaOS.mk xen
-#	@$(MAKE) -C build -f apps.hello.mk xen
+ASMFLAGS += \
+  -I $(INCDIR) -I $(SRCDIR)
 
-.PHONY: clean
-clean:
-	@echo cleaning build folder...
-	@$(MAKE) -f clean.mk
+CFLAGS += \
+  -I $(INCDIR) -I $(SRCDIR)
+
+CPPFLAGS += 
+
+VPATH = $(SRCDIR)
+
+ifeq ($(MAKECMDGOALS),xen)
+
+ASM_SOURCES = \
+  llamaos/xen/Entry-minimal-c.S
+
+C_SOURCES = \
+  llamaos/xen/Minimal-c.c
+
+endif
+
+OBJECTS  = $(ASM_SOURCES:%.S=$(OBJDIR)/%.o)
+OBJECTS += $(C_SOURCES:%.c=$(OBJDIR)/%.o)
+DEPENDS += $(OBJECTS:%.o=%.d)
+
+.PHONY: xen
+xen : $(BINDIR)/xen/minimal-c
+
+# the entry object must be the first object listed here or the guest will crash!
+$(BINDIR)/xen/minimal-c: $(OBJECTS) $(LIBDIR)/glibc.a
+	@echo $(OBJECTS)
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo linking: $@
+	@$(LD) $(LDFLAGS) -T minimal-c.lds -o $@ $^
+	@gzip -c -f --best $@ >$@.gz
+	@echo successfully built: $@
+	@echo
+
+include rules.mk
+
+# include auto-generated dependencies
+-include $(DEPENDS)

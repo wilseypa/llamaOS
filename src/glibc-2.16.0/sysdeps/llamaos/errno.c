@@ -30,6 +30,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 #include <errno.h>
 
+#if 0
 #if RTLD_PRIVATE_ERRNO
 
 #else
@@ -37,3 +38,10 @@ either expressed or implied, of the copyright holder(s) or contributors.
 __thread int __libc_errno;
 
 #endif
+#endif
+
+/* This differs from plain `int errno;' in that it doesn't create
+   a common definition, but a plain symbol that resides in .bss,
+   which can have an alias.  */
+int errno __attribute__ ((nocommon));
+strong_alias (errno, _errno)

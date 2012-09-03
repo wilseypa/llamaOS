@@ -28,21 +28,30 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#ifndef llamaos_trace_h_
-#define llamaos_trace_h_
+#include <errno.h>
+#include <unistd.h>
+#include <stddef.h>
 
-int trace (const char *format, ...);
+// define function pointer
+typedef char *(*llamaos_getcwd_t) (char *, size_t);
 
-#ifdef __cplusplus
+// function pointer variable
+static llamaos_getcwd_t llamaos_getcwd = 0;
 
-namespace llamaos {
-
-// int trace (const char *format, ...);
-
-//void trace (const std::string &);
-
+// function called by llamaOS to register pointer
+void register_llamaos_getcwd (llamaos_getcwd_t getcwd)
+{
+   llamaos_getcwd = getcwd;
 }
 
-#endif  // __cplusplus
+char * __getcwd (char *buf, size_t size)
+{
+   if (0 != llamaos_getcwd)
+   {
+      return llamaos_getcwd (buf, size);
+   }
 
-#endif  //  llamaos_trace_h_
+   __set_errno (ENOSYS);
+   return NULL;
+}
+weak_alias (__getcwd, getcwd)

@@ -1,6 +1,5 @@
 /* config.h.  Generated from config.h.in by configure.  */
-#if !defined IS_IN_build && !defined __ASSEMBLER__ && !defined _ISOMAC \
-    && !defined __OPTIMIZE__
+#if !defined __ASSEMBLER__ && !defined _ISOMAC && !defined __OPTIMIZE__
 # error "glibc cannot be compiled without optimization"
 #endif
 
@@ -10,6 +9,11 @@
 # error "glibc must not be compiled with -ffast-math"
 #endif
 
+/* Define if using ELF, which supports weak symbols.
+   This implies HAVE_ASM_WEAK_DIRECTIVE and NO_UNDERSCORES; set by
+   --with-elf.  */
+#define HAVE_ELF 1
+
 /* Define if building with SELinux support.  Set by --with-selinux.  */
 /* #undef HAVE_SELINUX */
 
@@ -18,6 +22,13 @@
 
 /* Defined if building with SELinux support & libcap libs are detected.  */
 /* #undef HAVE_LIBCAP */
+
+/* Define if using XCOFF. Set by --with-xcoff.  */
+/* #undef HAVE_XCOFF */
+
+/* Define if C symbols are asm symbols.  Don't define if C symbols
+   have a `_' prepended to make the asm symbol.  */
+#define NO_UNDERSCORES 1
 
 /* Define if weak symbols are available via the `.weak' directive.  */
 #define HAVE_ASM_WEAK_DIRECTIVE 1
@@ -31,6 +42,9 @@
 /* Define to the assembler line separator character for multiple
    assembler instructions per line.  Default is `;'  */
 /* #undef ASM_LINE_SEP */
+
+/* Define if not using ELF, but `.init' and `.fini' sections are available.  */
+/* #undef HAVE_INITFINI */
 
 /* Define if __attribute__((section("foo"))) puts quotes around foo.  */
 /* #undef HAVE_SECTION_QUOTES */
@@ -61,6 +75,10 @@
 /* Define if _Unwind_Find_FDE should be exported from glibc.  */
 /* #undef EXPORT_UNWIND_FIND_FDE */
 
+/* Define to use GNU libio instead of GNU stdio.
+   This is defined by configure under --enable-libio.  */
+#define USE_IN_LIBIO 1
+
 /* Define if using ELF and the assembler supports the `.previous'
    directive.  */
 #define HAVE_ASM_PREVIOUS_DIRECTIVE 1
@@ -78,8 +96,21 @@
 /* Define if static NSS modules are wanted.  */
 #define DO_STATIC_NSS 1
 
+/* Define if the compiler supports __builtin_expect.  */
+#define HAVE_BUILTIN_EXPECT 1
+
 /* Define if the compiler supports __builtin_memset.  */
 #define HAVE_BUILTIN_MEMSET 1
+
+/* Define if __asm () on built-in function's prototype causes redirection of
+   the builtin.  */
+#define HAVE_BUILTIN_REDIRECTION 1
+
+/* Define if the __thread keyword is supported.  */
+/* #undef HAVE___THREAD */
+
+/* Define if the compiler supports __attribute__((tls_model(""))).  */
+/* #undef HAVE_TLS_MODEL_ATTRIBUTE */
 
 /* Define if the regparm attribute shall be used for local functions
    (gcc on ix86 only).  */
@@ -89,11 +120,9 @@
    certain registers (CR0, MQ, CTR, LR) in asm statements.  */
 /* #undef BROKEN_PPC_ASM_CR0 */
 
-/* Defined on SPARC if GCC emits GOTDATA relocations.  */
-/* #undef HAVE_GCC_GOTDATA */
-
-/* Define on SPARC if AS supports VIS3 instructions.  */
-/* #undef HAVE_AS_VIS3_SUPPORT */
+/* Defined on SPARC if ld doesn't handle R_SPARC_WDISP22 against .hidden
+   symbol.  sysdeps/sparc/sparc32/elf/configure.  */
+/* #undef BROKEN_SPARC_WDISP22 */
 
 /* Define if the linker supports the -z combreloc option.  */
 #define HAVE_Z_COMBRELOC 1
@@ -101,26 +130,23 @@
 /* Define if _rtld_local structure should be forced into .sdata section.  */
 /* #undef HAVE_SDATA_SECTION */
 
+/* Define if binutils support TLS handling.  */
+/* #undef HAVE_TLS_SUPPORT */
+
 /* Define if gcc supports SSE4.  */
 #define HAVE_SSE4_SUPPORT 1
 
 /* Define if gcc supports AVX.  */
 #define HAVE_AVX_SUPPORT 1
 
-/* Define if gcc supports VEX encoding.  */
-#define HAVE_SSE2AVX_SUPPORT 1
-
-/* Define if gcc supports FMA4.  */
-#define HAVE_FMA4_SUPPORT 1
-
-/* Define if the compiler\'s exception support is based on libunwind.  */
+/* Define if the compiler's exception support is based on libunwind.  */
 /* #undef HAVE_CC_WITH_LIBUNWIND */
 
 /* Define if the access to static and hidden variables is position independent
    and does not need relocations.  */
 #define PI_STATIC_AND_HIDDEN 1
 
-/* Define this to disable the 'hidden_proto' et al macros in
+/* Define this to disable the `hidden_proto' et al macros in
    include/libc-symbols.h that avoid PLT slots in the shared objects.  */
 /* #undef NO_HIDDEN */
 
@@ -132,7 +158,8 @@
 #endif
 
 /* Linux specific: minimum supported kernel version.  */
-#define __LINUX_KERNEL_VERSION (2 * 65536 + 4 * 256 + 0)
+// !BAM
+// #define __LINUX_KERNEL_VERSION (2 * 65536 + 4 * 256 + 0)
 
 /* Override abi-tags ABI version if necessary.  */
 #define __ABI_TAG_VERSION 2,4,0
@@ -156,10 +183,10 @@
 /* #undef HAVE_I386_SET_GDT */
 
 /* Defined if forced unwind support is available.  */
-#define HAVE_FORCED_UNWIND 1
+/* #undef HAVE_FORCED_UNWIND */
 
 /* Defined of libidn is available.  */
-#define HAVE_LIBIDN 1
+/* #undef HAVE_LIBIDN */
 
 /* Define if inlined system calls are available.  */
 #define HAVE_INLINED_SYSCALLS 1
@@ -178,13 +205,6 @@
 
 /* Define if `.ctors' and `.dtors' sections shouldn't be used.  */
 #define NO_CTORS_DTORS_SECTIONS 1
-
-/* Define if obsolete RPC code should be made available for user-level code
-   to link against.  */
-/* #undef LINK_OBSOLETE_RPC */
-
-/* Define if Systemtap <sys/sdt.h> probes should be defined.  */
-/* #undef USE_STAP_PROBE */
 
 /*
  */
@@ -225,8 +245,5 @@
 /* The locale code needs these definitions.  */
 
 #define HAVE_REGEX 1
-
-/* The ARM hard-float ABI is being used.  */
-/* #undef HAVE_ARM_PCS_VFP */
 
 #endif

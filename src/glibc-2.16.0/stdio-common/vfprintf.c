@@ -1332,7 +1332,7 @@ vfprintf (FILE *s, const CHAR_T *format, va_list ap)
 			|| __printf_modifier_table != NULL
 			|| __printf_va_arg_table != NULL, 0))
     goto do_positional;
-
+ 
   /* Process whole format string.  */
   do
     {

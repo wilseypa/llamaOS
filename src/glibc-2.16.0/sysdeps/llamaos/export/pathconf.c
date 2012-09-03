@@ -28,21 +28,38 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#ifndef llamaos_trace_h_
-#define llamaos_trace_h_
+#include <sys/types.h>
+#include <sys/mman.h>
+#include <errno.h>
 
-int trace (const char *format, ...);
+// define function pointer
+typedef int (*llamaos_pathconf_t) (const char *, int);
 
-#ifdef __cplusplus
+// function pointer variable
+static llamaos_pathconf_t llamaos_pathconf = 0;
 
-namespace llamaos {
-
-// int trace (const char *format, ...);
-
-//void trace (const std::string &);
-
+// function called by llamaOS to register pointer
+void register_llamaos_pathconf (llamaos_pathconf_t madvise)
+{
+   llamaos_pathconf = madvise;
 }
 
-#endif  // __cplusplus
+/* Get file-specific information about PATH.  */
+long int __pathconf (const char *path, int name)
+{
+   if (0 != llamaos_pathconf)
+   {
+      if (path == NULL)
+      {
+         __set_errno (EINVAL);
+         return -1;
+      }
 
-#endif  //  llamaos_trace_h_
+      return llamaos_pathconf (path, name);
+   }
+
+   __set_errno (ENOSYS);
+   return -1;
+}
+
+weak_alias (__pathconf, pathconf)

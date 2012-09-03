@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012, William Magato
+Copyright (c) 2011, William Magato
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,21 +28,20 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#ifndef llamaos_trace_h_
-#define llamaos_trace_h_
+#include <stdarg.h>
+#include <stdio.h>
 
-int trace (const char *format, ...);
+void __libc_message (int do_abort, const char *fmt, ...)
+{
+   va_list args;
+   va_start (args, fmt);
 
-#ifdef __cplusplus
+   vfprintf (stderr, fmt, args);
 
-namespace llamaos {
+   va_end (args);
 
-// int trace (const char *format, ...);
-
-//void trace (const std::string &);
-
+   if (do_abort)
+   {
+      abort ();
+   }
 }
-
-#endif  // __cplusplus
-
-#endif  //  llamaos_trace_h_

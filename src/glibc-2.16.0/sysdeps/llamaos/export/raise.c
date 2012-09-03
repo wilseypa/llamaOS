@@ -28,21 +28,33 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#ifndef llamaos_trace_h_
-#define llamaos_trace_h_
+#include <signal.h>
+#include <errno.h>
 
-int trace (const char *format, ...);
+// define function pointer
+typedef int (*llamaos_raise_t) (int);
 
-#ifdef __cplusplus
+// function pointer variable
+static llamaos_raise_t llamaos_raise = 0;
 
-namespace llamaos {
-
-// int trace (const char *format, ...);
-
-//void trace (const std::string &);
-
+// function called by llamaOS to register pointer
+void register_llamaos_raise (llamaos_raise_t raise)
+{
+   llamaos_raise = raise;
 }
 
-#endif  // __cplusplus
+/* Raise the signal SIG.  */
+int raise (int sig)
+{
+   if (0 != llamaos_raise)
+   {
+      return llamaos_raise (sig);
+   }
 
-#endif  //  llamaos_trace_h_
+   __set_errno (ENOSYS);
+   return -1;
+}
+weak_alias (raise, gsignal)
+
+
+

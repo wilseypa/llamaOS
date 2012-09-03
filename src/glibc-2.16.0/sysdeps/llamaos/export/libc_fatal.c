@@ -28,21 +28,32 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#ifndef llamaos_trace_h_
-#define llamaos_trace_h_
+#include <errno.h>
+#include <stdio.h>
 
-int trace (const char *format, ...);
+// define function pointer
+typedef void (*llamaos_libc_fatal_t) (const char *);
 
-#ifdef __cplusplus
+// function pointer variable
+static llamaos_libc_fatal_t llamaos_libc_fatal = 0;
 
-namespace llamaos {
-
-// int trace (const char *format, ...);
-
-//void trace (const std::string &);
-
+// function called by llamaOS to register pointer
+void register_llamaos_libc_fatal (llamaos_libc_fatal_t libc_fatal)
+{
+   llamaos_libc_fatal = libc_fatal;
 }
 
-#endif  // __cplusplus
+/* Abort with an error message.  */
+void __libc_fatal (const char *message)
+{
+   /* This function should write MESSAGE out in the most reliable way.
+      It is called in situations like internal stdio lossage.  */
+   if (0 != llamaos_libc_fatal)
+   {
+      llamaos_libc_fatal (message);
+   }
 
-#endif  //  llamaos_trace_h_
+   __set_errno (ENOSYS);
+   abort ();
+}
+libc_hidden_def (__libc_fatal)
