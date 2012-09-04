@@ -33,35 +33,25 @@
 # include common variables
 include common.mk
 
-ifeq ($(MAKECMDGOALS),xen)
-include entry-xen.mk
-endif
-
 MAKEFILE_SOURCES += apps.hello.mk
-
-ASMFLAGS += 
-
-CFLAGS += 
 
 CPPFLAGS += \
   -I $(INCDIR)
-
-VPATH = $(SRCDIR)
 
 SOURCES = \
   llamaos/apps/hello/main.cpp
 
 OBJECTS = $(SOURCES:%.cpp=$(OBJDIR)/%.o)
-DEPENDS += $(OBJECTS:%.o=%.d)
+DEPENDS = $(OBJECTS:%.o=%.d)
 
 .PHONY: xen
 xen : $(BINDIR)/xen/hello
 
 # the entry object must be the first object listed here or the guest will crash!
-$(BINDIR)/xen/hello: $(ENTRY_OBJECTS) $(OBJECTS) $(LIBDIR)/xen/llamaOS.a
+$(BINDIR)/xen/hello: $(OBJECTS) $(LIBDIR)/xen/llamaOS.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
-	@$(LD) $(LDFLAGS) -T $(ENTRY_LDS) -o $@ $^
+	@$(LD) $(LDFLAGS) -T x86_64.lds -o $@ $^
 	@gzip -c -f --best $@ >$@.gz
 	@echo successfully built: $@
 	@echo

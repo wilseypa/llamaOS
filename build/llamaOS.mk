@@ -33,12 +33,6 @@
 # include common variables
 include common.mk
 
-# include the glibc object list
-include glibc-obj-$(GLIBC_VERSION).mk
-
-# include the gcc object list
-include gcc-obj-$(GCC_VERSION).mk
-
 # make file list
 MAKEFILE_SOURCES += llamaOS.mk
 
@@ -47,40 +41,22 @@ CPPFLAGS += \
   -I $(SRCDIR) \
   -D__XEN_INTERFACE_VERSION__=0x0003020a
 
-LLAMAOS_SOURCES_ASM = 
-LLAMAOS_SOURCES_C = 
-LLAMAOS_SOURCES_CPP = 
-
 # xen specific source files
 ifeq ($(MAKECMDGOALS),xen)
-LLAMAOS_SOURCES_CPP += \
-  llamaos/xen/glibc-export.cpp \
+CPP_SOURCES += \
   llamaos/xen/Hypercall.cpp \
   llamaos/xen/kernel.cpp \
   llamaos/xen/trace.cpp
 endif
 
 # generate object list
-LLAMAOS_OBJECTS  = $(LLAMAOS_SOURCES_ASM:%.S=$(OBJDIR)/%.o)
-LLAMAOS_OBJECTS += $(LLAMAOS_SOURCES_C:%.c=$(OBJDIR)/%.o)
-LLAMAOS_OBJECTS += $(LLAMAOS_SOURCES_CPP:%.cpp=$(OBJDIR)/%.o)
+OBJECTS += $(CPP_SOURCES:%.cpp=$(OBJDIR)/%.o)
+DEPENDS = $(OBJECTS:%.o=%.d)
 
 .PHONY: xen
-xen : glibc gcc xen-headers $(LIBDIR)/xen/llamaOS.a
+xen : $(LIBDIR)/xen/llamaOS.a
 
-.PHONY: glibc
-glibc:
-	@$(MAKE) -f glibc-$(GLIBC_VERSION).mk
-
-.PHONY: gcc
-gcc:
-	@$(MAKE) -f gcc-$(GCC_VERSION).mk
-
-.PHONY: xen-headers
-xen-headers:
-	@$(MAKE) -f xen-$(XEN_VERSION).mk
-
-$(LIBDIR)/xen/llamaOS.a: $(GLIBC_OBJECTS) $(GCC_OBJECTS) $(LLAMAOS_OBJECTS)
+$(LIBDIR)/xen/llamaOS.a: $(OBJECTS)
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
 	@$(AR) r $@ $^

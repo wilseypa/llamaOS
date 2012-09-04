@@ -885,7 +885,8 @@ namespace std
 #define _GLIBCXX_HAVE_TGMATH_H 1
 
 /* Define to 1 if the target supports thread-local storage. */
-#define _GLIBCXX_HAVE_TLS 1
+// !BAM
+//#define _GLIBCXX_HAVE_TLS 1
 
 /* Define to 1 if you have the <unistd.h> header file. */
 #define _GLIBCXX_HAVE_UNISTD_H 1

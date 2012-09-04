@@ -184,6 +184,7 @@ HEADERS = \
   $(INCDIR)/_G_config.h \
   $(INCDIR)/alloca.h \
   $(INCDIR)/assert.h \
+  $(INCDIR)/config.h \
   $(INCDIR)/ctype.h \
   $(INCDIR)/errno.h \
   $(INCDIR)/endian.h \
@@ -266,7 +267,6 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/io/open64.c \
   glibc-$(GLIBC_VERSION)/io/poll.c \
   glibc-$(GLIBC_VERSION)/io/read.c \
-  glibc-$(GLIBC_VERSION)/io/write.c \
   glibc-$(GLIBC_VERSION)/io/xstat.c \
   glibc-$(GLIBC_VERSION)/io/xstat64.c \
   glibc-$(GLIBC_VERSION)/libio/fcloseall.c \
@@ -362,7 +362,6 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/misc/getclktck.c \
   glibc-$(GLIBC_VERSION)/misc/getdtsz.c \
   glibc-$(GLIBC_VERSION)/misc/getpagesize.c \
-  glibc-$(GLIBC_VERSION)/misc/getsysstats.c \
   glibc-$(GLIBC_VERSION)/misc/init-misc.c \
   glibc-$(GLIBC_VERSION)/misc/lseek.c \
   glibc-$(GLIBC_VERSION)/misc/mmap.c \
@@ -371,7 +370,6 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/misc/munmap.c \
   glibc-$(GLIBC_VERSION)/misc/readv.c \
   glibc-$(GLIBC_VERSION)/misc/sbrk.c \
-  glibc-$(GLIBC_VERSION)/misc/syscall.c \
   glibc-$(GLIBC_VERSION)/misc/tsearch.c \
   glibc-$(GLIBC_VERSION)/misc/writev.c \
   glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS/lowlevellock.c \
@@ -393,13 +391,10 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/posix/pause.c \
   glibc-$(GLIBC_VERSION)/posix/sched_getp.c \
   glibc-$(GLIBC_VERSION)/posix/sched_gets.c \
-  glibc-$(GLIBC_VERSION)/posix/sched_primax.c \
-  glibc-$(GLIBC_VERSION)/posix/sched_primin.c \
   glibc-$(GLIBC_VERSION)/posix/sched_setp.c \
   glibc-$(GLIBC_VERSION)/posix/sched_sets.c \
   glibc-$(GLIBC_VERSION)/signal/sigaction.c \
   glibc-$(GLIBC_VERSION)/signal/sigprocmask.c \
-  glibc-$(GLIBC_VERSION)/signal/sigsuspend.c \
   glibc-$(GLIBC_VERSION)/stdio-common/_itoa.c \
   glibc-$(GLIBC_VERSION)/stdio-common/_itowa.c \
   glibc-$(GLIBC_VERSION)/stdio-common/asprintf.c \
@@ -522,12 +517,22 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/sysdeps/ieee754/ldbl-128/s_isnanl.c \
   glibc-$(GLIBC_VERSION)/sysdeps/ieee754/ldbl-128/s_signbitl.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/_exit.c \
+  glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/get_avphys_pages.c \
+  glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/get_nprocs.c \
+  glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/get_nprocs_conf.c \
+  glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/get_phys_pages.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/getcwd.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/libc_fatal.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/libc_open.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/madvise.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/pathconf.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/raise.c \
+  glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/sched_primax.c \
+  glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/sched_primin.c \
+  glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/sigsuspend.c \
+  glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/sigsuspend_nocancel.c \
+  glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/syscall.c \
+  glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/write.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/dl-libc.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/dl-profstub.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/dl-support.c \
@@ -604,8 +609,10 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/wctype/wctype.c \
   glibc-$(GLIBC_VERSION)/wctype/wctype_l.c
 
+# crashes on __thread errno
 #  glibc-$(GLIBC_VERSION)/csu/errno.c \
 
+# are these really needed?
 #  glibc-$(GLIBC_VERSION)/setjmp/__longjmp.c \
 #  glibc-$(GLIBC_VERSION)/setjmp/longjmp.c \
 #  glibc-$(GLIBC_VERSION)/setjmp/setjmp.c \
@@ -613,11 +620,18 @@ C_SOURCES = \
 
 # llamaOS export provided
 #  glibc-$(GLIBC_VERSION)/io/getcwd.c \
+#  glibc-$(GLIBC_VERSION)/misc/getsysstats.c \
 #  glibc-$(GLIBC_VERSION)/misc/madvise.c \
+#  glibc-$(GLIBC_VERSION)/misc/syscall.c \
 #  glibc-$(GLIBC_VERSION)/posix/_exit.c \
 #  glibc-$(GLIBC_VERSION)/posix/pathconf.c \
+#  glibc-$(GLIBC_VERSION)/posix/sched_primax.c \
+#  glibc-$(GLIBC_VERSION)/posix/sched_primin.c \
 #  glibc-$(GLIBC_VERSION)/signal/raise.c \
+#  glibc-$(GLIBC_VERSION)/signal/sigsuspend.c \
+#  glibc-$(GLIBC_VERSION)/io/write.c \
 
+# are these really needed? 
 #  glibc-$(GLIBC_VERSION)/sysdeps/llamaos/abort.c \
 #  glibc-$(GLIBC_VERSION)/sysdeps/llamaos/libc-fatal.c \
 #  glibc-$(GLIBC_VERSION)/sysdeps/llamaos/libc_open.c \

@@ -87,38 +87,15 @@ return;
 
 int main(int argc, char **argv);
 
-void recurse_stack(int i)
-{
-   if ((i % 200) == 0)
-   {
-      HYPERVISOR_console_io(CONSOLEIO_write, strlen(".\n"), ".\n");
-   }
-   else
-   {
-      HYPERVISOR_console_io(CONSOLEIO_write, strlen("."), ".");
-   }
-   recurse_stack(i + 1);
-}
-
 extern "C"
 void kernel (start_info_t *start_info)
 {
    if (verify_magic (start_info))
    {
-
       static char hello[] = "Bootstrapping...\n";
 
       HYPERVISOR_console_io(CONSOLEIO_write, strlen(hello), hello);
 
-      HYPERVISOR_console_io(CONSOLEIO_write, strlen("12345\n"), "12345\n");
-      HYPERVISOR_console_io(CONSOLEIO_write, strlen("67890\n"), "67890\n");
-
-   recurse_stack(1);
-//      xen::Hypercall::console_io (hello);
-goto label;
-      trace("from trace\n");
-label:
-      HYPERVISOR_console_io(CONSOLEIO_write, strlen(hello), hello);
       trace_start_info (start_info);
 
 for(;;);

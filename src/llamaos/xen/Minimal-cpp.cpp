@@ -33,6 +33,8 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <stdio.h>
 #include <string.h>
 
+#include <string>
+
 #include <xen/xen.h>
 
 #include <llamaos/xen/Hypercall-macros.h>
@@ -74,9 +76,9 @@ static int trace (const char *format, ...)
    return count;
 }
 
-static int ctrace (char *message)
+static int ctrace (const char *message)
 {
-   return HYPERVISOR_console_io(CONSOLEIO_write, strlen(message), message);
+   return HYPERVISOR_console_io(CONSOLEIO_write, strlen(message), const_cast<char *>(message));
 }
 
 static void trace_startup (const start_info_t *start_info)
@@ -107,6 +109,7 @@ static void trace_startup (const start_info_t *start_info)
    trace ("\n");
 }
 
+extern "C"
 void llamaos_exit (int status)
 {
    ctrace ("glibc calling llamaos_exit ()\n");
@@ -115,8 +118,9 @@ void llamaos_exit (int status)
 }
 
 typedef void (*llamaos_exit_t) (int);
-void register_llamaos_exit (llamaos_exit_t);
+extern "C" void register_llamaos_exit (llamaos_exit_t);
 
+extern "C"
 char *llamaos_getcwd (char *buf, size_t size)
 {
    ctrace ("glibc calling llamaos_getcwd ()\n");
@@ -133,16 +137,18 @@ char *llamaos_getcwd (char *buf, size_t size)
 }
 
 typedef char *(*llamaos_getcwd_t) (char *, size_t);
-void register_llamaos_getcwd (llamaos_getcwd_t);
+extern "C" void register_llamaos_getcwd (llamaos_getcwd_t);
 
+extern "C"
 void llamaos_libc_fatal (const char *message)
 {
    ctrace ("glibc calling libc_fatal ()\n");
 }
 
 typedef void (*llamaos_libc_fatal_t) (const char *);
-void register_llamaos_libc_fatal (llamaos_libc_fatal_t);
+extern "C" void register_llamaos_libc_fatal (llamaos_libc_fatal_t);
 
+extern "C"
 int llamaos_libc_open (const char *format, int flags)
 {
    ctrace ("glibc calling libc_open ()\n");
@@ -150,8 +156,9 @@ int llamaos_libc_open (const char *format, int flags)
 }
 
 typedef int (*llamaos_libc_open_t) (const char *, int);
-void register_llamaos_libc_open (llamaos_libc_open_t);
+extern "C" void register_llamaos_libc_open (llamaos_libc_open_t);
 
+extern "C"
 int llamaos_madvise (__ptr_t addr, size_t len, int advice)
 {
    ctrace ("glibc calling madvise ()\n");
@@ -159,8 +166,9 @@ int llamaos_madvise (__ptr_t addr, size_t len, int advice)
 }
 
 typedef int (*llamaos_madvise_t) (__ptr_t, size_t, int);
-void register_llamaos_madvise (llamaos_madvise_t);
+extern "C" void register_llamaos_madvise (llamaos_madvise_t);
 
+extern "C"
 long int llamaos_pathconf (const char *path, int name)
 {
    ctrace ("glibc calling llamaos_pathconf ()\n");
@@ -169,8 +177,9 @@ long int llamaos_pathconf (const char *path, int name)
 }
 
 typedef long int (*llamaos_pathconf_t) (const char *, int);
-void register_llamaos_pathconf (llamaos_pathconf_t);
+extern "C" void register_llamaos_pathconf (llamaos_pathconf_t);
 
+extern "C"
 int llamaos_raise (int sig)
 {
    ctrace ("glibc calling llamaos_raise ()\n");
@@ -179,7 +188,123 @@ int llamaos_raise (int sig)
 }
 
 typedef int (*llamaos_raise_t) (int);
-void register_llamaos_raise (llamaos_raise_t);
+extern "C" void register_llamaos_raise (llamaos_raise_t);
+
+
+
+
+
+
+
+extern "C"
+long int llamaos_get_avphys_pages ()
+{
+   ctrace ("glibc calling llamaos_get_avphys_pages ()\n");
+
+   return 0;
+}
+
+typedef long int (*llamaos_get_avphys_pages_t) ();
+extern "C" void register_llamaos_get_avphys_pages (llamaos_get_avphys_pages_t);
+
+extern "C"
+int llamaos_get_nprocs ()
+{
+   ctrace ("glibc calling llamaos_get_nprocs ()\n");
+
+   return 0;
+}
+
+typedef int (*llamaos_get_nprocs_t) ();
+extern "C" void register_llamaos_get_nprocs (llamaos_get_nprocs_t);
+
+extern "C"
+int llamaos_get_nprocs_conf ()
+{
+   ctrace ("glibc calling llamaos_get_nprocs_conf ()\n");
+
+   return 0;
+}
+
+typedef int (*llamaos_get_nprocs_conf_t) ();
+extern "C" void register_llamaos_get_nprocs_conf (llamaos_get_nprocs_conf_t);
+
+extern "C"
+long int llamaos_get_phys_pages ()
+{
+   ctrace ("glibc calling llamaos_get_phys_pages ()\n");
+
+   return 0;
+}
+
+typedef long int (*llamaos_get_phys_pages_t) ();
+extern "C" void register_llamaos_get_phys_pages (llamaos_get_phys_pages_t);
+
+extern "C"
+int llamaos_sched_get_priority_max (int algorithm)
+{
+   ctrace ("glibc calling llamaos_sched_get_priority_max ()\n");
+
+   return 0;
+}
+
+typedef int (*llamaos_sched_get_priority_max_t) (int);
+extern "C" void register_llamaos_sched_get_priority_max (llamaos_sched_get_priority_max_t);
+
+extern "C"
+int llamaos_sched_get_priority_min (int algorithm)
+{
+   ctrace ("glibc calling llamaos_sched_get_priority_min ()\n");
+
+   return 0;
+}
+
+typedef int (*llamaos_sched_get_priority_min_t) (int);
+extern "C" void register_llamaos_sched_get_priority_min (llamaos_sched_get_priority_min_t);
+
+extern "C"
+int llamaos_sigsuspend (const sigset_t *set)
+{
+   ctrace ("glibc calling llamaos_sigsuspend ()\n");
+
+   return -1;
+}
+
+typedef int (*llamaos_sigsuspend_t) (const sigset_t *);
+extern "C" void register_llamaos_sigsuspend (llamaos_sigsuspend_t);
+
+extern "C"
+int llamaos_sigsuspend_nocancel (const sigset_t *set)
+{
+   ctrace ("glibc calling llamaos_sigsuspend_nocancel ()\n");
+
+   return -1;
+}
+
+typedef int (*llamaos_sigsuspend_nocancel_t) (const sigset_t *);
+extern "C" void register_llamaos_sigsuspend_nocancel (llamaos_sigsuspend_nocancel_t);
+
+extern "C"
+long int llamaos_syscall (long int callno)
+{
+   ctrace ("glibc calling llamaos_syscall ()\n");
+
+   return -1;
+}
+
+typedef long int (*llamaos_syscall_t) (long int);
+extern "C" void register_llamaos_syscall (llamaos_syscall_t);
+
+extern "C"
+ssize_t llamaos_write (int fd, const void *buf, size_t nbytes)
+{
+   ctrace ("glibc calling llamaos_write ()\n");
+
+   return 0;
+}
+
+typedef ssize_t (*llamaos_write_t) (int, const void *, size_t);
+extern "C" void register_llamaos_write (llamaos_write_t);
 
 void register_glibc_exports ()
 {
@@ -190,22 +315,30 @@ void register_glibc_exports ()
    register_llamaos_madvise (llamaos_madvise);
    register_llamaos_pathconf (llamaos_pathconf);
    register_llamaos_raise (llamaos_raise);
+
+   register_llamaos_get_avphys_pages (llamaos_get_avphys_pages);
+   register_llamaos_get_nprocs (llamaos_get_nprocs);
+   register_llamaos_get_nprocs_conf (llamaos_get_nprocs_conf);
+   register_llamaos_get_phys_pages (llamaos_get_avphys_pages);
+   register_llamaos_sched_get_priority_max(llamaos_sched_get_priority_max);
+   register_llamaos_sched_get_priority_min(llamaos_sched_get_priority_min);
+   register_llamaos_sigsuspend (llamaos_sigsuspend);
+   register_llamaos_sigsuspend_nocancel (llamaos_sigsuspend_nocancel);
+   register_llamaos_syscall (llamaos_syscall);
+   register_llamaos_write (llamaos_write);
 }
 
-void minimal_c_kernel (start_info_t *start_info)
+extern "C"
+void minimal_cpp_kernel (start_info_t *start_info)
 {
    if (verify_magic (start_info))
    {
       // make sure hypercalls are working
-      ctrace ("\n\nStarting minimal-C Xen guest...\n\n");
+      ctrace ("\n\nStarting minimal-C++ Xen guest...\n\n");
 
       // print the info given from Xen
       trace_startup (start_info);
 
-      // enable dynamic memory
-      
-
-      trace ("registering llamaOS glibc call-backs...\n");
       register_glibc_exports ();
 
       // loop forever
