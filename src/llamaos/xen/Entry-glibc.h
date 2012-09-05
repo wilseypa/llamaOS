@@ -28,21 +28,9 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#ifndef llamaos_trace_h_
-#define llamaos_trace_h_
+#ifndef llamaos_xen_entry_glibc_h_
+#define llamaos_xen_entry_glibc_h_
 
-int trace (const char *format, ...);
+void entry_glibc (start_info_t *start_info);
 
-#ifdef __cplusplus
-
-namespace llamaos {
-
-// int trace (const char *format, ...);
-
-//void trace (const std::string &);
-
-}
-
-#endif  // __cplusplus
-
-#endif  //  llamaos_trace_h_
+#endif	// llamaos_xen_entry_glibc_h_

@@ -36,28 +36,46 @@ include common.mk
 # make file list
 MAKEFILE_SOURCES += llamaOS.mk
 
-CPPFLAGS += \
+XFLAGS = \
   -I $(INCDIR) \
   -I $(SRCDIR) \
   -D__XEN_INTERFACE_VERSION__=0x0003020a
 
+ASMFLAGS += \
+  $(XFLAGS)
+
+CFLAGS += \
+  $(XFLAGS)
+
+CPPFLAGS += \
+  $(XFLAGS)
+
 # xen specific source files
 ifeq ($(MAKECMDGOALS),xen)
+C_SOURCES += \
+  llamaos/xen/Entry-glibc.c \
+  llamaos/xen/Trace.c
+
 CPP_SOURCES += \
   llamaos/xen/Hypercall.cpp \
-  llamaos/xen/kernel.cpp \
-  llamaos/xen/trace.cpp
+  llamaos/xen/Entry-gcc.cpp \
+  llamaos/xen/Entry-llamaOS.cpp
 endif
 
 # generate object list
+OBJECTS  = $(C_SOURCES:%.c=$(OBJDIR)/%.o)
 OBJECTS += $(CPP_SOURCES:%.cpp=$(OBJDIR)/%.o)
 DEPENDS = $(OBJECTS:%.o=%.d)
 
 .PHONY: xen
-xen : $(LIBDIR)/xen/llamaOS.a
+xen : $(OBJDIR)/llamaos/xen/Entry.o $(LIBDIR)/xen/llamaOS.a
+
+# $(LIBDIR)/xen/Entry.o: llamaos/xen/Entry.S
 
 $(LIBDIR)/xen/llamaOS.a: $(OBJECTS)
 	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo copying Entry object...
+	@cp $(OBJDIR)/llamaos/xen/Entry.o $(LIBDIR)/xen/Entry.o
 	@echo linking: $@
 	@$(AR) r $@ $^
 	@echo successfully built: $@

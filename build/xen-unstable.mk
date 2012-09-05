@@ -36,10 +36,14 @@ include common.mk
 MAKEFILE_SOURCES += xen-$(XEN_VERSION).mk
 
 HEADERS = \
+  $(INCDIR)/xen/arch-x86/xen-mca.h \
   $(INCDIR)/xen/arch-x86/xen-x86_64.h \
   $(INCDIR)/xen/arch-x86/xen.h \
   $(INCDIR)/xen/event_channel.h \
+  $(INCDIR)/xen/physdev.h \
+  $(INCDIR)/xen/platform.h \
   $(INCDIR)/xen/sched.h \
+  $(INCDIR)/xen/tmem.h \
   $(INCDIR)/xen/xen-compat.h \
   $(INCDIR)/xen/xen.h
 

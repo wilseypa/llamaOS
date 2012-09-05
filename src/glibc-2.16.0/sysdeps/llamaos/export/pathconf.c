@@ -33,15 +33,15 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <errno.h>
 
 // define function pointer
-typedef int (*llamaos_pathconf_t) (const char *, int);
+typedef long int (*llamaos_pathconf_t) (const char *, int);
 
 // function pointer variable
 static llamaos_pathconf_t llamaos_pathconf = 0;
 
 // function called by llamaOS to register pointer
-void register_llamaos_pathconf (llamaos_pathconf_t madvise)
+void register_llamaos_pathconf (llamaos_pathconf_t pathconf)
 {
-   llamaos_pathconf = madvise;
+   llamaos_pathconf = pathconf;
 }
 
 /* Get file-specific information about PATH.  */

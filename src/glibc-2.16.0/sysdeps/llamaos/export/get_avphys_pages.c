@@ -31,7 +31,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <errno.h>
 
 // define function pointer
-typedef long int (*llamaos_get_avphys_pages_t) ();
+typedef long int (*llamaos_get_avphys_pages_t) (void);
 
 // function pointer variable
 static llamaos_get_avphys_pages_t llamaos_get_avphys_pages = 0;
@@ -42,7 +42,7 @@ void register_llamaos_get_avphys_pages (llamaos_get_avphys_pages_t get_avphys_pa
    llamaos_get_avphys_pages = get_avphys_pages;
 }
 
-long int __get_avphys_pages ()
+long int __get_avphys_pages (void)
 {
    if (0 != llamaos_get_avphys_pages)
    {

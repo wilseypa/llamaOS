@@ -32,7 +32,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <unistd.h>
 
 // define function pointer
-typedef char *(*llamaos_exit_t) (int);
+typedef void (*llamaos_exit_t) (int);
 
 // function pointer variable
 static llamaos_exit_t llamaos_exit = 0;

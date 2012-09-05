@@ -56,7 +56,7 @@ OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 SUCH DAMAGE.
 */
 
-#include <llamaos/config.h>
+#include <llamaos/llamaOS.h>
 
 .section __xen_guest
    .ascii  "GUEST_OS=llamaOS"

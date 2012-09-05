@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2011, William Magato
+Copyright (c) 2012, William Magato
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,13 +28,32 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <errno.h>
+#include <stdint.h>
+#include <stdarg.h>
+#include <stdio.h>
+#include <string.h>
 
-void abort (void)
+#include <llamaos/xen/Hypercall-macros.h>
+#include <llamaos/Trace.h>
+
+static char buffer [512] = { '\0' };
+
+int trace (const char *format, ...)
 {
-   // error if llamaos_abort is not registered
-   __set_errno (ENOSYS);
-   for (;;);
-}
+   // prep variable arguments
+   va_list arg;
+   va_start (arg, format);
 
-libc_hidden_def (abort)
+   // copy formatted output to buffer
+   int count = vsnprintf (buffer, sizeof(buffer)-1, format, arg);
+
+   // term variable arguments
+   va_end (arg);
+
+   // write buffer to system output/log
+   // xen::Hypercall::console_io (buffer);
+   HYPERVISOR_console_io(CONSOLEIO_write, strlen(buffer), buffer);
+
+   // return the number characters written
+   return count;
+}

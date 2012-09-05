@@ -36,7 +36,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <xen/xen.h>
 
 #include <llamaos/xen/Hypercall-macros.h>
-#include <llamaos/config.h>
+#include <llamaos/llamaOS.h>
 
 // runtime stack memory
 char RUNTIME_STACK [2 * LLAMAOS_STACK_SIZE];

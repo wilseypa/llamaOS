@@ -28,48 +28,23 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-//#include <stdint>
-// no stdlib so just define these here
-typedef char int8_t;
-typedef unsigned char uint8_t;
-typedef short int16_t;
-typedef unsigned short uint16_t;
-typedef int int32_t;
-typedef unsigned int uint32_t;
-typedef long int64_t;
-typedef unsigned long uint64_t;
+#include <cstdint>
+#include <cstring>
 
 #include <xen/xen.h>
 
-#include <llamaos/xen/Hypercall-macros.h>
 #include <llamaos/llamaOS.h>
+#include <llamaos/Trace.h>
 
-// runtime stack memory
-char RUNTIME_STACK [2 * LLAMAOS_STACK_SIZE];
+int main (int argc, char *argv []);
 
-static int verify_magic (const start_info_t *start_info)
+void entry_llamaOS (start_info_t *start_info)
 {
-   if (   (0 != start_info)
-       && ('x' == start_info->magic [0])
-       && ('e' == start_info->magic [1])
-       && ('n' == start_info->magic [2])
-       && ('-' == start_info->magic [3]))
-   {
-      return 1;
-   }
 
-   return 0;
-}
+   // start the application
+   char *argv [2];
+   argv [0] = const_cast<char *>("llamaOS");
+   argv [1] = nullptr;
 
-void minimal_kernel (start_info_t *start_info)
-{
-   if (verify_magic (start_info))
-   {
-      HYPERVISOR_console_io(CONSOLEIO_write, 32, "\n\nStarting minimal Xen guest...\n\n");
-
-      // loop forever
-      for (;;);
-   }
-
-   // error finding memory, so just leave
+   main (1, argv);
 }

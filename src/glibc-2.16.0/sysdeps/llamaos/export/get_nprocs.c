@@ -31,7 +31,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <errno.h>
 
 // define function pointer
-typedef int (*llamaos_get_nprocs_t) ();
+typedef int (*llamaos_get_nprocs_t) (void);
 
 // function pointer variable
 static llamaos_get_nprocs_t llamaos_get_nprocs = 0;
@@ -42,7 +42,7 @@ void register_llamaos_get_nprocs (llamaos_get_nprocs_t get_nprocs)
    llamaos_get_nprocs = get_nprocs;
 }
 
-int __get_nprocs ()
+int __get_nprocs (void)
 {
    if (0 != llamaos_get_nprocs)
    {

@@ -55,15 +55,7 @@ public:
     * @param string
     *
     */
-   static bool console_io (char *string);
-
-   /**
-    * @brief
-    *
-    * @param string
-    *
-    */
-//   static bool console_io (const std::string &string);
+   static bool console_io (const char *text);
 
    /**
     * @brief Halt execution of this domain (all VCPUs) and notify the system controller.
