@@ -49,4 +49,13 @@ all:
 .PHONY: clean
 clean:
 	@echo cleaning build folder...
-	@$(MAKE) -f clean.mk
+	@echo removing: $(OBJDIR)
+	@rm -rf $(OBJDIR)
+	@echo removing: $(BINDIR)
+	@rm -rf $(BINDIR)
+	@echo removing: $(LIBDIR)
+	@rm -rf $(LIBDIR)
+	@echo removing: $(INCDIR)
+	@rm -rf $(INCDIR)
+	@echo removing: include-fixed
+	@rm -rf include-fixed
