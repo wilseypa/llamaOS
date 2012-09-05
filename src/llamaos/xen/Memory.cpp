@@ -33,7 +33,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 #include <xen/xen.h>
 
-#include <llamaos/memory/memory.h>
+#include <llamaos/memory/Memory.h>
 
 #include <llamaos/memory/Entry.h>
 #include <llamaos/memory/PTE.h>
@@ -47,8 +47,8 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <llamaos/memory/PML4.h>
 
 #include <llamaos/xen/Hypercall.h>
-#include <llamaos/config.h>
-#include <llamaos/trace.h>
+#include <llamaos/Trace.h>
+#include <llamaos/llamaOS.h>
 
 namespace llamaos {
 namespace memory {

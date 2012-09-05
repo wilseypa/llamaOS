@@ -28,7 +28,7 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <llamaos/memory/memory.h>
+#include <llamaos/memory/Memory.h>
 
 #include <llamaos/memory/Entry.h>
 #include <llamaos/memory/PTE.h>
@@ -41,8 +41,8 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <llamaos/memory/PDP.h>
 #include <llamaos/memory/PML4.h>
 
-#include <llamaos/trace.h>
-#include <llamaos/config.h>
+#include <llamaos/llamaOS.h>
+#include <llamaos/Trace.h>
 
 namespace llamaos {
 namespace memory {

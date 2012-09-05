@@ -31,17 +31,42 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <cstdint>
 #include <cstring>
 
-// #include <ios>
+ #include <ios>
 
 #include <xen/xen.h>
 
+#include <llamaos/memory/Memory.h>
 #include <llamaos/xen/Entry-llamaOS.h>
 #include <llamaos/llamaOS.h>
 #include <llamaos/Trace.h>
 
 using namespace std;
+using namespace llamaos;
+//using namespace llamaos::xen;
 
-static void register_gcc_exports (void)
+namespace llamaos {
+namespace memory {
+
+// needs initialized by startup logic
+extern uint64_t *machine_table;
+extern uint64_t  machine_table_size;
+extern uint64_t *pseudo_table;
+extern uint64_t  pseudo_table_size;
+
+} }
+
+static void initialize_mmu (start_info_t *start_info)
+{
+   // initialize memory management
+   memory::machine_table = memory::address_to_pointer<uint64_t>(MACH2PHYS_VIRT_START);
+   memory::machine_table_size = MACH2PHYS_NR_ENTRIES;
+   memory::pseudo_table = memory::address_to_pointer<uint64_t> (start_info->mfn_list);
+   memory::pseudo_table_size = start_info->nr_pages;
+
+   memory::initialize (start_info->pt_base, start_info->nr_pages, 1024);
+}
+
+static void register_gcc_exports ()
 {
 }
 
@@ -55,7 +80,7 @@ void entry_gcc (start_info_t *start_info)
    
 
    // initialize libstdc++
-//   ios_base::Init ios_base_init;
+   ios_base::Init ios_base_init;
 
    entry_llamaOS (start_info);
 }

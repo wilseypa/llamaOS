@@ -33,7 +33,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 #include <cstdint>
 
-#include <llamaos/memory/memory.h>
+#include <llamaos/memory/Memory.h>
 #include <llamaos/memory/PML4E.h>
 
 namespace llamaos {

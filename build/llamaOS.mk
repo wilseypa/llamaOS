@@ -57,9 +57,12 @@ C_SOURCES += \
   llamaos/xen/Trace.c
 
 CPP_SOURCES += \
-  llamaos/xen/Hypercall.cpp \
+  llamaos/memory/Entry.cpp \
+  llamaos/memory/Memory.cpp \
   llamaos/xen/Entry-gcc.cpp \
-  llamaos/xen/Entry-llamaOS.cpp
+  llamaos/xen/Entry-llamaOS.cpp \
+  llamaos/xen/Hypercall.cpp \
+  llamaos/xen/Memory.cpp
 endif
 
 # generate object list

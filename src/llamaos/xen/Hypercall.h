@@ -37,6 +37,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 #include <xen/xen.h>
 #include <xen/event_channel.h>
+#include <xen/version.h>
 
 namespace llamaos {
 namespace xen {
@@ -49,23 +50,6 @@ class Hypercall
 {
 public:
 
-   /**
-    * @brief
-    *
-    * @param string
-    *
-    */
-   static bool console_io (const char *text);
-
-   /**
-    * @brief Halt execution of this domain (all VCPUs) and notify the system controller.
-    *
-    * @param reason
-    *
-    */
-   static bool sched_op_shutdown (unsigned int reason = 0);
-
-#if 0
    /**
     * @brief
     *
@@ -146,6 +130,13 @@ public:
     */
    static void xen_version (int &major, int &minor);
 
+   /**
+    * @brief
+    *
+    * @param string
+    *
+    */
+   static bool console_io (const char *text);
 
    // llamaOS UNSUPPORTED CALLS
    //   __HYPERVISOR_physdev_op_compat    19 /* compat since 0x00030202 */
@@ -211,7 +202,6 @@ public:
    //   __HYPERVISOR_domctl               36
    //   __HYPERVISOR_kexec_op             37
    //   __HYPERVISOR_tmem_op              38
-#endif
 
 };
 
