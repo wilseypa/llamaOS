@@ -74,6 +74,8 @@ ASMFLAGS += \
 # from original glibc.a
 # CFLAGS += -DHAVE_MREMAP=0 -D'LOCALEDIR=""' -D'GCONV_PATH=""' -D'GCONV_DIR=""' -D'LOCALE_ALIAS_PATH=""'
 
+#  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/include \
+
 CFLAGS += \
   -D _IO_MTSAFE_IO \
   -D 'GCONV_DIR=""' \
@@ -87,7 +89,6 @@ CFLAGS += \
   -I $(SRCDIR)/gcc-$(GCC_VERSION)/gcc/ginclude \
   -I $(SRCDIR)/gcc-$(GCC_VERSION)/gcc/include \
   -I $(SRCDIR)/gcc-$(GCC_VERSION)/include \
-  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/include \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/include \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS/x86_64 \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS/x86 \
@@ -111,7 +112,8 @@ CFLAGS += \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/stdio-common \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/wcsmbs \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION) \
-  -include $(SRCDIR)/glibc-$(GLIBC_VERSION)/include/libc-symbols.h
+  -include $(SRCDIR)/glibc-$(GLIBC_VERSION)/include/libc-symbols.h \
+  -include $(SRCDIR)/llamaos/__thread.h
 
 HEADERS = \
   $(INCDIR)/asm/unistd.h \
@@ -228,6 +230,7 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/assert/assert.c \
   glibc-$(GLIBC_VERSION)/csu/dso_handle.c \
   glibc-$(GLIBC_VERSION)/csu/errno-loc.c \
+  glibc-$(GLIBC_VERSION)/csu/errno.c \
   glibc-$(GLIBC_VERSION)/ctype/ctype-info.c \
   glibc-$(GLIBC_VERSION)/ctype/ctype.c \
   glibc-$(GLIBC_VERSION)/debug/fortify_fail.c \
@@ -262,11 +265,8 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/io/fxstat.c \
   glibc-$(GLIBC_VERSION)/io/fxstat64.c \
   glibc-$(GLIBC_VERSION)/io/isatty.c \
-  glibc-$(GLIBC_VERSION)/io/lseek64.c \
   glibc-$(GLIBC_VERSION)/io/open.c \
   glibc-$(GLIBC_VERSION)/io/open64.c \
-  glibc-$(GLIBC_VERSION)/io/poll.c \
-  glibc-$(GLIBC_VERSION)/io/read.c \
   glibc-$(GLIBC_VERSION)/io/xstat.c \
   glibc-$(GLIBC_VERSION)/io/xstat64.c \
   glibc-$(GLIBC_VERSION)/libio/fcloseall.c \
@@ -371,7 +371,6 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/misc/readv.c \
   glibc-$(GLIBC_VERSION)/misc/sbrk.c \
   glibc-$(GLIBC_VERSION)/misc/tsearch.c \
-  glibc-$(GLIBC_VERSION)/misc/writev.c \
   glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS/lowlevellock.c \
   glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS/register-atfork.c \
   glibc-$(GLIBC_VERSION)/nptl/sysdeps/pthread/flockfile.c \
@@ -523,21 +522,24 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/get_phys_pages.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/getcwd.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/libc_fatal.c \
+  glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/lseek64.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/libc_open.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/madvise.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/pathconf.c \
+  glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/poll.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/raise.c \
+  glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/read.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/sched_primax.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/sched_primin.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/sigsuspend.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/sigsuspend_nocancel.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/syscall.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/write.c \
+  glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/writev.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/dl-libc.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/dl-profstub.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/dl-support.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/errlist.c \
-  glibc-$(GLIBC_VERSION)/sysdeps/llamaos/errno.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/init-first.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/libc_message.c \
   glibc-$(GLIBC_VERSION)/sysdeps/posix/pause.c \
@@ -611,6 +613,7 @@ C_SOURCES = \
 
 # crashes on __thread errno
 #  glibc-$(GLIBC_VERSION)/csu/errno.c \
+#  glibc-$(GLIBC_VERSION)/sysdeps/llamaos/errno.c \
 
 # are these really needed?
 #  glibc-$(GLIBC_VERSION)/setjmp/__longjmp.c \
@@ -620,16 +623,20 @@ C_SOURCES = \
 
 # llamaOS export provided
 #  glibc-$(GLIBC_VERSION)/io/getcwd.c \
+#  glibc-$(GLIBC_VERSION)/io/lseek64.c \
+#  glibc-$(GLIBC_VERSION)/io/poll.c \
+#  glibc-$(GLIBC_VERSION)/io/read.c \
+#  glibc-$(GLIBC_VERSION)/io/write.c \
 #  glibc-$(GLIBC_VERSION)/misc/getsysstats.c \
 #  glibc-$(GLIBC_VERSION)/misc/madvise.c \
 #  glibc-$(GLIBC_VERSION)/misc/syscall.c \
+#  glibc-$(GLIBC_VERSION)/misc/writev.c \
 #  glibc-$(GLIBC_VERSION)/posix/_exit.c \
 #  glibc-$(GLIBC_VERSION)/posix/pathconf.c \
 #  glibc-$(GLIBC_VERSION)/posix/sched_primax.c \
 #  glibc-$(GLIBC_VERSION)/posix/sched_primin.c \
 #  glibc-$(GLIBC_VERSION)/signal/raise.c \
 #  glibc-$(GLIBC_VERSION)/signal/sigsuspend.c \
-#  glibc-$(GLIBC_VERSION)/io/write.c \
 
 # are these really needed? 
 #  glibc-$(GLIBC_VERSION)/sysdeps/llamaos/abort.c \

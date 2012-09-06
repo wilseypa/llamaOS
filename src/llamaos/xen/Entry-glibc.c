@@ -147,6 +147,12 @@ static int glibc_libc_open (const char *file, int oflag)
    return -1;
 }
 
+static off64_t glibc_lseek64 (int fd, off64_t offset, int whence)
+{
+   trace("!!! ALERT: glibc calling lseek64() before file system support is enabled.\n");
+   return -1;
+}
+
 static int glibc_madvise (__ptr_t addr, size_t len, int advice)
 {
    trace("!!! ALERT: glibc calling madvise() before memory management is enabled.\n");
@@ -159,9 +165,21 @@ static long int glibc_pathconf (const char *path, int name)
    return -1;
 }
 
+static int glibc_poll (struct pollfd *fds, nfds_t nfds, int timeout)
+{
+   trace("!!! ALERT: glibc calling poll() before file system support is enabled.\n");
+   return -1;
+}
+
 static int glibc_raise (int sig)
 {
    trace("!!! ALERT: glibc calling raise() before signal support is enabled.\n");
+   return -1;
+}
+
+static ssize_t glibc_read (int fd, void *buf, size_t nbytes)
+{
+   trace("!!! ALERT: glibc calling read() before file system support is enabled.\n");
    return -1;
 }
 
@@ -201,6 +219,12 @@ static ssize_t glibc_libc_write (int fd, const void *buf, size_t nbytes)
    return -1;
 }
 
+static ssize_t glibc_writev (int fd, const struct iovec *vector, int count)
+{
+   trace("!!! ALERT: glibc calling writev() before file system support is enabled.\n");
+   return -1;
+}
+
 static void register_glibc_exports (void)
 {
    register_llamaos_exit (glibc_exit);
@@ -211,20 +235,31 @@ static void register_glibc_exports (void)
    register_llamaos_getcwd (glibc_getcwd);
    register_llamaos_libc_fatal (glibc_libc_fatal);
    register_llamaos_libc_open (glibc_libc_open);
+   register_llamaos_lseek64 (glibc_lseek64);
    register_llamaos_madvise (glibc_madvise);
    register_llamaos_pathconf (glibc_pathconf);
+   register_llamaos_poll (glibc_poll);
    register_llamaos_raise (glibc_raise);
+   register_llamaos_read (glibc_read);
    register_llamaos_sched_get_priority_max (glibc_sched_get_priority_max);
    register_llamaos_sched_get_priority_min (glibc_sched_get_priority_min);
    register_llamaos_sigsuspend (glibc_sigsuspend);
    register_llamaos_sigsuspend_nocancel (glibc_sigsuspend_nocancel);
    register_llamaos_syscall (glibc_syscall);
    register_llamaos_write (glibc_libc_write);
+   register_llamaos_writev (glibc_writev);
 }
+
+// void __libc_init_first (int argc, char *arg0, ...);
+
+//#include <llamaos/__thread.h>
+__thread int magato = 0;
 
 // entry function called from Entry.S
 void entry_glibc (start_info_t *start_info)
 {
+   magato = 1;
+
    // check to make sure the initial memory is good
    if (verify_magic (start_info))
    {
@@ -236,7 +271,7 @@ void entry_glibc (start_info_t *start_info)
       register_glibc_exports ();
 
       // initialize glibc
-      // libc_init_first();
+      // __libc_init_first (1, "");
 
       // call the C++ entry function
       entry_gcc (start_info);

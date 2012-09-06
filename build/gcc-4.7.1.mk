@@ -42,6 +42,7 @@ CFLAGS += \
   -I $(SRCDIR)/gcc-$(GCC_VERSION)/gcc/include-fixed \
   -I $(SRCDIR)/gcc-$(GCC_VERSION)/include \
   -I $(INCDIR) \
+  -include $(SRCDIR)/llamaos/__thread.h \
   -D HAVE_CONFIG_H \
   -D HAVE_STDLIB_H \
   -D HAVE_STRING_H \
@@ -58,7 +59,8 @@ CPPFLAGS += \
   -I $(SRCDIR)/gcc-$(GCC_VERSION)/gcc/include-fixed \
   -I $(SRCDIR)/gcc-$(GCC_VERSION)/gcc/ginclude \
   -I $(SRCDIR)/gcc-$(GCC_VERSION)/include \
-  -I $(INCDIR)
+  -I $(INCDIR) \
+  -include $(SRCDIR)/llamaos/__thread.h
 
 HEADERS = \
   $(INCDIR)/backward/binders.h \

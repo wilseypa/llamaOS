@@ -28,59 +28,50 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <cstdint>
-#include <cstring>
+#include <errno.h>
+#include <unistd.h>
+#include <stddef.h>
 
-#include <ios>
+// define function pointer
+typedef ssize_t (*llamaos_read_t) (int, void *, size_t);
 
-#include <xen/xen.h>
+// function pointer variable
+static llamaos_read_t llamaos_read = 0;
 
-#include <llamaos/memory/Memory.h>
-#include <llamaos/xen/Entry-llamaOS.h>
-#include <llamaos/llamaOS.h>
-#include <llamaos/Trace.h>
-
-using namespace std;
-using namespace llamaos;
-//using namespace llamaos::xen;
-
-namespace llamaos {
-namespace memory {
-
-// needs initialized by startup logic
-extern uint64_t *machine_table;
-extern uint64_t  machine_table_size;
-extern uint64_t *pseudo_table;
-extern uint64_t  pseudo_table_size;
-
-} }
-
-static void initialize_mmu (start_info_t *start_info)
+// function called by llamaOS to register pointer
+void register_llamaos_read (llamaos_read_t func)
 {
-   // initialize memory management
-   memory::machine_table = memory::address_to_pointer<uint64_t>(MACH2PHYS_VIRT_START);
-   memory::machine_table_size = MACH2PHYS_NR_ENTRIES;
-   memory::pseudo_table = memory::address_to_pointer<uint64_t> (start_info->mfn_list);
-   memory::pseudo_table_size = start_info->nr_pages;
-
-   memory::initialize (start_info->pt_base, start_info->nr_pages, 1024);
+   llamaos_read = func;
 }
 
-static void register_gcc_exports ()
+/* Read NBYTES into BUF from FD.  Return the number read or -1.  */
+ssize_t __libc_read (int fd, void *buf, size_t nbytes)
 {
+   if (0 != llamaos_read)
+   {
+      if (nbytes == 0)
+      {
+         return 0;
+      }
+
+      if (fd < 0)
+      {
+         __set_errno (EBADF);
+         return -1;
+      }
+      if (buf == NULL)
+      {
+         __set_errno (EINVAL);
+         return -1;
+      }
+
+      return llamaos_read (fd, buf, nbytes);
+   }
+
+   __set_errno (ENOSYS);
+   return -1;
 }
-
-extern "C"
-void entry_gcc (start_info_t *start_info)
-{
-   trace ("registering llamaOS gcc exports...\n");
-   register_gcc_exports ();
-
-   // initialize memory management
-   initialize_mmu (start_info);
-
-   // initialize libstdc++
-   ios_base::Init ios_base_init;
-
-   entry_llamaOS (start_info);
-}
+libc_hidden_def (__libc_read)
+weak_alias (__libc_read, __read)
+libc_hidden_weak (__read)
+weak_alias (__libc_read, read)

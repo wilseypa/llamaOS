@@ -31,8 +31,16 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #ifndef llamaos_xen_export_glibc_h_
 #define llamaos_xen_export_glibc_h_
 
+#include <stddef.h>
 #include <signal.h>
 #include <unistd.h>
+#include <sys/poll.h>
+#include <sys/types.h>
+#include <sys/uio.h>
+
+// !BAM
+// why is this not defined?
+typedef int64_t off64_t;
 
 // void _exit (int status)
 typedef void (*llamaos_exit_t) (int);
@@ -66,6 +74,10 @@ void register_llamaos_libc_fatal (llamaos_libc_fatal_t libc_fatal);
 typedef int (*llamaos_libc_open_t) (const char *, int);
 void register_llamaos_libc_open (llamaos_libc_open_t libc_open);
 
+// off64_t __libc_lseek64 (int fd, off64_t offset, int whence)
+typedef off64_t (*llamaos_lseek64_t) (int, off64_t, int);
+void register_llamaos_lseek64 (llamaos_lseek64_t func);
+
 // int madvise (__ptr_t addr, size_t len, int advice)
 typedef int (*llamaos_madvise_t) (__ptr_t, size_t, int);
 void register_llamaos_madvise (llamaos_madvise_t madvise);
@@ -74,9 +86,17 @@ void register_llamaos_madvise (llamaos_madvise_t madvise);
 typedef long int (*llamaos_pathconf_t) (const char *, int);
 void register_llamaos_pathconf (llamaos_pathconf_t madvise);
 
+// int poll (struct pollfd *fds, nfds_t nfds, int timeout)
+typedef int (*llamaos_poll_t) (struct pollfd *, nfds_t, int);
+void register_llamaos_poll (llamaos_poll_t func);
+
 // int raise (int sig)
 typedef int (*llamaos_raise_t) (int);
 void register_llamaos_raise (llamaos_raise_t raise);
+
+// ssize_t __libc_read (int fd, void *buf, size_t nbytes)
+typedef ssize_t (*llamaos_read_t) (int, void *, size_t);
+void register_llamaos_read (llamaos_read_t func);
 
 // int sched_get_priority_max (int algorithm)
 typedef int (*llamaos_sched_get_priority_max_t) (int);
@@ -101,5 +121,9 @@ void register_llamaos_syscall (llamaos_syscall_t syscall);
 // ssize_t libc_write (int fd, const void *buf, size_t nbytes)
 typedef ssize_t (*llamaos_write_t) (int, const void *, size_t);
 void register_llamaos_write (llamaos_write_t write);
+
+// ssize_t __libc_writev (int fd, const struct iovec *vector, int count)
+typedef ssize_t (*llamaos_writev_t) (int, const struct iovec *, int);
+void register_llamaos_writev (llamaos_writev_t func);
 
 #endif	//  llamaos_xen_export_glibc_h_

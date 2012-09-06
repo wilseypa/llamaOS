@@ -36,7 +36,8 @@ include common.mk
 MAKEFILE_SOURCES += apps.hello.mk
 
 CPPFLAGS += \
-  -I $(INCDIR)
+  -I $(INCDIR) \
+  -include $(SRCDIR)/llamaos/__thread.h
 
 SOURCES = \
   llamaos/apps/hello/main.cpp

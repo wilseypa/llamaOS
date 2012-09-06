@@ -28,59 +28,13 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <cstdint>
-#include <cstring>
+#ifndef llamaos_thread_h_
+#define llamaos_thread_h_
 
-#include <ios>
+#undef __thread
+#define __thread 
 
-#include <xen/xen.h>
+#undef attribute_tls_model_ie
+#define attribute_tls_model_ie 
 
-#include <llamaos/memory/Memory.h>
-#include <llamaos/xen/Entry-llamaOS.h>
-#include <llamaos/llamaOS.h>
-#include <llamaos/Trace.h>
-
-using namespace std;
-using namespace llamaos;
-//using namespace llamaos::xen;
-
-namespace llamaos {
-namespace memory {
-
-// needs initialized by startup logic
-extern uint64_t *machine_table;
-extern uint64_t  machine_table_size;
-extern uint64_t *pseudo_table;
-extern uint64_t  pseudo_table_size;
-
-} }
-
-static void initialize_mmu (start_info_t *start_info)
-{
-   // initialize memory management
-   memory::machine_table = memory::address_to_pointer<uint64_t>(MACH2PHYS_VIRT_START);
-   memory::machine_table_size = MACH2PHYS_NR_ENTRIES;
-   memory::pseudo_table = memory::address_to_pointer<uint64_t> (start_info->mfn_list);
-   memory::pseudo_table_size = start_info->nr_pages;
-
-   memory::initialize (start_info->pt_base, start_info->nr_pages, 1024);
-}
-
-static void register_gcc_exports ()
-{
-}
-
-extern "C"
-void entry_gcc (start_info_t *start_info)
-{
-   trace ("registering llamaOS gcc exports...\n");
-   register_gcc_exports ();
-
-   // initialize memory management
-   initialize_mmu (start_info);
-
-   // initialize libstdc++
-   ios_base::Init ios_base_init;
-
-   entry_llamaOS (start_info);
-}
+#endif	// llamaos_thread_h_

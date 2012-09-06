@@ -28,59 +28,36 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <cstdint>
-#include <cstring>
+#include <errno.h>
+#include <unistd.h>
+#include <sys/uio.h>
 
-#include <ios>
+// define function pointer
+typedef ssize_t (*llamaos_writev_t) (int, const struct iovec *, int);
 
-#include <xen/xen.h>
+// function pointer variable
+static llamaos_writev_t llamaos_writev = 0;
 
-#include <llamaos/memory/Memory.h>
-#include <llamaos/xen/Entry-llamaOS.h>
-#include <llamaos/llamaOS.h>
-#include <llamaos/Trace.h>
-
-using namespace std;
-using namespace llamaos;
-//using namespace llamaos::xen;
-
-namespace llamaos {
-namespace memory {
-
-// needs initialized by startup logic
-extern uint64_t *machine_table;
-extern uint64_t  machine_table_size;
-extern uint64_t *pseudo_table;
-extern uint64_t  pseudo_table_size;
-
-} }
-
-static void initialize_mmu (start_info_t *start_info)
+// function called by llamaOS to register pointer
+void register_llamaos_writev (llamaos_writev_t func)
 {
-   // initialize memory management
-   memory::machine_table = memory::address_to_pointer<uint64_t>(MACH2PHYS_VIRT_START);
-   memory::machine_table_size = MACH2PHYS_NR_ENTRIES;
-   memory::pseudo_table = memory::address_to_pointer<uint64_t> (start_info->mfn_list);
-   memory::pseudo_table_size = start_info->nr_pages;
-
-   memory::initialize (start_info->pt_base, start_info->nr_pages, 1024);
+   llamaos_writev = func;
 }
 
-static void register_gcc_exports ()
+/* Write data pointed by the buffers described by VECTOR, which
+   is a vector of COUNT `struct iovec's, to file descriptor FD.
+   The data is written in the order specified.
+   Operates just like `write' (see <unistd.h>) except that the data
+   are taken from VECTOR instead of a contiguous buffer.  */
+ssize_t __libc_writev (int fd, const struct iovec *vector, int count)
 {
+   if (0 != llamaos_writev)
+   {
+      return llamaos_writev (fd, vector, count);
+   }
+
+   __set_errno (ENOSYS);
+   return -1;
 }
-
-extern "C"
-void entry_gcc (start_info_t *start_info)
-{
-   trace ("registering llamaOS gcc exports...\n");
-   register_gcc_exports ();
-
-   // initialize memory management
-   initialize_mmu (start_info);
-
-   // initialize libstdc++
-   ios_base::Init ios_base_init;
-
-   entry_llamaOS (start_info);
-}
+strong_alias (__libc_writev, __writev)
+weak_alias (__libc_writev, writev)

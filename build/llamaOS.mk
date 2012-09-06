@@ -36,19 +36,22 @@ include common.mk
 # make file list
 MAKEFILE_SOURCES += llamaOS.mk
 
-XFLAGS = \
+ASMFLAGS += \
   -I $(INCDIR) \
   -I $(SRCDIR) \
   -D__XEN_INTERFACE_VERSION__=0x0003020a
 
-ASMFLAGS += \
-  $(XFLAGS)
-
 CFLAGS += \
-  $(XFLAGS)
+  -I $(INCDIR) \
+  -I $(SRCDIR) \
+  -include $(SRCDIR)/llamaos/__thread.h \
+  -D__XEN_INTERFACE_VERSION__=0x0003020a
 
 CPPFLAGS += \
-  $(XFLAGS)
+  -I $(INCDIR) \
+  -I $(SRCDIR) \
+  -include $(SRCDIR)/llamaos/__thread.h \
+  -D__XEN_INTERFACE_VERSION__=0x0003020a
 
 # xen specific source files
 ifeq ($(MAKECMDGOALS),xen)
