@@ -45,7 +45,6 @@ typedef uintptr_t uatomicptr_t;
 typedef intmax_t atomic_max_t;
 typedef uintmax_t uatomic_max_t;
 
-
 #ifndef LOCK_PREFIX
 # ifdef UP
 #  define LOCK_PREFIX	/* nothing */
@@ -60,6 +59,7 @@ typedef uintmax_t uatomic_max_t;
 #define atomic_compare_and_exchange_bool_acq(mem, newval, oldval) \
   (! __sync_bool_compare_and_swap (mem, oldval, newval))
 
+#if 0
 
 #define __arch_c_compare_and_exchange_val_8_acq(mem, newval, oldval) \
   ({ __typeof (*mem) ret;						      \
@@ -459,3 +459,5 @@ typedef uintmax_t uatomic_max_t;
 #define atomic_or(mem, mask) __arch_or_body (LOCK_PREFIX, mem, mask)
 
 #define catomic_or(mem, mask) __arch_or_body (__arch_cprefix, mem, mask)
+
+#endif

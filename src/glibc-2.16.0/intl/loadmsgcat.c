@@ -70,6 +70,8 @@ char *alloca ();
 # define HAVE_MMAP	1
 #else
 # undef HAVE_MMAP
+// !BAM
+#define MAP_FAILED (void *)-1
 #endif
 
 #if defined HAVE_STDINT_H_WITH_UINTMAX || defined _LIBC

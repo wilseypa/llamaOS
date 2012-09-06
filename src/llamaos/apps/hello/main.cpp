@@ -28,15 +28,15 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-// #include <iostream>
+#include <iostream>
 
-// using namespace std;
+using namespace std;
 
 // simple guest instance should just output text to console
 int main (int argc, char *argv [])
 {
-//   cout << endl << "hello llamaOS" << endl;
-//   cout.flush ();
+   cout << endl << "hello llamaOS" << endl;
+   cout.flush ();
 
    for (;;);
 

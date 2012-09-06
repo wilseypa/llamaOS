@@ -82,12 +82,13 @@ ASMFLAGS += \
 #  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS \
 #  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/nptl \
 
+#  -D HAVE_MMAP \
+#  -D HAVE_MUNMAP \
+
 CFLAGS += \
   -D _IO_MTSAFE_IO \
   -D 'GCONV_DIR=""' \
   -D 'GCONV_PATH=""' \
-  -D HAVE_MMAP \
-  -D HAVE_MUNMAP \
   -D HAVE_MREMAP=0 \
   -D 'LOCALE_ALIAS_PATH=""' \
   -D 'LOCALEDIR=""' \
