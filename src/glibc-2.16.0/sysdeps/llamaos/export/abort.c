@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2011, William Magato
+Copyright (c) 2012, William Magato
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,21 +28,33 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <stdarg.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <errno.h>
 
-void __libc_message (int do_abort, const char *fmt, ...)
+// define function pointer
+typedef void (*llamaos_abort_t) (void);
+
+// function pointer variable
+static llamaos_abort_t llamaos_abort = 0;
+
+// function called by llamaOS to register pointer
+void register_llamaos_abort (llamaos_abort_t func)
 {
-   va_list args;
-   va_start (args, fmt);
-
-   vfprintf (stderr, fmt, args);
-
-   va_end (args);
-
-   if (do_abort)
-   {
-      abort ();
-   }
+   llamaos_abort = func;
 }
+
+/* Exported variable to locate abort message in core files etc.  */
+struct abort_msg_s *__abort_msg __attribute__ ((nocommon));
+libc_hidden_def (__abort_msg)
+
+/* Cause an abnormal program termination with core-dump.  */
+void abort (void)
+{
+   if (0 != llamaos_abort)
+   {
+      llamaos_abort ();
+   }
+
+   __set_errno (ENOSYS);
+   for (;;);
+}
+libc_hidden_def (abort)

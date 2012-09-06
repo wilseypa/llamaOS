@@ -48,22 +48,33 @@ Grant_table::Grant_table ()
       avail(),
       inuse()
 {
+   trace ("Grant_table constructor...\n");
+   trace (" size: %x\n", size);
+   trace (" entries: %lx\n", entries);
+
    unsigned long frame_list [1] = { 0 };
 
+   trace ("calling grant_table_setup_table...\n");
    if (!Hypercall::grant_table_setup_table (1, frame_list))
    {
+      trace ("failed to create grant table\n");
       throw runtime_error ("failed to create grant table");
    }
 
+   trace ("calling update_va_mapping...\n");
    if (!Hypercall::update_va_mapping (pointer_to_address(entries), page_to_address (frame_list [0])))
    {
+      trace("failed to map grant table\n");
       throw runtime_error ("failed to map grant table");
    }
+   trace ("calling update_va_mapping returned.\n");
 
    for (grant_ref_t i = 0; i < 512; i++)
    {
       avail.push_back(i);
    }
+
+   trace ("Grant_table constructor ended.\n");
 }
 
 Grant_table::~Grant_table ()

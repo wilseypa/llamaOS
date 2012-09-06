@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2011, William Magato
+Copyright (c) 2012, William Magato
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,21 +28,43 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <stdarg.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <errno.h>
 
-void __libc_message (int do_abort, const char *fmt, ...)
+// define function pointer
+typedef void *(*llamaos_brk_t) (void *);
+
+// function pointer variable
+static llamaos_brk_t llamaos_brk = 0;
+
+// function called by llamaOS to register pointer
+void register_llamaos_brk (llamaos_brk_t func)
 {
-   va_list args;
-   va_start (args, fmt);
-
-   vfprintf (stderr, fmt, args);
-
-   va_end (args);
-
-   if (do_abort)
-   {
-      abort ();
-   }
+   llamaos_brk = func;
 }
+
+/* sbrk.c expects this.  */
+void *__curbrk = 0;
+
+/* Set the end of the process's data space to ADDR.
+   Return 0 if successful, -1 if not.  */
+int __brk (void *addr)
+{
+   if (0 != llamaos_brk)
+   {
+      // call llamaos_brk
+      __curbrk = llamaos_brk (addr);
+
+      // error if requested memory is not available
+      if (__curbrk < addr)
+      {
+         __set_errno (ENOMEM);
+         return -1;
+      }
+
+      return 0;
+   }
+
+   __set_errno (ENOSYS);
+   return -1;
+}
+weak_alias (__brk, brk)

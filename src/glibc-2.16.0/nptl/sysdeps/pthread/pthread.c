@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2011, William Magato
+Copyright (c) 2012, William Magato
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,21 +28,34 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <stdarg.h>
-#include <stdio.h>
-#include <stdlib.h>
+// bypassing pthread logic until llamaOS supports threads
 
-void __libc_message (int do_abort, const char *fmt, ...)
+#include <pthread.h>
+
+int __pthread_mutex_lock (pthread_mutex_t *mutex)
 {
-   va_list args;
-   va_start (args, fmt);
-
-   vfprintf (stderr, fmt, args);
-
-   va_end (args);
-
-   if (do_abort)
-   {
-      abort ();
-   }
+   return 0;
 }
+#ifndef __pthread_mutex_lock
+strong_alias (__pthread_mutex_lock, pthread_mutex_lock)
+hidden_def (__pthread_mutex_lock)
+#endif
+
+int
+__pthread_mutex_unlock (mutex)
+     pthread_mutex_t *mutex;
+{
+  return 0; // __pthread_mutex_unlock_usercnt (mutex, 1);
+}
+strong_alias (__pthread_mutex_unlock, pthread_mutex_unlock)
+hidden_def (__pthread_mutex_unlock)
+
+int
+__pthread_once (once_control, init_routine)
+     pthread_once_t *once_control;
+     void (*init_routine) (void);
+{
+  return 0;
+}
+strong_alias (__pthread_once, pthread_once)
+hidden_def (__pthread_once)

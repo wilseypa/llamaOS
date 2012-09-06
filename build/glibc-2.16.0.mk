@@ -37,14 +37,15 @@ MAKEFILE_SOURCES += glibc-$(GLIBC_VERSION).mk
 
 #  -D__ASSUME_PRIVATE_FUTEX \
 
+#  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS/x86_64 \
+#  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS/x86 \
+#  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS/i386 \
+#  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS \
+#  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/nptl \
+
 ASMFLAGS += \
-  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS/x86_64 \
-  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS/x86 \
-  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS/i386 \
-  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS \
-  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/nptl/sysdeps/x86_64 \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/nptl/sysdeps/pthread \
-  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/nptl \
+  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/nptl/sysdeps/x86_64 \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/x86_64 \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/sysdeps/llamaos \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/sysdeps/x86_64 \
@@ -76,6 +77,11 @@ ASMFLAGS += \
 
 #  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/include \
 
+#  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS/x86_64 \
+#  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS/x86 \
+#  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS \
+#  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/nptl \
+
 CFLAGS += \
   -D _IO_MTSAFE_IO \
   -D 'GCONV_DIR=""' \
@@ -90,12 +96,8 @@ CFLAGS += \
   -I $(SRCDIR)/gcc-$(GCC_VERSION)/gcc/include \
   -I $(SRCDIR)/gcc-$(GCC_VERSION)/include \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/include \
-  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS/x86_64 \
-  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS/x86 \
-  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/nptl/sysdeps/pthread \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/nptl/sysdeps/x86_64 \
-  -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/nptl \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/x86_64 \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/sysdeps/llamaos \
   -I $(SRCDIR)/glibc-$(GLIBC_VERSION)/sysdeps/x86_64 \
@@ -227,6 +229,14 @@ ASM_SOURCES = \
   glibc-$(GLIBC_VERSION)/sysdeps/x86_64/mul_1.S \
   glibc-$(GLIBC_VERSION)/sysdeps/x86_64/rshift.S
 
+#  glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS/lowlevellock.c \
+#  glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS/pthread_mutex_lock.c \
+#  glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS/register-atfork.c \
+#  glibc-$(GLIBC_VERSION)/nptl/pthread_mutex_unlock.c \
+#  glibc-$(GLIBC_VERSION)/nptl/pthread_once.c \
+#  glibc-$(GLIBC_VERSION)/nptl/tpp.c \
+#  glibc-$(GLIBC_VERSION)/nptl/vars.c \
+
 C_SOURCES = \
   glibc-$(GLIBC_VERSION)/assert/assert.c \
   glibc-$(GLIBC_VERSION)/csu/dso_handle.c \
@@ -356,13 +366,14 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/locale/SYS_libc.c \
   glibc-$(GLIBC_VERSION)/locale/uselocale.c \
   glibc-$(GLIBC_VERSION)/locale/xlocale.c \
+  glibc-$(GLIBC_VERSION)/nptl/sysdeps/pthread/flockfile.c \
+  glibc-$(GLIBC_VERSION)/nptl/sysdeps/pthread/funlockfile.c \
+  glibc-$(GLIBC_VERSION)/nptl/sysdeps/pthread/pthread.c \
   glibc-$(GLIBC_VERSION)/malloc/malloc.c \
   glibc-$(GLIBC_VERSION)/malloc/memusage.c \
   glibc-$(GLIBC_VERSION)/malloc/morecore.c \
-  glibc-$(GLIBC_VERSION)/misc/brk.c \
   glibc-$(GLIBC_VERSION)/misc/getclktck.c \
   glibc-$(GLIBC_VERSION)/misc/getdtsz.c \
-  glibc-$(GLIBC_VERSION)/misc/getpagesize.c \
   glibc-$(GLIBC_VERSION)/misc/init-misc.c \
   glibc-$(GLIBC_VERSION)/misc/lseek.c \
   glibc-$(GLIBC_VERSION)/misc/mmap.c \
@@ -372,15 +383,6 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/misc/readv.c \
   glibc-$(GLIBC_VERSION)/misc/sbrk.c \
   glibc-$(GLIBC_VERSION)/misc/tsearch.c \
-  glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS/lowlevellock.c \
-  glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS/pthread_mutex_lock.c \
-  glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS/register-atfork.c \
-  glibc-$(GLIBC_VERSION)/nptl/sysdeps/pthread/flockfile.c \
-  glibc-$(GLIBC_VERSION)/nptl/sysdeps/pthread/funlockfile.c \
-  glibc-$(GLIBC_VERSION)/nptl/pthread_mutex_unlock.c \
-  glibc-$(GLIBC_VERSION)/nptl/pthread_once.c \
-  glibc-$(GLIBC_VERSION)/nptl/tpp.c \
-  glibc-$(GLIBC_VERSION)/nptl/vars.c \
   glibc-$(GLIBC_VERSION)/posix/environ.c \
   glibc-$(GLIBC_VERSION)/posix/fpathconf.c \
   glibc-$(GLIBC_VERSION)/posix/get_child_max.c \
@@ -419,7 +421,6 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/stdio-common/vfscanf.c \
   glibc-$(GLIBC_VERSION)/stdio-common/vfwprintf.c \
   glibc-$(GLIBC_VERSION)/stdio-common/vfwscanf.c \
-  glibc-$(GLIBC_VERSION)/stdlib/abort.c \
   glibc-$(GLIBC_VERSION)/stdlib/abs.c \
   glibc-$(GLIBC_VERSION)/stdlib/add_n.c \
   glibc-$(GLIBC_VERSION)/stdlib/addmul_1.c \
@@ -517,9 +518,12 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/sysdeps/ieee754/ldbl-128/s_isnanl.c \
   glibc-$(GLIBC_VERSION)/sysdeps/ieee754/ldbl-128/s_signbitl.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/_exit.c \
+  glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/abort.c \
+  glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/brk.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/get_avphys_pages.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/get_nprocs.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/get_nprocs_conf.c \
+  glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/getpagesize.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/get_phys_pages.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/getcwd.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/libc_fatal.c \
@@ -624,6 +628,8 @@ C_SOURCES = \
 #  glibc-$(GLIBC_VERSION)/io/poll.c \
 #  glibc-$(GLIBC_VERSION)/io/read.c \
 #  glibc-$(GLIBC_VERSION)/io/write.c \
+#  glibc-$(GLIBC_VERSION)/misc/brk.c \
+#  glibc-$(GLIBC_VERSION)/misc/getpagesize.c \
 #  glibc-$(GLIBC_VERSION)/misc/getsysstats.c \
 #  glibc-$(GLIBC_VERSION)/misc/madvise.c \
 #  glibc-$(GLIBC_VERSION)/misc/syscall.c \
@@ -632,6 +638,7 @@ C_SOURCES = \
 #  glibc-$(GLIBC_VERSION)/posix/pathconf.c \
 #  glibc-$(GLIBC_VERSION)/posix/sched_primax.c \
 #  glibc-$(GLIBC_VERSION)/posix/sched_primin.c \
+#  glibc-$(GLIBC_VERSION)/stdlib/abort.c \
 #  glibc-$(GLIBC_VERSION)/signal/raise.c \
 #  glibc-$(GLIBC_VERSION)/signal/sigsuspend.c \
 

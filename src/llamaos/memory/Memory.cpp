@@ -248,6 +248,7 @@ bool initialize (uint64_t CR3_virtual_address, uint64_t total_pages, uint64_t re
 
 uint64_t get_reserved_virtual_address ()
 {
+   trace("calling get_reserved_virtual_address()...\n");
    return memory::start_reserved_virtual_address;
 }
 

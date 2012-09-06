@@ -52,7 +52,7 @@ int trace (const char *format, ...)
 
    // write buffer to system output/log
    // xen::Hypercall::console_io (buffer);
-   HYPERVISOR_console_io(CONSOLEIO_write, strlen(buffer), buffer);
+   HYPERVISOR_console_io(CONSOLEIO_write, count, buffer);
 
    // return the number characters written
    return count;

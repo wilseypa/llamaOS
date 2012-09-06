@@ -90,7 +90,6 @@ public:
    Traps traps;
    Events events;
    Grant_table grant_table;
-
    Xenstore xenstore;
 
 private:

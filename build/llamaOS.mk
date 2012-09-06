@@ -75,6 +75,7 @@ CPP_SOURCES += \
   llamaos/xen/Xenstore.cpp
 endif
 
+
 # generate object list
 OBJECTS  = $(C_SOURCES:%.c=$(OBJDIR)/%.o)
 OBJECTS += $(CPP_SOURCES:%.cpp=$(OBJDIR)/%.o)

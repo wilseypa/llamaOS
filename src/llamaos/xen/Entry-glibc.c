@@ -82,6 +82,21 @@ static void trace_startup (const start_info_t *start_info)
    trace ("\n");
 }
 
+static void glibc_abort (void)
+{
+   trace("!!! ALERT: glibc calling abort().\n");
+
+   sched_shutdown_t arg;
+   arg.reason = SHUTDOWN_crash;
+   HYPERVISOR_sched_op(SCHEDOP_shutdown, &arg);
+}
+
+static void *glibc_brk (void *addr)
+{
+   trace("!!! ALERT: glibc calling brk() before memory management is enabled.\n");
+   return 0;
+}
+
 static void glibc_exit (int status)
 {
    trace("!!! ALERT: glibc calling exit().\n");
@@ -107,6 +122,11 @@ static int glibc_get_nprocs_conf (void)
 {
    trace("!!! ALERT: glibc calling get_nprocs_conf().\n");
    return 1;
+}
+
+static int glibc_getpagesize (void)
+{
+   return LLAMAOS_PAGE_SIZE;
 }
 
 static long int glibc_get_phys_pages (void)
@@ -227,10 +247,13 @@ static ssize_t glibc_writev (int fd, const struct iovec *vector, int count)
 
 static void register_glibc_exports (void)
 {
+   register_llamaos_abort (glibc_abort);
+   register_llamaos_brk (glibc_brk);
    register_llamaos_exit (glibc_exit);
    register_llamaos_get_avphys_pages (glibc_get_avphys_pages);
    register_llamaos_get_nprocs (glibc_get_nprocs);
    register_llamaos_get_nprocs_conf (glibc_get_nprocs_conf);
+   register_llamaos_getpagesize (glibc_getpagesize);
    register_llamaos_get_phys_pages (glibc_get_phys_pages);
    register_llamaos_getcwd (glibc_getcwd);
    register_llamaos_libc_fatal (glibc_libc_fatal);

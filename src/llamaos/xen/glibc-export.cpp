@@ -319,10 +319,10 @@ extern "C" int register_llamaos_abort (llamaos_abort_t);
 extern "C"
 void *llamaos_brk (void *addr)
 {
-   trace ("glibc calling brk (%lx)\n", addr);
+}   trace ("glibc calling brk (%lx)\n", addr);
 
    return memory::set_program_break (addr);
-}
+
 
 typedef void *(*llamaos_brk_t) (void *);
 extern "C" int register_llamaos_brk (llamaos_brk_t);

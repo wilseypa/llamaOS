@@ -221,10 +221,9 @@ bool Hypercall::set_callbacks (uint64_t event_address, uint64_t failsafe_address
 
 bool Hypercall::update_va_mapping (uint64_t virtual_address, uint64_t machine_address)
 {
-   pte_t val;
-   val.pte = machine_address | 7;
+   machine_address |= 7;
 
-   if (0 != HYPERVISOR_update_va_mapping (virtual_address, val, UVMF_INVLPG))
+   if (0 != HYPERVISOR_update_va_mapping (virtual_address, machine_address, UVMF_INVLPG))
    {
       trace ("HYPERVISOR_update_va_mapping (pseudo_page: %lx, machine_page: %lx) FAILED\n", virtual_address, machine_address);
       return false;
@@ -235,10 +234,9 @@ bool Hypercall::update_va_mapping (uint64_t virtual_address, uint64_t machine_ad
 
 bool Hypercall::update_va_mapping_nocache (uint64_t virtual_address, uint64_t machine_address)
 {
-   pte_t val;
-   val.pte = machine_address | 0x17;
+   machine_address |= 0x17;
 
-   if (0 != HYPERVISOR_update_va_mapping (virtual_address, val, UVMF_INVLPG))
+   if (0 != HYPERVISOR_update_va_mapping (virtual_address, machine_address, UVMF_INVLPG))
    {
       trace ("HYPERVISOR_update_va_mapping (pseudo_page: %lx, machine_page: %lx) FAILED\n", virtual_address, machine_address);
       return false;

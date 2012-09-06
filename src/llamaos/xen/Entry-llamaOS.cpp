@@ -34,6 +34,8 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <xen/xen.h>
 #include <xen/features.h>
 
+#include <llamaos/memory/Memory.h>
+#include <llamaos/xen/Export-glibc.h>
 #include <llamaos/xen/Hypervisor.h>
 #include <llamaos/llamaOS.h>
 #include <llamaos/Trace.h>
@@ -44,10 +46,36 @@ using namespace llamaos::xen;
 
 uint8_t xen_features [XENFEAT_NR_SUBMAPS * 32];
 
+static void *glibc_brk (void *addr)
+{
+   trace ("glibc calling brk (%lx)\n", addr);
+
+   return memory::set_program_break (addr);
+}
+
+static ssize_t glibc_libc_write (int fd, const void *buf, size_t nbytes)
+{
+   if (stdout->_fileno == fd)
+   {
+      Hypervisor::get_instance ()->console.write (static_cast<const char *>(buf), nbytes);
+      return nbytes;
+   }
+
+   return -1;
+}
+
+static void register_glibc_exports (void)
+{
+   register_llamaos_brk (glibc_brk);
+   register_llamaos_write (glibc_libc_write);
+}
+
 int main (int argc, char *argv []);
 
 void entry_llamaOS (start_info_t *start_info)
 {
+   register_glibc_exports ();
+
    try
    {
       // create the one and only hypervisor object

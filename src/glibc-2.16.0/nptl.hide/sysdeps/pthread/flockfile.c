@@ -23,10 +23,10 @@
 
 
 void
-__funlockfile (stream)
+__flockfile (stream)
      FILE *stream;
 {
-//  _IO_lock_unlock (*stream->_lock);
+  _IO_lock_lock (*stream->_lock);
 }
-strong_alias (__funlockfile, _IO_funlockfile)
-weak_alias (__funlockfile, funlockfile)
+strong_alias (__flockfile, _IO_flockfile)
+weak_alias (__flockfile, flockfile)
