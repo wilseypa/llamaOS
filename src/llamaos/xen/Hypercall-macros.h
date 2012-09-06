@@ -328,13 +328,12 @@ HYPERVISOR_event_channel_op(int cmd, void *arg)
 {
 	int rc = _hypercall2(int, event_channel_op, cmd, arg);
 //	if (unlikely(rc == -ENOSYS)) {
-	if (rc == -ENOSYS) {
-		struct evtchn_op op;
-		op.cmd = cmd;
-		memcpy(&op.u, arg, sizeof(op.u));
-		rc = _hypercall1(int, event_channel_op_compat, &op);
-		memcpy(arg, &op.u, sizeof(op.u));
-	}
+//		struct evtchn_op op;
+//		op.cmd = cmd;
+//		memcpy(&op.u, arg, sizeof(op.u));
+//		rc = _hypercall1(int, event_channel_op_compat, &op);
+//		memcpy(arg, &op.u, sizeof(op.u));
+//	}
 	return rc;
 }
 

@@ -81,7 +81,7 @@ static void virq_timer_event (void * /* data */)
 {
 //   Hypervisor *hypervisor = reinterpret_cast<Hypervisor *> (data);
 
-//   cout << "virq_timer_event" << endl;
+   cout << "virq_timer_event" << endl;
    cout.flush ();
    fflush (stdout);
 }
