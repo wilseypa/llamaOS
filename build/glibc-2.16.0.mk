@@ -612,10 +612,6 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/wctype/wctype.c \
   glibc-$(GLIBC_VERSION)/wctype/wctype_l.c
 
-# crashes on __thread errno
-#  glibc-$(GLIBC_VERSION)/csu/errno.c \
-#  glibc-$(GLIBC_VERSION)/sysdeps/llamaos/errno.c \
-
 # are these really needed?
 #  glibc-$(GLIBC_VERSION)/setjmp/__longjmp.c \
 #  glibc-$(GLIBC_VERSION)/setjmp/longjmp.c \
