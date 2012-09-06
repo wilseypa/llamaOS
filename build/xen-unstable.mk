@@ -39,6 +39,10 @@ HEADERS = \
   $(INCDIR)/xen/arch-x86/xen-mca.h \
   $(INCDIR)/xen/arch-x86/xen-x86_64.h \
   $(INCDIR)/xen/arch-x86/xen.h \
+  $(INCDIR)/xen/io/console.h \
+  $(INCDIR)/xen/io/pciif.h \
+  $(INCDIR)/xen/io/xenbus.h \
+  $(INCDIR)/xen/io/xs_wire.h \
   $(INCDIR)/xen/event_channel.h \
   $(INCDIR)/xen/features.h \
   $(INCDIR)/xen/grant_table.h \

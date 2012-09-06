@@ -90,6 +90,7 @@ HEADERS = \
   $(INCDIR)/bits/hash_bytes.h \
   $(INCDIR)/bits/ios_base.h \
   $(INCDIR)/bits/istream.tcc \
+  $(INCDIR)/bits/list.tcc \
   $(INCDIR)/bits/locale_classes.h \
   $(INCDIR)/bits/locale_classes.tcc \
   $(INCDIR)/bits/locale_facets.h \
@@ -102,12 +103,17 @@ HEADERS = \
   $(INCDIR)/bits/ostream_insert.h \
   $(INCDIR)/bits/postypes.h \
   $(INCDIR)/bits/range_access.h \
+  $(INCDIR)/bits/sstream.tcc \
   $(INCDIR)/bits/stl_algobase.h \
   $(INCDIR)/bits/stl_function.h \
   $(INCDIR)/bits/stl_iterator.h \
   $(INCDIR)/bits/stl_iterator_base_funcs.h \
   $(INCDIR)/bits/stl_iterator_base_types.h \
+  $(INCDIR)/bits/stl_list.h \
+  $(INCDIR)/bits/stl_map.h \
+  $(INCDIR)/bits/stl_multimap.h \
   $(INCDIR)/bits/stl_pair.h \
+  $(INCDIR)/bits/stl_tree.h \
   $(INCDIR)/bits/streambuf.tcc \
   $(INCDIR)/bits/streambuf_iterator.h \
   $(INCDIR)/bits/stringfwd.h \
@@ -136,10 +142,14 @@ HEADERS = \
   $(INCDIR)/iosfwd \
   $(INCDIR)/iostream \
   $(INCDIR)/istream \
+  $(INCDIR)/list \
+  $(INCDIR)/map \
   $(INCDIR)/new \
   $(INCDIR)/ostream \
+  $(INCDIR)/sstream \
   $(INCDIR)/stdarg.h \
   $(INCDIR)/stddef.h \
+  $(INCDIR)/stdexcept \
   $(INCDIR)/streambuf \
   $(INCDIR)/string \
   $(INCDIR)/type_traits

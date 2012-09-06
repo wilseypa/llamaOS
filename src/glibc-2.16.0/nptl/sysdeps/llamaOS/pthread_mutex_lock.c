@@ -28,61 +28,13 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <stdexcept>
+#include "pthreadP.h"
 
-#include <llamaos/memory/Memory.h>
-#include <llamaos/xen/Grant_table.h>
-#include <llamaos/xen/Hypercall.h>
-#include <llamaos/llamaOS.h>
-#include <llamaos/Trace.h>
-
-using namespace std;
-using namespace llamaos;
-using namespace llamaos::memory;
-using namespace llamaos::xen;
-
-// for now just map a single page for the table
-Grant_table::Grant_table ()
-   :  size(PAGE_SIZE / sizeof(grant_entry_v1_t)),
-      entries(address_to_pointer<grant_entry_v1_t> (get_reserved_virtual_address ())),
-      avail(),
-      inuse()
+int __pthread_mutex_lock (pthread_mutex_t *mutex)
 {
-   unsigned long frame_list [1] = { 0 };
-
-   if (!Hypercall::grant_table_setup_table (1, frame_list))
-   {
-      throw runtime_error ("failed to create grant table");
-   }
-
-   if (!Hypercall::update_va_mapping (pointer_to_address(entries), page_to_address (frame_list [0])))
-   {
-      throw runtime_error ("failed to map grant table");
-   }
-
-   for (grant_ref_t i = 0; i < 512; i++)
-   {
-      avail.push_back(i);
-   }
+   return 0;
 }
-
-Grant_table::~Grant_table ()
-{
-   Hypercall::grant_table_setup_table(0, nullptr);
-}
-
-grant_ref_t Grant_table::grant_access (domid_t domid, void *address)
-{
-   grant_ref_t ref = avail.back ();
-   avail.pop_back ();
-   inuse.push_back (ref);
-
-   entries [ref].domid = domid;
-   entries [ref].frame = virtual_pointer_to_machine_page (address);
-
-   trace ("grant_access: %u, %u, %u\n", ref, entries [ref].domid, entries [ref].frame);
-   wmb();
-   entries [ref].flags = GTF_permit_access;
-
-   return ref;
-}
+#ifndef __pthread_mutex_lock
+strong_alias (__pthread_mutex_lock, pthread_mutex_lock)
+hidden_def (__pthread_mutex_lock)
+#endif

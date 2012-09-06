@@ -28,10 +28,11 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
+#include <malloc.h>
+
 #include <cstring>
 #include <cstdint>
 #include <cstdlib>
-#include <malloc.h>
 
 #include <iostream>
 
@@ -41,11 +42,11 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 #include <llamaos/api/pci/PCI.h>
 #include <llamaos/api/sleep.h>
-#include <llamaos/memory/memory.h>
+#include <llamaos/memory/Memory.h>
 #include <llamaos/xen/Hypercall.h>
 #include <llamaos/xen/Hypervisor.h>
 #include <llamaos/xen/Xenstore.h>
-#include <llamaos/config.h>
+#include <llamaos/llamaOS.h>
 
 namespace llamaos {
 namespace api {

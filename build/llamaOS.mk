@@ -62,10 +62,17 @@ C_SOURCES += \
 CPP_SOURCES += \
   llamaos/memory/Entry.cpp \
   llamaos/memory/Memory.cpp \
+  llamaos/xen/Console.cpp \
   llamaos/xen/Entry-gcc.cpp \
   llamaos/xen/Entry-llamaOS.cpp \
+  llamaos/xen/Events.cpp \
+  llamaos/xen/Grant_table.cpp \
   llamaos/xen/Hypercall.cpp \
-  llamaos/xen/Memory.cpp
+  llamaos/xen/Hypervisor.cpp \
+  llamaos/xen/Memory.cpp \
+  llamaos/xen/PCI.cpp \
+  llamaos/xen/Traps.cpp \
+  llamaos/xen/Xenstore.cpp
 endif
 
 # generate object list

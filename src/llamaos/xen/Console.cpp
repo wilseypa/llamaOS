@@ -28,7 +28,7 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <llamaos/memory/memory.h>
+#include <llamaos/memory/Memory.h>
 #include <llamaos/xen/Console.h>
 #include <llamaos/xen/Hypercall.h>
 

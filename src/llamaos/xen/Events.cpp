@@ -30,11 +30,11 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 #include <iostream>
 
-#include <llamaos/memory/memory.h>
+#include <llamaos/memory/Memory.h>
 #include <llamaos/xen/Events.h>
 #include <llamaos/xen/Hypercall.h>
 #include <llamaos/xen/Hypervisor.h>
-#include <llamaos/trace.h>
+#include <llamaos/Trace.h>
 
 using namespace llamaos;
 using namespace llamaos::memory;

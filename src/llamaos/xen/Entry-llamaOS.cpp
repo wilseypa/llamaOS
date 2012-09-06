@@ -32,19 +32,45 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <cstring>
 
 #include <xen/xen.h>
+#include <xen/features.h>
 
+#include <llamaos/xen/Hypervisor.h>
 #include <llamaos/llamaOS.h>
 #include <llamaos/Trace.h>
+
+using namespace std;
+using namespace llamaos;
+using namespace llamaos::xen;
+
+uint8_t xen_features [XENFEAT_NR_SUBMAPS * 32];
 
 int main (int argc, char *argv []);
 
 void entry_llamaOS (start_info_t *start_info)
 {
+   try
+   {
+      // create the one and only hypervisor object
+      trace ("Creating Hypervisor...\n");
+      Hypervisor hypervisor (start_info);
 
-   // start the application
-   char *argv [2];
-   argv [0] = const_cast<char *>("llamaOS");
-   argv [1] = nullptr;
+      // start the application
+      char *argv [2];
+      argv [0] = const_cast<char *>("llamaOS");
+      argv [1] = nullptr;
 
-   main (1, argv);
+      trace ("Before application main()...\n");
+
+      main (1, argv);
+
+      trace ("After application main()...\n");
+   }
+   catch (const std::runtime_error &e)
+   {
+      trace ("*** runtime_error: %s ***\n", e.what ());
+   }
+   catch (...)
+   {
+      trace ("*** unknown exception ***\n");
+   }
 }

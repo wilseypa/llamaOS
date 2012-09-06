@@ -31,10 +31,10 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <iostream>
 #include <stdexcept>
 
-#include <llamaos/memory/memory.h>
+#include <llamaos/memory/Memory.h>
 #include <llamaos/xen/Hypercall.h>
 #include <llamaos/xen/Hypervisor.h>
-#include <llamaos/trace.h>
+#include <llamaos/Trace.h>
 
 using namespace std;
 using namespace llamaos;

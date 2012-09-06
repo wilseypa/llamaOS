@@ -56,7 +56,7 @@ private:
    Grant_table &operator= (const Grant_table &);
 
    const unsigned int size;
-   grant_entry_t *const entries;
+   grant_entry_v1_t *const entries;
 
    std::list<grant_ref_t> avail;
    std::list<grant_ref_t> inuse;

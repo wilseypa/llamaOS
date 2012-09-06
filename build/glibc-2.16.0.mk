@@ -199,6 +199,7 @@ HEADERS = \
   $(INCDIR)/limits.h \
   $(INCDIR)/locale.h \
   $(INCDIR)/math.h \
+  $(INCDIR)/malloc.h \
   $(INCDIR)/poll.h \
   $(INCDIR)/pthread.h \
   $(INCDIR)/resolv.h \
@@ -372,10 +373,10 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/misc/sbrk.c \
   glibc-$(GLIBC_VERSION)/misc/tsearch.c \
   glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS/lowlevellock.c \
+  glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS/pthread_mutex_lock.c \
   glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaOS/register-atfork.c \
   glibc-$(GLIBC_VERSION)/nptl/sysdeps/pthread/flockfile.c \
   glibc-$(GLIBC_VERSION)/nptl/sysdeps/pthread/funlockfile.c \
-  glibc-$(GLIBC_VERSION)/nptl/pthread_mutex_lock.c \
   glibc-$(GLIBC_VERSION)/nptl/pthread_mutex_unlock.c \
   glibc-$(GLIBC_VERSION)/nptl/pthread_once.c \
   glibc-$(GLIBC_VERSION)/nptl/tpp.c \
@@ -723,6 +724,11 @@ $(INCDIR)/% : $(SRCDIR)/glibc-$(GLIBC_VERSION)/locale/%
 	cp $< $@
 
 $(INCDIR)/% : $(SRCDIR)/glibc-$(GLIBC_VERSION)/math/%
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo copying: $@ from $<
+	cp $< $@
+
+$(INCDIR)/% : $(SRCDIR)/glibc-$(GLIBC_VERSION)/malloc/%
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo copying: $@ from $<
 	cp $< $@

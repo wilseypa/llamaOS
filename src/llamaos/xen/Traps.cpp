@@ -34,7 +34,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 #include <llamaos/xen/Hypercall.h>
 #include <llamaos/xen/Traps.h>
-#include <llamaos/memory/memory.h>
+#include <llamaos/memory/Memory.h>
 
 using namespace llamaos::xen;
 using namespace llamaos::memory;

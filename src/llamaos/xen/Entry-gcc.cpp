@@ -70,6 +70,34 @@ static void register_gcc_exports ()
 {
 }
 
+typedef void (*func_ptr) (void);
+extern func_ptr __CTOR_LIST__[];
+extern func_ptr __DTOR_LIST__[];
+
+static void exe_ctors ()
+{
+   uint64_t ctor_size = reinterpret_cast<uint64_t>(__CTOR_LIST__[0]);
+
+   trace ("__CTOR_LIST__[0]: %lx\n", ctor_size);
+
+   for (uint64_t i = ctor_size; i >= 1; i--)
+   {
+      __CTOR_LIST__[i] ();
+   }
+}
+
+static void exe_dtors ()
+{
+   uint64_t dtor_size = reinterpret_cast<uint64_t>(__DTOR_LIST__[0]);
+
+   trace ("__DTOR_LIST__[0]: %lx\n", dtor_size);
+
+   for (uint64_t i = dtor_size; i >= 1; i--)
+   {
+      __DTOR_LIST__[i] ();
+   }
+}
+
 extern "C"
 void entry_gcc (start_info_t *start_info)
 {
@@ -79,8 +107,12 @@ void entry_gcc (start_info_t *start_info)
    // initialize memory management
    initialize_mmu (start_info);
 
+   exe_ctors ();
+
    // initialize libstdc++
    ios_base::Init ios_base_init;
 
    entry_llamaOS (start_info);
+
+   exe_dtors ();
 }

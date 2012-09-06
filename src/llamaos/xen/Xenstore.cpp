@@ -36,7 +36,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 #include <llamaos/xen/Hypercall.h>
 #include <llamaos/xen/Xenstore.h>
-#include <llamaos/trace.h>
+#include <llamaos/Trace.h>
 
 using namespace std;
 using namespace llamaos::xen;
