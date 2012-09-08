@@ -33,7 +33,7 @@
 # include common variables
 include common.mk
 
-MAKEFILE_SOURCES += minimal-c.mk
+MAKEFILE_SOURCES += minimal/minimal-glibc.mk
 
 ASMFLAGS += \
   -I $(INCDIR) -I $(SRCDIR)
@@ -48,10 +48,10 @@ VPATH = $(SRCDIR)
 ifeq ($(MAKECMDGOALS),xen)
 
 ASM_SOURCES = \
-  llamaos/xen/Entry-minimal-c.S
+  llamaos/xen/minimal/Entry-glibc.S
 
 C_SOURCES = \
-  llamaos/xen/Minimal-c.c
+  llamaos/xen/minimal/Minimal-glibc.c
 
 endif
 
@@ -60,14 +60,14 @@ OBJECTS += $(C_SOURCES:%.c=$(OBJDIR)/%.o)
 DEPENDS += $(OBJECTS:%.o=%.d)
 
 .PHONY: xen
-xen : $(BINDIR)/xen/minimal-c
+xen : $(BINDIR)/xen/minimal-glibc
 
 # the entry object must be the first object listed here or the guest will crash!
-$(BINDIR)/xen/minimal-c: $(OBJECTS) $(LIBDIR)/glibc.a
+$(BINDIR)/xen/minimal-glibc: $(OBJECTS) $(LIBDIR)/glibc.a
 	@echo $(OBJECTS)
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
-	@$(LD) $(LDFLAGS) -T minimal-c.lds -o $@ $^
+	@$(LD) $(LDFLAGS) -T minimal/minimal-glibc.lds -o $@ $^
 	@gzip -c -f --best $@ >$@.gz
 	@echo successfully built: $@
 	@echo

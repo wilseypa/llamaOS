@@ -33,39 +33,41 @@
 # include common variables
 include common.mk
 
-MAKEFILE_SOURCES += minimal-cpp.mk
+MAKEFILE_SOURCES += minimal/minimal.mk
 
 ASMFLAGS += \
   -I $(INCDIR) -I $(SRCDIR)
 
-CFLAGS += 
-
-CPPFLAGS += \
+CFLAGS += \
   -I $(INCDIR) -I $(SRCDIR)
+
+CPPFLAGS += 
+
+VPATH = $(SRCDIR)
 
 ifeq ($(MAKECMDGOALS),xen)
 
 ASM_SOURCES = \
-  llamaos/xen/Entry-minimal-cpp.S
+  llamaos/xen/minimal/Entry.S
 
-CPP_SOURCES = \
-  llamaos/xen/Minimal-cpp.cpp
+C_SOURCES = \
+  llamaos/xen/minimal/Minimal.c
 
 endif
 
 OBJECTS  = $(ASM_SOURCES:%.S=$(OBJDIR)/%.o)
-OBJECTS += $(CPP_SOURCES:%.cpp=$(OBJDIR)/%.o)
+OBJECTS += $(C_SOURCES:%.c=$(OBJDIR)/%.o)
 DEPENDS += $(OBJECTS:%.o=%.d)
 
 .PHONY: xen
-xen : $(BINDIR)/xen/minimal-cpp
+xen : $(BINDIR)/xen/minimal
 
 # the entry object must be the first object listed here or the guest will crash!
-$(BINDIR)/xen/minimal-cpp: $(OBJECTS) $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
+$(BINDIR)/xen/minimal: $(OBJECTS)
 	@echo $(OBJECTS)
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
-	@$(LD) $(LDFLAGS) -T minimal-c.lds -o $@ $^
+	@$(LD) $(LDFLAGS) -T minimal/minimal.lds -o $@ $^
 	@gzip -c -f --best $@ >$@.gz
 	@echo successfully built: $@
 	@echo

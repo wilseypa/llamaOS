@@ -33,26 +33,39 @@
 # include common variables
 include common.mk
 
-MAKEFILE_SOURCES += apps.hello.mk
+MAKEFILE_SOURCES += minimal/minimal-gcc.mk
+
+ASMFLAGS += \
+  -I $(INCDIR) -I $(SRCDIR)
+
+CFLAGS += 
 
 CPPFLAGS += \
-  -I $(INCDIR) \
-  -include $(SRCDIR)/llamaos/__thread.h
+  -I $(INCDIR) -I $(SRCDIR)
 
-SOURCES = \
-  llamaos/apps/hello/main.cpp
+ifeq ($(MAKECMDGOALS),xen)
 
-OBJECTS = $(SOURCES:%.cpp=$(OBJDIR)/%.o)
-DEPENDS = $(OBJECTS:%.o=%.d)
+ASM_SOURCES = \
+  llamaos/xen/minimal/Entry-gcc.S
+
+CPP_SOURCES = \
+  llamaos/xen/minimal/Minimal-gcc.cpp
+
+endif
+
+OBJECTS  = $(ASM_SOURCES:%.S=$(OBJDIR)/%.o)
+OBJECTS += $(CPP_SOURCES:%.cpp=$(OBJDIR)/%.o)
+DEPENDS += $(OBJECTS:%.o=%.d)
 
 .PHONY: xen
-xen : $(BINDIR)/xen/hello
+xen : $(BINDIR)/xen/minimal-gcc
 
 # the entry object must be the first object listed here or the guest will crash!
-$(BINDIR)/xen/hello: $(LIBDIR)/xen/Entry.o $(OBJECTS) $(LIBDIR)/xen/llamaOS.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
+$(BINDIR)/xen/minimal-gcc: $(OBJECTS) $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
+	@echo $(OBJECTS)
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
-	@$(LD) $(LDFLAGS) -T llamaOS.lds -o $@ $^
+	@$(LD) $(LDFLAGS) -T minimal/minimal-gcc.lds -o $@ $^
 	@gzip -c -f --best $@ >$@.gz
 	@echo successfully built: $@
 	@echo

@@ -41,11 +41,10 @@ all:
 	@$(MAKE) -f gcc-$(GCC_VERSION).mk
 	@$(MAKE) -f xen-$(XEN_VERSION).mk
 	@$(MAKE) -f llamaOS.mk xen
-	@$(MAKE) -f apps.hello.mk xen
-
-#	@$(MAKE) -f minimal.mk xen
-#	@$(MAKE) -f minimal-c.mk xen
-#	@$(MAKE) -f minimal-cpp.mk xen
+	@$(MAKE) -f apps/hello.mk xen
+	@$(MAKE) -f minimal/minimal.mk xen
+	@$(MAKE) -f minimal/minimal-glibc.mk xen
+	@$(MAKE) -f minimal/minimal-gcc.mk xen
 
 .PHONY: clean
 clean:
