@@ -47,7 +47,6 @@ either expressed or implied, of the copyright holder(s) or contributors.
 using namespace llamaos;
 using namespace llamaos::xen;
 
-
 #if 0
 // it would be nice to use these templates but they don't seem to work?
 
@@ -165,9 +164,13 @@ static inline T hypercall (uint64_t index,
 
 bool Hypercall::set_trap_table (const trap_info_t *table)
 {
-   if (0 != HYPERVISOR_set_trap_table(const_cast<trap_info_t *>(table)))
+   // __HYPERVISOR_set_trap_table        0
+   int result = HYPERVISOR_set_trap_table(const_cast<trap_info_t *>(table));
+
+   if (0 != result)
    {
       trace ("HYPERVISOR_set_trap_table (%lx) FAILED\n", table);
+      trace ("   error code: %d\n", result);
       return false;
    }
 
@@ -188,9 +191,13 @@ bool Hypercall::mmu_update (const mmu_update_t *req, unsigned int count)
    int request_count = count;
    int success_count = 0;
 
-   if (0 != HYPERVISOR_mmu_update(const_cast<mmu_update_t *>(req), request_count, &success_count, DOMID_SELF))
+   // __HYPERVISOR_mmu_update            1
+   int result = HYPERVISOR_mmu_update(const_cast<mmu_update_t *>(req), request_count, &success_count, DOMID_SELF);
+
+   if (0 != result)
    {
       trace ("HYPERVISOR_mmu_update (count: %d) FAILED\n", request_count);
+      trace ("   error code: %d\n", result);
 
       for (unsigned int i = 0; i < count; i++)
       {
@@ -210,9 +217,13 @@ bool Hypercall::mmu_update (const mmu_update_t *req, unsigned int count)
 
 bool Hypercall::set_callbacks (uint64_t event_address, uint64_t failsafe_address)
 {
-   if (0 != HYPERVISOR_set_callbacks (event_address, failsafe_address, 0UL))
+   // __HYPERVISOR_set_callbacks         4
+   int result = HYPERVISOR_set_callbacks (event_address, failsafe_address, 0UL);
+
+   if (0 != result)
    {
       trace ("HYPERVISOR_set_callbacks (event_address: %lx, failsafe_address: %lx) FAILED\n", event_address, failsafe_address);
+      trace ("   error code: %d\n", result);
       return false;
    }
 
@@ -223,9 +234,13 @@ bool Hypercall::update_va_mapping (uint64_t virtual_address, uint64_t machine_ad
 {
    machine_address |= 7;
 
-   if (0 != HYPERVISOR_update_va_mapping (virtual_address, machine_address, UVMF_INVLPG))
+   // __HYPERVISOR_update_va_mapping    14
+   int result = HYPERVISOR_update_va_mapping (virtual_address, machine_address, UVMF_INVLPG);
+ 
+   if (0 != result)
    {
       trace ("HYPERVISOR_update_va_mapping (pseudo_page: %lx, machine_page: %lx) FAILED\n", virtual_address, machine_address);
+      trace ("   error code: %d\n", result);
       return false;
    }
 
@@ -236,9 +251,13 @@ bool Hypercall::update_va_mapping_nocache (uint64_t virtual_address, uint64_t ma
 {
    machine_address |= 0x17;
 
-   if (0 != HYPERVISOR_update_va_mapping (virtual_address, machine_address, UVMF_INVLPG))
+   // __HYPERVISOR_update_va_mapping    14
+   int result = HYPERVISOR_update_va_mapping (virtual_address, machine_address, UVMF_INVLPG);
+ 
+   if (0 != result)
    {
       trace ("HYPERVISOR_update_va_mapping (pseudo_page: %lx, machine_page: %lx) FAILED\n", virtual_address, machine_address);
+      trace ("   error code: %d\n", result);
       return false;
    }
 
@@ -247,6 +266,7 @@ bool Hypercall::update_va_mapping_nocache (uint64_t virtual_address, uint64_t ma
 
 void Hypercall::xen_version (int &major, int &minor)
 {
+   // __HYPERVISOR_xen_version          17
    uint32_t version = HYPERVISOR_xen_version (XENVER_version, 0);
 
    major = version >> 16;
@@ -257,9 +277,12 @@ bool Hypercall::console_io (const char *text)
 {
    int count = strlen(text);
 
-   if (0 != HYPERVISOR_console_io (CONSOLEIO_write,
-                                   count,
-				   const_cast<char *>(text)))
+   // __HYPERVISOR_console_io           18
+   int result = HYPERVISOR_console_io (CONSOLEIO_write,
+                                       count,
+				       const_cast<char *>(text));
+
+   if (0 != result)
    {
       // probably nothing can be done here since trace would just recall this
       return false;
@@ -276,9 +299,13 @@ bool Hypercall::grant_table_setup_table (unsigned int pages, unsigned long *fram
    setup_table.nr_frames = pages;
    set_xen_guest_handle(setup_table.frame_list, frame_list);
 
-   if (0 != HYPERVISOR_grant_table_op (GNTTABOP_setup_table, &setup_table, 1))
+   // __HYPERVISOR_grant_table_op       20
+   int result = HYPERVISOR_grant_table_op (GNTTABOP_setup_table, &setup_table, 1);
+
+   if (0 != result)
    {
       trace ("HYPERVISOR_grant_table_op (GNTTABOP_setup_table) FAILED\n");
+      trace ("   error code: %d\n", result);
       return false;
    }
    else if (setup_table.status != GNTST_okay)
@@ -295,9 +322,13 @@ bool Hypercall::grant_table_query_size (uint32_t &frames, uint32_t &max_frames, 
    gnttab_query_size_t query_size;
    query_size.dom = DOMID_SELF;
 
-   if (0 != HYPERVISOR_grant_table_op (GNTTABOP_query_size, &query_size, 1))
+   // __HYPERVISOR_grant_table_op       20
+   int result = HYPERVISOR_grant_table_op (GNTTABOP_query_size, &query_size, 1);
+
+   if (0 != result)
    {
       trace ("HYPERVISOR_grant_table_op (GNTTABOP_query_size) FAILED\n");
+      trace ("   error code: %d\n", result);
       return false;
    }
 
@@ -325,9 +356,13 @@ bool Hypercall::grant_table_query_size (uint32_t &frames, uint32_t &max_frames, 
 
 bool Hypercall::sched_op_yield ()
 {
-   if (0 != HYPERVISOR_sched_op (SCHEDOP_yield, 0))
+   // __HYPERVISOR_sched_op             29
+   int result = HYPERVISOR_sched_op (SCHEDOP_yield, 0);
+
+   if (0 != result)
    {
       trace ("HYPERVISOR_sched_op (SCHEDOP_yield) FAILED\n");
+      trace ("   error code: %d\n", result);
       return false;
    }
 
@@ -336,9 +371,13 @@ bool Hypercall::sched_op_yield ()
 
 bool Hypercall::sched_op_block ()
 {
-   if (0 != HYPERVISOR_sched_op (SCHEDOP_block, 0))
+   // __HYPERVISOR_sched_op             29
+   int result = HYPERVISOR_sched_op (SCHEDOP_block, 0);
+
+   if (0 != result)
    {
       trace ("HYPERVISOR_sched_op (SCHEDOP_block) FAILED\n");
+      trace ("   error code: %d\n", result);
       return false;
    }
 
@@ -350,9 +389,13 @@ bool Hypercall::sched_op_shutdown (unsigned int reason)
    sched_shutdown_t arg;
    arg.reason = reason;
 
-   if (0 != HYPERVISOR_sched_op (SCHEDOP_shutdown, &arg))
+   // __HYPERVISOR_sched_op             29
+   int result = HYPERVISOR_sched_op (SCHEDOP_shutdown, &arg);
+
+   if (0 != result)
    {
       trace ("HYPERVISOR_sched_op (SCHEDOP_shutdown, reason: %u) FAILED\n", reason);
+      trace ("   error code: %d\n", result);
       return false;
    }
 
@@ -364,9 +407,13 @@ bool Hypercall::event_channel_send (evtchn_port_t port)
    evtchn_send_t op;
    op.port = port;
 
-   if (0 != HYPERVISOR_event_channel_op (EVTCHNOP_send, &op))
+   // __HYPERVISOR_event_channel_op     32
+   int result = HYPERVISOR_event_channel_op (EVTCHNOP_send, &op);
+
+   if (0 != result)
    {
       trace ("HYPERVISOR_event_channel_op (EVTCHNOP_send, port: %u) FAILED\n", port);
+      trace ("   error code: %d\n", result);
       return false;
    }
 
@@ -379,9 +426,13 @@ bool Hypercall::event_channel_bind_virq (uint32_t virq, evtchn_port_t &port)
    op.virq = virq;
    op.vcpu = 0;
 
-   if (0 != HYPERVISOR_event_channel_op (EVTCHNOP_bind_virq, &op))
+   // __HYPERVISOR_event_channel_op     32
+   int result = HYPERVISOR_event_channel_op (EVTCHNOP_bind_virq, &op);
+
+   if (0 != result)
    {
       trace ("HYPERVISOR_event_channel_op (EVTCHNOP_bind_virq, virq: %u) FAILED\n", virq);
+      trace ("   error code: %d\n", result);
       return false;
    }
 
@@ -395,9 +446,13 @@ bool Hypercall::event_channel_alloc_unbound (domid_t dom, evtchn_port_t &port)
    op.dom = DOMID_SELF;
    op.remote_dom = dom;
 
-   if (0 != HYPERVISOR_event_channel_op (EVTCHNOP_alloc_unbound, &op))
+   // __HYPERVISOR_event_channel_op     32
+   int result = HYPERVISOR_event_channel_op (EVTCHNOP_alloc_unbound, &op);
+
+   if (0 != result)
    {
       trace ("HYPERVISOR_event_channel_op (EVTCHNOP_alloc_unbound) FAILED\n");
+      trace ("   error code: %d\n", result);
       return false;
    }
 
