@@ -64,6 +64,7 @@ CPPFLAGS += \
 
 HEADERS = \
   $(INCDIR)/backward/binders.h \
+  $(INCDIR)/bits/alloc_traits.h \
   $(INCDIR)/bits/allocator.h \
   $(INCDIR)/bits/atomic_lockfree_defines.h \
   $(INCDIR)/bits/atomic_word.h \
@@ -81,6 +82,7 @@ HEADERS = \
   $(INCDIR)/bits/ctype_base.h \
   $(INCDIR)/bits/ctype_inline.h \
   $(INCDIR)/bits/cxxabi_forced.h \
+  $(INCDIR)/bits/deque.tcc \
   $(INCDIR)/bits/exception_defines.h \
   $(INCDIR)/bits/exception_ptr.h \
   $(INCDIR)/bits/functexcept.h \
@@ -102,10 +104,15 @@ HEADERS = \
   $(INCDIR)/bits/ostream.tcc \
   $(INCDIR)/bits/ostream_insert.h \
   $(INCDIR)/bits/postypes.h \
+  $(INCDIR)/bits/ptr_traits.h \
   $(INCDIR)/bits/range_access.h \
   $(INCDIR)/bits/sstream.tcc \
   $(INCDIR)/bits/stl_algobase.h \
+  $(INCDIR)/bits/stl_bvector.h \
+  $(INCDIR)/bits/stl_construct.h \
+  $(INCDIR)/bits/stl_deque.h \
   $(INCDIR)/bits/stl_function.h \
+  $(INCDIR)/bits/stl_heap.h \
   $(INCDIR)/bits/stl_iterator.h \
   $(INCDIR)/bits/stl_iterator_base_funcs.h \
   $(INCDIR)/bits/stl_iterator_base_types.h \
@@ -113,11 +120,16 @@ HEADERS = \
   $(INCDIR)/bits/stl_map.h \
   $(INCDIR)/bits/stl_multimap.h \
   $(INCDIR)/bits/stl_pair.h \
+  $(INCDIR)/bits/stl_queue.h \
   $(INCDIR)/bits/stl_tree.h \
+  $(INCDIR)/bits/stl_uninitialized.h \
+  $(INCDIR)/bits/stl_vector.h \
   $(INCDIR)/bits/streambuf.tcc \
   $(INCDIR)/bits/streambuf_iterator.h \
   $(INCDIR)/bits/stringfwd.h \
+  $(INCDIR)/bits/vector.tcc \
   $(INCDIR)/debug/debug.h \
+  $(INCDIR)/ext/alloc_traits.h \
   $(INCDIR)/ext/atomicity.h \
   $(INCDIR)/ext/new_allocator.h \
   $(INCDIR)/ext/numeric_traits.h \
@@ -135,6 +147,7 @@ HEADERS = \
   $(INCDIR)/ctime \
   $(INCDIR)/cwctype \
   $(INCDIR)/cwchar \
+  $(INCDIR)/deque \
   $(INCDIR)/exception \
   $(INCDIR)/float.h \
   $(INCDIR)/initializer_list \
@@ -146,13 +159,15 @@ HEADERS = \
   $(INCDIR)/map \
   $(INCDIR)/new \
   $(INCDIR)/ostream \
+  $(INCDIR)/queue \
   $(INCDIR)/sstream \
   $(INCDIR)/stdarg.h \
   $(INCDIR)/stddef.h \
   $(INCDIR)/stdexcept \
   $(INCDIR)/streambuf \
   $(INCDIR)/string \
-  $(INCDIR)/type_traits
+  $(INCDIR)/type_traits \
+  $(INCDIR)/vector
 
 #  $(INCDIR)/bits/basic_file.h \
 #  $(INCDIR)/bits/c++io.h \

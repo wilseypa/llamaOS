@@ -31,9 +31,9 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <iostream>
 
 #include <llamaos/api/io.h>
-#include <llamaos/memory/memory.h>
+#include <llamaos/memory/Memory.h>
 #include <llamaos/net/i82574/CSR.h>
-#include <llamaos/config.h>
+#include <llamaos/llamaOS.h>
 
 using namespace std;
 using namespace llamaos::api;

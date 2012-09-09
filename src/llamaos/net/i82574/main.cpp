@@ -40,13 +40,13 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <llamaos/api/pci/PCI.h>
 #include <llamaos/api/pci/Status.h>
 #include <llamaos/api/sleep.h>
-#include <llamaos/memory/memory.h>
+#include <llamaos/memory/Memory.h>
 #include <llamaos/net/i82574/CSR.h>
 #include <llamaos/net/i82574/CTRL.h>
 #include <llamaos/net/i82574/EXTCNF_CTRL.h>
 #include <llamaos/net/i82574/STATUS.h>
 #include <llamaos/xen/Hypervisor.h>
-#include <llamaos/config.h>
+#include <llamaos/llamaOS.h>
 
 using namespace std;
 using namespace llamaos;

@@ -34,79 +34,42 @@
 include common.mk
 
 # make file list
-MAKEFILE_SOURCES += llamaOS.mk
-
-ASMFLAGS += \
-  -I $(INCDIR) \
-  -I $(SRCDIR) \
-  -D__XEN_INTERFACE_VERSION__=0x0003020a
-
-CFLAGS += \
-  -I $(INCDIR) \
-  -I $(SRCDIR) \
-  -include $(SRCDIR)/llamaos/__thread.h \
-  -D__XEN_INTERFACE_VERSION__=0x0003020a
+MAKEFILE_SOURCES += net/i82574.mk
 
 CPPFLAGS += \
   -I $(INCDIR) \
   -I $(SRCDIR) \
-  -include $(SRCDIR)/llamaos/__thread.h \
-  -D__XEN_INTERFACE_VERSION__=0x0003020a
+  -include $(SRCDIR)/llamaos/__thread.h
 
-# xen specific source files
-ifeq ($(MAKECMDGOALS),xen)
-C_SOURCES += \
-  llamaos/xen/Entry-glibc.c \
-  llamaos/xen/Trace.c
+SOURCES = \
+  llamaos/net/i82574/CSR.cpp \
+  llamaos/net/i82574/CTRL.cpp \
+  llamaos/net/i82574/CTRL_EXT.cpp \
+  llamaos/net/i82574/EXTCNF_CTRL.cpp \
+  llamaos/net/i82574/GCR.cpp \
+  llamaos/net/i82574/IMC.cpp \
+  llamaos/net/i82574/IMS.cpp \
+  llamaos/net/i82574/main.cpp \
+  llamaos/net/i82574/RCTL.cpp \
+  llamaos/net/i82574/RXDCTL.cpp \
+  llamaos/net/i82574/STATUS.cpp \
+  llamaos/net/i82574/TCTL.cpp \
+  llamaos/net/i82574/TXDCTL.cpp
 
-CPP_SOURCES += \
-  llamaos/api/pci/BAR.cpp \
-  llamaos/api/pci/Command.cpp \
-  llamaos/api/pci/PCI.cpp \
-  llamaos/api/pci/Status.cpp \
-  llamaos/memory/Entry.cpp \
-  llamaos/memory/Memory.cpp \
-  llamaos/xen/Console.cpp \
-  llamaos/xen/Entry-gcc.cpp \
-  llamaos/xen/Entry-llamaOS.cpp \
-  llamaos/xen/Events.cpp \
-  llamaos/xen/Grant_table.cpp \
-  llamaos/xen/Hypercall.cpp \
-  llamaos/xen/Hypervisor.cpp \
-  llamaos/xen/Memory.cpp \
-  llamaos/xen/PCI.cpp \
-  llamaos/xen/Traps.cpp \
-  llamaos/xen/Xenstore.cpp
-
-HEADERS = \
-  $(INCDIR)/llamaos/api/io.h \
-  $(INCDIR)/llamaos/memory/Memory.h
-endif
-
-
-# generate object list
-OBJECTS  = $(C_SOURCES:%.c=$(OBJDIR)/%.o)
-OBJECTS += $(CPP_SOURCES:%.cpp=$(OBJDIR)/%.o)
+OBJECTS = $(SOURCES:%.cpp=$(OBJDIR)/%.o)
 DEPENDS = $(OBJECTS:%.o=%.d)
 
 .PHONY: xen
-xen : $(OBJDIR)/llamaos/xen/Entry.o $(LIBDIR)/xen/llamaOS.a $(HEADERS)
+xen : $(BINDIR)/net/i82574
 
-# $(LIBDIR)/xen/Entry.o: llamaos/xen/Entry.S
-
-$(LIBDIR)/xen/llamaOS.a: $(OBJECTS)
+# the entry object must be the first object listed here or the guest will crash!
+$(BINDIR)/net/i82574: $(LIBDIR)/xen/Entry.o $(OBJECTS) $(LIBDIR)/xen/llamaOS.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
 	@[ -d $(@D) ] || (mkdir -p $(@D))
-	@echo copying Entry object...
-	@cp $(OBJDIR)/llamaos/xen/Entry.o $(LIBDIR)/xen/Entry.o
 	@echo linking: $@
-	@$(AR) r $@ $^
+	@$(LD) $(LDFLAGS) -T llamaOS.lds -o $@ $^
+	@gzip -c -f --best $@ >$@.gz
 	@echo successfully built: $@
 	@echo
-
-$(INCDIR)/% : $(SRCDIR)/%
-	@[ -d $(@D) ] || (mkdir -p $(@D))
-	@echo copying: $@ from $<
-	cp $< $@
 
 include rules.mk
 

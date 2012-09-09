@@ -35,6 +35,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <signal.h>
 #include <unistd.h>
 #include <sys/poll.h>
+#include <sys/time.h>
 #include <sys/types.h>
 #include <sys/uio.h>
 
@@ -83,6 +84,10 @@ EXTERN void register_llamaos_get_phys_pages (llamaos_get_phys_pages_t get_phys_p
 // char *getcwd (char *buf, size_t size)
 typedef char *(*llamaos_getcwd_t) (char *, size_t);
 EXTERN void register_llamaos_getcwd (llamaos_getcwd_t getcwd);
+
+// int __gettimeofday (struct timeval *tv, struct timezone *tz)
+typedef int (*llamaos_gettimeofday_t) (struct timeval *, struct timezone *);
+EXTERN void register_llamaos_gettimeofday (llamaos_gettimeofday_t func);
 
 // void __libc_fatal (const char *message)
 typedef void (*llamaos_libc_fatal_t) (const char *);

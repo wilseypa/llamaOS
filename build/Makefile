@@ -45,6 +45,7 @@ all:
 	@$(MAKE) -f minimal/minimal.mk xen
 	@$(MAKE) -f minimal/minimal-glibc.mk xen
 	@$(MAKE) -f minimal/minimal-gcc.mk xen
+	@$(MAKE) -f net/i82574.mk xen
 
 .PHONY: clean
 clean:

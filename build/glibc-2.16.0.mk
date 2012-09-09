@@ -540,6 +540,7 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/sigsuspend.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/sigsuspend_nocancel.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/syscall.c \
+  glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/gettimeofday.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/write.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/writev.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/dl-libc.c \
@@ -560,6 +561,7 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/time/localtime.c \
   glibc-$(GLIBC_VERSION)/time/mktime.c \
   glibc-$(GLIBC_VERSION)/time/offtime.c \
+  glibc-$(GLIBC_VERSION)/time/settimeofday.c \
   glibc-$(GLIBC_VERSION)/time/strftime.c \
   glibc-$(GLIBC_VERSION)/time/strftime_l.c \
   glibc-$(GLIBC_VERSION)/time/tzfile.c \
@@ -642,6 +644,7 @@ C_SOURCES = \
 #  glibc-$(GLIBC_VERSION)/stdlib/abort.c \
 #  glibc-$(GLIBC_VERSION)/signal/raise.c \
 #  glibc-$(GLIBC_VERSION)/signal/sigsuspend.c \
+#  glibc-$(GLIBC_VERSION)/time/gettimeofday.c \
 
 # are these really needed? 
 #  glibc-$(GLIBC_VERSION)/sysdeps/llamaos/abort.c \
