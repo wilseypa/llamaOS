@@ -6,6 +6,10 @@ all:
 #	@$(MAKE) -C build -f llamaOS.mk xen
 #	@$(MAKE) -C build -f apps.hello.mk xen
 
+.PHONY: install
+install:
+	@$(MAKE) -C build $@
+
 .PHONY: clean
 clean:
 	@$(MAKE) -C build $@

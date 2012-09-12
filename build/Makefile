@@ -35,6 +35,9 @@ include common.mk
 
 MAKEFILE_SOURCES += Makefile
 
+INSTALL_DIR = /opt
+INSTALL_FOLDER = ${INSTALL_DIR}/llamaOS-1.0
+
 .PHONY: all
 all:
 	@$(MAKE) -f glibc-$(GLIBC_VERSION).mk
@@ -48,6 +51,21 @@ all:
 	@$(MAKE) -f minimal/minimal-glibc.mk xen
 	@$(MAKE) -f minimal/minimal-gcc.mk xen
 	@$(MAKE) -f net/i82574.mk xen
+
+.PHONY: install
+install:
+	@echo installing llamaOS into ${INSTALL_FOLDER} folder...
+	@[ -d ${INSTALL_FOLDER} ] || (mkdir -p ${INSTALL_FOLDER})
+	@cp -r bin ${INSTALL_FOLDER}/bin
+	@cp -r include ${INSTALL_FOLDER}/include
+	@cp -r include-fixed ${INSTALL_FOLDER}/include-fixed
+	@cp -r lib ${INSTALL_FOLDER}/lib
+	@cp -r ../script ${INSTALL_FOLDER}/script
+	@echo adjusting file attributes...
+	@chmod -R o+r ${INSTALL_FOLDER}
+	@echo install complete.
+	@echo 
+
 
 .PHONY: clean
 clean:
