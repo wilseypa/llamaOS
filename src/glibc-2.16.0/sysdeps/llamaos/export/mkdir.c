@@ -28,40 +28,38 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <sys/time.h>
+#include <errno.h>
+#include <stddef.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 
-#include <gtest/gtest.h>
+// define function pointer
+typedef int (*llamaos_mkdir_t) (const char *, mode_t);
 
-TEST(Gettimeofday, NonzeroStartTime)
+// function pointer variable
+static llamaos_mkdir_t llamaos_mkdir = 0;
+
+// function called by llamaOS to register pointer
+void register_llamaos_mkdir (llamaos_mkdir_t func)
 {
-   struct timeval tv;
-
-   EXPECT_EQ(0, gettimeofday (&tv, 0));
-   EXPECT_NE(0, tv.tv_sec);
+   llamaos_mkdir = func;
 }
 
-TEST(Gettimeofday, IncrementingSeconds)
+/* Create a directory named PATH with protections MODE.  */
+int __mkdir (const char *path, mode_t mode)
 {
-   struct timeval tv;
-
-   EXPECT_EQ(0, gettimeofday (&tv, 0));
-   EXPECT_NE(0, tv.tv_sec);
-
-   __time_t tv_sec = tv.tv_sec;
-
-   for (int i = 0; i < 30; i++)
+   if (0 != llamaos_mkdir)
    {
-      for (;;)
+      if (path == NULL)
       {
-         EXPECT_EQ(0, gettimeofday (&tv, 0));
-         EXPECT_NE(0, tv.tv_sec);
-
-         if (tv_sec != tv.tv_sec)
-         {
-            ++tv_sec;
-            EXPECT_EQ(tv_sec, tv.tv_sec);
-            break;
-         }
+         __set_errno (EINVAL);
+         return -1;
       }
+
+      return llamaos_mkdir (path, mode);
    }
+
+   __set_errno (ENOSYS);
+   return -1;
 }
+weak_alias (__mkdir, mkdir)

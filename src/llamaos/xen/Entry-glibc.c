@@ -157,6 +157,12 @@ static int glibc_gettimeofday (struct timeval *tv, struct timezone *tz)
    return -1;
 }
 
+static int glibc_isatty (int fd)
+{
+   trace("!!! ALERT: glibc calling isatty().\n");
+   return 0;
+}
+
 static void glibc_libc_fatal (const char *message)
 {
    trace("!!! ALERT: glibc calling libc_fatal().\n");
@@ -182,6 +188,12 @@ static off64_t glibc_lseek64 (int fd, off64_t offset, int whence)
 static int glibc_madvise (__ptr_t addr, size_t len, int advice)
 {
    trace("!!! ALERT: glibc calling madvise() before memory management is enabled.\n");
+   return -1;
+}
+
+static int glibc_mkdir (const char *path, mode_t mode)
+{
+   trace("!!! ALERT: glibc calling mkdir() before file system support is enabled.\n");
    return -1;
 }
 
@@ -263,10 +275,12 @@ static void register_glibc_exports (void)
    register_llamaos_get_phys_pages (glibc_get_phys_pages);
    register_llamaos_getcwd (glibc_getcwd);
    register_llamaos_gettimeofday (glibc_gettimeofday);
+   register_llamaos_isatty (glibc_isatty);
    register_llamaos_libc_fatal (glibc_libc_fatal);
    register_llamaos_libc_open (glibc_libc_open);
    register_llamaos_lseek64 (glibc_lseek64);
    register_llamaos_madvise (glibc_madvise);
+   register_llamaos_mkdir (glibc_mkdir);
    register_llamaos_pathconf (glibc_pathconf);
    register_llamaos_poll (glibc_poll);
    register_llamaos_raise (glibc_raise);

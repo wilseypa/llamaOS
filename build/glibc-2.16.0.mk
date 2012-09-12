@@ -205,6 +205,7 @@ HEADERS = \
   $(INCDIR)/malloc.h \
   $(INCDIR)/poll.h \
   $(INCDIR)/pthread.h \
+  $(INCDIR)/regex.h \
   $(INCDIR)/resolv.h \
   $(INCDIR)/sched.h \
   $(INCDIR)/setjmp.h \
@@ -217,6 +218,7 @@ HEADERS = \
   $(INCDIR)/stdio.h \
   $(INCDIR)/stdlib.h \
   $(INCDIR)/string.h \
+  $(INCDIR)/strings.h \
   $(INCDIR)/syscall.h \
   $(INCDIR)/unistd.h \
   $(INCDIR)/time.h \
@@ -276,7 +278,6 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/io/fcntl.c \
   glibc-$(GLIBC_VERSION)/io/fxstat.c \
   glibc-$(GLIBC_VERSION)/io/fxstat64.c \
-  glibc-$(GLIBC_VERSION)/io/isatty.c \
   glibc-$(GLIBC_VERSION)/io/open.c \
   glibc-$(GLIBC_VERSION)/io/open64.c \
   glibc-$(GLIBC_VERSION)/io/xstat.c \
@@ -313,6 +314,7 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/libio/iogetdelim.c \
   glibc-$(GLIBC_VERSION)/libio/iogetline.c \
   glibc-$(GLIBC_VERSION)/libio/iopadn.c \
+  glibc-$(GLIBC_VERSION)/libio/ioputs.c \
   glibc-$(GLIBC_VERSION)/libio/ioseekoff.c \
   glibc-$(GLIBC_VERSION)/libio/iosetvbuf.c \
   glibc-$(GLIBC_VERSION)/libio/ioungetc.c \
@@ -321,7 +323,11 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/libio/iovsscanf.c \
   glibc-$(GLIBC_VERSION)/libio/iowpadn.c \
   glibc-$(GLIBC_VERSION)/libio/putc.c \
+  glibc-$(GLIBC_VERSION)/libio/putchar.c \
+  glibc-$(GLIBC_VERSION)/libio/putchar_u.c \
   glibc-$(GLIBC_VERSION)/libio/putwc.c \
+  glibc-$(GLIBC_VERSION)/libio/putwchar.c \
+  glibc-$(GLIBC_VERSION)/libio/putwchar_u.c \
   glibc-$(GLIBC_VERSION)/libio/stdfiles.c \
   glibc-$(GLIBC_VERSION)/libio/stdio.c \
   glibc-$(GLIBC_VERSION)/libio/strops.c \
@@ -392,6 +398,7 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/posix/getgid.c \
   glibc-$(GLIBC_VERSION)/posix/getuid.c \
   glibc-$(GLIBC_VERSION)/posix/pause.c \
+  glibc-$(GLIBC_VERSION)/posix/regex.c \
   glibc-$(GLIBC_VERSION)/posix/sched_getp.c \
   glibc-$(GLIBC_VERSION)/posix/sched_gets.c \
   glibc-$(GLIBC_VERSION)/posix/sched_setp.c \
@@ -527,10 +534,12 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/getpagesize.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/get_phys_pages.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/getcwd.c \
+  glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/isatty.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/libc_fatal.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/lseek64.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/libc_open.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/madvise.c \
+  glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/mkdir.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/pathconf.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/poll.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/raise.c \
@@ -595,6 +604,7 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/wcsmbs/wcsnlen.c \
   glibc-$(GLIBC_VERSION)/wcsmbs/wcsnrtombs.c \
   glibc-$(GLIBC_VERSION)/wcsmbs/wcsrtombs.c \
+  glibc-$(GLIBC_VERSION)/wcsmbs/wcsstr.c \
   glibc-$(GLIBC_VERSION)/wcsmbs/wcstol.c \
   glibc-$(GLIBC_VERSION)/wcsmbs/wcstol_l.c \
   glibc-$(GLIBC_VERSION)/wcsmbs/wcstoll.c \
@@ -628,6 +638,8 @@ C_SOURCES = \
 # llamaOS export provided
 #  glibc-$(GLIBC_VERSION)/io/getcwd.c \
 #  glibc-$(GLIBC_VERSION)/io/lseek64.c \
+#  glibc-$(GLIBC_VERSION)/io/isatty.c \
+#  glibc-$(GLIBC_VERSION)/io/mkdir.c \
 #  glibc-$(GLIBC_VERSION)/io/poll.c \
 #  glibc-$(GLIBC_VERSION)/io/read.c \
 #  glibc-$(GLIBC_VERSION)/io/write.c \

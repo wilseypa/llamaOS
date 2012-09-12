@@ -28,40 +28,32 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <sys/time.h>
+#include <errno.h>
+#include <unistd.h>
 
-#include <gtest/gtest.h>
+// define function pointer
+typedef int (*llamaos_isatty_t) (int);
 
-TEST(Gettimeofday, NonzeroStartTime)
+// function pointer variable
+static llamaos_isatty_t llamaos_isatty = 0;
+
+// function called by llamaOS to register pointer
+void register_llamaos_isatty (llamaos_isatty_t func)
 {
-   struct timeval tv;
-
-   EXPECT_EQ(0, gettimeofday (&tv, 0));
-   EXPECT_NE(0, tv.tv_sec);
+   llamaos_isatty = func;
 }
 
-TEST(Gettimeofday, IncrementingSeconds)
+/* Return 1 if FD is a terminal, 0 if not.  */
+int __isatty (int fd)
 {
-   struct timeval tv;
-
-   EXPECT_EQ(0, gettimeofday (&tv, 0));
-   EXPECT_NE(0, tv.tv_sec);
-
-   __time_t tv_sec = tv.tv_sec;
-
-   for (int i = 0; i < 30; i++)
+   if (0 != llamaos_isatty)
    {
-      for (;;)
-      {
-         EXPECT_EQ(0, gettimeofday (&tv, 0));
-         EXPECT_NE(0, tv.tv_sec);
-
-         if (tv_sec != tv.tv_sec)
-         {
-            ++tv_sec;
-            EXPECT_EQ(tv_sec, tv.tv_sec);
-            break;
-         }
-      }
+      return llamaos_isatty (fd);
    }
+
+   __set_errno (ENOSYS);
+   return -1;
 }
+
+weak_alias (__isatty, isatty)
+

@@ -33,32 +33,34 @@
 # include common variables
 include common.mk
 
-MAKEFILE_SOURCES += Makefile
+MAKEFILE_SOURCES += llamaOS-xen-test.mk
 
-.PHONY: all
-all:
-	@$(MAKE) -f glibc-$(GLIBC_VERSION).mk
-	@$(MAKE) -f gcc-$(GCC_VERSION).mk
-	@$(MAKE) -f xen-$(XEN_VERSION).mk
-	@$(MAKE) -f llamaOS.mk xen
-	@$(MAKE) -f gtest-$(GTEST_VERSION).mk
-	@$(MAKE) -f llamaOS-xen-test.mk xen
-	@$(MAKE) -f apps/hello.mk xen
-	@$(MAKE) -f minimal/minimal.mk xen
-	@$(MAKE) -f minimal/minimal-glibc.mk xen
-	@$(MAKE) -f minimal/minimal-gcc.mk xen
-	@$(MAKE) -f net/i82574.mk xen
+CPPFLAGS += \
+  -I $(INCDIR) \
+  -include $(SRCDIR)/llamaos/__thread.h
 
-.PHONY: clean
-clean:
-	@echo cleaning build folder...
-	@echo removing: $(OBJDIR)
-	@rm -rf $(OBJDIR)
-	@echo removing: $(BINDIR)
-	@rm -rf $(BINDIR)
-	@echo removing: $(LIBDIR)
-	@rm -rf $(LIBDIR)
-	@echo removing: $(INCDIR)
-	@rm -rf $(INCDIR)
-	@echo removing: include-fixed
-	@rm -rf include-fixed
+SOURCES = \
+  ../test/llamaos/Console.cpp \
+  ../test/llamaos/Gettimeofday.cpp \
+  ../test/llamaos/Stopwatch.cpp \
+  ../test/llamaos/xen/main.cpp
+
+OBJECTS = $(SOURCES:%.cpp=$(OBJDIR)/%.o)
+DEPENDS = $(OBJECTS:%.o=%.d)
+
+.PHONY: xen
+xen : $(BINDIR)/xen/llamaOS-test
+
+# the entry object must be the first object listed here or the guest will crash!
+$(BINDIR)/xen/llamaOS-test: $(LIBDIR)/xen/Entry.o $(OBJECTS) $(LIBDIR)/gtest.a $(LIBDIR)/xen/llamaOS.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo linking: $@
+	@$(LD) $(LDFLAGS) -T llamaOS.lds -o $@ $^
+	@gzip -c -f --best $@ >$@.gz
+	@echo successfully built: $@
+	@echo
+
+include rules.mk
+
+# include auto-generated dependencies
+-include $(DEPENDS)

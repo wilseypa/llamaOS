@@ -14,8 +14,13 @@
 #define EXEC_PAGESIZE 4096
 
 /* Macros for min/max.  */
+#ifndef MIN
 #define MIN(a,b) (((a)<(b))?(a):(b))
+#endif
+
+#ifndef MAX
 #define MAX(a,b) (((a)>(b))?(a):(b))
+#endif
 
 // !BAM
 # define roundup(x, y)   ((((x) + ((y) - 1)) / (y)) * (y))

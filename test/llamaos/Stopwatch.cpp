@@ -37,7 +37,6 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 #include <xen/xen.h>
 
-#include <llamaos/xen/Hypercall.h>
 #include <llamaos/xen/Hypervisor.h>
 
 using namespace std;

@@ -64,6 +64,7 @@ CPPFLAGS += \
 
 HEADERS = \
   $(INCDIR)/backward/binders.h \
+  $(INCDIR)/bits/algorithmfwd.h \
   $(INCDIR)/bits/alloc_traits.h \
   $(INCDIR)/bits/allocator.h \
   $(INCDIR)/bits/atomic_lockfree_defines.h \
@@ -76,12 +77,14 @@ HEADERS = \
   $(INCDIR)/bits/c++config.h \
   $(INCDIR)/bits/c++locale.h \
   $(INCDIR)/bits/char_traits.h \
+  $(INCDIR)/bits/codecvt.h \
   $(INCDIR)/bits/concept_check.h \
   $(INCDIR)/bits/cpp_type_traits.h \
   $(INCDIR)/bits/cpu_defines.h \
   $(INCDIR)/bits/ctype_base.h \
   $(INCDIR)/bits/ctype_inline.h \
   $(INCDIR)/bits/cxxabi_forced.h \
+  $(INCDIR)/bits/cxxabi_tweaks.h \
   $(INCDIR)/bits/deque.tcc \
   $(INCDIR)/bits/exception_defines.h \
   $(INCDIR)/bits/exception_ptr.h \
@@ -97,7 +100,10 @@ HEADERS = \
   $(INCDIR)/bits/locale_classes.tcc \
   $(INCDIR)/bits/locale_facets.h \
   $(INCDIR)/bits/locale_facets.tcc \
+  $(INCDIR)/bits/locale_facets_nonio.h \
+  $(INCDIR)/bits/locale_facets_nonio.tcc \
   $(INCDIR)/bits/localefwd.h \
+  $(INCDIR)/bits/messages_members.h \
   $(INCDIR)/bits/move.h \
   $(INCDIR)/bits/nested_exception.h \
   $(INCDIR)/bits/os_defines.h \
@@ -105,8 +111,11 @@ HEADERS = \
   $(INCDIR)/bits/ostream_insert.h \
   $(INCDIR)/bits/postypes.h \
   $(INCDIR)/bits/ptr_traits.h \
+  $(INCDIR)/bits/random.h \
+  $(INCDIR)/bits/random.tcc \
   $(INCDIR)/bits/range_access.h \
   $(INCDIR)/bits/sstream.tcc \
+  $(INCDIR)/bits/stl_algo.h \
   $(INCDIR)/bits/stl_algobase.h \
   $(INCDIR)/bits/stl_bvector.h \
   $(INCDIR)/bits/stl_construct.h \
@@ -119,14 +128,22 @@ HEADERS = \
   $(INCDIR)/bits/stl_list.h \
   $(INCDIR)/bits/stl_map.h \
   $(INCDIR)/bits/stl_multimap.h \
+  $(INCDIR)/bits/stl_multiset.h \
+  $(INCDIR)/bits/stl_numeric.h \
   $(INCDIR)/bits/stl_pair.h \
   $(INCDIR)/bits/stl_queue.h \
+  $(INCDIR)/bits/stl_relops.h \
+  $(INCDIR)/bits/stl_set.h \
+  $(INCDIR)/bits/stl_tempbuf.h \
   $(INCDIR)/bits/stl_tree.h \
   $(INCDIR)/bits/stl_uninitialized.h \
   $(INCDIR)/bits/stl_vector.h \
+  $(INCDIR)/bits/stream_iterator.h \
   $(INCDIR)/bits/streambuf.tcc \
   $(INCDIR)/bits/streambuf_iterator.h \
   $(INCDIR)/bits/stringfwd.h \
+  $(INCDIR)/bits/time_members.h \
+  $(INCDIR)/bits/uses_allocator.h \
   $(INCDIR)/bits/vector.tcc \
   $(INCDIR)/debug/debug.h \
   $(INCDIR)/ext/alloc_traits.h \
@@ -135,10 +152,14 @@ HEADERS = \
   $(INCDIR)/ext/numeric_traits.h \
   $(INCDIR)/ext/string_conversions.h \
   $(INCDIR)/ext/type_traits.h \
+  $(INCDIR)/tr1/tuple \
+  $(INCDIR)/algorithm \
   $(INCDIR)/cassert \
   $(INCDIR)/cctype \
   $(INCDIR)/cerrno \
+  $(INCDIR)/climits \
   $(INCDIR)/clocale \
+  $(INCDIR)/cmath \
   $(INCDIR)/cstdarg \
   $(INCDIR)/cstdint \
   $(INCDIR)/cstdio \
@@ -147,41 +168,39 @@ HEADERS = \
   $(INCDIR)/ctime \
   $(INCDIR)/cwctype \
   $(INCDIR)/cwchar \
+  $(INCDIR)/cxxabi.h \
   $(INCDIR)/deque \
   $(INCDIR)/exception \
   $(INCDIR)/float.h \
+  $(INCDIR)/functional \
   $(INCDIR)/initializer_list \
+  $(INCDIR)/iomanip \
   $(INCDIR)/ios \
   $(INCDIR)/iosfwd \
   $(INCDIR)/iostream \
   $(INCDIR)/istream \
+  $(INCDIR)/iterator \
+  $(INCDIR)/limits \
   $(INCDIR)/list \
+  $(INCDIR)/locale \
   $(INCDIR)/map \
   $(INCDIR)/new \
+  $(INCDIR)/numeric \
   $(INCDIR)/ostream \
   $(INCDIR)/queue \
+  $(INCDIR)/random \
+  $(INCDIR)/set \
   $(INCDIR)/sstream \
   $(INCDIR)/stdarg.h \
   $(INCDIR)/stddef.h \
   $(INCDIR)/stdexcept \
   $(INCDIR)/streambuf \
   $(INCDIR)/string \
+  $(INCDIR)/tuple \
   $(INCDIR)/type_traits \
+  $(INCDIR)/typeinfo \
+  $(INCDIR)/utility \
   $(INCDIR)/vector
-
-#  $(INCDIR)/bits/basic_file.h \
-#  $(INCDIR)/bits/c++io.h \
-#  $(INCDIR)/bits/codecvt.h \
-#  $(INCDIR)/bits/fstream.tcc \
-#  $(INCDIR)/bits/locale_facets_nonio.h \
-#  $(INCDIR)/bits/locale_facets_nonio.tcc \
-#  $(INCDIR)/bits/messages_members.h \
-#  $(INCDIR)/bits/time_members.h \
-#  $(INCDIR)/ext/stdio_filebuf.h \
-#  $(INCDIR)/ext/stdio_sync_filebuf.h \
-#  $(INCDIR)/fstream \
-#  $(INCDIR)/limits \
-#  $(INCDIR)/locale \
 
 C_SOURCES = \
   gcc-$(GCC_VERSION)/libgcc/unwind-dw2-fde.c \

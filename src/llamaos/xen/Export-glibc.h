@@ -89,6 +89,10 @@ EXTERN void register_llamaos_getcwd (llamaos_getcwd_t getcwd);
 typedef int (*llamaos_gettimeofday_t) (struct timeval *, struct timezone *);
 EXTERN void register_llamaos_gettimeofday (llamaos_gettimeofday_t func);
 
+// int __isatty (int fd)
+typedef int (*llamaos_isatty_t) (int);
+EXTERN void register_llamaos_isatty (llamaos_isatty_t func);
+
 // void __libc_fatal (const char *message)
 typedef void (*llamaos_libc_fatal_t) (const char *);
 EXTERN void register_llamaos_libc_fatal (llamaos_libc_fatal_t libc_fatal);
@@ -104,6 +108,10 @@ EXTERN void register_llamaos_lseek64 (llamaos_lseek64_t func);
 // int madvise (__ptr_t addr, size_t len, int advice)
 typedef int (*llamaos_madvise_t) (__ptr_t, size_t, int);
 EXTERN void register_llamaos_madvise (llamaos_madvise_t madvise);
+
+// int __mkdir (const char *path, mode_t mode)
+typedef int (*llamaos_mkdir_t) (const char *, mode_t);
+EXTERN void register_llamaos_mkdir (llamaos_mkdir_t func);
 
 // long int pathconf (const char *path, int name)
 typedef long int (*llamaos_pathconf_t) (const char *, int);

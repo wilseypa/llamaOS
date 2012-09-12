@@ -49,6 +49,7 @@ GCC_VERSION = 4.7.1
 # XEN_VERSION = 4.1.2
 XEN_VERSION = 4.1.3
 # XEN_VERSION = unstable
+GTEST_VERSION = 1.6.0
 
 # auto dependency generation
 DEPENDS = 

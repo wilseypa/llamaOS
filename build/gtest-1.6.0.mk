@@ -33,32 +33,57 @@
 # include common variables
 include common.mk
 
-MAKEFILE_SOURCES += Makefile
+MAKEFILE_SOURCES += gtest-$(GTEST_VERSION).mk
+
+CPPFLAGS += \
+  -I $(SRCDIR)/gtest-$(GTEST_VERSION)/include \
+  -I $(SRCDIR)/gtest-$(GTEST_VERSION) \
+  -I $(INCDIR) \
+  -I include-fixed \
+  -DGTEST_HAS_PTHREAD=0 \
+  -DGTEST_HAS_STREAM_REDIRECTION=0 \
+  -include $(SRCDIR)/llamaos/__thread.h
+
+HEADERS = \
+  $(INCDIR)/gtest/internal/gtest-death-test-internal.h \
+  $(INCDIR)/gtest/internal/gtest-filepath.h \
+  $(INCDIR)/gtest/internal/gtest-internal.h \
+  $(INCDIR)/gtest/internal/gtest-linked_ptr.h \
+  $(INCDIR)/gtest/internal/gtest-param-util.h \
+  $(INCDIR)/gtest/internal/gtest-param-util-generated.h \
+  $(INCDIR)/gtest/internal/gtest-port.h \
+  $(INCDIR)/gtest/internal/gtest-string.h \
+  $(INCDIR)/gtest/internal/gtest-tuple.h \
+  $(INCDIR)/gtest/internal/gtest-type-util.h \
+  $(INCDIR)/gtest/gtest-death-test.h \
+  $(INCDIR)/gtest/gtest-message.h \
+  $(INCDIR)/gtest/gtest-param-test.h \
+  $(INCDIR)/gtest/gtest-printers.h \
+  $(INCDIR)/gtest/gtest-spi.h \
+  $(INCDIR)/gtest/gtest-test-part.h \
+  $(INCDIR)/gtest/gtest-typed-test.h \
+  $(INCDIR)/gtest/gtest.h \
+  $(INCDIR)/gtest/gtest_pred_impl.h \
+  $(INCDIR)/gtest/gtest_prod.h
+
+SOURCES = \
+  gtest-$(GTEST_VERSION)/src/gtest-all.cc
+
+OBJECTS = $(SOURCES:%.cc=$(OBJDIR)/%.o)
 
 .PHONY: all
-all:
-	@$(MAKE) -f glibc-$(GLIBC_VERSION).mk
-	@$(MAKE) -f gcc-$(GCC_VERSION).mk
-	@$(MAKE) -f xen-$(XEN_VERSION).mk
-	@$(MAKE) -f llamaOS.mk xen
-	@$(MAKE) -f gtest-$(GTEST_VERSION).mk
-	@$(MAKE) -f llamaOS-xen-test.mk xen
-	@$(MAKE) -f apps/hello.mk xen
-	@$(MAKE) -f minimal/minimal.mk xen
-	@$(MAKE) -f minimal/minimal-glibc.mk xen
-	@$(MAKE) -f minimal/minimal-gcc.mk xen
-	@$(MAKE) -f net/i82574.mk xen
+all : $(LIBDIR)/gtest.a $(HEADERS)
 
-.PHONY: clean
-clean:
-	@echo cleaning build folder...
-	@echo removing: $(OBJDIR)
-	@rm -rf $(OBJDIR)
-	@echo removing: $(BINDIR)
-	@rm -rf $(BINDIR)
-	@echo removing: $(LIBDIR)
-	@rm -rf $(LIBDIR)
-	@echo removing: $(INCDIR)
-	@rm -rf $(INCDIR)
-	@echo removing: include-fixed
-	@rm -rf include-fixed
+$(LIBDIR)/gtest.a : $(OBJECTS)
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo linking: $@
+	@$(AR) r $@ $(OBJECTS)
+	@echo successfully built: $@
+	@echo
+
+$(INCDIR)/% : $(SRCDIR)/gtest-$(GTEST_VERSION)/include/%
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo copying: $@ from $<
+	cp $< $@
+
+include rules.mk
