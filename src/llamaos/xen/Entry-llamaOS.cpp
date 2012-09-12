@@ -170,7 +170,7 @@ void entry_llamaOS (start_info_t *start_info)
       // start the application
       char *argv [2];
       argv [0] = const_cast<char *>("llamaOS");
-      argv [1] = nullptr;
+      argv [1] = 0;
 
       trace ("Before application main()...\n");
 

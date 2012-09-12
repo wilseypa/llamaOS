@@ -46,14 +46,20 @@ TEST(Default,Test1)
 int main (int argc, char *argv [])
 {
    cout << "running test-xen..." << endl;
+   cout << "  argc: " << argc << ", argv[0]: " << argv [0] << endl;
 
    ::testing::InitGoogleTest(&argc, argv);
 
    cout << "  RUN_ALL_TESTS: " << RUN_ALL_TESTS() << endl << endl;
 
-   cout << "waiting 20 sec, then exit..." << endl;
+   cout << "waiting 5 sec, then exit..." << endl;
    cout.flush ();
-   llamaos::api::sleep (20);
+   llamaos::api::sleep (5);
 
    return 0;
+}
+
+TEST(LLAMAOS,TESTTEST)
+{
+   EXPECT_EQ(0, 0);
 }
