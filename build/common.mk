@@ -40,6 +40,7 @@ BINDIR = bin
 LIBDIR = lib
 OBJDIR = obj
 INCDIR = include
+INC2DIR = include-fixed
 
 SRCDIR = ../src
 VPATH = $(SRCDIR)

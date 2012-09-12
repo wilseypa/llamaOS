@@ -30,55 +30,44 @@
 # contributors.
 #
 
-# include common variables
-include common.mk
+MAKEFILE_SOURCES += rules.mk
 
-MAKEFILE_SOURCES += Makefile
+$(OBJDIR)/%.o : %.S $(MAKEFILE_SOURCES)
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo compiling: $<
+	@$(CC) -c $(ASMFLAGS) -o $@ $<
 
-INSTALL_DIR = /opt
-INSTALL_FOLDER = $(INSTALL_DIR)/llamaOS-1.0
+$(OBJDIR)/%.o : %.c $(MAKEFILE_SOURCES)
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo compiling: $<
+	@$(CC) -c $(CFLAGS) -o $@ $<
 
-.PHONY: all
-all:
-	@$(MAKE) -f glibc-$(GLIBC_VERSION).mk
-	@$(MAKE) -f gcc-$(GCC_VERSION).mk
-	@$(MAKE) -f xen-$(XEN_VERSION).mk
-	@$(MAKE) -f llamaOS.mk xen
-	@$(MAKE) -f gtest-$(GTEST_VERSION).mk
-	@$(MAKE) -f llamaOS-xen-test.mk xen
-	@$(MAKE) -f apps/hello.mk xen
-	@$(MAKE) -f minimal/minimal.mk xen
-	@$(MAKE) -f minimal/minimal-glibc.mk xen
-	@$(MAKE) -f minimal/minimal-gcc.mk xen
-	@$(MAKE) -f net/i82574.mk xen
+$(OBJDIR)/%.o : %.cc $(MAKEFILE_SOURCES)
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo compiling: $<
+	@$(CC) -c $(CPPFLAGS) -o $@ $<
 
-.PHONY: install
-install:
-	@echo installing llamaOS into $(INSTALL_FOLDER) folder...
-	@[ -d $(INSTALL_FOLDER) ] || (mkdir -p $(INSTALL_FOLDER))
-	@cp -r bin $(INSTALL_FOLDER)/bin
-	@cp -r include $(INSTALL_FOLDER)/include
-	@cp -r include-fixed $(INSTALL_FOLDER)/include-fixed
-	@cp -r lib $(INSTALL_FOLDER)/lib
-	@cp -r ../script $(INSTALL_FOLDER)/script
-	@cp llamaOS-flags.mk $(INSTALL_FOLDER)/llamaOS-flags.mk
-	@cp llamaOS.lds $(INSTALL_FOLDER)/llamaOS.lds
-	@echo adjusting file attributes...
-	@chmod -R o+r $(INSTALL_FOLDER)
-	@echo install complete.
-	@echo 
+$(OBJDIR)/%.o : %.cpp $(MAKEFILE_SOURCES)
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo compiling: $<
+	@$(CC) -c $(CPPFLAGS) -o $@ $<
 
+$(OBJDIR)/%.d : %.S
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo creating: $@ from $<
+	@$(CC) $(ASMFLAGS) -MM -MP -MT '$(OBJDIR)/$*.o $(OBJDIR)/$*.d' -MF $@ $<
 
-.PHONY: clean
-clean:
-	@echo cleaning build folder...
-	@echo removing: $(OBJDIR)
-	@rm -rf $(OBJDIR)
-	@echo removing: $(BINDIR)
-	@rm -rf $(BINDIR)
-	@echo removing: $(LIBDIR)
-	@rm -rf $(LIBDIR)
-	@echo removing: $(INCDIR)
-	@rm -rf $(INCDIR)
-	@echo removing: include-fixed
-	@rm -rf include-fixed
+$(OBJDIR)/%.d : %.c
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo creating: $@ from $<
+	@$(CC) $(CFLAGS) -MM -MP -MT '$(OBJDIR)/$*.o $(OBJDIR)/$*.d' -MF $@ $<
+
+$(OBJDIR)/%.d : %.cc
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo creating: $@ from $<
+	@$(CC) $(CPPFLAGS) -MM -MP -MT '$(OBJDIR)/$*.o $(OBJDIR)/$*.d' -MF $@ $<
+
+$(OBJDIR)/%.d : %.cpp
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo creating: $@ from $<
+	@$(CC) $(CPPFLAGS) -MM -MP -MT '$(OBJDIR)/$*.o $(OBJDIR)/$*.d' -MF $@ $<

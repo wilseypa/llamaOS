@@ -30,55 +30,52 @@
 # contributors.
 #
 
-# include common variables
-include common.mk
+# template makefile for llamaOS applications
 
-MAKEFILE_SOURCES += Makefile
+MAKEFILE_SOURCES = example_app.mk
 
-INSTALL_DIR = /opt
-INSTALL_FOLDER = $(INSTALL_DIR)/llamaOS-1.0
+LLAMAOS_INSTALL_DIR = /opt/llamaOS-1.0
+
+# include common flag variables
+include $(LLAMAOS_INSTALL_DIR)/llamaOS-flags.mk
+
+LLAMAOS_LIBDIR = $(LLAMAOS_INSTALL_DIR)/lib
+LLAMAOS_INCDIR = $(LLAMAOS_INSTALL_DIR)/include
+LLAMAOS_INC2DIR = $(LLAMAOS_INSTALL_DIR)/include-fixed
+
+BINDIR = bin
+LIBDIR = lib
+OBJDIR = obj
+
+CPPFLAGS += \
+  -I $(LLAMAOS_INCDIR) \
+  -I $(LLAMAOS_INC2DIR) \
+  -include $(LLAMAOS_INCDIR)/llamaos/__thread.h
+
+SOURCES = \
+  main.cpp
+
+OBJECTS = $(SOURCES:%.cpp=$(OBJDIR)/%.o)
+DEPENDS = $(OBJECTS:%.o=%.d)
 
 .PHONY: all
-all:
-	@$(MAKE) -f glibc-$(GLIBC_VERSION).mk
-	@$(MAKE) -f gcc-$(GCC_VERSION).mk
-	@$(MAKE) -f xen-$(XEN_VERSION).mk
-	@$(MAKE) -f llamaOS.mk xen
-	@$(MAKE) -f gtest-$(GTEST_VERSION).mk
-	@$(MAKE) -f llamaOS-xen-test.mk xen
-	@$(MAKE) -f apps/hello.mk xen
-	@$(MAKE) -f minimal/minimal.mk xen
-	@$(MAKE) -f minimal/minimal-glibc.mk xen
-	@$(MAKE) -f minimal/minimal-gcc.mk xen
-	@$(MAKE) -f net/i82574.mk xen
-
-.PHONY: install
-install:
-	@echo installing llamaOS into $(INSTALL_FOLDER) folder...
-	@[ -d $(INSTALL_FOLDER) ] || (mkdir -p $(INSTALL_FOLDER))
-	@cp -r bin $(INSTALL_FOLDER)/bin
-	@cp -r include $(INSTALL_FOLDER)/include
-	@cp -r include-fixed $(INSTALL_FOLDER)/include-fixed
-	@cp -r lib $(INSTALL_FOLDER)/lib
-	@cp -r ../script $(INSTALL_FOLDER)/script
-	@cp llamaOS-flags.mk $(INSTALL_FOLDER)/llamaOS-flags.mk
-	@cp llamaOS.lds $(INSTALL_FOLDER)/llamaOS.lds
-	@echo adjusting file attributes...
-	@chmod -R o+r $(INSTALL_FOLDER)
-	@echo install complete.
-	@echo 
-
+all : $(BINDIR)/example_app
 
 .PHONY: clean
 clean:
-	@echo cleaning build folder...
-	@echo removing: $(OBJDIR)
-	@rm -rf $(OBJDIR)
-	@echo removing: $(BINDIR)
 	@rm -rf $(BINDIR)
-	@echo removing: $(LIBDIR)
-	@rm -rf $(LIBDIR)
-	@echo removing: $(INCDIR)
-	@rm -rf $(INCDIR)
-	@echo removing: include-fixed
-	@rm -rf include-fixed
+	@rm -rf $(OBJDIR)
+
+# the entry object must be the first object listed here or the guest will crash!
+$(BINDIR)/example_app : $(LLAMAOS_LIBDIR)/xen/Entry.o $(OBJECTS) $(LLAMAOS_LIBDIR)/xen/llamaOS.a $(LLAMAOS_LIBDIR)/gcc.a $(LLAMAOS_LIBDIR)/glibc.a
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo linking: $@
+	@$(LD) $(LDFLAGS) -T $(LLAMAOS_INSTALL_DIR)/llamaOS.lds -o $@ $^
+	@gzip -c -f --best $@ >$@.gz
+	@echo successfully built: $@
+	@echo
+
+include rules.mk
+
+# include auto-generated dependencies
+-include $(DEPENDS)

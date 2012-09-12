@@ -88,7 +88,8 @@ HEADERS = \
   $(INCDIR)/llamaos/xen/Hypercall.h \
   $(INCDIR)/llamaos/xen/Hypervisor.h \
   $(INCDIR)/llamaos/xen/Traps.h \
-  $(INCDIR)/llamaos/xen/Xenstore.h
+  $(INCDIR)/llamaos/xen/Xenstore.h \
+  $(INCDIR)/llamaos/__thread.h
 endif
 
 
