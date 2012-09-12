@@ -35,10 +35,8 @@ MAKEFLAGS = --silent
 
 # compiler tools
 CC = /opt/gcc-4.7.1/bin/gcc
-CXX = /opt/gcc-4.7.1/bin/gcc
+CXX = /opt/gcc-4.7.1/bin/g++
 LD = /opt/gcc-4.7.1/bin/gcc
-#CC = /opt/gcc-4.7.1/bin/gcc
-#LD = /opt/gcc-4.7.1/bin/gcc
 
 # assembler/compiler/linker options
 # notes from manual:

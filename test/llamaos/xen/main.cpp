@@ -36,7 +36,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 using namespace std;
 
-TEST(Default,Test1)
+GTEST_TEST(Default,Test1)
 {
    int x = 0;
 
@@ -59,7 +59,7 @@ int main (int argc, char *argv [])
    return 0;
 }
 
-TEST(LLAMAOS,TESTTEST)
+GTEST_TEST(LLAMAOS,TESTTEST)
 {
    EXPECT_EQ(0, 0);
 }

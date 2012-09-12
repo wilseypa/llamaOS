@@ -34,7 +34,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 using namespace std;
 
-TEST(Console, MassiveEntries)
+GTEST_TEST(Console, MassiveEntries)
 {
    for (int i = 0; i < 100000; i++)
    {
@@ -44,7 +44,7 @@ TEST(Console, MassiveEntries)
    EXPECT_EQ(0, 0);
 }
 
-TEST(Console, MassiveDataPerEntry)
+GTEST_TEST(Console, MassiveDataPerEntry)
 {
    stringstream ss;
 

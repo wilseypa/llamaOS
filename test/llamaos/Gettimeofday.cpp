@@ -32,7 +32,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 #include <gtest/gtest.h>
 
-TEST(Gettimeofday, NonzeroStartTime)
+GTEST_TEST(Gettimeofday, NonzeroStartTime)
 {
    struct timeval tv;
 
@@ -40,7 +40,7 @@ TEST(Gettimeofday, NonzeroStartTime)
    EXPECT_NE(0, tv.tv_sec);
 }
 
-TEST(Gettimeofday, IncrementingSeconds)
+GTEST_TEST(Gettimeofday, IncrementingSeconds)
 {
    struct timeval tv;
 

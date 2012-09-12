@@ -47,6 +47,7 @@ all:
 	@$(MAKE) -f gtest-$(GTEST_VERSION).mk
 	@$(MAKE) -f llamaOS-xen-test.mk xen
 	@$(MAKE) -f apps/hello.mk xen
+	@$(MAKE) -f apps/latency-tcp-native.mk
 	@$(MAKE) -f minimal/minimal.mk xen
 	@$(MAKE) -f minimal/minimal-glibc.mk xen
 	@$(MAKE) -f minimal/minimal-gcc.mk xen

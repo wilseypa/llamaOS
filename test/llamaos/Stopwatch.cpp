@@ -72,7 +72,7 @@ static inline uint64_t tsc_to_ns (uint64_t tsc)
    return time_ns;
 }
 
-TEST(Stopwatch, NonzeroElapsedTime)
+GTEST_TEST(Stopwatch, NonzeroElapsedTime)
 {
    struct timeval tv1, tv2;
    gettimeofday (&tv1, 0);

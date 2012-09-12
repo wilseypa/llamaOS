@@ -113,10 +113,7 @@ void Events::bind_virq (unsigned int virq, event_handler_t handler, void *data)
 
    handlers [port] = std::pair<event_handler_t, void *> (handler, data);
    trace ("bind_virq: %x\n", port);
-std::cout << "bind_virq: " << port << std::endl;
-std::cout << "evtchn_mask [0]: " << shared_info->evtchn_mask [0] << std::endl;
 //   shared_info->evtchn_mask [port / sizeof(unsigned long)] &= ~(1 << (port % sizeof(unsigned long)));
-std::cout << "evtchn_mask [0]: " << shared_info->evtchn_mask [0] << std::endl;
 }
 
 void Events::unbind_virq (unsigned int /* virq */)

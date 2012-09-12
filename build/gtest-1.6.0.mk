@@ -42,6 +42,7 @@ CPPFLAGS += \
   -I include-fixed \
   -DGTEST_HAS_PTHREAD=0 \
   -DGTEST_HAS_STREAM_REDIRECTION=0 \
+  -DGTEST_DONT_DEFINE_TEST=1\
   -include $(SRCDIR)/llamaos/__thread.h
 
 HEADERS = \
