@@ -580,7 +580,12 @@ int main (int /* argc */, char ** /* argv [] */)
    config_command.Memory_enable(true);
 
    cout << "Writing " << config_command << endl;
+   cout << "Writing " << hex << static_cast<uint16_t>(config_command) << endl;
    pci.write_config_word (4, config_command);
+
+   config_command = pci.read_config_word (4);
+   config_status =  pci.read_config_word (6);
+   cout << config_command << config_status << endl;
 
    BAR bar0 = pci.read_config_dword (16);
    cout << bar0 << endl;

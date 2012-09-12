@@ -303,25 +303,25 @@ HYPERVISOR_multicall(void *call_list, int nr_calls)
 	return _hypercall2(int, multicall, call_list, nr_calls);
 }
 
-//static inline int
-//HYPERVISOR_update_va_mapping(unsigned long va, pte_t new_val,
-//			     unsigned long flags)
-//{
-//	if (sizeof(new_val) == sizeof(long))
-//		return _hypercall3(int, update_va_mapping, va,
-//				   new_val.pte, flags);
-//	else
-//		return _hypercall4(int, update_va_mapping, va,
-//				   new_val.pte, new_val.pte >> 32, flags);
-//}
-
 static inline int
-HYPERVISOR_update_va_mapping(unsigned long va, unsigned long new_val,
+HYPERVISOR_update_va_mapping(unsigned long va, pte_t new_val,
 			     unsigned long flags)
 {
-	return _hypercall3(int, update_va_mapping, va,
-				   new_val, flags);
+	if (sizeof(new_val) == sizeof(long))
+		return _hypercall3(int, update_va_mapping, va,
+				   new_val.pte, flags);
+	else
+		return _hypercall4(int, update_va_mapping, va,
+				   new_val.pte, new_val.pte >> 32, flags);
 }
+
+//static inline int
+//HYPERVISOR_update_va_mapping(unsigned long va, unsigned long new_val,
+//			     unsigned long flags)
+//{
+//	return _hypercall3(int, update_va_mapping, va,
+//				   new_val, flags);
+//}
 
 static inline int
 HYPERVISOR_event_channel_op(int cmd, void *arg)

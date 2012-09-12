@@ -232,10 +232,12 @@ bool Hypercall::set_callbacks (uint64_t event_address, uint64_t failsafe_address
 
 bool Hypercall::update_va_mapping (uint64_t virtual_address, uint64_t machine_address)
 {
-   machine_address |= 7;
+   pte_t val;
+   val.pte = machine_address | 0x7;
+//   machine_address |= 7;
 
    // __HYPERVISOR_update_va_mapping    14
-   int result = HYPERVISOR_update_va_mapping (virtual_address, machine_address, UVMF_INVLPG);
+   int result = HYPERVISOR_update_va_mapping (virtual_address, val, UVMF_INVLPG);
  
    if (0 != result)
    {
@@ -249,10 +251,12 @@ bool Hypercall::update_va_mapping (uint64_t virtual_address, uint64_t machine_ad
 
 bool Hypercall::update_va_mapping_nocache (uint64_t virtual_address, uint64_t machine_address)
 {
-   machine_address |= 0x17;
+   pte_t val;
+   val.pte = machine_address | 0x17;
+//   machine_address |= 0x17;
 
    // __HYPERVISOR_update_va_mapping    14
-   int result = HYPERVISOR_update_va_mapping (virtual_address, machine_address, UVMF_INVLPG);
+   int result = HYPERVISOR_update_va_mapping (virtual_address, val, UVMF_INVLPG);
  
    if (0 != result)
    {
