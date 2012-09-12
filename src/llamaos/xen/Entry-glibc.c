@@ -296,14 +296,9 @@ static void register_glibc_exports (void)
 
 // void __libc_init_first (int argc, char *arg0, ...);
 
-//#include <llamaos/__thread.h>
-__thread int magato = 0;
-
 // entry function called from Entry.S
 void entry_glibc (start_info_t *start_info)
 {
-   magato = 1;
-
    // check to make sure the initial memory is good
    if (verify_magic (start_info))
    {

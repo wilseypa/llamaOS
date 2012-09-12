@@ -114,5 +114,7 @@ void entry_gcc (start_info_t *start_info)
 
    entry_llamaOS (start_info);
 
-   exe_dtors ();
+   // !BAM
+   // this is crashing right now so just stop calling them
+   // exe_dtors ();
 }

@@ -30,10 +30,12 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 #include <cstdint>
 #include <cstring>
+#include <iostream>
 
 #include <xen/xen.h>
 #include <xen/features.h>
 
+#include <llamaos/api/sleep.h>
 #include <llamaos/memory/Memory.h>
 #include <llamaos/xen/Export-glibc.h>
 #include <llamaos/xen/Hypervisor.h>
@@ -176,7 +178,12 @@ void entry_llamaOS (start_info_t *start_info)
 
       main (1, argv);
 
+      // get rid of all leftover console buffer
+      cout.flush ();
+      fflush (stdout);
+
       trace ("After application main()...\n");
+      api::sleep(1);
    }
    catch (const std::runtime_error &e)
    {
