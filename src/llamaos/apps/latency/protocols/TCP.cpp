@@ -38,7 +38,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <iostream>
 #include <string>
 
-#include "Experiment_tcp.h"
+#include "TCP.h"
 
 using namespace std;
 using namespace latency;

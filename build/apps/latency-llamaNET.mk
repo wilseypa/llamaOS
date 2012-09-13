@@ -31,61 +31,32 @@
 #
 
 # include common variables
-# include common.mk
-# don;t include common.mk since this is not llamaOS
-# but try to make the build as similar as possible
-MAKEFLAGS = --silent
+include common.mk
 
-# compiler tools
-CC = /opt/gcc-4.7.1/bin/g++
-LD = /opt/gcc-4.7.1/bin/g++
-
-CPPFLAGS = \
-  -m64 -g -O1 \
-  -Wall \
-  -fno-common \
-  -std=gnu++11
-
-LDFLAGS =
-
-# shared common paths
-BINDIR = bin
-LIBDIR = lib
-OBJDIR = obj
-INCDIR = include
-INC2DIR = include-fixed
-
-SRCDIR = ../src
-VPATH = $(SRCDIR)
-
-GLIBC_VERSION = 2.16.0
-GCC_VERSION = 4.7.1
-# XEN_VERSION = 4.1.2
-XEN_VERSION = 4.1.3
-# XEN_VERSION = unstable
-GTEST_VERSION = 1.6.0
-
-# auto dependency generation
-DEPENDS = 
-
-MAKEFILE_SOURCES += apps/latency-tcp-native.mk
+MAKEFILE_SOURCES += apps/latency-llamaNET.mk
 
 CPPFLAGS += \
   -I $(INCDIR) \
+  -I $(SRCDIR) \
   -include $(SRCDIR)/llamaos/__thread.h
 
 SOURCES = \
   llamaos/apps/latency/Experiment.cpp \
-  llamaos/apps/latency/protocols/TCP.cpp \
+  llamaos/apps/latency/protocols/llamaNET.cpp \
   llamaos/apps/latency/main.cpp
 
 OBJECTS = $(SOURCES:%.cpp=$(OBJDIR)/%.o)
 DEPENDS = $(OBJECTS:%.o=%.d)
 
-$(BINDIR)/native/latency-tcp: $(OBJECTS)
+.PHONY: xen
+xen : $(BINDIR)/xen/latency-llamaNET
+
+# the entry object must be the first object listed here or the guest will crash!
+$(BINDIR)/xen/latency-llamaNET: $(LIBDIR)/xen/Entry.o $(OBJECTS) $(LIBDIR)/xen/llamaOS.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
-	@$(LD) $(LDFLAGS) -o $@ $^
+	@$(LD) $(LDFLAGS) -T llamaOS.lds -o $@ $^
+	@gzip -c -f --best $@ >$@.gz
 	@echo successfully built: $@
 	@echo
 
