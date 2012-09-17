@@ -268,6 +268,11 @@ bool Experiment_tcp::run (unsigned long trial)
    return true;
 }
 
+bool Experiment_tcp::stop ()
+{
+   return true;
+}
+
 bool Experiment_tcp::recv_buffer ()
 {
    int result;

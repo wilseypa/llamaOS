@@ -32,6 +32,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #define latency_experiment_llamanet_h_
 
 #include <llamaos/apps/latency/Experiment.h>
+#include <llamaos/net/llamaNET.h>
 
 namespace latency {
 namespace protocols {
@@ -45,6 +46,7 @@ public:
    virtual bool verify ();
    virtual bool run_trials ();
    virtual bool run (unsigned long trial);
+   virtual bool stop ();
 
 private:
    llamaNET ();
@@ -54,11 +56,12 @@ private:
    bool recv_buffer ();
    bool send_buffer ();
 
-   bool client;
-   std::string ip_addr;
+   int node;
 
-   int socket;
-   unsigned char *buffer;
+   llamaos::net::llamanet::llamaNET_interface *interface;
+
+   volatile unsigned char *tx_buffers [8];
+   volatile unsigned char *rx_buffers [8];
 
 };
 

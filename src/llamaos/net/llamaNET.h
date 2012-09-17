@@ -28,38 +28,49 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#ifndef latency_experiment_tcp_h_
-#define latency_experiment_tcp_h_
+#ifndef llamaos_net_llamanet_h_
+#define llamaos_net_llamanet_h_
 
-#include "../Experiment.h"
+namespace llamaos {
+namespace net {
+namespace llamanet {
 
-using namespace latency;
-
-class Experiment_tcp : public Experiment
+#pragma pack(1)
+class Protocol_header
 {
 public:
-   Experiment_tcp (int argc, char **argv);
-    virtual ~Experiment_tcp ();
+   uint32_t src;
+   uint32_t dest;
+   uint32_t type;
+   uint32_t seq;
+   uint32_t ack;
+   uint32_t len;
 
-   virtual bool verify ();
-   virtual bool run_trials ();
-   virtual bool run (unsigned long trial);
-   virtual bool stop ();
+};
+#pragma pack()
 
-private:
-   Experiment_tcp ();
-   Experiment_tcp (const Experiment_tcp &);
-   Experiment_tcp &operator= (const Experiment_tcp &);
+const unsigned int HEADER_LENGTH = sizeof(Protocol_header);
 
-   bool recv_buffer ();
-   bool send_buffer ();
+class State
+{
+public:
+   volatile bool online;
 
-   bool client;
-   std::string ip_addr;
-
-   int socket;
-   unsigned char *buffer;
+   volatile unsigned int rx_head;
+   volatile unsigned int rx_tail;
+   volatile unsigned int tx_head;
+   volatile unsigned int tx_tail;
 
 };
 
-#endif  // latency_experiment_tcp_h_
+class llamaNET_interface
+{
+public:
+   volatile State driver;
+   volatile State app [6];
+
+};
+
+} } }
+
+#endif	// llamaos_net_llamanet_h_

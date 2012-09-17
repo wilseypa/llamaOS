@@ -38,6 +38,7 @@ MAKEFILE_SOURCES += llamaOS-xen-test.mk
 CPPFLAGS += \
   -I $(INCDIR) \
   -DGTEST_DONT_DEFINE_TEST=1 \
+  -D__XEN_INTERFACE_VERSION__=0x00030205 \
   -include $(SRCDIR)/llamaos/__thread.h
 
 SOURCES = \

@@ -38,7 +38,7 @@ using namespace latency;
 int main (int argc, char *argv [])
 {
    // most implementations will require more
-   if (argc < 3)
+   if (argc < 1)//3)
    {
       cout << "too few program arguments." << endl;
    }
@@ -51,21 +51,23 @@ int main (int argc, char *argv [])
          cout << "failed to create experiment instance." << endl;
       }
       // run once to test and sync multiple nodes
-      else if (!experiment->verify ())
-      {
-         cout << "failed to verify experiment data (first trial)." << endl;
-      }
-      else if (!experiment->run_trials ())
-      {
-         cout << "failed to complete all trials." << endl;
-      }
-      // run again to ensure valid
-      else if (!experiment->verify ())
-      {
-         cout << "failed to verify experiment data (last trial)." << endl;
-      }
       else
       {
+         if (!experiment->verify ())
+         {
+            cout << "failed to verify experiment data (first trial)." << endl;
+         }
+         else if (!experiment->run_trials ())
+         {
+            cout << "failed to complete all trials." << endl;
+         }
+         // run again to ensure valid
+         else if (!experiment->verify ())
+         {
+            cout << "failed to verify experiment data (last trial)." << endl;
+         }
+
+         experiment->stop ();
          delete experiment;
          return 0;
       }

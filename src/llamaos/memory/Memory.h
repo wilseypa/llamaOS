@@ -109,7 +109,7 @@ void update_table_entry (uint64_t entry_machine_address, uint64_t page_machine_a
 
 bool initialize (uint64_t CR3_virtual_address, uint64_t total_pages, uint64_t reserved_pages);
 
-uint64_t get_reserved_virtual_address ();
+uint64_t get_reserved_virtual_address (uint64_t pages);
 uint64_t get_reserved_size ();
 
 void *set_program_break (void *address);

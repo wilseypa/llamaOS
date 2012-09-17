@@ -57,6 +57,7 @@ static uint64_t start_virtual_address = 0UL;
 static uint64_t end_virtual_address = 0UL;
 
 static uint64_t start_reserved_virtual_address = 0UL;
+static uint64_t next_reserved_virtual_address = 0UL;
 static uint64_t reserved_pages = 0UL;
 
 static void *program_break = nullptr;
@@ -232,6 +233,7 @@ bool initialize (uint64_t CR3_virtual_address, uint64_t total_pages, uint64_t re
    memory::end_virtual_address = pseudo_to_virtual (page_to_address(end_pseudo_page));
 
    memory::start_reserved_virtual_address = memory::end_virtual_address;
+   memory::next_reserved_virtual_address = memory::end_virtual_address;
    memory::reserved_pages = reserved_pages;
 
    program_break = address_to_pointer<void>(start_virtual_address);
@@ -246,10 +248,13 @@ bool initialize (uint64_t CR3_virtual_address, uint64_t total_pages, uint64_t re
    return true;
 }
 
-uint64_t get_reserved_virtual_address ()
+uint64_t get_reserved_virtual_address (uint64_t pages)
 {
-   trace("calling get_reserved_virtual_address()...\n");
-   return memory::start_reserved_virtual_address;
+   uint64_t next_address = memory::next_reserved_virtual_address;
+   memory::next_reserved_virtual_address += (pages * PAGE_SIZE);
+
+   trace("calling get_reserved_virtual_address(%lu) = %lu\n", pages, next_address);
+   return next_address;
 }
 
 uint64_t get_reserved_size ()

@@ -44,13 +44,14 @@ public:
    virtual bool verify () = 0;
    virtual bool run_trials () = 0;
    virtual bool run (unsigned long trial) = 0;
+   virtual bool stop () = 0;
 
    void compute_statistics ();
 
-   void mark_data_alpha (unsigned char *buffer, unsigned long length);
-   bool verify_data_alpha (const unsigned char *buffer, unsigned long length);
-   void mark_data_numeric (unsigned char *buffer, unsigned long length);
-   bool verify_data_numeric (const unsigned char *buffer, unsigned long length);
+   void mark_data_alpha (volatile unsigned char *buffer, unsigned long length);
+   bool verify_data_alpha (const volatile unsigned char *buffer, unsigned long length);
+   void mark_data_numeric (volatile unsigned char *buffer, unsigned long length);
+   bool verify_data_numeric (const volatile unsigned char *buffer, unsigned long length);
 
    const std::string name;
    const unsigned long trials;

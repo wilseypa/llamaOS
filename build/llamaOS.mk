@@ -39,19 +39,19 @@ MAKEFILE_SOURCES += llamaOS.mk
 ASMFLAGS += \
   -I $(INCDIR) \
   -I $(SRCDIR) \
-  -D__XEN_INTERFACE_VERSION__=0x0003020a
+  -D__XEN_INTERFACE_VERSION__=0x00030205
 
 CFLAGS += \
   -I $(INCDIR) \
   -I $(SRCDIR) \
   -include $(SRCDIR)/llamaos/__thread.h \
-  -D__XEN_INTERFACE_VERSION__=0x0003020a
+  -D__XEN_INTERFACE_VERSION__=0x00030205
 
 CPPFLAGS += \
   -I $(INCDIR) \
   -I $(SRCDIR) \
   -include $(SRCDIR)/llamaos/__thread.h \
-  -D__XEN_INTERFACE_VERSION__=0x0003020a
+  -D__XEN_INTERFACE_VERSION__=0x00030205
 
 # xen specific source files
 ifeq ($(MAKECMDGOALS),xen)

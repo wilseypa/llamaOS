@@ -89,7 +89,7 @@ Experiment::Experiment (int argc, char **argv)
       length(parse_length(argc, argv)),
       results(new unsigned long [trials])
 {
-   
+   cout << "running experiment with " << dec << trials << " of " << length << " packets" << endl; 
 }
 
 Experiment::~Experiment ()
@@ -99,8 +99,8 @@ Experiment::~Experiment ()
 
 void Experiment::compute_statistics ()
 {
-   double mean = 0.0;
-   double variance = 0.0;
+   unsigned long mean = 0.0;
+   unsigned long variance = 0.0;
    unsigned long latency = 0UL;
    unsigned long min_latency = 0xFFFFFFFFFFFFFFFFUL;
    unsigned long max_latency = 0UL;
@@ -128,10 +128,10 @@ void Experiment::compute_statistics ()
 
    variance /= trials;
 
-   cout << "  mean: " << mean << ", var: " << variance << ", [" << min_latency << ", " << max_latency << "]" << endl;
+   cout << "  mean: " << dec << mean << ", var: " << variance << ", [" << min_latency << ", " << max_latency << "]" << endl;
 }
 
-void Experiment::mark_data_alpha (unsigned char *buffer, unsigned long length)
+void Experiment::mark_data_alpha (volatile unsigned char *buffer, unsigned long length)
 {
    unsigned long j = 0;
 
@@ -142,7 +142,7 @@ void Experiment::mark_data_alpha (unsigned char *buffer, unsigned long length)
    }
 }
 
-bool Experiment::verify_data_alpha (const unsigned char *buffer, unsigned long length)
+bool Experiment::verify_data_alpha (const volatile unsigned char *buffer, unsigned long length)
 {
    unsigned long j = 0;
    unsigned char c;
@@ -161,7 +161,7 @@ bool Experiment::verify_data_alpha (const unsigned char *buffer, unsigned long l
    return true;
 }
 
-void Experiment::mark_data_numeric (unsigned char *buffer, unsigned long length)
+void Experiment::mark_data_numeric (volatile unsigned char *buffer, unsigned long length)
 {
    unsigned long j = 0;
 
@@ -172,7 +172,7 @@ void Experiment::mark_data_numeric (unsigned char *buffer, unsigned long length)
    }
 }
 
-bool Experiment::verify_data_numeric (const unsigned char *buffer, unsigned long length)
+bool Experiment::verify_data_numeric (const volatile unsigned char *buffer, unsigned long length)
 {
    unsigned long j = 0;
    unsigned char c;

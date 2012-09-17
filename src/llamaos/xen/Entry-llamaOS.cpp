@@ -30,7 +30,11 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 #include <cstdint>
 #include <cstring>
+
+#include <algorithm>
 #include <iostream>
+#include <iterator>
+#include <vector>
 
 #include <xen/xen.h>
 #include <xen/features.h>
@@ -39,6 +43,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <llamaos/memory/Memory.h>
 #include <llamaos/xen/Export-glibc.h>
 #include <llamaos/xen/Hypervisor.h>
+#include <bits/stringfwd.h>
 #include <llamaos/llamaOS.h>
 #include <llamaos/Trace.h>
 
@@ -159,6 +164,44 @@ static void register_glibc_exports (void)
 
 int main (int argc, char *argv []);
 
+static vector<string> split (const string &input)
+{
+   vector<string> tokens;
+
+   string::const_iterator first = input.begin ();
+   string::const_iterator mark = input.begin ();
+   string::const_iterator last = input.end ();
+
+   while (first != last)
+   {
+      cout << "cl char: " << *first << ", " << dec << (int)*first << endl;
+// !BAM isspace is NOT working. FUCK.
+//      if (isspace (*first))
+      if (*first == ' ')
+      {
+         string token = string (mark, first);
+
+         if (token.length () > 0)
+         {
+            tokens.push_back (token);
+         }
+
+         mark = first + 1;
+      }
+
+      first++;
+   }
+
+   string token = string (mark, first);
+
+   if (token.length () > 0)
+   {
+      tokens.push_back (token);
+   }
+
+   return tokens;
+}
+
 void entry_llamaOS (start_info_t *start_info)
 {
    register_glibc_exports ();
@@ -169,14 +212,45 @@ void entry_llamaOS (start_info_t *start_info)
       trace ("Creating Hypervisor...\n");
       Hypervisor hypervisor (start_info);
 
-      // start the application
-      char *argv [2];
+      // read and create args
+      trace ("reading command-line args from extra string\n");
+//      string cl (reinterpret_cast<char *>(start_info->cmd_line));
+//      istringstream ss (cl, istringstream::in);
+//      vector<string> args;
+
+//      copy (stringstream_iterator<string> (ss),
+//            stringstream_iterator<string> (),
+//            back_inserter<vector<string> > (args));
+//      string arg;
+
+//      while (ss >> arg)
+//      {
+//         cout << "found arg: " << arg << endl;
+//        args.push_back (arg);
+//      }
+
+      string cl (reinterpret_cast<char *>(start_info->cmd_line));
+      cout << "splitting cl " << cl << endl;
+      vector<string> args = split (cl);
+
+      trace ("args size is %d\n", args.size ());
+      for (unsigned int i = 0; i < args.size (); i++)
+      {
+         trace ("argv [%d] = %s\n", i, args [i].c_str ());
+      }
+
+      char *argv [16] = { '\0' };
       argv [0] = const_cast<char *>("llamaOS");
-      argv [1] = 0;
+
+      for (unsigned int i = 0; i < args.size (); i++)
+      {
+         argv [i+1] = const_cast<char *>(args [i].c_str ());
+      }
 
       trace ("Before application main()...\n");
 
-      main (1, argv);
+      // start the application
+      main (args.size () + 1, argv);
 
       // get rid of all leftover console buffer
       cout.flush ();

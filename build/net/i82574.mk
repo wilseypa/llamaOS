@@ -39,6 +39,7 @@ MAKEFILE_SOURCES += net/i82574.mk
 CPPFLAGS += \
   -I $(INCDIR) \
   -I $(SRCDIR) \
+  -D__XEN_INTERFACE_VERSION__=0x00030205 \
   -include $(SRCDIR)/llamaos/__thread.h
 
 SOURCES = \

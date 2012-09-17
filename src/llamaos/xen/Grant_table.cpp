@@ -28,10 +28,12 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
+#include <malloc.h>
 #include <stdexcept>
 
 #include <llamaos/memory/Memory.h>
 #include <llamaos/xen/Grant_table.h>
+#include <llamaos/xen/Hypercall-macros.h>
 #include <llamaos/xen/Hypercall.h>
 #include <llamaos/llamaOS.h>
 #include <llamaos/Trace.h>
@@ -44,7 +46,7 @@ using namespace llamaos::xen;
 // for now just map a single page for the table
 Grant_table::Grant_table ()
    :  size(PAGE_SIZE / sizeof(grant_entry_v1_t)),
-      entries(address_to_pointer<grant_entry_v1_t> (get_reserved_virtual_address ())),
+      entries(address_to_pointer<grant_entry_v1_t> (get_reserved_virtual_address (1))),
       avail(),
       inuse()
 {
@@ -69,7 +71,7 @@ Grant_table::Grant_table ()
    }
    trace ("calling update_va_mapping returned.\n");
 
-   for (grant_ref_t i = 0; i < 512; i++)
+   for (grant_ref_t i = 0; i < size; i++)
    {
       avail.push_back(i);
    }
@@ -89,11 +91,11 @@ grant_ref_t Grant_table::grant_access (domid_t domid, void *address)
    inuse.push_back (ref);
 
    entries [ref].domid = domid;
-   entries [ref].frame = virtual_pointer_to_machine_page (address);
+   entries [ref].frame = virtual_pointer_to_machine_page(address);
 
-   trace ("grant_access: %u, %u, %u\n", ref, entries [ref].domid, entries [ref].frame);
+   trace ("grant_access - ref: %u, domid: %u, virtual address: %lu, machine address: %lu\n", ref, entries [ref].domid, address, entries [ref].frame);
    wmb();
-   entries [ref].flags = GTF_permit_access;
+   entries [ref].flags = GTF_permit_access | GTF_reading | GTF_writing;
 
    return ref;
 }
