@@ -60,8 +60,8 @@ private:
 
    llamaos::net::llamanet::llamaNET_interface *interface;
 
-   volatile unsigned char *tx_buffers [8];
-   volatile unsigned char *rx_buffers [8];
+   unsigned char *tx_buffers [8];
+   unsigned char *rx_buffers [8];
 
 };
 

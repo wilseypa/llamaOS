@@ -165,14 +165,14 @@ cout << "calling verify..." << endl;
    // dalai initiates the trial
    if (node == 0)
    {
-      volatile net::llamanet::Protocol_header *header = reinterpret_cast<volatile net::llamanet::Protocol_header *>(tx_buffers [interface->app [0].tx_head]);
+      net::llamanet::Protocol_header *header = reinterpret_cast<net::llamanet::Protocol_header *>(tx_buffers [interface->app [0].tx_head]);
       memset((void *)header, 0, net::llamanet::HEADER_LENGTH);
       header->src = 0;
       header->dest = 1;
       header->type = 1;
       header->len = length;
 
-      volatile unsigned char *data = tx_buffers [interface->app [0].tx_head] + net::llamanet::HEADER_LENGTH;
+      unsigned char *data = tx_buffers [interface->app [0].tx_head] + net::llamanet::HEADER_LENGTH;
 
       // marks all bytes with alpha chars (a,b,c,...)
       mark_data_alpha (data, length);
@@ -200,7 +200,7 @@ cout << "redpj waiting packet..." << endl;
       // wait for mesg and verify alpha chars
       if (recv_buffer ())
       {
-         volatile unsigned char *data = rx_buffers [interface->app [0].rx_tail] + net::llamanet::HEADER_LENGTH;
+         unsigned char *data = rx_buffers [interface->app [0].rx_tail] + net::llamanet::HEADER_LENGTH;
 
          if (verify_data_alpha (data, length))
          {
@@ -209,7 +209,7 @@ cout << "redpj waiting packet..." << endl;
             tail %= 8;
             interface->app [0].rx_tail = tail;
 
-            volatile net::llamanet::Protocol_header *header = reinterpret_cast<volatile net::llamanet::Protocol_header *>(tx_buffers [interface->app [0].tx_head]);
+            net::llamanet::Protocol_header *header = reinterpret_cast<net::llamanet::Protocol_header *>(tx_buffers [interface->app [0].tx_head]);
             data = tx_buffers [interface->app [0].tx_head] + net::llamanet::HEADER_LENGTH;
             header->src = 1;
             header->dest = 0;
@@ -278,8 +278,8 @@ bool llamaNET::run (unsigned long trial)
    // dalai initiates the trial
    if (node == 0)
    {
-      volatile net::llamanet::Protocol_header *header = reinterpret_cast<volatile net::llamanet::Protocol_header *>(tx_buffers [interface->app [0].tx_head]);
-      volatile unsigned char *data = tx_buffers [interface->app [0].tx_head] + net::llamanet::HEADER_LENGTH;
+      net::llamanet::Protocol_header *header = reinterpret_cast<net::llamanet::Protocol_header *>(tx_buffers [interface->app [0].tx_head]);
+      unsigned char *data = tx_buffers [interface->app [0].tx_head] + net::llamanet::HEADER_LENGTH;
       header->src = 0;
       header->dest = 1;
       header->type = 1;
@@ -292,7 +292,7 @@ bool llamaNET::run (unsigned long trial)
       {
          data = rx_buffers [interface->app [0].rx_tail] + net::llamanet::HEADER_LENGTH;
 
-         if (*(reinterpret_cast<volatile unsigned long *>(data)) == trial)
+         if (*(reinterpret_cast<unsigned long *>(data)) == trial)
          {
             unsigned int tail = interface->app [0].rx_tail;
             tail++;
@@ -308,14 +308,14 @@ bool llamaNET::run (unsigned long trial)
       // wait for message to arrive
       if (recv_buffer ())
       {
-         volatile unsigned char *data = rx_buffers [interface->app [0].rx_tail] + net::llamanet::HEADER_LENGTH;
+         unsigned char *data = rx_buffers [interface->app [0].rx_tail] + net::llamanet::HEADER_LENGTH;
 
          unsigned int tail = interface->app [0].rx_tail;
          tail++;
          tail %= 8;
          interface->app [0].rx_tail = tail;
 
-         volatile net::llamanet::Protocol_header *header = reinterpret_cast<volatile net::llamanet::Protocol_header *>(tx_buffers [interface->app [0].tx_head]);
+         net::llamanet::Protocol_header *header = reinterpret_cast<net::llamanet::Protocol_header *>(tx_buffers [interface->app [0].tx_head]);
          data = tx_buffers [interface->app [0].tx_head] + net::llamanet::HEADER_LENGTH;
          header->src = 1;
          header->dest = 0;
@@ -323,7 +323,7 @@ bool llamaNET::run (unsigned long trial)
          header->len = length;
 
          // place trial number in first "int" for master to verify
-         *(reinterpret_cast<volatile unsigned long *>(data)) = trial;
+         *(reinterpret_cast<unsigned long *>(data)) = trial;
 
          return send_buffer ();
       }
@@ -334,7 +334,7 @@ bool llamaNET::run (unsigned long trial)
 
 bool llamaNET::stop ()
 {
-   volatile net::llamanet::Protocol_header *header = reinterpret_cast<volatile net::llamanet::Protocol_header *>(tx_buffers [interface->app [0].tx_head]);
+   net::llamanet::Protocol_header *header = reinterpret_cast<net::llamanet::Protocol_header *>(tx_buffers [interface->app [0].tx_head]);
    header->src = 0;
    header->dest = 0;
    header->type = 0xDEAD;

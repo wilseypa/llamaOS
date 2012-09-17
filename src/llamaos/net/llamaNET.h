@@ -66,8 +66,8 @@ public:
 class llamaNET_interface
 {
 public:
-   volatile State driver;
-   volatile State app [6];
+   State driver;
+   State app [6];
 
 };
 

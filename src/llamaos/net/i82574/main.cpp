@@ -417,7 +417,7 @@ int main (int /* argc */, char ** /* argv [] */)
          tx_sw.pop ();
          tx_hw.push(tx_buffer);
 
-         volatile Protocol_header *header = reinterpret_cast<volatile Protocol_header *>(app_tx_buffer [llamaNET->app [0].tx_tail]);
+         Protocol_header *header = reinterpret_cast<Protocol_header *>(app_tx_buffer [llamaNET->app [0].tx_tail]);
    // ensure write is processed
    rmb();
 
