@@ -74,7 +74,7 @@ typedef void (*func_ptr) (void);
 extern func_ptr __CTOR_LIST__[];
 extern func_ptr __DTOR_LIST__[];
 
-static void exe_ctors ()
+static void execute_ctors ()
 {
    uint64_t ctor_size = reinterpret_cast<uint64_t>(__CTOR_LIST__[0]);
 
@@ -86,7 +86,7 @@ static void exe_ctors ()
    }
 }
 
-static void exe_dtors ()
+static void execute_dtors ()
 {
    uint64_t dtor_size = reinterpret_cast<uint64_t>(__DTOR_LIST__[0]);
 
@@ -107,14 +107,12 @@ void entry_gcc (start_info_t *start_info)
    // initialize memory management
    initialize_mmu (start_info);
 
-   exe_ctors ();
+   execute_ctors ();
 
    // initialize libstdc++
    ios_base::Init ios_base_init;
 
    entry_llamaOS (start_info);
 
-   // !BAM
-   // this is crashing right now so just stop calling them
-   // exe_dtors ();
+   execute_dtors ();
 }

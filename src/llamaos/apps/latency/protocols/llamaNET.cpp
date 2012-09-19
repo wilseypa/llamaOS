@@ -46,6 +46,8 @@ using namespace llamaos;
 using namespace llamaos::memory;
 using namespace llamaos::xen;
 
+static uint32_t seq = 1;
+
 static net::llamanet::llamaNET_interface *get_llamaNET_interface ()
 {
    // also a hack, get an open address in the second half of the reserved area
@@ -165,14 +167,15 @@ cout << "calling verify..." << endl;
    // dalai initiates the trial
    if (node == 0)
    {
-      net::llamanet::Protocol_header *header = reinterpret_cast<net::llamanet::Protocol_header *>(tx_buffers [interface->app [0].tx_head]);
+      net::llamanet::Protocol_header *header = reinterpret_cast<net::llamanet::Protocol_header *>(tx_buffers [interface->app [0].tx_head] + 14);
       memset((void *)header, 0, net::llamanet::HEADER_LENGTH);
       header->src = 0;
       header->dest = 1;
       header->type = 1;
+      header->seq = seq++;
       header->len = length;
 
-      unsigned char *data = tx_buffers [interface->app [0].tx_head] + net::llamanet::HEADER_LENGTH;
+      unsigned char *data = tx_buffers [interface->app [0].tx_head] + 14 + net::llamanet::HEADER_LENGTH;
 
       // marks all bytes with alpha chars (a,b,c,...)
       mark_data_alpha (data, length);
@@ -182,7 +185,7 @@ cout << "dalai sending packet..." << endl;
       if (   (send_buffer ())
           && (recv_buffer ()))
       {
-         data = rx_buffers [interface->app [0].rx_tail] + net::llamanet::HEADER_LENGTH;
+         data = rx_buffers [interface->app [0].rx_tail] + 14 + net::llamanet::HEADER_LENGTH;
 
          if (verify_data_numeric (data, length))
          {
@@ -200,8 +203,16 @@ cout << "redpj waiting packet..." << endl;
       // wait for mesg and verify alpha chars
       if (recv_buffer ())
       {
-         unsigned char *data = rx_buffers [interface->app [0].rx_tail] + net::llamanet::HEADER_LENGTH;
+         unsigned char *data = rx_buffers [interface->app [0].rx_tail];
 
+            cout << endl;
+         for (unsigned int i = 0; i < (14 + net::llamanet::HEADER_LENGTH + 64); i++)
+         {
+            cout << " " << hex << static_cast<int>(data [i]);
+         }
+            cout << endl;
+
+         data = rx_buffers [interface->app [0].rx_tail] + 14 + net::llamanet::HEADER_LENGTH;
          if (verify_data_alpha (data, length))
          {
             unsigned int tail = interface->app [0].rx_tail;
@@ -209,11 +220,12 @@ cout << "redpj waiting packet..." << endl;
             tail %= 8;
             interface->app [0].rx_tail = tail;
 
-            net::llamanet::Protocol_header *header = reinterpret_cast<net::llamanet::Protocol_header *>(tx_buffers [interface->app [0].tx_head]);
-            data = tx_buffers [interface->app [0].tx_head] + net::llamanet::HEADER_LENGTH;
+            net::llamanet::Protocol_header *header = reinterpret_cast<net::llamanet::Protocol_header *>(tx_buffers [interface->app [0].tx_head] + 14);
+            data = tx_buffers [interface->app [0].tx_head] + 14 + net::llamanet::HEADER_LENGTH;
             header->src = 1;
             header->dest = 0;
             header->type = 1;
+            header->seq = seq++;
             header->len = length;
 
             // marks all bytes with numerals and send
@@ -278,11 +290,12 @@ bool llamaNET::run (unsigned long trial)
    // dalai initiates the trial
    if (node == 0)
    {
-      net::llamanet::Protocol_header *header = reinterpret_cast<net::llamanet::Protocol_header *>(tx_buffers [interface->app [0].tx_head]);
-      unsigned char *data = tx_buffers [interface->app [0].tx_head] + net::llamanet::HEADER_LENGTH;
+      net::llamanet::Protocol_header *header = reinterpret_cast<net::llamanet::Protocol_header *>(tx_buffers [interface->app [0].tx_head] + 14);
+      unsigned char *data = tx_buffers [interface->app [0].tx_head] + 14 + net::llamanet::HEADER_LENGTH;
       header->src = 0;
       header->dest = 1;
       header->type = 1;
+      header->seq = seq++;
       header->len = length;
 
       // send/recv mesg, check first "int" in buffer is the trial number just
@@ -290,7 +303,7 @@ bool llamaNET::run (unsigned long trial)
       if (   (send_buffer ())
           && (recv_buffer ()))
       {
-         data = rx_buffers [interface->app [0].rx_tail] + net::llamanet::HEADER_LENGTH;
+         data = rx_buffers [interface->app [0].rx_tail] + 14 + net::llamanet::HEADER_LENGTH;
 
          if (*(reinterpret_cast<unsigned long *>(data)) == trial)
          {
@@ -308,18 +321,19 @@ bool llamaNET::run (unsigned long trial)
       // wait for message to arrive
       if (recv_buffer ())
       {
-         unsigned char *data = rx_buffers [interface->app [0].rx_tail] + net::llamanet::HEADER_LENGTH;
+         unsigned char *data = rx_buffers [interface->app [0].rx_tail] + 14 + net::llamanet::HEADER_LENGTH;
 
          unsigned int tail = interface->app [0].rx_tail;
          tail++;
          tail %= 8;
          interface->app [0].rx_tail = tail;
 
-         net::llamanet::Protocol_header *header = reinterpret_cast<net::llamanet::Protocol_header *>(tx_buffers [interface->app [0].tx_head]);
-         data = tx_buffers [interface->app [0].tx_head] + net::llamanet::HEADER_LENGTH;
+         net::llamanet::Protocol_header *header = reinterpret_cast<net::llamanet::Protocol_header *>(tx_buffers [interface->app [0].tx_head] + 14);
+         data = tx_buffers [interface->app [0].tx_head] + 14 + net::llamanet::HEADER_LENGTH;
          header->src = 1;
          header->dest = 0;
          header->type = 1;
+         header->seq = seq++;
          header->len = length;
 
          // place trial number in first "int" for master to verify
@@ -334,10 +348,11 @@ bool llamaNET::run (unsigned long trial)
 
 bool llamaNET::stop ()
 {
-   net::llamanet::Protocol_header *header = reinterpret_cast<net::llamanet::Protocol_header *>(tx_buffers [interface->app [0].tx_head]);
+   net::llamanet::Protocol_header *header = reinterpret_cast<net::llamanet::Protocol_header *>(tx_buffers [interface->app [0].tx_head] + 14);
    header->src = 0;
    header->dest = 0;
    header->type = 0xDEAD;
+   header->seq = seq++;
    header->len = 0;
 
    send_buffer ();
@@ -350,7 +365,7 @@ bool llamaNET::recv_buffer ()
    while (interface->app [0].rx_head == interface->app [0].rx_tail);
 
    // ensure write is processed
-   rmb();
+//   rmb();
 
    return true;
 }

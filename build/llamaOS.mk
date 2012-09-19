@@ -70,6 +70,7 @@ CPP_SOURCES += \
   llamaos/xen/Entry-gcc.cpp \
   llamaos/xen/Entry-llamaOS.cpp \
   llamaos/xen/Events.cpp \
+  llamaos/xen/Grant_map.cpp \
   llamaos/xen/Grant_table.cpp \
   llamaos/xen/Hypercall.cpp \
   llamaos/xen/Hypervisor.cpp \
