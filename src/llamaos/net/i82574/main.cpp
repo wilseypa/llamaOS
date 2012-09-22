@@ -263,6 +263,7 @@ int main (int /* argc */, char ** /* argv [] */)
    tctl.COLD (0x3F);
    tctl.PSP (true);
    tctl.EN (true);
+   tctl.PBE(true);
    csr.write_TCTL (tctl);
 
    cout << "initialize receiver..." << endl;
@@ -277,6 +278,9 @@ int main (int /* argc */, char ** /* argv [] */)
    rctl.UPE(true);
    rctl.BAM(true);
    rctl.EN (true);
+   rctl.LPE(true);
+   rctl.BSIZE(RCTL::BYTES_256);
+   rctl.BSEX(true);
    csr.write_RCTL (rctl);
 
    cout << "create transmit descriptors..." << endl;
@@ -383,6 +387,50 @@ int main (int /* argc */, char ** /* argv [] */)
    cout << "sizeof(HEADER_LENGTH): " << HEADER_LENGTH << endl;
    cout << "starting forever loop..." << endl;
 
+#if 0
+   for (;;)
+   {
+      if (rx_head != csr.read_RDH())
+      {
+         buffer_entry rx_buffer = rx_hw.front();
+         rx_hw.pop ();
+
+         unsigned int head = llamaNET->app [0].rx_head;
+         head++;
+         head %= 8;
+         llamaNET->app [0].rx_head = head;
+
+         rx_head++;
+         rx_hw.push(rx_buffer);
+      }
+      else if (llamaNET->app [0].tx_head != llamaNET->app [0].tx_tail)
+      {
+         buffer_entry tx_buffer = tx_sw.front();
+         tx_sw.pop ();
+         tx_hw.push(tx_buffer);
+
+         Protocol_header *header = reinterpret_cast<Protocol_header *>(tx_buffers [llamaNET->app [0].tx_tail].pointer + 14);
+
+         // leave driver is app is done
+         if (header->type == 0xDEAD)
+         {
+            break;
+         }
+
+         unsigned int tail = llamaNET->app [0].tx_tail;
+         tail++;
+         tail %= 8;
+         llamaNET->app [0].tx_tail = tail;
+
+         // don't send it just put it back in list
+         tx_sw.push(tx_hw.front());
+         tx_hw.pop();
+
+         // wake up receiver as if frame left and is back
+         rx_head--;
+      }
+   }
+#else
    for (;;)
    {
       if (rx_head != csr.read_RDH())
@@ -438,6 +486,8 @@ int main (int /* argc */, char ** /* argv [] */)
             break;
          }
 
+#if 0
+// moved into the application
 // !BAM get these in a config soon
 // dalai node 0 mac 00-1b-21-d5-66-ef
 // redpj node 1 mac 68-05-ca-01-f7-db
@@ -476,7 +526,7 @@ int main (int /* argc */, char ** /* argv [] */)
 
          tx_buffer.pointer [12] = 0x09;
          tx_buffer.pointer [13] = 0x0c;
-
+#endif
 //         memcpy (&tx_buffer.pointer [14], (void *)header, HEADER_LENGTH + header->len);
 
          unsigned int tail = llamaNET->app [0].tx_tail;
@@ -508,6 +558,7 @@ int main (int /* argc */, char ** /* argv [] */)
          }
       }
    }
+#endif
 
    cout << "waiting 5 sec, then exit..." << endl;
    cout.flush ();

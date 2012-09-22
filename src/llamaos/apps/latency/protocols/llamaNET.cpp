@@ -70,8 +70,8 @@ static net::llamanet::llamaNET_interface *get_llamaNET_interface ()
    {
       cout << "access granted: " << map_grant_ref.status << endl;
       cout << "  ref: " << dec << 510 << ", virtual address: " << hex << reserved_virtual_address << ", machine address: " << memory::virtual_pointer_to_machine_page (memory::address_to_pointer<net::llamanet::Protocol_header>(reserved_virtual_address)) << endl;
-      cout << "sleep 5 seconds..." << endl;
-      api::sleep(5);
+//      cout << "sleep 5 seconds..." << endl;
+//      api::sleep(5);
 
       return memory::address_to_pointer<net::llamanet::llamaNET_interface>(reserved_virtual_address);
    }
@@ -133,6 +133,7 @@ llamaNET::llamaNET (int argc, char **argv)
       node(parse_node (argc, argv)),
       interface(get_llamaNET_interface())
 {
+   client = (node == 0);
 
       cout << "driver.online: " << interface->driver.online << endl;
       cout << "llamaNET running as node " << dec << node << endl;
@@ -152,12 +153,25 @@ llamaNET::llamaNET (int argc, char **argv)
       }
 
       cout << "sizeof(HEADER_LENGTH): " << net::llamanet::HEADER_LENGTH << endl;
-      cout << "sleep 5 seconds..." << endl;
-      api::sleep(5);
+      cout << "sleep 2 seconds..." << endl;
+      api::sleep(2);
 }
 
 llamaNET::~llamaNET ()
 {
+   cout << "stopping llamaNET driver..." << endl;
+
+   net::llamanet::Protocol_header *header = reinterpret_cast<net::llamanet::Protocol_header *>(tx_buffers [interface->app [0].tx_head] + 14);
+   header->src = 0;
+   header->dest = 0;
+   header->type = 0xDEAD;
+   header->seq = seq++;
+   header->len = 0;
+
+   send_buffer ();
+
+   cout << "sleep 2 seconds..." << endl;
+   api::sleep(2);
    // release interface
 }
 
@@ -239,53 +253,7 @@ cout << "redpj sending packet..." << endl;
    return false;
 }
 
-bool llamaNET::run_trials ()
-{
-   if (node == 0)
-   {
-      struct timeval tv1;
-      struct timeval tv2;
-      unsigned long usec1;
-      unsigned long usec2;
-      bool result;
-
-      // run timed trials
-      for (unsigned long i = 0; i < trials; i++)
-      {
-         gettimeofday (&tv1, 0);
-         result = run (i);
-         gettimeofday (&tv2, 0);
-
-         if (!result)
-         {
-            cout << "failed to complete trial " << i << endl;
-            return false;
-         }
-
-         usec1 = (tv1.tv_sec*1000000) + tv1.tv_usec;
-         usec2 = (tv2.tv_sec*1000000) + tv2.tv_usec;
-
-         results [i] = (usec2 >= usec1) ? usec2 - usec1 : 0xFFFFFFFF;
-      }
-
-      compute_statistics ();
-   }
-   else
-   {
-      for (unsigned long i = 0; i < trials; i++)
-      {
-         if (!run (i))
-         {
-            cout << "failed to complete trial " << i << endl;
-            return false;
-         }
-      }
-   }
-
-   return true;
-}
-
-bool llamaNET::run (unsigned long trial)
+bool llamaNET::run_trial (unsigned long trial)
 {
    // dalai initiates the trial
    if (node == 0)
@@ -306,6 +274,7 @@ bool llamaNET::run (unsigned long trial)
          data = rx_buffers [interface->app [0].rx_tail] + 14 + net::llamanet::HEADER_LENGTH;
 
          if (*(reinterpret_cast<unsigned long *>(data)) == trial)
+//; // disable trial check
          {
             unsigned int tail = interface->app [0].rx_tail;
             tail++;
@@ -346,20 +315,6 @@ bool llamaNET::run (unsigned long trial)
    return false;
 }
 
-bool llamaNET::stop ()
-{
-   net::llamanet::Protocol_header *header = reinterpret_cast<net::llamanet::Protocol_header *>(tx_buffers [interface->app [0].tx_head] + 14);
-   header->src = 0;
-   header->dest = 0;
-   header->type = 0xDEAD;
-   header->seq = seq++;
-   header->len = 0;
-
-   send_buffer ();
-
-   return true;
-}
-
 bool llamaNET::recv_buffer ()
 {
    while (interface->app [0].rx_head == interface->app [0].rx_tail);
@@ -372,6 +327,48 @@ bool llamaNET::recv_buffer ()
 
 bool llamaNET::send_buffer ()
 {
+   net::llamanet::Protocol_header *header = reinterpret_cast<net::llamanet::Protocol_header *>(tx_buffers [interface->app [0].tx_head] + 14);
+   unsigned char *frame = tx_buffers [interface->app [0].tx_head];
+
+   // !BAM get these in a config soon
+   // dalai node 0 mac 00-1b-21-d5-66-ef
+   // redpj node 1 mac 68-05-ca-01-f7-db
+   if (header->dest == 1)
+   {
+      // redpj
+      frame [0] = 0x00;
+      frame [1] = 0x1b;
+      frame [2] = 0x21;
+      frame [3] = 0xd5;
+      frame [4] = 0x66;
+      frame [5] = 0xef;
+      frame [6] = 0x68;
+      frame [7] = 0x05;
+      frame [8] = 0xca;
+      frame [9] = 0x01;
+      frame [10] = 0xf7;
+      frame [11] = 0xdb;
+   }
+   else
+   {
+      // dalai
+      frame [0] = 0x68;
+      frame [1] = 0x05;
+      frame [2] = 0xca;
+      frame [3] = 0x01;
+      frame [4] = 0xf7;
+      frame [5] = 0xdb;
+      frame [6] = 0x00;
+      frame [7] = 0x1b;
+      frame [8] = 0x21;
+      frame [9] = 0xd5;
+      frame [10] = 0x66;
+      frame [11] = 0xef;
+   }
+
+   frame [12] = 0x09;
+   frame [13] = 0x0c;
+
    // ensure write is processed
    wmb();
 

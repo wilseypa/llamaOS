@@ -28,6 +28,8 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
+#include <sys/time.h>
+
 #include <iostream>
 #include <sstream>
 
@@ -87,7 +89,8 @@ Experiment::Experiment (int argc, char **argv)
    :  name(parse_name(argc, argv)),
       trials(parse_trials(argc, argv)),
       length(parse_length(argc, argv)),
-      results(new unsigned long [trials])
+      results(new unsigned long [trials]),
+      client(false)
 {
    cout << "running experiment with " << dec << trials << " of " << length << " packets" << endl; 
 }
@@ -97,38 +100,85 @@ Experiment::~Experiment ()
    delete results;
 }
 
+bool Experiment::run_trials ()
+{
+   if (client)
+   {
+      struct timeval tv1;
+      struct timeval tv2;
+      unsigned long usec1;
+      unsigned long usec2;
+      bool result;
+
+      // run timed trials
+      for (unsigned long i = 0; i < trials; i++)
+      {
+         gettimeofday (&tv1, 0);
+         result = run_trial (i);
+         gettimeofday (&tv2, 0);
+
+         if (!result)
+         {
+            cout << "failed to complete trial " << i << endl;
+            return false;
+         }
+
+         usec1 = (tv1.tv_sec*1000000) + tv1.tv_usec;
+         usec2 = (tv2.tv_sec*1000000) + tv2.tv_usec;
+
+         results [i] = (usec2 >= usec1) ? usec2 - usec1 : 0xFFFFFFFF;
+      }
+   }
+   else
+   {
+      for (unsigned long i = 0; i < trials; i++)
+      {
+         if (!run_trial (i))
+         {
+            cout << "failed to complete trial " << i << endl;
+            return false;
+         }
+      }
+   }
+
+   return true;
+}
+
 void Experiment::compute_statistics ()
 {
-   unsigned long mean = 0.0;
-   unsigned long variance = 0.0;
-   unsigned long latency = 0UL;
-   unsigned long min_latency = 0xFFFFFFFFFFFFFFFFUL;
-   unsigned long max_latency = 0UL;
-
-   // iterate to compute mean
-   for (unsigned long i = 0; i < trials; i++)
+   if (client)
    {
-      latency = results [i];
+      unsigned long mean = 0.0;
+      unsigned long variance = 0.0;
+      unsigned long latency = 0UL;
+      unsigned long min_latency = 0xFFFFFFFFFFFFFFFFUL;
+      unsigned long max_latency = 0UL;
 
-      mean += latency;
+      // iterate to compute mean
+      for (unsigned long i = 0; i < trials; i++)
+      {
+         latency = results [i];
 
-      min_latency = (latency < min_latency) ? latency : min_latency;
-      max_latency = (latency > max_latency) ? latency : max_latency;
+         mean += latency;
+
+         min_latency = (latency < min_latency) ? latency : min_latency;
+         max_latency = (latency > max_latency) ? latency : max_latency;
+      }
+
+      mean /= trials;
+
+      // iterate to compute variance
+      for (unsigned long i = 0; i < trials; i++)
+      {
+         latency = results [i];
+
+         variance += ((latency - mean) * (latency - mean));
+      }
+
+      variance /= trials;
+
+      cout << "  mean: " << dec << mean << ", var: " << variance << ", [" << min_latency << ", " << max_latency << "]" << endl;
    }
-
-   mean /= trials;
-
-   // iterate to compute variance
-   for (unsigned long i = 0; i < trials; i++)
-   {
-      latency = results [i];
-
-      variance += ((latency - mean) * (latency - mean));
-   }
-
-   variance /= trials;
-
-   cout << "  mean: " << dec << mean << ", var: " << variance << ", [" << min_latency << ", " << max_latency << "]" << endl;
 }
 
 void Experiment::mark_data_alpha (volatile unsigned char *buffer, unsigned long length)

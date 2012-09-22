@@ -206,3 +206,13 @@ void RCTL::BSIZE (RCTL::BUFFER_SIZE size)
       break;
    }
 }
+
+bool RCTL::BSEX () const
+{
+   return test_bit (value, 25);
+}
+
+void RCTL::BSEX (bool flag)
+{
+   edit_bit (value, 25, flag);
+}

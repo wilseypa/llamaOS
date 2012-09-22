@@ -28,41 +28,35 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#ifndef latency_experiment_llamanet_h_
-#define latency_experiment_llamanet_h_
+#ifndef latency_experiment_tcpnb_h_
+#define latency_experiment_tcpnb_h_
 
-#include <llamaos/apps/latency/Experiment.h>
-#include <llamaos/net/llamaNET.h>
+#include "../Experiment.h"
 
-namespace latency {
-namespace protocols {
+using namespace latency;
 
-class llamaNET : public Experiment
+class TCPnb : public Experiment
 {
 public:
-   llamaNET (int argc, char **argv);
-    virtual ~llamaNET ();
+   TCPnb (int argc, char **argv);
+   virtual ~TCPnb ();
 
    virtual bool verify ();
    virtual bool run_trial (unsigned long trial);
 
 private:
-   llamaNET ();
-   llamaNET (const llamaNET &);
-   llamaNET &operator= (const llamaNET &);
+   TCPnb ();
+   TCPnb (const TCPnb &);
+   TCPnb &operator= (const TCPnb &);
 
    bool recv_buffer ();
    bool send_buffer ();
 
-   int node;
+   std::string ip_addr;
 
-   llamaos::net::llamanet::llamaNET_interface *interface;
-
-   unsigned char *tx_buffers [8];
-   unsigned char *rx_buffers [8];
+   int socket;
+   unsigned char *buffer;
 
 };
 
-} }
-
-#endif  // latency_experiment_llamanet_h_
+#endif  // latency_experiment_tcpnb_h_

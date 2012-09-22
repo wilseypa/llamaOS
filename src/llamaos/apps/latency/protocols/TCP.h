@@ -35,26 +35,23 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 using namespace latency;
 
-class Experiment_tcp : public Experiment
+class TCP : public Experiment
 {
 public:
-   Experiment_tcp (int argc, char **argv);
-    virtual ~Experiment_tcp ();
+   TCP (int argc, char **argv);
+   virtual ~TCP ();
 
    virtual bool verify ();
-   virtual bool run_trials ();
-   virtual bool run (unsigned long trial);
-   virtual bool stop ();
+   virtual bool run_trial (unsigned long trial);
 
 private:
-   Experiment_tcp ();
-   Experiment_tcp (const Experiment_tcp &);
-   Experiment_tcp &operator= (const Experiment_tcp &);
+   TCP ();
+   TCP (const TCP &);
+   TCP &operator= (const TCP &);
 
    bool recv_buffer ();
    bool send_buffer ();
 
-   bool client;
    std::string ip_addr;
 
    int socket;

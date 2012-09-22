@@ -42,10 +42,9 @@ public:
    virtual ~Experiment ();
 
    virtual bool verify () = 0;
-   virtual bool run_trials () = 0;
-   virtual bool run (unsigned long trial) = 0;
-   virtual bool stop () = 0;
+   virtual bool run_trial (unsigned long trial) = 0;
 
+   bool run_trials ();
    void compute_statistics ();
 
    void mark_data_alpha (volatile unsigned char *buffer, unsigned long length);
@@ -56,7 +55,10 @@ public:
    const std::string name;
    const unsigned long trials;
    const unsigned long length;
+
    unsigned long *const results;
+
+   bool client;
 
 private:
    Experiment ();

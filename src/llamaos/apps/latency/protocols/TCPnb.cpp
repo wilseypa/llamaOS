@@ -30,6 +30,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 #include <string.h>
 #include <unistd.h>
+#include <fcntl.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <netinet/tcp.h>
@@ -37,7 +38,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <iostream>
 #include <string>
 
-#include "TCP.h"
+#include "TCPnb.h"
 
 using namespace std;
 using namespace latency;
@@ -75,6 +76,14 @@ static int client_init (const string &ip_addr)
          if (-1 == setsockopt (s, IPPROTO_TCP, TCP_NODELAY, &opt, sizeof(int)))
          {
             cout << "error: setsockopt TCP_NODELAY." << endl;
+         }
+         else if ((opt = fcntl (s, F_GETFL, 0)) == -1)
+         {
+            printf ("error: fcntl F_GETFL.\n");
+         }
+         else if (fcntl (s, F_SETFL, opt | O_NONBLOCK) == -1)
+         {
+            printf ("error: setting non-blocking socket.\n");
          }
          else
          {
@@ -136,6 +145,14 @@ static int server_init ()
             {
                cout << "error: setsockopt TCP_NODELAY." << endl;
             }
+            else if ((opt = fcntl (s, F_GETFL, 0)) == -1)
+            {
+               printf ("error: fcntl F_GETFL.\n");
+            }
+            else if (fcntl (s, F_SETFL, opt | O_NONBLOCK) == -1)
+            {
+               printf ("error: setting non-blocking socket.\n");
+            }
             else
             {
                return s;
@@ -147,7 +164,7 @@ static int server_init ()
    return -1;
 }
 
-TCP::TCP (int argc, char **argv)
+TCPnb::TCPnb (int argc, char **argv)
    :  Experiment(argc, argv),
       ip_addr((argc > 3) ? argv[3] : ""),
       socket((argc > 3) ? client_init(ip_addr) : server_init()),
@@ -156,12 +173,12 @@ TCP::TCP (int argc, char **argv)
    client = (argc > 3);
 }
 
-TCP::~TCP ()
+TCPnb::~TCPnb ()
 {
    delete[] buffer;
 }
 
-bool TCP::verify ()
+bool TCPnb::verify ()
 {
    // client initiates the trial
    if (client)
@@ -192,7 +209,7 @@ bool TCP::verify ()
    return false;
 }
 
-bool TCP::run_trial (unsigned long trial)
+bool TCPnb::run_trial (unsigned long trial)
 {
    // client initiates the trial
    if (client)
@@ -220,7 +237,7 @@ bool TCP::run_trial (unsigned long trial)
    return true;
 }
 
-bool TCP::recv_buffer ()
+bool TCPnb::recv_buffer ()
 {
    int result;
    unsigned long bytes = 0;
@@ -229,8 +246,14 @@ bool TCP::recv_buffer ()
    {
       result = recv (socket, &buffer [bytes], length - bytes, 0);
 
-      if (result <= 0)
+      if (   (result == -1)
+          && (errno == EAGAIN))
       {
+         continue;
+      }
+      else if (result <= 0)
+      {
+         cout << "recv error: " << result << ", errno " << errno << endl;
          return false;
       }
 
@@ -240,7 +263,7 @@ bool TCP::recv_buffer ()
    return true;
 }
 
-bool TCP::send_buffer ()
+bool TCPnb::send_buffer ()
 {
    int result;
    unsigned long bytes = 0;
@@ -251,6 +274,12 @@ bool TCP::send_buffer ()
 
       if (result < 0)
       {
+         if (   (result == -1)
+             && (errno == EAGAIN))
+         {
+            continue;
+         }
+
          return false;
       }
 
@@ -262,5 +291,5 @@ bool TCP::send_buffer ()
 
 Experiment *Experiment_factory::create (int argc, char **argv)
 {
-   return new TCP (argc, argv);
+   return new TCPnb (argc, argv);
 }

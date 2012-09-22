@@ -77,6 +77,9 @@ public:
    BUFFER_SIZE BSIZE () const;
    void BSIZE (BUFFER_SIZE size);
 
+   bool BSEX () const;
+   void BSEX (bool flag);
+
 private:
    uint32_t value;
 };

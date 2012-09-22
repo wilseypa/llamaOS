@@ -66,8 +66,11 @@ int main (int argc, char *argv [])
          {
             cout << "failed to verify experiment data (last trial)." << endl;
          }
+         else
+         {
+            experiment->compute_statistics ();
+         }
 
-         experiment->stop ();
          delete experiment;
          return 0;
       }

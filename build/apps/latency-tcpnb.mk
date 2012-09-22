@@ -68,21 +68,20 @@ GTEST_VERSION = 1.6.0
 # auto dependency generation
 DEPENDS = 
 
-MAKEFILE_SOURCES += apps/latency-tcp-native.mk
+MAKEFILE_SOURCES += apps/latency-tcpnb.mk
 
 CPPFLAGS += \
-  -I $(INCDIR) \
   -include $(SRCDIR)/llamaos/__thread.h
 
 SOURCES = \
   llamaos/apps/latency/Experiment.cpp \
-  llamaos/apps/latency/protocols/TCP.cpp \
+  llamaos/apps/latency/protocols/TCPnb.cpp \
   llamaos/apps/latency/main.cpp
 
 OBJECTS = $(SOURCES:%.cpp=$(OBJDIR)/%.o)
 DEPENDS = $(OBJECTS:%.o=%.d)
 
-$(BINDIR)/native/latency-tcp: $(OBJECTS)
+$(BINDIR)/native/latency-tcpnb: $(OBJECTS)
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
 	@$(LD) $(LDFLAGS) -o $@ $^

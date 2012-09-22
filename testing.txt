@@ -1,0 +1,150 @@
+
+native
+
+wmagato@dalai ~/llamaOS $ ./tcp
+running experiment with 250000 of 8 packets
+  mean: 87, var: 14, [67, 320]
+running experiment with 250000 of 256 packets
+  mean: 89, var: 26, [73, 262]
+running experiment with 250000 of 512 packets
+  mean: 93, var: 4, [81, 321]
+running experiment with 250000 of 768 packets
+  mean: 93, var: 4, [85, 153]
+running experiment with 250000 of 1024 packets
+  mean: 92, var: 10, [89, 325]
+running experiment with 250000 of 1280 packets
+  mean: 106, var: 304, [99, 284]
+running experiment with 250000 of 1536 packets
+  mean: 143, var: 2117, [110, 287]
+running experiment with 250000 of 1792 packets
+  mean: 166, var: 1785, [121, 294]
+running experiment with 250000 of 2048 packets
+  mean: 447, var: 9779, [148, 1121]
+running experiment with 250000 of 2304 packets
+  mean: 421, var: 10351, [147, 658]
+running experiment with 250000 of 2560 packets
+  mean: 442, var: 13595, [162, 777]
+running experiment with 250000 of 2816 packets
+  mean: 434, var: 7631, [170, 739]
+running experiment with 250000 of 3072 packets
+  mean: 440, var: 7669, [188, 782]
+running experiment with 250000 of 3328 packets
+  mean: 404, var: 9741, [190, 700]
+running experiment with 250000 of 3584 packets
+  mean: 414, var: 8659, [199, 921]
+running experiment with 250000 of 3840 packets
+  mean: 403, var: 11672, [210, 754]
+
+  
+  wmagato@dalai ~/llamaOS $ ./tcpnb
+running experiment with 250000 of 8 packets
+  mean: 85, var: 27, [59, 123]
+running experiment with 250000 of 256 packets
+  mean: 86, var: 12, [65, 145]
+running experiment with 250000 of 512 packets
+  mean: 86, var: 15, [63, 131]
+running experiment with 250000 of 768 packets
+  mean: 86, var: 5, [77, 174]
+running experiment with 250000 of 1024 packets
+  mean: 85, var: 3, [80, 148]
+running experiment with 250000 of 1280 packets
+  mean: 93, var: 3, [90, 139]
+running experiment with 250000 of 1536 packets
+  mean: 107, var: 79, [99, 326]
+running experiment with 250000 of 1792 packets
+  mean: 141, var: 1321, [112, 249]
+running experiment with 250000 of 2048 packets
+  mean: 401, var: 8939, [139, 664]
+running experiment with 250000 of 2304 packets
+  mean: 404, var: 9597, [155, 614]
+running experiment with 250000 of 2560 packets
+  mean: 414, var: 8857, [172, 612]
+running experiment with 250000 of 2816 packets
+  mean: 410, var: 7125, [181, 622]
+running experiment with 250000 of 3072 packets
+  mean: 410, var: 6673, [174, 613]
+running experiment with 250000 of 3328 packets
+  mean: 385, var: 7305, [172, 641]
+running experiment with 250000 of 3584 packets
+  mean: 415, var: 8461, [183, 633]
+running experiment with 250000 of 3840 packets
+  mean: 382, var: 13966, [193, 669]
+
+  
+  dom0
+  
+  wmagato@dalai ~/llamaOS $ ./tcp
+running experiment with 250000 of 8 packets
+  mean: 131, var: 143, [116, 2806]
+running experiment with 250000 of 256 packets
+  mean: 146, var: 119, [137, 1027]
+running experiment with 250000 of 512 packets
+  mean: 156, var: 126, [144, 1124]
+running experiment with 250000 of 768 packets
+  mean: 161, var: 110, [148, 827]
+running experiment with 250000 of 1024 packets
+  mean: 160, var: 113, [153, 969]
+running experiment with 250000 of 1280 packets
+  mean: 171, var: 110, [164, 852]
+running experiment with 250000 of 1536 packets
+  mean: 182, var: 111, [169, 1121]
+running experiment with 250000 of 1792 packets
+  mean: 194, var: 99, [180, 965]
+running experiment with 250000 of 2048 packets
+  mean: 383, var: 20734, [194, 1311]
+running experiment with 250000 of 2304 packets
+  mean: 393, var: 24131, [206, 1236]
+running experiment with 250000 of 2560 packets
+  mean: 419, var: 8658, [218, 2084]
+running experiment with 250000 of 2816 packets
+  mean: 384, var: 23249, [226, 1340]
+running experiment with 250000 of 3072 packets
+  mean: 427, var: 15794, [235, 1220]
+running experiment with 250000 of 3328 packets
+  mean: 445, var: 7594, [248, 1276]
+running experiment with 250000 of 3584 packets
+  mean: 409, var: 13894, [258, 1381]
+running experiment with 250000 of 3840 packets
+  mean: 430, var: 8234, [268, 1303]
+
+wmagato@dalai ~/llamaOS $ ./tcpnb
+running experiment with 250000 of 8 packets
+  mean: 63, var: 43, [54, 327]
+running experiment with 250000 of 256 packets
+  mean: 74, var: 54, [65, 372]
+running experiment with 250000 of 512 packets
+  mean: 84, var: 73, [74, 768]
+running experiment with 250000 of 768 packets
+  mean: 90, var: 70, [80, 404]
+running experiment with 250000 of 1024 packets
+  mean: 89, var: 69, [85, 355]
+running experiment with 250000 of 1280 packets
+  mean: 99, var: 61, [95, 325]
+running experiment with 250000 of 1536 packets
+  mean: 110, var: 57, [107, 389]
+running experiment with 250000 of 1792 packets
+  mean: 119, var: 58, [116, 347]
+running experiment with 250000 of 2048 packets
+  mean: 360, var: 8100, [126, 647]
+running experiment with 250000 of 2304 packets
+  mean: 335, var: 16685, [136, 697]
+running experiment with 250000 of 2560 packets
+  mean: 361, var: 15509, [147, 649]
+running experiment with 250000 of 2816 packets
+  mean: 392, var: 5678, [237, 637]
+running experiment with 250000 of 3072 packets
+  mean: 364, var: 8982, [167, 683]
+running experiment with 250000 of 3328 packets
+  mean: 360, var: 6575, [177, 628]
+running experiment with 250000 of 3584 packets
+  mean: 374, var: 4268, [188, 755]
+running experiment with 250000 of 3840 packets
+  mean: 377, var: 5341, [197, 690]
+
+  
+  
+
+  
+  
+  
+  
