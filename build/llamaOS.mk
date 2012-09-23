@@ -66,6 +66,7 @@ CPP_SOURCES += \
   llamaos/api/pci/Status.cpp \
   llamaos/memory/Entry.cpp \
   llamaos/memory/Memory.cpp \
+  llamaos/net/llamaNET.cpp \
   llamaos/xen/Console.cpp \
   llamaos/xen/Entry-gcc.cpp \
   llamaos/xen/Entry-llamaOS.cpp \
@@ -83,6 +84,7 @@ HEADERS = \
   $(INCDIR)/llamaos/api/io.h \
   $(INCDIR)/llamaos/api/sleep.h \
   $(INCDIR)/llamaos/memory/Memory.h \
+  $(INCDIR)/llamaos/net/llamaNET.h \
   $(INCDIR)/llamaos/xen/Console.h \
   $(INCDIR)/llamaos/xen/Events.h \
   $(INCDIR)/llamaos/xen/Grant_table.h \

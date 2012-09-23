@@ -342,6 +342,34 @@ bool Hypercall::grant_table_query_size (uint32_t &frames, uint32_t &max_frames, 
    return true;
 }
 
+bool Hypercall::grant_table_map_grant_ref (gnttab_map_grant_ref_t &map_grant_ref)
+{
+   int result = HYPERVISOR_grant_table_op (GNTTABOP_map_grant_ref, &map_grant_ref, 1);
+
+   if (0 != result)
+   {
+      trace ("HYPERVISOR_grant_table_op (GNTTABOP_map_grant_ref) FAILED\n");
+      trace ("   error code: %d\n", result);
+      return false;
+   }
+
+   return true;
+}
+
+bool Hypercall::grant_table_unmap_grant_ref (gnttab_unmap_grant_ref_t &unmap_grant_ref)
+{
+   int result = HYPERVISOR_grant_table_op (GNTTABOP_unmap_grant_ref, &unmap_grant_ref, 1);
+
+   if (0 != result)
+   {
+      trace ("HYPERVISOR_grant_table_op (GNTTABOP_unmap_grant_ref) FAILED\n");
+      trace ("   error code: %d\n", result);
+      return false;
+   }
+
+   return true;
+}
+
 // needs __XEN_INTERFACE_VERSION__=0x0003020a
 //bool Hypercall::grant_table_get_version (uint32_t &version)
 //{

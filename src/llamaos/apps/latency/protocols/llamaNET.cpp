@@ -48,69 +48,7 @@ using namespace llamaos::xen;
 
 static uint32_t seq = 1;
 
-static net::llamanet::llamaNET_interface *get_llamaNET_interface ()
-{
-   // also a hack, get an open address in the second half of the reserved area
-   uint64_t reserved_virtual_address = get_reserved_virtual_address (1);
-
-   // get access to the interface
-   domid_t self_id = Hypervisor::get_instance ()->xenstore.read<domid_t>("domid");
-   cout << "self_id: " << self_id << endl;
-
-   gnttab_map_grant_ref_t map_grant_ref;
-   map_grant_ref.host_addr = reserved_virtual_address;
-   map_grant_ref.flags = GNTMAP_host_map;
-   map_grant_ref.ref = 510;
-   map_grant_ref.dom = self_id - 1;
-
-   cout << "Calling GNTMAP_host_map with ref: " << 510 << " and host_addr: " << reserved_virtual_address << endl;
-   cout << "hypercall: " << HYPERVISOR_grant_table_op(GNTTABOP_map_grant_ref, &map_grant_ref, 1) << endl;
-
-   if (map_grant_ref.status == GNTST_okay)
-   {
-      cout << "access granted: " << map_grant_ref.status << endl;
-      cout << "  ref: " << dec << 510 << ", virtual address: " << hex << reserved_virtual_address << ", machine address: " << memory::virtual_pointer_to_machine_page (memory::address_to_pointer<net::llamanet::Protocol_header>(reserved_virtual_address)) << endl;
-//      cout << "sleep 5 seconds..." << endl;
-//      api::sleep(5);
-
-      return memory::address_to_pointer<net::llamanet::llamaNET_interface>(reserved_virtual_address);
-   }
-
-   cout << "failed to get access: " << map_grant_ref.status << endl;
-   return nullptr;
-}
-
-static unsigned char *get_buffer (grant_ref_t ref)
-{
-   // also a hack, get an open address in the second half of the reserved area
-   uint64_t reserved_virtual_address = get_reserved_virtual_address (1);
-
-   // get access to the interface
-   domid_t self_id = Hypervisor::get_instance ()->xenstore.read<domid_t>("domid");
-
-   gnttab_map_grant_ref_t map_grant_ref;
-   map_grant_ref.host_addr = reserved_virtual_address;
-   map_grant_ref.flags = GNTMAP_host_map;
-   map_grant_ref.ref = ref;
-   map_grant_ref.dom = self_id - 1;
-
-   cout << "Calling GNTMAP_host_map with ref: " << dec << ref << " and host_addr: " << hex << reserved_virtual_address << endl;
-   cout << "hypercall: " << HYPERVISOR_grant_table_op(GNTTABOP_map_grant_ref, &map_grant_ref, 1) << endl;
-
-   if (map_grant_ref.status == GNTST_okay)
-   {
-      cout << "access granted: " << map_grant_ref.status << endl;
-//      cout << "  ref: " << ref << ", virtual address: " << reserved_virtual_address << ", machine address: " << memory::virtual_pointer_to_machine_page (memory::address_to_pointer<net::llamanet::Protocol_header>(reserved_virtual_address)) << endl;
-      cout.flush();
-
-      return memory::address_to_pointer<unsigned char>(reserved_virtual_address);
-   }
-
-   cout << "failed to get access: " << map_grant_ref.status << endl;
-   return nullptr;
-}
-
-static int parse_node (int argc, char **argv)
+static uint32_t parse_node (int argc, char **argv)
 {
    if (   (argc > 4)
        && (nullptr != argv [4]))
@@ -125,127 +63,126 @@ static int parse_node (int argc, char **argv)
       }
    }
 
+   cout << "FAILED TO GET NODE INDEX FROM ARGV!!!!!!!!!!!!!!!!!!!!" << endl;
    return -1;
+}
+
+static domid_t get_domd_id (int node)
+{
+   // for now it's just self minus node % 6
+   domid_t self_id = Hypervisor::get_instance ()->xenstore.read<domid_t>("domid");
+
+   return (self_id - (node % 6));
 }
 
 llamaNET::llamaNET (int argc, char **argv)
    :  Experiment(argc, argv),
       node(parse_node (argc, argv)),
-      interface(get_llamaNET_interface())
+      interface(get_domd_id (node), (node % 6))
 {
-   client = (node == 0);
+   // dalai 1-6 always starts the experiments
+   client = (node <= 6);
 
-      cout << "driver.online: " << interface->driver.online << endl;
-      cout << "llamaNET running as node " << dec << node << endl;
+   cout << "llamaNET running as node " << dec << node << endl;
 
-      cout << "mapping tranmit buffers..." << endl;
-      for (int i = 0; i < 8; i++)
-      {
-         cout << "mapping tx_buffers [" << dec << i << "]" << endl;
-         tx_buffers [i] = get_buffer (509 - i);
-      }
-
-      cout << "mapping receive buffers..." << endl;
-      for (int i = 0; i < 8; i++)
-      {
-         cout << "mapping rx_buffers [" << dec << i << "]" << endl;
-         rx_buffers [i] = get_buffer (501 - i);;
-      }
-
-      cout << "sizeof(HEADER_LENGTH): " << net::llamanet::HEADER_LENGTH << endl;
-      cout << "sleep 2 seconds..." << endl;
-      api::sleep(2);
+   cout << "sleep 2 seconds..." << endl;
+   api::sleep(2);
 }
 
 llamaNET::~llamaNET ()
 {
-   cout << "stopping llamaNET driver..." << endl;
-
-   net::llamanet::Protocol_header *header = reinterpret_cast<net::llamanet::Protocol_header *>(tx_buffers [interface->app [0].tx_head] + 14);
-   header->src = 0;
-   header->dest = 0;
-   header->type = 0xDEAD;
-   header->seq = seq++;
-   header->len = 0;
-
-   send_buffer ();
-
    cout << "sleep 2 seconds..." << endl;
    api::sleep(2);
+
    // release interface
 }
 
 bool llamaNET::verify ()
 {
-cout << "calling verify..." << endl;
+   net::llamaNET::Protocol_header *header;
+   unsigned char *data;
+
+   cout << "calling verify..." << endl;
+
    // dalai initiates the trial
-   if (node == 0)
+   if (client)
    {
-      net::llamanet::Protocol_header *header = reinterpret_cast<net::llamanet::Protocol_header *>(tx_buffers [interface->app [0].tx_head] + 14);
-      memset((void *)header, 0, net::llamanet::HEADER_LENGTH);
-      header->src = 0;
-      header->dest = 1;
+      header = interface.get_send_buffer ();
+      header->dest = 7;
+      header->src = 1;
       header->type = 1;
       header->seq = seq++;
       header->len = length;
 
-      unsigned char *data = tx_buffers [interface->app [0].tx_head] + 14 + net::llamanet::HEADER_LENGTH;
+      // get pointer to data section of buffer
+      data = reinterpret_cast<unsigned char *>(header + 1);
 
       // marks all bytes with alpha chars (a,b,c,...)
       mark_data_alpha (data, length);
 
-cout << "dalai sending packet..." << endl;
-      // send/recv and verify the data has been changed to numerals (1,2,3,...)
-      if (   (send_buffer ())
-          && (recv_buffer ()))
-      {
-         data = rx_buffers [interface->app [0].rx_tail] + 14 + net::llamanet::HEADER_LENGTH;
+      cout << "dalai sending packet..." << endl;
 
-         if (verify_data_numeric (data, length))
+      // send/recv and verify the data has been changed to numerals (1,2,3,...)
+      interface.send ();
+
+      for (;;)
+      {
+         header = interface.recv ();
+
+         if (header->dest == node)
          {
-            unsigned int tail = interface->app [0].rx_tail;
-            tail++;
-            tail %= 8;
-            interface->app [0].rx_tail = tail;
-            return true;
+            // get pointer to data section of buffer
+            data = reinterpret_cast<unsigned char *>(header + 1);
+
+            if (verify_data_numeric (data, length))
+            {
+               interface.release_recv_buffer ();
+               return true;
+            }
+         }
+         else
+         {
+            interface.release_recv_buffer ();
          }
       }
    }
    else
    {
-cout << "redpj waiting packet..." << endl;
-      // wait for mesg and verify alpha chars
-      if (recv_buffer ())
+      cout << "redpj waiting packet..." << endl;
+      for (;;)
       {
-         unsigned char *data = rx_buffers [interface->app [0].rx_tail];
+         header = interface.recv ();
 
-            cout << endl;
-         for (unsigned int i = 0; i < (14 + net::llamanet::HEADER_LENGTH + 64); i++)
+         if (header->dest == node)
          {
-            cout << " " << hex << static_cast<int>(data [i]);
+            // get pointer to data section of buffer
+            data = reinterpret_cast<unsigned char *>(header + 1);
+
+            if (verify_data_alpha (data, length))
+            {
+               interface.release_recv_buffer ();
+
+               header = interface.get_send_buffer ();
+               header->dest = 1;
+               header->src = 7;
+               header->type = 1;
+               header->seq = seq++;
+               header->len = length;
+
+               // get pointer to data section of buffer
+               data = reinterpret_cast<unsigned char *>(header + 1);
+
+               // marks all bytes with numerals and send
+               mark_data_numeric (data, length);
+
+               cout << "redpj sending packet..." << endl;
+               interface.send ();
+               return true;
+            }
          }
-            cout << endl;
-
-         data = rx_buffers [interface->app [0].rx_tail] + 14 + net::llamanet::HEADER_LENGTH;
-         if (verify_data_alpha (data, length))
+         else
          {
-            unsigned int tail = interface->app [0].rx_tail;
-            tail++;
-            tail %= 8;
-            interface->app [0].rx_tail = tail;
-
-            net::llamanet::Protocol_header *header = reinterpret_cast<net::llamanet::Protocol_header *>(tx_buffers [interface->app [0].tx_head] + 14);
-            data = tx_buffers [interface->app [0].tx_head] + 14 + net::llamanet::HEADER_LENGTH;
-            header->src = 1;
-            header->dest = 0;
-            header->type = 1;
-            header->seq = seq++;
-            header->len = length;
-
-            // marks all bytes with numerals and send
-            mark_data_numeric (data, length);
-cout << "redpj sending packet..." << endl;
-            return send_buffer ();
+            interface.release_recv_buffer ();
          }
       }
    }
@@ -255,129 +192,79 @@ cout << "redpj sending packet..." << endl;
 
 bool llamaNET::run_trial (unsigned long trial)
 {
+   net::llamaNET::Protocol_header *header;
+   unsigned char *data;
+
    // dalai initiates the trial
-   if (node == 0)
+   if (client)
    {
-      net::llamanet::Protocol_header *header = reinterpret_cast<net::llamanet::Protocol_header *>(tx_buffers [interface->app [0].tx_head] + 14);
-      unsigned char *data = tx_buffers [interface->app [0].tx_head] + 14 + net::llamanet::HEADER_LENGTH;
-      header->src = 0;
-      header->dest = 1;
+      header = interface.get_send_buffer ();
+      header->dest = 7;
+      header->src = 1;
       header->type = 1;
       header->seq = seq++;
       header->len = length;
 
-      // send/recv mesg, check first "int" in buffer is the trial number just
-      // as a low cost sanity check to verify both machines are in sync
-      if (   (send_buffer ())
-          && (recv_buffer ()))
+      interface.send ();
+
+      for (;;)
       {
-         data = rx_buffers [interface->app [0].rx_tail] + 14 + net::llamanet::HEADER_LENGTH;
+         header = interface.recv ();
 
-         if (*(reinterpret_cast<unsigned long *>(data)) == trial)
-//; // disable trial check
+         if (header->dest == node)
          {
-            unsigned int tail = interface->app [0].rx_tail;
-            tail++;
-            tail %= 8;
-            interface->app [0].rx_tail = tail;
+            // get pointer to data section of buffer
+            data = reinterpret_cast<unsigned char *>(header + 1);
 
-            return true;
+            if (*(reinterpret_cast<unsigned long *>(data)) == trial)
+            {
+               interface.release_recv_buffer ();
+               return true;
+            }
+            else
+            {
+               interface.release_recv_buffer ();
+               return false;
+            }
          }
+
+         interface.release_recv_buffer ();
       }
    }
    else
    {
-      // wait for message to arrive
-      if (recv_buffer ())
+      for (;;)
       {
-         unsigned char *data = rx_buffers [interface->app [0].rx_tail] + 14 + net::llamanet::HEADER_LENGTH;
+         header = interface.recv ();
 
-         unsigned int tail = interface->app [0].rx_tail;
-         tail++;
-         tail %= 8;
-         interface->app [0].rx_tail = tail;
+         if (header->dest == node)
+         {
+            interface.release_recv_buffer ();
 
-         net::llamanet::Protocol_header *header = reinterpret_cast<net::llamanet::Protocol_header *>(tx_buffers [interface->app [0].tx_head] + 14);
-         data = tx_buffers [interface->app [0].tx_head] + 14 + net::llamanet::HEADER_LENGTH;
-         header->src = 1;
-         header->dest = 0;
-         header->type = 1;
-         header->seq = seq++;
-         header->len = length;
+            header = interface.get_send_buffer ();
+            header->dest = 1;
+            header->src = 7;
+            header->type = 1;
+            header->seq = seq++;
+            header->len = length;
 
-         // place trial number in first "int" for master to verify
-         *(reinterpret_cast<unsigned long *>(data)) = trial;
+            // get pointer to data section of buffer
+            data = reinterpret_cast<unsigned char *>(header + 1);
 
-         return send_buffer ();
+            // place trial number in first "int" for master to verify
+            *(reinterpret_cast<unsigned long *>(data)) = trial;
+
+            interface.send ();
+            return true;
+         }
+         else
+         {
+            interface.release_recv_buffer ();
+         }
       }
    }
 
    return false;
-}
-
-bool llamaNET::recv_buffer ()
-{
-   while (interface->app [0].rx_head == interface->app [0].rx_tail);
-
-   // ensure write is processed
-//   rmb();
-
-   return true;
-}
-
-bool llamaNET::send_buffer ()
-{
-   net::llamanet::Protocol_header *header = reinterpret_cast<net::llamanet::Protocol_header *>(tx_buffers [interface->app [0].tx_head] + 14);
-   unsigned char *frame = tx_buffers [interface->app [0].tx_head];
-
-   // !BAM get these in a config soon
-   // dalai node 0 mac 00-1b-21-d5-66-ef
-   // redpj node 1 mac 68-05-ca-01-f7-db
-   if (header->dest == 1)
-   {
-      // redpj
-      frame [0] = 0x00;
-      frame [1] = 0x1b;
-      frame [2] = 0x21;
-      frame [3] = 0xd5;
-      frame [4] = 0x66;
-      frame [5] = 0xef;
-      frame [6] = 0x68;
-      frame [7] = 0x05;
-      frame [8] = 0xca;
-      frame [9] = 0x01;
-      frame [10] = 0xf7;
-      frame [11] = 0xdb;
-   }
-   else
-   {
-      // dalai
-      frame [0] = 0x68;
-      frame [1] = 0x05;
-      frame [2] = 0xca;
-      frame [3] = 0x01;
-      frame [4] = 0xf7;
-      frame [5] = 0xdb;
-      frame [6] = 0x00;
-      frame [7] = 0x1b;
-      frame [8] = 0x21;
-      frame [9] = 0xd5;
-      frame [10] = 0x66;
-      frame [11] = 0xef;
-   }
-
-   frame [12] = 0x09;
-   frame [13] = 0x0c;
-
-   // ensure write is processed
-   wmb();
-
-   unsigned int head = interface->app [0].tx_head;
-   head++;
-   head %= 8;
-   interface->app [0].tx_head = head;
-
-   return true;
 }
 
 Experiment *Experiment_factory::create (int argc, char **argv)

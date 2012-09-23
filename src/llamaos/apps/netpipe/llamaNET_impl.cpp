@@ -27,13 +27,3 @@ The views and conclusions contained in the software and documentation are those
 of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
-
-#include <llamaos/memory/Memory.h>
-#include <llamaos/xen/Grant_map.h>
-#include <llamaos/xen/Hypercall.h>
-
-using namespace std;
-using namespace llamaos;
-using namespace llamaos::memory;
-using namespace llamaos::xen;
-

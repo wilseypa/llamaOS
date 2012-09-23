@@ -28,12 +28,77 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <llamaos/memory/Memory.h>
-#include <llamaos/xen/Grant_map.h>
-#include <llamaos/xen/Hypercall.h>
+#include <stdio.h>
 
-using namespace std;
-using namespace llamaos;
-using namespace llamaos::memory;
-using namespace llamaos::xen;
+#include <netpipe.h>
 
+void Init(ArgStruct *p, int* pargc, char*** pargv)
+{
+   p->reset_conn = 0; /* Default to not resetting connection */
+   p->tr = 0;     /* The transmitter will be set using the -h host flag. */
+   p->rcv = 1;
+
+// !BAM
+// support this?
+//   p->prot.sndbufsz = p->prot.rcvbufsz = 0;
+}
+
+void Setup(ArgStruct *p)
+{
+   
+}
+
+void Sync(ArgStruct *p)
+{
+   
+}
+
+void PrepareToReceive(ArgStruct *p)
+{
+   
+}
+
+void SendData(ArgStruct *p)
+{
+   
+}
+
+void RecvData(ArgStruct *p)
+{
+   
+}
+
+void SendTime(ArgStruct *p, double *t)
+{
+
+}
+
+void RecvTime(ArgStruct *p, double *t)
+{
+
+}
+
+void SendRepeat(ArgStruct *p, int rpt)
+{
+
+}
+
+void RecvRepeat(ArgStruct *p, int *rpt)
+{
+
+}
+
+void CleanUp(ArgStruct *p)
+{
+
+}
+
+void Reset(ArgStruct *p)
+{
+
+}
+
+void AfterAlignmentInit(ArgStruct *p)
+{
+
+}

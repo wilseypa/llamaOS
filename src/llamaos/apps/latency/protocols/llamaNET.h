@@ -51,15 +51,8 @@ private:
    llamaNET (const llamaNET &);
    llamaNET &operator= (const llamaNET &);
 
-   bool recv_buffer ();
-   bool send_buffer ();
-
-   int node;
-
-   llamaos::net::llamanet::llamaNET_interface *interface;
-
-   unsigned char *tx_buffers [8];
-   unsigned char *rx_buffers [8];
+   const uint32_t node;
+   llamaos::net::llamaNET interface;
 
 };
 

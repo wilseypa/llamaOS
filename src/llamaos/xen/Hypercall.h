@@ -37,6 +37,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 #include <xen/xen.h>
 #include <xen/event_channel.h>
+#include <xen/grant_table.h>
 #include <xen/version.h>
 
 namespace llamaos {
@@ -148,6 +149,9 @@ public:
    static bool grant_table_setup_table (unsigned int pages, unsigned long *frame_list);
 
    static bool grant_table_query_size (uint32_t &frames, uint32_t &max_frames, int16_t &status);
+
+   static bool grant_table_map_grant_ref (gnttab_map_grant_ref_t &map_grant_ref);
+   static bool grant_table_unmap_grant_ref (gnttab_unmap_grant_ref_t &unmap_grant_ref);
 
    // needs __XEN_INTERFACE_VERSION__=0x00030205
    // static bool grant_table_get_version (uint32_t &version);

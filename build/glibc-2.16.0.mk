@@ -134,6 +134,7 @@ HEADERS = \
   $(INCDIR)/bits/huge_vall.h \
   $(INCDIR)/bits/ioctl-types.h \
   $(INCDIR)/bits/ioctls.h \
+  $(INCDIR)/bits/in.h \
   $(INCDIR)/bits/inf.h \
   $(INCDIR)/bits/local_lim.h \
   $(INCDIR)/bits/locale.h \
@@ -146,8 +147,11 @@ HEADERS = \
   $(INCDIR)/bits/posix1_lim.h \
   $(INCDIR)/bits/posix2_lim.h \
   $(INCDIR)/bits/pthreadtypes.h \
+  $(INCDIR)/bits/resource.h \
   $(INCDIR)/bits/sched.h \
   $(INCDIR)/bits/select.h \
+  $(INCDIR)/bits/sockaddr.h \
+  $(INCDIR)/bits/socket.h \
   $(INCDIR)/bits/stdio_lim.h \
   $(INCDIR)/bits/setjmp.h \
   $(INCDIR)/bits/sigaction.h \
@@ -173,11 +177,16 @@ HEADERS = \
   $(INCDIR)/bits/wordsize.h \
   $(INCDIR)/bits/xopen_lim.h \
   $(INCDIR)/gnu/stubs.h \
+  $(INCDIR)/netinet/in.h \
+  $(INCDIR)/rpc/netdb.h \
+  $(INCDIR)/sunrpc/rpc/netdb.h \
   $(INCDIR)/sys/cdefs.h \
   $(INCDIR)/sys/ioctl.h \
   $(INCDIR)/sys/poll.h \
+  $(INCDIR)/sys/resource.h \
   $(INCDIR)/sys/sysmacros.h \
   $(INCDIR)/sys/select.h \
+  $(INCDIR)/sys/socket.h \
   $(INCDIR)/sys/stat.h \
   $(INCDIR)/sys/syscall.h \
   $(INCDIR)/sys/sysinfo.h \
@@ -203,6 +212,7 @@ HEADERS = \
   $(INCDIR)/locale.h \
   $(INCDIR)/math.h \
   $(INCDIR)/malloc.h \
+  $(INCDIR)/netdb.h \
   $(INCDIR)/poll.h \
   $(INCDIR)/pthread.h \
   $(INCDIR)/regex.h \
@@ -275,6 +285,7 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/intl/plural.c \
   glibc-$(GLIBC_VERSION)/io/access.c \
   glibc-$(GLIBC_VERSION)/io/close.c \
+  glibc-$(GLIBC_VERSION)/io/dup.c \
   glibc-$(GLIBC_VERSION)/io/fcntl.c \
   glibc-$(GLIBC_VERSION)/io/fxstat.c \
   glibc-$(GLIBC_VERSION)/io/fxstat64.c \
@@ -322,6 +333,7 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/libio/iovsprintf.c \
   glibc-$(GLIBC_VERSION)/libio/iovsscanf.c \
   glibc-$(GLIBC_VERSION)/libio/iowpadn.c \
+  glibc-$(GLIBC_VERSION)/libio/memstream.c \
   glibc-$(GLIBC_VERSION)/libio/putc.c \
   glibc-$(GLIBC_VERSION)/libio/putchar.c \
   glibc-$(GLIBC_VERSION)/libio/putchar_u.c \
@@ -396,6 +408,8 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/posix/getegid.c \
   glibc-$(GLIBC_VERSION)/posix/geteuid.c \
   glibc-$(GLIBC_VERSION)/posix/getgid.c \
+  glibc-$(GLIBC_VERSION)/posix/getopt.c \
+  glibc-$(GLIBC_VERSION)/posix/getpid.c \
   glibc-$(GLIBC_VERSION)/posix/getuid.c \
   glibc-$(GLIBC_VERSION)/posix/pause.c \
   glibc-$(GLIBC_VERSION)/posix/regex.c \
@@ -414,6 +428,7 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/stdio-common/itoa-digits.c \
   glibc-$(GLIBC_VERSION)/stdio-common/itoa-udigits.c \
   glibc-$(GLIBC_VERSION)/stdio-common/itowa-digits.c \
+  glibc-$(GLIBC_VERSION)/stdio-common/perror.c \
   glibc-$(GLIBC_VERSION)/stdio-common/printf-parsemb.c \
   glibc-$(GLIBC_VERSION)/stdio-common/printf-parsewc.c \
   glibc-$(GLIBC_VERSION)/stdio-common/printf.c \
@@ -727,6 +742,11 @@ $(INCDIR)/% : $(SRCDIR)/glibc-$(GLIBC_VERSION)/io/%
 	@echo copying: $@ from $<
 	cp $< $@
 
+$(INCDIR)/% : $(SRCDIR)/glibc-$(GLIBC_VERSION)/inet/%
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo copying: $@ from $<
+	cp $< $@
+
 $(INCDIR)/% : $(SRCDIR)/glibc-$(GLIBC_VERSION)/intl/%
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo copying: $@ from $<
@@ -777,12 +797,22 @@ $(INCDIR)/% : $(SRCDIR)/glibc-$(GLIBC_VERSION)/resolv/%
 	@echo copying: $@ from $<
 	cp $< $@
 
+$(INCDIR)/% : $(SRCDIR)/glibc-$(GLIBC_VERSION)/resource/%
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo copying: $@ from $<
+	cp $< $@
+
 $(INCDIR)/% : $(SRCDIR)/glibc-$(GLIBC_VERSION)/setjmp/%
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo copying: $@ from $<
 	cp $< $@
 
 $(INCDIR)/% : $(SRCDIR)/glibc-$(GLIBC_VERSION)/signal/%
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo copying: $@ from $<
+	cp $< $@
+
+$(INCDIR)/% : $(SRCDIR)/glibc-$(GLIBC_VERSION)/socket/%
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo copying: $@ from $<
 	cp $< $@
@@ -813,6 +843,11 @@ $(INCDIR)/% : $(SRCDIR)/glibc-$(GLIBC_VERSION)/wctype/%
 	cp $< $@
 
 $(INCDIR)/% : $(SRCDIR)/glibc-$(GLIBC_VERSION)/%
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo copying: $@ from $<
+	cp $< $@
+
+$(INCDIR)/rpc/netdb.h : $(SRCDIR)/glibc-$(GLIBC_VERSION)/include/rpc/netdb.h
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo copying: $@ from $<
 	cp $< $@

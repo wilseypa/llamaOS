@@ -92,6 +92,8 @@ public:
    Grant_table grant_table;
    Xenstore xenstore;
 
+   const int domid;
+
 private:
    Hypervisor ();
    Hypervisor (const Hypervisor &);

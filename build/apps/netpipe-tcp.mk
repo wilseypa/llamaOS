@@ -31,59 +31,65 @@
 #
 
 # include common variables
-include common.mk
+# include common.mk
+# don;t include common.mk since this is not llamaOS
+# but try to make the build as similar as possible
+MAKEFLAGS = --silent
 
-MAKEFILE_SOURCES += Makefile
+# compiler tools
+CC = /opt/gcc-4.7.1/bin/gcc
+LD = /opt/gcc-4.7.1/bin/gcc
 
-INSTALL_DIR = /opt
-INSTALL_FOLDER = $(INSTALL_DIR)/llamaOS-1.0
+CFLAGS = \
+  -m64 -g -O1 \
+  -Wall \
+  -fno-common \
+  -std=gnu99 -fgnu89-inline
 
-.PHONY: all
-all:
-	@$(MAKE) -f glibc-$(GLIBC_VERSION).mk
-	@$(MAKE) -f gcc-$(GCC_VERSION).mk
-	@$(MAKE) -f xen-$(XEN_VERSION).mk
-	@$(MAKE) -f llamaOS.mk xen
-	@$(MAKE) -f gtest-$(GTEST_VERSION).mk
-	@$(MAKE) -f llamaOS-xen-test.mk xen
-	@$(MAKE) -f apps/hello.mk xen
-	@$(MAKE) -f apps/latency-llamaNET.mk
-	@$(MAKE) -f apps/latency-tcp.mk
-	@$(MAKE) -f apps/latency-tcpnb.mk
-	@$(MAKE) -f apps/netpipe-llamaNET.mk
-	@$(MAKE) -f apps/netpipe-tcp.mk
-	@$(MAKE) -f minimal/minimal.mk xen
-	@$(MAKE) -f minimal/minimal-glibc.mk xen
-	@$(MAKE) -f minimal/minimal-gcc.mk xen
-	@$(MAKE) -f net/i82574.mk xen
+LDFLAGS =
 
-.PHONY: install
-install:
-	@echo installing llamaOS into $(INSTALL_FOLDER) folder...
-	@[ -d $(INSTALL_FOLDER) ] || (mkdir -p $(INSTALL_FOLDER))
-	@cp -r bin $(INSTALL_FOLDER)/bin
-	@cp -r include $(INSTALL_FOLDER)/include
-	@cp -r include-fixed $(INSTALL_FOLDER)/include-fixed
-	@cp -r lib $(INSTALL_FOLDER)/lib
-	@cp -r ../script $(INSTALL_FOLDER)/script
-	@cp llamaOS-flags.mk $(INSTALL_FOLDER)/llamaOS-flags.mk
-	@cp llamaOS.lds $(INSTALL_FOLDER)/llamaOS.lds
-	@echo adjusting file attributes...
-	@chmod -R o+r $(INSTALL_FOLDER)
-	@echo install complete.
-	@echo 
+# shared common paths
+BINDIR = bin
+LIBDIR = lib
+OBJDIR = obj
+INCDIR = include
+INC2DIR = include-fixed
 
+SRCDIR = ../src
+VPATH = $(SRCDIR)
 
-.PHONY: clean
-clean:
-	@echo cleaning build folder...
-	@echo removing: $(OBJDIR)
-	@rm -rf $(OBJDIR)
-	@echo removing: $(BINDIR)
-	@rm -rf $(BINDIR)
-	@echo removing: $(LIBDIR)
-	@rm -rf $(LIBDIR)
-	@echo removing: $(INCDIR)
-	@rm -rf $(INCDIR)
-	@echo removing: include-fixed
-	@rm -rf include-fixed
+GLIBC_VERSION = 2.16.0
+GCC_VERSION = 4.7.1
+# XEN_VERSION = 4.1.2
+XEN_VERSION = 4.1.3
+# XEN_VERSION = unstable
+GTEST_VERSION = 1.6.0
+NETPIPE_VERSION = 3.7.1
+
+# auto dependency generation
+DEPENDS = 
+
+MAKEFILE_SOURCES += apps/netpipe-tcp.mk
+
+CFLAGS += \
+  -D TCP \
+  -include $(SRCDIR)/llamaos/__thread.h
+
+SOURCES = \
+  netpipe-$(NETPIPE_VERSION)/src/netpipe.c \
+  netpipe-$(NETPIPE_VERSION)/src/tcp.c
+
+OBJECTS = $(SOURCES:%.c=$(OBJDIR)/%.o)
+DEPENDS = $(OBJECTS:%.o=%.d)
+
+$(BINDIR)/native/netpipe-tcp: $(OBJECTS)
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo linking: $@
+	@$(LD) $(LDFLAGS) -o $@ $^
+	@echo successfully built: $@
+	@echo
+
+include rules.mk
+
+# include auto-generated dependencies
+-include $(DEPENDS)

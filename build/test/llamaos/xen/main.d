@@ -23,8 +23,8 @@ obj/../test/llamaos/xen/main.o obj/../test/llamaos/xen/main.d: \
  include/llamaos/xen/Hypercall.h include/xen/xen.h \
  include/xen/xen-compat.h include/xen/arch-x86/xen.h \
  include/xen/arch-x86/../xen.h include/xen/arch-x86/xen-x86_64.h \
- include/xen/event_channel.h include/xen/xen.h include/xen/version.h \
- include/xen/features.h
+ include/xen/event_channel.h include/xen/xen.h include/xen/grant_table.h \
+ include/xen/version.h include/xen/features.h
 
 ../src/llamaos/__thread.h:
 
@@ -125,6 +125,8 @@ include/xen/arch-x86/xen-x86_64.h:
 include/xen/event_channel.h:
 
 include/xen/xen.h:
+
+include/xen/grant_table.h:
 
 include/xen/version.h:
 

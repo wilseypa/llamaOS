@@ -31,8 +31,87 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #ifndef llamaos_net_llamanet_h_
 #define llamaos_net_llamanet_h_
 
+#include <cstdint>
+#include <vector>
+
+#include <llamaos/xen/Grant_map.h>
+
 namespace llamaos {
 namespace net {
+
+class llamaNET
+{
+public:
+#pragma pack(1)
+   class Protocol_header
+   {
+   public:
+      uint8_t eth_dest [6];
+      uint8_t eth_src [6];
+      uint16_t eth_type;
+      uint32_t dest;
+      uint32_t src;
+      uint16_t type;
+      uint32_t seq;
+      uint32_t ack;
+      uint32_t len;
+
+   };
+#pragma pack()
+
+   static const unsigned int HEADER_LENGTH;
+
+   class State
+   {
+   public:
+      volatile bool online;
+
+      volatile unsigned int rx_head;
+      volatile unsigned int rx_tail;
+
+      volatile unsigned int tx_head;
+      volatile unsigned int tx_tail;
+
+   };
+
+   class Control
+   {
+   public:
+      State driver;
+      State app [6];
+
+      volatile unsigned int rx_buffer_size;
+      volatile grant_ref_t rx_refs [128];
+
+      volatile unsigned int tx_buffer_size;
+      volatile grant_ref_t tx_refs [128];
+
+   };
+
+   llamaNET (int domd_id, int index);
+   virtual ~llamaNET ();
+
+   bool recv_poll ();
+   Protocol_header *recv ();
+   void release_recv_buffer ();
+
+   Protocol_header *get_send_buffer ();
+   void send ();
+
+   const int domd_id;
+   const int index;
+
+private:
+   llamaNET ();
+   llamaNET (const llamaNET &);
+   llamaNET &operator= (const llamaNET &);
+
+   xen::Grant_map<Control> control;
+   std::vector<xen::Grant_map<Protocol_header> *> rx_buffers;
+   std::vector<xen::Grant_map<Protocol_header> *> tx_buffers;
+
+};
+
 namespace llamanet {
 
 #pragma pack(1)

@@ -31,19 +31,66 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #ifndef llamaos_xen_grant_map_h_
 #define llamaos_xen_grant_map_h_
 
+#include <xen/grant_table.h>
+#include <xen/xen.h>
+
+#include <llamaos/memory/Memory.h>
+#include <llamaos/xen/Hypercall.h>
+
 namespace llamaos {
 namespace xen {
 
+template <typename T>
 class Grant_map
 {
 public:
-   Grant_map ();
-   virtual ~Grant_map ();
+   Grant_map (domid_t domid, grant_ref_t ref, bool readonly = false)
+      :  address(memory::get_reserved_virtual_address (1)),
+         handle(0)
+   {
+      gnttab_map_grant_ref_t map_grant_ref;
 
+      map_grant_ref.dom = domid;
+      map_grant_ref.ref = ref;
+      map_grant_ref.host_addr = address;
+
+      map_grant_ref.flags = (readonly) ? GNTMAP_host_map | GNTMAP_readonly
+                                       : GNTMAP_host_map;
+
+      Hypercall::grant_table_map_grant_ref (map_grant_ref);
+
+      if (map_grant_ref.status == GNTST_okay)
+      {
+         handle = map_grant_ref.handle;
+      }
+   }
+
+   virtual ~Grant_map ()
+   {
+      gnttab_unmap_grant_ref unmap_grant_ref;
+
+      unmap_grant_ref.host_addr = address;
+      unmap_grant_ref.handle = handle;
+
+      Hypercall::grant_table_unmap_grant_ref (unmap_grant_ref);
+   }
+
+   const uint64_t address;
+
+   // dereference operator when pointer
+   T *get_pointer () { return memory::address_to_pointer<T>(address); }
+
+   // dereference operator when pointer
+   T *operator-> () { return memory::address_to_pointer<T>(address); }
+
+   // index operator when array
+   T &operator[] (int index) { return memory::address_to_pointer<T>(address) [index]; }
 
 private:
    Grant_map (const Grant_map &);
    Grant_map &operator= (const Grant_map &);
+
+   grant_handle_t handle;
 
 };
 
