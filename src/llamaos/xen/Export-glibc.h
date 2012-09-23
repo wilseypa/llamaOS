@@ -85,6 +85,10 @@ EXTERN void register_llamaos_get_phys_pages (llamaos_get_phys_pages_t get_phys_p
 typedef char *(*llamaos_getcwd_t) (char *, size_t);
 EXTERN void register_llamaos_getcwd (llamaos_getcwd_t getcwd);
 
+// int getpid (void)
+typedef int (*llamaos_getpid_t) (void);
+EXTERN void register_llamaos_getpid (llamaos_getpid_t getpid);
+
 // int __gettimeofday (struct timeval *tv, struct timezone *tz)
 typedef int (*llamaos_gettimeofday_t) (struct timeval *, struct timezone *);
 EXTERN void register_llamaos_gettimeofday (llamaos_gettimeofday_t func);

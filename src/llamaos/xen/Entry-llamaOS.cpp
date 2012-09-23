@@ -89,6 +89,11 @@ static inline uint64_t tsc_to_ns (const vcpu_time_info_t *time_info, uint64_t ts
    return time_ns;
 }
 
+static int glibc_getpid ()
+{
+   return Hypervisor::get_instance ()->domid;
+}
+
 static int glibc_gettimeofday (struct timeval *tv, struct timezone *tz)
 {
    uint32_t wc_version = 0;
@@ -158,6 +163,7 @@ static ssize_t glibc_libc_write (int fd, const void *buf, size_t nbytes)
 static void register_glibc_exports (void)
 {
    register_llamaos_brk (glibc_brk);
+   register_llamaos_getpid (glibc_getpid);
    register_llamaos_gettimeofday (glibc_gettimeofday);
    register_llamaos_write (glibc_libc_write);
 }
@@ -174,7 +180,6 @@ static vector<string> split (const string &input)
 
    while (first != last)
    {
-      cout << "cl char: " << *first << ", " << dec << (int)*first << endl;
 // !BAM isspace is NOT working. FUCK.
 //      if (isspace (*first))
       if (*first == ' ')

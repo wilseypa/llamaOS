@@ -151,6 +151,12 @@ static char *glibc_getcwd (char *buf, size_t size)
    return 0;
 }
 
+static int glibc_getpid (void)
+{
+   trace("!!! ALERT: glibc calling getpid() before system support is enabled.\n");
+   return -1;
+}
+
 static int glibc_gettimeofday (struct timeval *tv, struct timezone *tz)
 {
    trace("!!! ALERT: glibc calling gettimeofday() before support is enabled.\n");
@@ -274,6 +280,7 @@ static void register_glibc_exports (void)
    register_llamaos_getpagesize (glibc_getpagesize);
    register_llamaos_get_phys_pages (glibc_get_phys_pages);
    register_llamaos_getcwd (glibc_getcwd);
+   register_llamaos_getpid (glibc_getpid);
    register_llamaos_gettimeofday (glibc_gettimeofday);
    register_llamaos_isatty (glibc_isatty);
    register_llamaos_libc_fatal (glibc_libc_fatal);
