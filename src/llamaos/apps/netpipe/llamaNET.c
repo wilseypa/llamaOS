@@ -36,18 +36,18 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 void Init(ArgStruct *p, int* pargc, char*** pargv)
 {
-   p->reset_conn = 0; /* Default to not resetting connection */
-   p->tr = 0;     /* The transmitter will be set using the -h host flag. */
-   p->rcv = 1;
-
-// !BAM
-// support this?
-//   p->prot.sndbufsz = p->prot.rcvbufsz = 0;
 }
 
 void Setup(ArgStruct *p)
 {
-   llamaNET_setup (0);
+   if (p->tr)
+   {
+      llamaNET_setup (1);
+   }
+   else
+   {
+      llamaNET_setup (7);
+   }
 }
 
 void Sync(ArgStruct *p)
@@ -57,7 +57,6 @@ void Sync(ArgStruct *p)
 
 void PrepareToReceive(ArgStruct *p)
 {
-   
 }
 
 void SendData(ArgStruct *p)
@@ -104,10 +103,8 @@ void CleanUp(ArgStruct *p)
 
 void Reset(ArgStruct *p)
 {
-
 }
 
 void AfterAlignmentInit(ArgStruct *p)
 {
-
 }

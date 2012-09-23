@@ -55,7 +55,6 @@ using namespace llamaos::api;
 using namespace llamaos::api::pci;
 using namespace llamaos::memory;
 using namespace llamaos::net::i82574;
-using namespace llamaos::net::llamanet;
 
 struct __attribute__ ((__packed__)) rx_desc_t
 {
@@ -341,50 +340,33 @@ int main (int /* argc */, char ** /* argv [] */)
    uint16_t rx_tail = 8;
    csr.write_RDT (rx_tail);
 
-   // create memory for the interface page
-   llamaNET_interface *llamaNET = static_cast<llamaNET_interface *>(memalign (PAGE_SIZE, PAGE_SIZE));
+   // create memory for the control page
+   net::llamaNET::Control *llamaNET = static_cast<net::llamaNET::Control *>(memalign (PAGE_SIZE, PAGE_SIZE));
    memset(llamaNET, 0, PAGE_SIZE);
 
    // allow access to the interface
-   domid_t self_id = Hypervisor::get_instance ()->xenstore.read<domid_t>("domid");
+   domid_t self_id = Hypervisor::get_instance ()->domid;
    cout << "self_id: " << self_id << endl;
    grant_ref_t llamaNET_ref = Hypervisor::get_instance ()->grant_table.grant_access (self_id+1, llamaNET);
    cout << "llamaNET_ref: " << dec << llamaNET_ref << endl;
 
-   llamaNET->app [0].rx_head = 0;
-   llamaNET->app [0].rx_tail = 0;
-   llamaNET->app [0].tx_head = 0;
-   llamaNET->app [0].tx_tail = 0;
+   llamaNET->rx_buffer_size = 8;
+   llamaNET->tx_buffer_size = 8;
 
    // allow tx_buffer guest access
-//   unsigned char *app_tx_buffer[8];
-
-//   for (int i = 0; i < 8; i++)
-//   {
-//      app_tx_buffer [i] = static_cast<unsigned char *>(memalign (PAGE_SIZE, PAGE_SIZE));
-//      cout << "mapping app_tx_buffer [" << dec << i << "]: " << dec << Hypervisor::get_instance ()->grant_table.grant_access (self_id+1, app_tx_buffer [i]) << endl;
-//   }
-   for (int i = 0; i < 8; i++)
+   for (unsigned int i = 0; i < llamaNET->rx_buffer_size; i++)
    {
-      cout << "mapping tx_buffers [" << dec << i << "]: " << dec << Hypervisor::get_instance ()->grant_table.grant_access (self_id+1, tx_buffers [i].pointer) << endl;
+      llamaNET->tx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+1, tx_buffers [i].pointer);
    }
 
    // allow rx_buffer guest access
-//   unsigned char *app_rx_buffer[8];
-
-//   for (int i = 0; i < 8; i++)
-//   {
-//      app_rx_buffer [i] = static_cast<unsigned char *>(memalign (PAGE_SIZE, PAGE_SIZE));
-//      cout << "mapping app_rx_buffer [" << dec << i << "]: " << dec << Hypervisor::get_instance ()->grant_table.grant_access (self_id+1, app_rx_buffer [i]) << endl;
-//   }
-   for (int i = 0; i < 8; i++)
+   for (unsigned int i = 0; i < llamaNET->rx_buffer_size; i++)
    {
-      cout << "mapping rx_buffers [" << dec << i << "]: " << dec << Hypervisor::get_instance ()->grant_table.grant_access (self_id+1, rx_buffers [i].pointer) << endl;
+      llamaNET->rx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+1, rx_buffers [i].pointer);
    }
 
    llamaNET->driver.online = true;
 
-   cout << "sizeof(HEADER_LENGTH): " << HEADER_LENGTH << endl;
    cout << "starting forever loop..." << endl;
 
 #if 0
@@ -438,22 +420,10 @@ int main (int /* argc */, char ** /* argv [] */)
          buffer_entry rx_buffer = rx_hw.front();
          rx_hw.pop ();
 
-//         if (   (rx_buffer.pointer [12] == 0x09)
-//             && (rx_buffer.pointer [13] == 0x0C))
-//         {
-            // this is a llamaNET packet
-            // for now just forward it into the hard coded guest self+1
-//            Protocol_header *header = reinterpret_cast<Protocol_header *>(&rx_buffer.pointer [14]);
-
-//            memcpy (app_rx_buffer [llamaNET->app [0].rx_head], header, HEADER_LENGTH + header->len);
-
-   // ensure write is processed
-//   wmb();
-            unsigned int head = llamaNET->app [0].rx_head;
-            head++;
-            head %= 8;
-            llamaNET->app [0].rx_head = head;
-//         }
+         unsigned int head = llamaNET->app [0].rx_head;
+         head++;
+         head %= 8;
+         llamaNET->app [0].rx_head = head;
 
          rx_head++;
          rx_head %= 8;
@@ -475,67 +445,10 @@ int main (int /* argc */, char ** /* argv [] */)
          tx_sw.pop ();
          tx_hw.push(tx_buffer);
 
-//         Protocol_header *header = reinterpret_cast<Protocol_header *>(app_tx_buffer [llamaNET->app [0].tx_tail]);
-         Protocol_header *header = reinterpret_cast<Protocol_header *>(tx_buffers [llamaNET->app [0].tx_tail].pointer + 14);
-   // ensure write is processed
-//   rmb();
-
-         // leave driver is app is done
-         if (header->type == 0xDEAD)
-         {
-            break;
-         }
-
-#if 0
-// moved into the application
-// !BAM get these in a config soon
-// dalai node 0 mac 00-1b-21-d5-66-ef
-// redpj node 1 mac 68-05-ca-01-f7-db
-         if (header->dest == 1)
-         {
-            // redpj
-            tx_buffer.pointer [0] = 0x00;
-            tx_buffer.pointer [1] = 0x1b;
-            tx_buffer.pointer [2] = 0x21;
-            tx_buffer.pointer [3] = 0xd5;
-            tx_buffer.pointer [4] = 0x66;
-            tx_buffer.pointer [5] = 0xef;
-            tx_buffer.pointer [6] = 0x68;
-            tx_buffer.pointer [7] = 0x05;
-            tx_buffer.pointer [8] = 0xca;
-            tx_buffer.pointer [9] = 0x01;
-            tx_buffer.pointer [10] = 0xf7;
-            tx_buffer.pointer [11] = 0xdb;
-         }
-         else
-         {
-            // dalai
-            tx_buffer.pointer [0] = 0x68;
-            tx_buffer.pointer [1] = 0x05;
-            tx_buffer.pointer [2] = 0xca;
-            tx_buffer.pointer [3] = 0x01;
-            tx_buffer.pointer [4] = 0xf7;
-            tx_buffer.pointer [5] = 0xdb;
-            tx_buffer.pointer [6] = 0x00;
-            tx_buffer.pointer [7] = 0x1b;
-            tx_buffer.pointer [8] = 0x21;
-            tx_buffer.pointer [9] = 0xd5;
-            tx_buffer.pointer [10] = 0x66;
-            tx_buffer.pointer [11] = 0xef;
-         }
-
-         tx_buffer.pointer [12] = 0x09;
-         tx_buffer.pointer [13] = 0x0c;
-#endif
-//         memcpy (&tx_buffer.pointer [14], (void *)header, HEADER_LENGTH + header->len);
-
          unsigned int tail = llamaNET->app [0].tx_tail;
-         tail++;
-         tail %= 8;
-         llamaNET->app [0].tx_tail = tail;
 
          tx_desc [tx_tail].buffer = tx_buffer.address;
-         tx_desc [tx_tail].length = 14 + HEADER_LENGTH + header->len;
+         tx_desc [tx_tail].length = llamaNET->app [0].tx_length [tail];
          tx_desc [tx_tail].CSO = 0;
          tx_desc [tx_tail].CMD = 0x0B;
          tx_desc [tx_tail].STA = 0;
@@ -545,6 +458,10 @@ int main (int /* argc */, char ** /* argv [] */)
          tx_tail++;
          tx_tail %= 8;
          csr.write_TDT (tx_tail);
+
+         tail++;
+         tail %= 8;
+         llamaNET->app [0].tx_tail = tail;
       }
       else
       {
@@ -555,6 +472,12 @@ int main (int /* argc */, char ** /* argv [] */)
             tx_hw.pop();
             tx_head++;
             tx_head %= 8;
+         }
+
+         if (llamaNET->close_driver)
+         {
+            // leave driver, app is done
+            break;
          }
       }
    }

@@ -62,14 +62,7 @@ llamaNET::llamaNET (int domd_id, int index)
 
 llamaNET::~llamaNET ()
 {
-   Protocol_header *header = reinterpret_cast<Protocol_header *>(get_send_buffer ());
-   header->src = 0;
-   header->dest = 0;
-   header->type = 0xDEAD;
-   header->seq = 0;
-   header->len = 0;
-
-   send ();
+   control->close_driver = 1;
 
    // pause to make sure driver gets this message
    api::sleep (2);
@@ -176,10 +169,12 @@ void llamaNET::send ()
 
    header->eth_type = 0x0C09;
 
+   unsigned int head = control->app [0].tx_head;
+   control->app [0].tx_length [head] = HEADER_LENGTH + header->len;
+
    // ensure write is processed
    wmb();
 
-   unsigned int head = control->app [0].tx_head;
    head++;
    head %= control->tx_buffer_size;
    control->app [0].tx_head = head;
