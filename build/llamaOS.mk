@@ -87,6 +87,7 @@ HEADERS = \
   $(INCDIR)/llamaos/net/llamaNET.h \
   $(INCDIR)/llamaos/xen/Console.h \
   $(INCDIR)/llamaos/xen/Events.h \
+  $(INCDIR)/llamaos/xen/Grant_map.h \
   $(INCDIR)/llamaos/xen/Grant_table.h \
   $(INCDIR)/llamaos/xen/Hypercall.h \
   $(INCDIR)/llamaos/xen/Hypervisor.h \

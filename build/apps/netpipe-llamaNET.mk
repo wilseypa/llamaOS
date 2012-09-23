@@ -40,7 +40,7 @@ NETPIPE_VERSION = 3.7.1
 CFLAGS += \
   -D LLAMANET \
   -I $(INCDIR) \
-  -I $(SRCDIR) \
+  -I $(SRCDIR)/llamaos/apps/netpipe \
   -I $(SRCDIR)/netpipe-$(NETPIPE_VERSION)/src \
   -D__XEN_INTERFACE_VERSION__=0x00030205 \
   -include $(SRCDIR)/llamaos/__thread.h
@@ -48,7 +48,7 @@ CFLAGS += \
 CPPFLAGS += \
   -D LLAMANET \
   -I $(INCDIR) \
-  -I $(SRCDIR) \
+  -I $(SRCDIR)/llamaos/apps/netpipe \
   -D__XEN_INTERFACE_VERSION__=0x00030205 \
   -include $(SRCDIR)/llamaos/__thread.h
 

@@ -28,86 +28,25 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <stdio.h>
+#ifndef netpipe_llamanet_impl_h_
+#define netpipe_llamanet_impl_h_
 
-#include <netpipe.h>
+#ifdef cplusplus
+extern "C" {
+#endif
 
-#include <llamaNET_impl.h>
+void llamaNET_setup (int node);
+void llamaNET_sync (void);
+void llamaNET_send_data (const char *data, unsigned int length);
+void llamaNET_recv_data (char *data, unsigned int length);
+void llamaNET_send_time (double t);
+double llamaNET_recv_time (void);
+void llamaNET_send_repeat (int rpt);
+int llamaNET_recv_repeat (void);
+void llamaNET_cleanup (int client);
 
-void Init(ArgStruct *p, int* pargc, char*** pargv)
-{
-   p->reset_conn = 0; /* Default to not resetting connection */
-   p->tr = 0;     /* The transmitter will be set using the -h host flag. */
-   p->rcv = 1;
-
-// !BAM
-// support this?
-//   p->prot.sndbufsz = p->prot.rcvbufsz = 0;
+#ifdef cplusplus
 }
+#endif
 
-void Setup(ArgStruct *p)
-{
-   llamaNET_setup (0);
-}
-
-void Sync(ArgStruct *p)
-{
-   llamaNET_sync ();
-}
-
-void PrepareToReceive(ArgStruct *p)
-{
-   
-}
-
-void SendData(ArgStruct *p)
-{
-   llamaNET_send_data (p->s_ptr, p->bufflen);
-}
-
-void RecvData(ArgStruct *p)
-{
-  llamaNET_recv_data (p->s_ptr, p->bufflen);
-}
-
-void SendTime(ArgStruct *p, double *t)
-{
-   llamaNET_send_time (*t);
-}
-
-void RecvTime(ArgStruct *p, double *t)
-{
-   *t = llamaNET_recv_time ();
-}
-
-void SendRepeat(ArgStruct *p, int rpt)
-{
-   llamaNET_send_repeat (rpt);
-}
-
-void RecvRepeat(ArgStruct *p, int *rpt)
-{
-   *rpt = llamaNET_recv_repeat ();
-}
-
-void CleanUp(ArgStruct *p)
-{
-   if (p->tr)
-   {
-      llamaNET_cleanup (1);
-   }
-   else if( p->rcv )
-   {
-      llamaNET_cleanup (0);
-   }
-}
-
-void Reset(ArgStruct *p)
-{
-
-}
-
-void AfterAlignmentInit(ArgStruct *p)
-{
-
-}
+#endif
