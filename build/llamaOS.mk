@@ -93,7 +93,8 @@ HEADERS = \
   $(INCDIR)/llamaos/xen/Hypervisor.h \
   $(INCDIR)/llamaos/xen/Traps.h \
   $(INCDIR)/llamaos/xen/Xenstore.h \
-  $(INCDIR)/llamaos/__thread.h
+  $(INCDIR)/llamaos/__thread.h \
+  $(INCDIR)/llamaos/Trace.h
 endif
 
 

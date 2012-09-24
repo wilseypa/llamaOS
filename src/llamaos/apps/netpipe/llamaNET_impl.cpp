@@ -48,55 +48,91 @@ static domid_t get_domd_id (int node)
    // for now it's just self minus node % 6
    domid_t self_id = Hypervisor::get_instance ()->xenstore.read<domid_t>("domid");
 
-   return (self_id - (node % 6));
+   return (self_id - 1 - (node % 6));
 }
 
 extern "C"
 void llamaNET_setup (int _node)
 {
+   cout << "calling llamaNET_setup " << _node << endl;
    node = _node;
    interface = new llamaNET (get_domd_id (_node), (node % 6));
+   cout << "calling llamaNET_setup " << _node << endl;
 }
 
 extern "C"
-void llamaNET_sync ()
+void llamaNET_sync (int client)
 {
+//   cout << "calling llamaNET_sync..." << endl;
+
    const char *sync_string = "SyncMe";
 
    llamaNET::Protocol_header *header;
    char *data;
 
-   header = interface->get_send_buffer ();
-   header->dest = (node > 6) ? (node - 6) : (node + 6);
-   header->src = node;
-   header->type = 1;
-   header->seq = seq++;
-   header->len = strlen(sync_string);
-
-   // get pointer to data section of buffer
-   data = reinterpret_cast<char *>(header + 1);
-   strcpy (data, sync_string);
-
-   // send/recv and verify the data has been changed
-   interface->send ();
-
-   for (;;)
+   if (client)
    {
-      header = interface->recv ();
+//      cout << "syncing client..." << endl;
+      header = interface->get_send_buffer ();
+      header->dest = (node >= 6) ? (node - 6) : (node + 6);
+      header->src = node;
+      header->type = 1;
+      header->seq = seq++;
+      header->len = strlen(sync_string);
 
-      if (header->dest == node)
+      // get pointer to data section of buffer
+      data = reinterpret_cast<char *>(header + 1);
+      strcpy (data, sync_string);
+
+      // send/recv and verify the data has been changed
+      interface->send ();
+
+      for (;;)
       {
+         header = interface->recv (node);
+
          // get pointer to data section of buffer
          data = reinterpret_cast<char *>(header + 1);
 
-         if (0 == strcmp (data, sync_string))
+         if (0 == strncmp (data, sync_string, strlen(sync_string)))
          {
             interface->release_recv_buffer ();
             break;
          }
+         cout << "found wrong data in sync..." << endl;
+      }
+   }
+   else
+   {
+//      cout << "syncing server..." << endl;
+      for (;;)
+      {
+         header = interface->recv (node);
+
+         // get pointer to data section of buffer
+         data = reinterpret_cast<char *>(header + 1);
+
+         if (0 == strncmp (data, sync_string, strlen(sync_string)))
+         {
+            interface->release_recv_buffer ();
+            break;
+         }
+         cout << "found wrong data in sync..." << endl;
       }
 
-      interface->release_recv_buffer ();
+      header = interface->get_send_buffer ();
+      header->dest = (node >= 6) ? (node - 6) : (node + 6);
+      header->src = node;
+      header->type = 1;
+      header->seq = seq++;
+      header->len = strlen(sync_string);
+
+      // get pointer to data section of buffer
+      data = reinterpret_cast<char *>(header + 1);
+      strcpy (data, sync_string);
+
+      // send/recv and verify the data has been changed
+      interface->send ();
    }
 }
 
@@ -109,7 +145,7 @@ void llamaNET_send_data (const char *_data, unsigned int length)
       char *data;
 
       header = interface->get_send_buffer ();
-      header->dest = (node > 6) ? (node - 6) : (node + 6);
+      header->dest = (node >= 6) ? (node - 6) : (node + 6);
       header->src = node;
       header->type = 1;
       header->seq = seq++;
@@ -134,30 +170,22 @@ void llamaNET_recv_data (char *_data, unsigned int length)
       llamaNET::Protocol_header *header;
       char *data;
 
-      for (;;)
-      {
-         header = interface->recv ();
+      header = interface->recv (node);
 
-         if (header->dest == node)
-         {
-            // get pointer to data section of buffer
-            data = reinterpret_cast<char *>(header + 1);
+      // get pointer to data section of buffer
+      data = reinterpret_cast<char *>(header + 1);
 
-            // !BAM can I loose this?
-            memcpy (_data, data, length);
+      // !BAM can I loose this?
+      memcpy (_data, data, length);
 
-            interface->release_recv_buffer ();
-            break;
-         }
-
-         interface->release_recv_buffer ();
-      }
+      interface->release_recv_buffer ();
    }
 }
 
 extern "C"
 void llamaNET_send_time (double t)
 {
+//   cout << "calling llamaNET_send_time..." << endl;
    /*
       Multiply the number of seconds by 1e8 to get time in 0.01 microseconds
       and convert value to an unsigned 32-bit integer.
@@ -165,7 +193,7 @@ void llamaNET_send_time (double t)
 
    llamaNET::Protocol_header *header;
    header = interface->get_send_buffer ();
-   header->dest = (node > 6) ? (node - 6) : (node + 6);
+   header->dest = (node >= 6) ? (node - 6) : (node + 6);
    header->src = node;
    header->type = 1;
    header->seq = seq++;
@@ -183,35 +211,31 @@ void llamaNET_send_time (double t)
 extern "C"
 double llamaNET_recv_time ()
 {
+//   cout << "calling llamaNET_recv_time..." << endl;
+
    llamaNET::Protocol_header *header;
 
-   for (;;)
-   {
-      header = interface->recv ();
+   header = interface->recv (node);
 
-      if (header->dest == node)
-      {
-         // get pointer to data section of buffer
-         uint32_t *data = reinterpret_cast<uint32_t *>(header + 1);
+   // get pointer to data section of buffer
+   uint32_t *data = reinterpret_cast<uint32_t *>(header + 1);
 
-         /* Result is ltime (in microseconds) divided by 1.0e8 to get seconds */
-         double t = *data / 1.0e8;
+   /* Result is ltime (in microseconds) divided by 1.0e8 to get seconds */
+   double t = *data / 1.0e8;
 
-         interface->release_recv_buffer ();
+   interface->release_recv_buffer ();
 
-         return t;
-      }
-
-      interface->release_recv_buffer ();
-   }
+   return t;
 }
 
 extern "C"
 void llamaNET_send_repeat (int rpt)
 {
+//   cout << "calling llamaNET_send_repeat..." << endl;
+
    llamaNET::Protocol_header *header;
    header = interface->get_send_buffer ();
-   header->dest = (node > 6) ? (node - 6) : (node + 6);
+   header->dest = (node >= 6) ? (node - 6) : (node + 6);
    header->src = node;
    header->type = 1;
    header->seq = seq++;
@@ -229,26 +253,20 @@ void llamaNET_send_repeat (int rpt)
 extern "C"
 int llamaNET_recv_repeat (void)
 {
+//   cout << "calling llamaNET_recv_repeat..." << endl;
+
    llamaNET::Protocol_header *header;
 
-   for (;;)
-   {
-      header = interface->recv ();
+   header = interface->recv (node);
 
-      if (header->dest == node)
-      {
-         // get pointer to data section of buffer
-         uint32_t *data = reinterpret_cast<uint32_t *>(header + 1);
+   // get pointer to data section of buffer
+   uint32_t *data = reinterpret_cast<uint32_t *>(header + 1);
 
-         int rpt = static_cast<int>(*data);
+   int rpt = static_cast<int>(*data);
 
-         interface->release_recv_buffer ();
+   interface->release_recv_buffer ();
 
-         return rpt;
-      }
-
-      interface->release_recv_buffer ();
-   }
+   return rpt;
 }
 
 extern "C"
@@ -259,10 +277,12 @@ void llamaNET_cleanup (int client)
    llamaNET::Protocol_header *header;
    char *data;
 
+   cout << "calling llamaNET_cleanup..." << endl;
+
    if (client)
    {
       header = interface->get_send_buffer ();
-      header->dest = (node > 6) ? (node - 6) : (node + 6);
+      header->dest = (node >= 6) ? (node - 6) : (node + 6);
       header->src = node;
       header->type = 1;
       header->seq = seq++;
@@ -277,48 +297,38 @@ void llamaNET_cleanup (int client)
 
       for (;;)
       {
-         header = interface->recv ();
+         header = interface->recv (node);
 
-         if (header->dest == node)
+         // get pointer to data section of buffer
+         data = reinterpret_cast<char *>(header + 1);
+
+         if (0 == strncmp (data, quit, strlen(quit)))
          {
-            // get pointer to data section of buffer
-            data = reinterpret_cast<char *>(header + 1);
-
-            if (0 == strcmp (data, quit))
-            {
-               cout << "QUIT RECVED!!!!" << endl;
-               interface->release_recv_buffer ();
-               break;
-            }
+            cout << "QUIT RECVED!!!!" << endl;
+            interface->release_recv_buffer ();
+            break;
          }
-
-         interface->release_recv_buffer ();
       }
    }
    else
    {
       for (;;)
       {
-         header = interface->recv ();
+         header = interface->recv (node);
 
-         if (header->dest == node)
+         // get pointer to data section of buffer
+         data = reinterpret_cast<char *>(header + 1);
+
+         if (0 == strcmp (data, quit))
          {
-            // get pointer to data section of buffer
-            data = reinterpret_cast<char *>(header + 1);
-
-            if (0 == strcmp (data, quit))
-            {
-               cout << "QUIT RECVED!!!!" << endl;
-               interface->release_recv_buffer ();
-               break;
-            }
+            cout << "QUIT RECVED!!!!" << endl;
+            interface->release_recv_buffer ();
+            break;
          }
-
-         interface->release_recv_buffer ();
       }
 
       header = interface->get_send_buffer ();
-      header->dest = (node > 6) ? (node - 6) : (node + 6);
+      header->dest = (node >= 6) ? (node - 6) : (node + 6);
       header->src = node;
       header->type = 1;
       header->seq = seq++;

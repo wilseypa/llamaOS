@@ -36,7 +36,7 @@ extern "C" {
 #endif
 
 void llamaNET_setup (int node);
-void llamaNET_sync (void);
+void llamaNET_sync (int client);
 void llamaNET_send_data (const char *data, unsigned int length);
 void llamaNET_recv_data (char *data, unsigned int length);
 void llamaNET_send_time (double t);

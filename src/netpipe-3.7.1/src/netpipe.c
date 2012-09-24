@@ -438,15 +438,17 @@ int main(int argc, char **argv)
 
 #endif
 
-   if( args.tr )                     /* Primary transmitter */
-   {
-       if ((out = fopen(s, "w")) == NULL)
-       {
-           fprintf(stderr,"Can't open %s for output\n", s);
-           exit(1);
-       }
-   }
-   else out = stdout;
+// !BAM
+//   if( args.tr )                     /* Primary transmitter */
+//   {
+//       if ((out = fopen(s, "w")) == NULL)
+//       {
+//           fprintf(stderr,"Can't open %s for output\n", s);
+//           exit(1);
+//       }
+//   }
+//   else out = stdout;
+     out = stdout;
 
       /* Set a starting value for the message size increment. */
 
@@ -888,8 +890,11 @@ int main(int argc, char **argv)
                   fprintf(out,"%8d %d", bwdata[n].bits / 8, nrepeat);
 
                 } else {
-                  fprintf(out,"%8d %lf %12.8lf",
-                        bwdata[n].bits / 8, bwdata[n].bps, bwdata[n].t);
+// !BAM
+//                  fprintf(out,"%8d %lf %12.8lf",
+//                        bwdata[n].bits / 8, bwdata[n].bps, bwdata[n].t);
+                  fprintf(out,"%8d %8ld %8ld",
+                        bwdata[n].bits / 8, (long)bwdata[n].bps, (long)(bwdata[n].t*1.0e6));
 
                 }
                 fprintf(out, "\n");
@@ -923,7 +928,8 @@ int main(int argc, char **argv)
    if (!args.cache) {
         FreeBuff(args.s_buff_orig, args.r_buff_orig);
    }
-    if (args.tr) fclose(out);
+// !BAM
+//    if (args.tr) fclose(out);
          
     CleanUp(&args);
     return 0;

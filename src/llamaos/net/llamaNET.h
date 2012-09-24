@@ -71,7 +71,7 @@ public:
 
       volatile unsigned int tx_head;
       volatile unsigned int tx_tail;
-      volatile unsigned int tx_length [128];
+      volatile unsigned int tx_length [64];
 
    };
 
@@ -82,10 +82,10 @@ public:
       State app [6];
 
       volatile unsigned int rx_buffer_size;
-      volatile grant_ref_t rx_refs [128];
+      volatile grant_ref_t rx_refs [64];
 
       volatile unsigned int tx_buffer_size;
-      volatile grant_ref_t tx_refs [128];
+      volatile grant_ref_t tx_refs [64];
 
       volatile unsigned int close_driver;
 
@@ -96,6 +96,7 @@ public:
 
    bool recv_poll ();
    Protocol_header *recv ();
+   Protocol_header *recv (uint32_t node);
    void release_recv_buffer ();
 
    Protocol_header *get_send_buffer ();
@@ -114,49 +115,6 @@ private:
    std::vector<xen::Grant_map<Protocol_header> *> tx_buffers;
 
 };
-
-#if 0
-namespace llamanet {
-
-#pragma pack(1)
-class Protocol_header
-{
-public:
-   uint32_t src;
-   uint32_t dest;
-   uint32_t type;
-   uint32_t seq;
-   uint32_t ack;
-   uint32_t len;
-
-};
-#pragma pack()
-
-const unsigned int HEADER_LENGTH = sizeof(Protocol_header);
-
-class State
-{
-public:
-   volatile bool online;
-
-   volatile unsigned int rx_head;
-   volatile unsigned int rx_tail;
-   volatile unsigned int tx_head;
-   volatile unsigned int tx_tail;
-
-};
-
-class llamaNET_interface
-{
-public:
-   State driver;
-   State app [6];
-
-};
-
-}
-#endif
-
 
 } }
 

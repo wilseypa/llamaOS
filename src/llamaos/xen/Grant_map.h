@@ -36,6 +36,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 #include <llamaos/memory/Memory.h>
 #include <llamaos/xen/Hypercall.h>
+#include <llamaos/Trace.h>
 
 namespace llamaos {
 namespace xen {
@@ -63,6 +64,10 @@ public:
       {
          handle = map_grant_ref.handle;
       }
+      else
+      {
+         trace ("error mapping %d, %d\n", domid, ref);
+      }
    }
 
    virtual ~Grant_map ()
@@ -78,13 +83,13 @@ public:
    const uint64_t address;
 
    // dereference operator when pointer
-   T *get_pointer () { return memory::address_to_pointer<T>(address); }
+   T *get_pointer () const { return memory::address_to_pointer<T>(address); }
 
    // dereference operator when pointer
-   T *operator-> () { return memory::address_to_pointer<T>(address); }
+   T *operator-> () const { return memory::address_to_pointer<T>(address); }
 
    // index operator when array
-   T &operator[] (int index) { return memory::address_to_pointer<T>(address) [index]; }
+   T &operator[] (int index) const { return memory::address_to_pointer<T>(address) [index]; }
 
 private:
    Grant_map (const Grant_map &);

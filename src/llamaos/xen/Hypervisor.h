@@ -92,7 +92,8 @@ public:
    Grant_table grant_table;
    Xenstore xenstore;
 
-   const int domid;
+   std::string name;
+   int domid;
 
 private:
    Hypervisor ();

@@ -28,13 +28,14 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
+#include <iostream>
+
 #include <llamaos/api/sleep.h>
 #include <llamaos/memory/Memory.h>
 #include <llamaos/net/llamaNET.h>
 #include <llamaos/xen/Hypervisor.h>
 
-// using namespace std;
-
+using namespace std;
 using namespace llamaos;
 using namespace llamaos::memory;
 using namespace llamaos::net;
@@ -44,11 +45,16 @@ const unsigned int llamaNET::HEADER_LENGTH = sizeof(llamaNET::Protocol_header);
 
 llamaNET::llamaNET (int domd_id, int index)
    :  domd_id(domd_id),
-      index(index),
+      index(0),
       control(domd_id, 510),    // hardcoded 510 for now, eventually use the xenstore
       rx_buffers(),
       tx_buffers()
 {
+   cout << "mapping buffers..." << endl;
+   cout.flush();
+   cout << "mapping buffers... " << control.get_pointer ()->tx_buffer_size << endl;
+   cout.flush();
+
    for (unsigned int i = 0; i < control->tx_buffer_size; i++)
    {
       tx_buffers.push_back (new Grant_map<Protocol_header>(domd_id, control->tx_refs [i]));
@@ -58,6 +64,8 @@ llamaNET::llamaNET (int domd_id, int index)
    {
       rx_buffers.push_back (new Grant_map<Protocol_header>(domd_id, control->rx_refs [i], true));
    }
+
+   cout << "mapping buffers finished" << endl;
 }
 
 llamaNET::~llamaNET ()
@@ -92,6 +100,23 @@ llamaNET::Protocol_header *llamaNET::recv ()
    return rx_buffers [control->app [0].rx_tail]->get_pointer ();
 }
 
+llamaNET::Protocol_header *llamaNET::recv (uint32_t node)
+{
+   llamaNET::Protocol_header *header;
+
+   for (;;)
+   {
+      header = recv ();
+
+      if (header->dest == node)
+      {
+         return header;
+      }
+
+      release_recv_buffer ();
+   }
+}
+
 void llamaNET::release_recv_buffer ()
 {
    unsigned int tail = control->app [0].rx_tail;
@@ -103,7 +128,7 @@ void llamaNET::release_recv_buffer ()
 llamaNET::Protocol_header *llamaNET::get_send_buffer ()
 {
    // need atomic increment before this works with multiple llamaNET instances
-   return tx_buffers [control->app [index].tx_head]->get_pointer ();
+   return tx_buffers [control->app [0].tx_head]->get_pointer ();
 }
 
 void llamaNET::send ()
@@ -113,8 +138,8 @@ void llamaNET::send ()
    // !BAM get these in a config soon
    // dalai node 0 mac 00-1b-21-d5-66-ef
    // redpj node 1 mac 68-05-ca-01-f7-db
-   if (   (header->dest >= 1)
-       && (header->dest <= 6))
+   if (   (header->dest >= 0)
+       && (header->dest < 6))
    {
       // sending to redpj
       header->eth_dest [0] = 0x68;
@@ -124,8 +149,8 @@ void llamaNET::send ()
       header->eth_dest [4] = 0xf7;
       header->eth_dest [5] = 0xdb;
    }
-   else if (   (header->dest >= 7)
-            && (header->dest <= 12))
+   else if (   (header->dest >= 6)
+            && (header->dest < 12))
    {
       // sending to dalai
       header->eth_dest [0] = 0x00;
@@ -140,27 +165,27 @@ void llamaNET::send ()
       // throw exception?
    }
 
-   if (   (header->src >= 1)
-       && (header->src <= 6))
+   if (   (header->src >= 0)
+       && (header->src < 6))
    {
       // sending from dalai
-      header->eth_src [6] = 0x00;
-      header->eth_src [7] = 0x1b;
-      header->eth_src [8] = 0x21;
-      header->eth_src [9] = 0xd5;
-      header->eth_src [10] = 0x66;
-      header->eth_src [11] = 0xef;
+      header->eth_src [0] = 0x00;
+      header->eth_src [1] = 0x1b;
+      header->eth_src [2] = 0x21;
+      header->eth_src [3] = 0xd5;
+      header->eth_src [4] = 0x66;
+      header->eth_src [5] = 0xef;
    }
-   else if (   (header->src >= 7)
-            && (header->src <= 12))
+   else if (   (header->src >= 6)
+            && (header->src < 12))
    {
       // sending from redpj
-      header->eth_src [6] = 0x68;
-      header->eth_src [7] = 0x05;
-      header->eth_src [8] = 0xca;
-      header->eth_src [9] = 0x01;
-      header->eth_src [10] = 0xf7;
-      header->eth_src [11] = 0xdb;
+      header->eth_src [0] = 0x68;
+      header->eth_src [1] = 0x05;
+      header->eth_src [2] = 0xca;
+      header->eth_src [3] = 0x01;
+      header->eth_src [4] = 0xf7;
+      header->eth_src [5] = 0xdb;
    }
    else
    {

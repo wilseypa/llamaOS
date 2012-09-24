@@ -56,6 +56,152 @@ using namespace llamaos::api::pci;
 using namespace llamaos::memory;
 using namespace llamaos::net::i82574;
 
+#define DRIVER 1
+
+#define LATENCY_TRIAL 250000
+#define LATENCY_DATA 3840
+#define LATENCY_SERVER 0
+#define LATENCY_CLIENT 0
+
+#define LOOPBACK 0
+
+#if LATENCY_SERVER
+static bool verify_data_alpha (const unsigned char *buffer, unsigned long length)
+{
+   unsigned long j = 0;
+   unsigned char c;
+
+   for (unsigned long i = 0; i < length; i++)
+   {
+      c = 'A' + (++j % 26);
+
+      if (buffer [i] != c)
+      {
+         cout << "verify alpha failed (" << buffer [i] << " != " << c << ") @ index " << i << endl;
+         return false;
+      }
+   }
+
+   return true;
+}
+
+static void mark_data_numeric (unsigned char *buffer, unsigned long length)
+{
+   unsigned long j = 0;
+
+   // put num data (0 1 2 3 ...)
+   for (unsigned long i = 0; i < length; i++)
+   {
+      buffer [i] = ('0' + (++j % 10));
+   }
+}
+#endif
+
+#if LATENCY_CLIENT
+static uint64_t tsc1;
+static uint64_t tsc2;
+static unsigned long results [LATENCY_TRIAL];
+
+static void mark_data_alpha (unsigned char *buffer, unsigned long length)
+{
+   unsigned long j = 0;
+
+   // put alpha data (A B C D ...)
+   for (unsigned long i = 0; i < length; i++)
+   {
+      buffer [i] = ('A' + (++j % 26));
+   }
+}
+
+static bool verify_data_numeric (const unsigned char *buffer, unsigned long length)
+{
+   unsigned long j = 0;
+   unsigned char c;
+
+   for (unsigned long i = 0; i < length; i++)
+   {
+      c = '0' + (++j % 10);
+
+      if (buffer [i] != c)
+      {
+         cout << "verify numeric failed (" << buffer [i] << " != " << c << ") @ index " << i << endl;
+         return false;
+      }
+   }
+
+   return true;
+}
+
+static void compute_statistics (unsigned long trials, unsigned long *results)
+{
+   unsigned long mean = 0.0;
+   unsigned long variance = 0.0;
+   unsigned long latency = 0UL;
+   unsigned long sum = 0UL;
+   unsigned long min_latency = 0xFFFFFFFFFFFFFFFFUL;
+   unsigned long max_latency = 0UL;
+
+   // iterate to compute mean
+   for (unsigned long i = 0; i < trials; i++)
+   {
+      latency = results [i];
+
+      sum += latency;
+
+      min_latency = (latency < min_latency) ? latency : min_latency;
+      max_latency = (latency > max_latency) ? latency : max_latency;
+   }
+
+   cout << dec;
+   cout << "latency sum: " << sum << ", trials: " << trials << endl;
+   mean = sum / trials;
+   sum = 0UL;
+
+   // iterate to compute variance
+   for (unsigned long i = 0; i < trials; i++)
+   {
+      latency = results [i];
+
+      sum += ((latency - mean) * (latency - mean));
+   }
+
+   variance = sum / trials;
+
+   cout << dec;
+   cout << "  mean: " << mean << ", var: " << variance << ", [" << min_latency << ", " << max_latency << "]" << endl;
+}
+
+static inline uint64_t rdtsc ()
+{
+   uint32_t lo, hi;
+
+   asm volatile ("rdtsc" : "=a" (lo), "=d" (hi));
+
+   return (static_cast<uint64_t>(hi) << 32) | lo;
+}
+
+static inline uint64_t tsc_to_ns (uint64_t tsc)
+{
+   const vcpu_time_info_t *time_info = &Hypervisor::get_instance()->shared_info->vcpu_info [0].time;
+   const uint64_t overflow = UINT64_MAX / time_info->tsc_to_system_mul;
+   uint64_t time_ns = 0UL;
+
+   uint64_t stsc = (time_info->tsc_shift < 0)
+                 ? (tsc >> -time_info->tsc_shift) : (tsc << time_info->tsc_shift);
+
+   // mul will overflow 64 bits
+   while (stsc > overflow)
+   {
+      time_ns += ((overflow * time_info->tsc_to_system_mul) >> 32);
+      stsc -= overflow;
+   }
+
+   time_ns += (stsc * time_info->tsc_to_system_mul) >> 32;
+
+   return time_ns;
+}
+#endif
+
 struct __attribute__ ((__packed__)) rx_desc_t
 {
    uint64_t buffer;
@@ -86,15 +232,11 @@ struct buffer_entry
 int main (int /* argc */, char ** /* argv [] */)
 {
    cout << "running 82574 llamaNET domain...\n" << endl;
-   cout << "waiting..." << endl;
-   sleep (3);
-
    PCI pci;
    sleep (1);
    cout << "PCI config:" << endl;
 //   cout << pci << endl;
 
-   sleep (1);
    cout << "checking PCI config for valid 82574..." << endl;
    uint16_t vendor_id = pci.read_config_word (0);
    uint16_t device_id = pci.read_config_word (2);
@@ -110,10 +252,8 @@ int main (int /* argc */, char ** /* argv [] */)
       return -1;
    }
    cout << "PCI hardware detected is 82574" << endl;
-   cout.flush ();
-
-   sleep (1);
    cout << "enabling PCI access and creating CSR register class..." << endl;
+   cout.flush ();
 
    Command config_command = pci.read_config_word (4);
    Status config_status =  pci.read_config_word (6);
@@ -232,13 +372,9 @@ int main (int /* argc */, char ** /* argv [] */)
    status = csr.read_STATUS ();
    cout << "CSR STATUS: " << hex << status << endl;
 
-   sleep (2);
-
    cout << "setting link up..." << endl;
    ctrl.SLU (true);
    csr.write_CTRL (ctrl);
-
-   sleep (1);
 
    status = csr.read_STATUS ();
    cout << "CSR STATUS: " << hex << status << endl;
@@ -341,35 +477,34 @@ int main (int /* argc */, char ** /* argv [] */)
    csr.write_RDT (rx_tail);
 
    // create memory for the control page
-   net::llamaNET::Control *llamaNET = static_cast<net::llamaNET::Control *>(memalign (PAGE_SIZE, PAGE_SIZE));
-   memset(llamaNET, 0, PAGE_SIZE);
+   net::llamaNET::Control *llamaNET_control = static_cast<net::llamaNET::Control *>(memalign (PAGE_SIZE, PAGE_SIZE));
+   memset(static_cast<void *>(llamaNET_control), 0, PAGE_SIZE);
 
    // allow access to the interface
    domid_t self_id = Hypervisor::get_instance ()->domid;
    cout << "self_id: " << self_id << endl;
-   grant_ref_t llamaNET_ref = Hypervisor::get_instance ()->grant_table.grant_access (self_id+1, llamaNET);
+   grant_ref_t llamaNET_ref = Hypervisor::get_instance ()->grant_table.grant_access (self_id+1, llamaNET_control);
    cout << "llamaNET_ref: " << dec << llamaNET_ref << endl;
 
-   llamaNET->rx_buffer_size = 8;
-   llamaNET->tx_buffer_size = 8;
+   llamaNET_control->rx_buffer_size = 8;
+   llamaNET_control->tx_buffer_size = 8;
 
    // allow tx_buffer guest access
-   for (unsigned int i = 0; i < llamaNET->rx_buffer_size; i++)
+   for (unsigned int i = 0; i < llamaNET_control->rx_buffer_size; i++)
    {
-      llamaNET->tx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+1, tx_buffers [i].pointer);
+      llamaNET_control->tx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+1, tx_buffers [i].pointer);
    }
 
    // allow rx_buffer guest access
-   for (unsigned int i = 0; i < llamaNET->rx_buffer_size; i++)
+   for (unsigned int i = 0; i < llamaNET_control->rx_buffer_size; i++)
    {
-      llamaNET->rx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+1, rx_buffers [i].pointer);
+      llamaNET_control->rx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+1, rx_buffers [i].pointer);
    }
 
-   llamaNET->driver.online = true;
-
+   llamaNET_control->driver.online = true;
    cout << "starting forever loop..." << endl;
 
-#if 0
+#if DRIVER
    for (;;)
    {
       if (rx_head != csr.read_RDH())
@@ -377,53 +512,10 @@ int main (int /* argc */, char ** /* argv [] */)
          buffer_entry rx_buffer = rx_hw.front();
          rx_hw.pop ();
 
-         unsigned int head = llamaNET->app [0].rx_head;
+         unsigned int head = llamaNET_control->app [0].rx_head;
          head++;
          head %= 8;
-         llamaNET->app [0].rx_head = head;
-
-         rx_head++;
-         rx_hw.push(rx_buffer);
-      }
-      else if (llamaNET->app [0].tx_head != llamaNET->app [0].tx_tail)
-      {
-         buffer_entry tx_buffer = tx_sw.front();
-         tx_sw.pop ();
-         tx_hw.push(tx_buffer);
-
-         Protocol_header *header = reinterpret_cast<Protocol_header *>(tx_buffers [llamaNET->app [0].tx_tail].pointer + 14);
-
-         // leave driver is app is done
-         if (header->type == 0xDEAD)
-         {
-            break;
-         }
-
-         unsigned int tail = llamaNET->app [0].tx_tail;
-         tail++;
-         tail %= 8;
-         llamaNET->app [0].tx_tail = tail;
-
-         // don't send it just put it back in list
-         tx_sw.push(tx_hw.front());
-         tx_hw.pop();
-
-         // wake up receiver as if frame left and is back
-         rx_head--;
-      }
-   }
-#else
-   for (;;)
-   {
-      if (rx_head != csr.read_RDH())
-      {
-         buffer_entry rx_buffer = rx_hw.front();
-         rx_hw.pop ();
-
-         unsigned int head = llamaNET->app [0].rx_head;
-         head++;
-         head %= 8;
-         llamaNET->app [0].rx_head = head;
+         llamaNET_control->app [0].rx_head = head;
 
          rx_head++;
          rx_head %= 8;
@@ -439,16 +531,16 @@ int main (int /* argc */, char ** /* argv [] */)
          rx_tail %= 8;
          csr.write_RDT (rx_tail);
       }
-      else if (llamaNET->app [0].tx_head != llamaNET->app [0].tx_tail)
+      else if (llamaNET_control->app [0].tx_head != llamaNET_control->app [0].tx_tail)
       {
          buffer_entry tx_buffer = tx_sw.front();
          tx_sw.pop ();
          tx_hw.push(tx_buffer);
 
-         unsigned int tail = llamaNET->app [0].tx_tail;
+         unsigned int tail = llamaNET_control->app [0].tx_tail;
 
          tx_desc [tx_tail].buffer = tx_buffer.address;
-         tx_desc [tx_tail].length = llamaNET->app [0].tx_length [tail];
+         tx_desc [tx_tail].length = llamaNET_control->app [0].tx_length [tail];
          tx_desc [tx_tail].CSO = 0;
          tx_desc [tx_tail].CMD = 0x0B;
          tx_desc [tx_tail].STA = 0;
@@ -461,7 +553,7 @@ int main (int /* argc */, char ** /* argv [] */)
 
          tail++;
          tail %= 8;
-         llamaNET->app [0].tx_tail = tail;
+         llamaNET_control->app [0].tx_tail = tail;
       }
       else
       {
@@ -474,8 +566,9 @@ int main (int /* argc */, char ** /* argv [] */)
             tx_head %= 8;
          }
 
-         if (llamaNET->close_driver)
+         if (llamaNET_control->close_driver)
          {
+            cout << "close_driver is: " << llamaNET_control->close_driver << endl;
             // leave driver, app is done
             break;
          }
@@ -483,9 +576,319 @@ int main (int /* argc */, char ** /* argv [] */)
    }
 #endif
 
-   cout << "waiting 5 sec, then exit..." << endl;
+#if LATENCY_SERVER
+   cout << "waiting for client message..." << endl;
+   while (rx_head == csr.read_RDH());
+
+   buffer_entry rx_buffer = rx_hw.front();
+   rx_hw.pop ();
+
+   rx_head++;
+   rx_head %= 8;
+
+   cout << "received client message..." << endl;
+   verify_data_alpha (&rx_buffer.pointer [14], LATENCY_DATA);
+
+   rx_desc [rx_tail].buffer = rx_buffer.address;
+   rx_desc [rx_tail].checksum = 0;
+   rx_desc [rx_tail].error = 0;
+   rx_desc [rx_tail].length = 0;
+   rx_desc [rx_tail].status = 0;
+   rx_desc [rx_tail].vlan = 0;
+   rx_hw.push(rx_buffer);
+   rx_tail++;
+   rx_tail %= 8;
+   csr.write_RDT (rx_tail);
+
+   buffer_entry tx_buffer = tx_sw.front();
+   tx_sw.pop ();
+   tx_hw.push(tx_buffer);
+
+   tx_buffer.pointer [0] = 0x00;
+   tx_buffer.pointer [1] = 0x1b;
+   tx_buffer.pointer [2] = 0x21;
+   tx_buffer.pointer [3] = 0xd5;
+   tx_buffer.pointer [4] = 0x66;
+   tx_buffer.pointer [5] = 0xef;
+   tx_buffer.pointer [6] = 0x68;
+   tx_buffer.pointer [7] = 0x05;
+   tx_buffer.pointer [8] = 0xca;
+   tx_buffer.pointer [9] = 0x01;
+   tx_buffer.pointer [10] = 0xf7;
+   tx_buffer.pointer [11] = 0xdb;
+   tx_buffer.pointer [12] = 0x09;
+   tx_buffer.pointer [13] = 0x0c;
+
+   // marks all bytes with numerals and send
+   mark_data_numeric (&tx_buffer.pointer [14], LATENCY_DATA);
+
+   cout << "sending server message..." << endl;
+
+   tx_desc [tx_tail].buffer = tx_buffer.address;
+   tx_desc [tx_tail].length = 14 + LATENCY_DATA;
+   tx_desc [tx_tail].CSO = 0;
+   tx_desc [tx_tail].CMD = 0x0B;
+   tx_desc [tx_tail].STA = 0;
+   tx_desc [tx_tail].CSS = 0;
+   tx_desc [tx_tail].VLAN = 0;
+
+   tx_tail++;
+   tx_tail %= 8;
+   csr.write_TDT (tx_tail);
+
+   for (unsigned long i = 0; i < LATENCY_TRIAL; i++)
+   {
+      while (rx_head == csr.read_RDH())
+      {
+         // cleanup tx while waiting
+         if (tx_head != csr.read_TDH())
+         {
+            tx_sw.push(tx_hw.front());
+            tx_hw.pop();
+            tx_head++;
+            tx_head %= 8;
+         }
+      }
+
+      buffer_entry rx_buffer = rx_hw.front();
+      rx_hw.pop ();
+
+      rx_head++;
+      rx_head %= 8;
+
+      rx_desc [rx_tail].buffer = rx_buffer.address;
+      rx_desc [rx_tail].checksum = 0;
+      rx_desc [rx_tail].error = 0;
+      rx_desc [rx_tail].length = 0;
+      rx_desc [rx_tail].status = 0;
+      rx_desc [rx_tail].vlan = 0;
+      rx_hw.push(rx_buffer);
+      rx_tail++;
+      rx_tail %= 8;
+      csr.write_RDT (rx_tail);
+
+      buffer_entry tx_buffer = tx_sw.front();
+      tx_sw.pop ();
+      tx_hw.push(tx_buffer);
+
+      tx_buffer.pointer [0] = 0x00;
+      tx_buffer.pointer [1] = 0x1b;
+      tx_buffer.pointer [2] = 0x21;
+      tx_buffer.pointer [3] = 0xd5;
+      tx_buffer.pointer [4] = 0x66;
+      tx_buffer.pointer [5] = 0xef;
+      tx_buffer.pointer [6] = 0x68;
+      tx_buffer.pointer [7] = 0x05;
+      tx_buffer.pointer [8] = 0xca;
+      tx_buffer.pointer [9] = 0x01;
+      tx_buffer.pointer [10] = 0xf7;
+      tx_buffer.pointer [11] = 0xdb;
+      tx_buffer.pointer [12] = 0x09;
+      tx_buffer.pointer [13] = 0x0c;
+
+      // place trial number in first "int" for master to verify
+      *(reinterpret_cast<unsigned long *>(&tx_buffer.pointer [14])) = i;
+
+      tx_desc [tx_tail].buffer = tx_buffer.address;
+      tx_desc [tx_tail].length = 14 + LATENCY_DATA;
+      tx_desc [tx_tail].CSO = 0;
+      tx_desc [tx_tail].CMD = 0x0B;
+      tx_desc [tx_tail].STA = 0;
+      tx_desc [tx_tail].CSS = 0;
+      tx_desc [tx_tail].VLAN = 0;
+
+      tx_tail++;
+      tx_tail %= 8;
+      csr.write_TDT (tx_tail);
+   }
+
+#elif LATENCY_CLIENT
+
+   buffer_entry tx_buffer = tx_sw.front();
+   tx_sw.pop ();
+   tx_hw.push(tx_buffer);
+
+   tx_buffer.pointer [0] = 0x68;
+   tx_buffer.pointer [1] = 0x05;
+   tx_buffer.pointer [2] = 0xca;
+   tx_buffer.pointer [3] = 0x01;
+   tx_buffer.pointer [4] = 0xf7;
+   tx_buffer.pointer [5] = 0xdb;
+   tx_buffer.pointer [6] = 0x00;
+   tx_buffer.pointer [7] = 0x1b;
+   tx_buffer.pointer [8] = 0x21;
+   tx_buffer.pointer [9] = 0xd5;
+   tx_buffer.pointer [10] = 0x66;
+   tx_buffer.pointer [11] = 0xef;
+   tx_buffer.pointer [12] = 0x09;
+   tx_buffer.pointer [13] = 0x0c;
+
+   // marks all bytes with alpha chars (a,b,c,...)
+   mark_data_alpha (&tx_buffer.pointer [14], LATENCY_DATA);
+
+   cout << "sending client message..." << endl;
+
+   tx_desc [tx_tail].buffer = tx_buffer.address;
+   tx_desc [tx_tail].length = 14 + LATENCY_DATA;
+   tx_desc [tx_tail].CSO = 0;
+   tx_desc [tx_tail].CMD = 0x0B;
+   tx_desc [tx_tail].STA = 0;
+   tx_desc [tx_tail].CSS = 0;
+   tx_desc [tx_tail].VLAN = 0;
+
+   tx_tail++;
+   tx_tail %= 8;
+   csr.write_TDT (tx_tail);
+
+   cout << "waiting for server message..." << endl;
+   while (rx_head == csr.read_RDH());
+
+   buffer_entry rx_buffer = rx_hw.front();
+   rx_hw.pop ();
+
+   rx_head++;
+   rx_head %= 8;
+
+   cout << "received server message..." << endl;
+   verify_data_numeric (&rx_buffer.pointer [14], LATENCY_DATA);
+
+   rx_desc [rx_tail].buffer = rx_buffer.address;
+   rx_desc [rx_tail].checksum = 0;
+   rx_desc [rx_tail].error = 0;
+   rx_desc [rx_tail].length = 0;
+   rx_desc [rx_tail].status = 0;
+   rx_desc [rx_tail].vlan = 0;
+   rx_hw.push(rx_buffer);
+   rx_tail++;
+   rx_tail %= 8;
+   csr.write_RDT (rx_tail);
+
+   for (unsigned long i = 0; i < LATENCY_TRIAL; i++)
+   {
+      buffer_entry tx_buffer = tx_sw.front();
+      tx_sw.pop ();
+      tx_hw.push(tx_buffer);
+
+      tx_buffer.pointer [0] = 0x68;
+      tx_buffer.pointer [1] = 0x05;
+      tx_buffer.pointer [2] = 0xca;
+      tx_buffer.pointer [3] = 0x01;
+      tx_buffer.pointer [4] = 0xf7;
+      tx_buffer.pointer [5] = 0xdb;
+      tx_buffer.pointer [6] = 0x00;
+      tx_buffer.pointer [7] = 0x1b;
+      tx_buffer.pointer [8] = 0x21;
+      tx_buffer.pointer [9] = 0xd5;
+      tx_buffer.pointer [10] = 0x66;
+      tx_buffer.pointer [11] = 0xef;
+      tx_buffer.pointer [12] = 0x09;
+      tx_buffer.pointer [13] = 0x0c;
+
+      tx_desc [tx_tail].buffer = tx_buffer.address;
+      tx_desc [tx_tail].length = 14 + LATENCY_DATA;
+      tx_desc [tx_tail].CSO = 0;
+      tx_desc [tx_tail].CMD = 0x0B;
+      tx_desc [tx_tail].STA = 0;
+      tx_desc [tx_tail].CSS = 0;
+      tx_desc [tx_tail].VLAN = 0;
+
+      tx_tail++;
+      tx_tail %= 8;
+
+      // get initial timestamp
+      tsc1 = rdtsc ();
+
+      csr.write_TDT (tx_tail);
+
+      while (rx_head == csr.read_RDH())
+      {
+         // cleanup tx while waiting
+         if (tx_head != csr.read_TDH())
+         {
+            tx_sw.push(tx_hw.front());
+            tx_hw.pop();
+            tx_head++;
+            tx_head %= 8;
+         }
+      }
+
+      tsc2 = rdtsc ();
+
+      buffer_entry rx_buffer = rx_hw.front();
+      rx_hw.pop ();
+
+      rx_head++;
+      rx_head %= 8;
+
+      if (*(reinterpret_cast<unsigned long *>(&rx_buffer.pointer[14])) != i)
+      {
+         cout << "invalid trial number: " << i << " != " << *(reinterpret_cast<unsigned long *>(&rx_buffer.pointer[14])) << endl;
+      }
+
+      results [i] = tsc_to_ns(tsc2 - tsc1) / 1000;
+
+      rx_desc [rx_tail].buffer = rx_buffer.address;
+      rx_desc [rx_tail].checksum = 0;
+      rx_desc [rx_tail].error = 0;
+      rx_desc [rx_tail].length = 0;
+      rx_desc [rx_tail].status = 0;
+      rx_desc [rx_tail].vlan = 0;
+      rx_hw.push(rx_buffer);
+      rx_tail++;
+      rx_tail %= 8;
+      csr.write_RDT (rx_tail);
+   }
+
+   compute_statistics (LATENCY_TRIAL, results);
+
+#endif
+
+#if LOOPBACK
+   for (;;)
+   {
+      if (rx_head != csr.read_RDH())
+      {
+         buffer_entry rx_buffer = rx_hw.front();
+         rx_hw.pop ();
+
+         unsigned int head = llamaNET_control->app [0].rx_head;
+         head++;
+         head %= 8;
+         llamaNET_control->app [0].rx_head = head;
+
+         rx_head++;
+         rx_hw.push(rx_buffer);
+      }
+      else if (llamaNET_control->app [0].tx_head != llamaNET_control->app [0].tx_tail)
+      {
+         buffer_entry tx_buffer = tx_sw.front();
+         tx_sw.pop ();
+         tx_hw.push(tx_buffer);
+
+         unsigned int tail = llamaNET_control->app [0].tx_tail;
+         tail++;
+         tail %= 8;
+         llamaNET_control->app [0].tx_tail = tail;
+
+         // don't send it just put it back in list
+         tx_sw.push(tx_hw.front());
+         tx_hw.pop();
+
+         // wake up receiver as if frame left and is back
+         rx_head--;
+      }
+      else if (llamaNET_control->close_driver)
+      {
+         cout << "close_driver is: " << llamaNET_control->close_driver << endl;
+         // leave driver, app is done
+         break;
+      }
+   }
+#endif
+
+   cout << "waiting 3 sec, then exit..." << endl;
    cout.flush ();
-   sleep (5);
+   sleep (3);
 
    return 0;
 }

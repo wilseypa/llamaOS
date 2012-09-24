@@ -245,7 +245,7 @@ void entry_llamaOS (start_info_t *start_info)
       }
 
       char *argv [16] = { '\0' };
-      argv [0] = const_cast<char *>("llamaOS");
+      argv [0] = const_cast<char *>(hypervisor.name.c_str ());
 
       for (unsigned int i = 0; i < args.size (); i++)
       {

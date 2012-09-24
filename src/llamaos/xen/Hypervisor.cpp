@@ -104,19 +104,25 @@ Hypervisor::Hypervisor (const start_info_t *start_info)
       events(shared_info),
       grant_table(),
       xenstore(machine_page_to_virtual_pointer<xenstore_domain_interface>(start_info->store_mfn), start_info->store_evtchn),
-      domid(xenstore.read<domid_t>("domid"))
+      name(""),
+      domid(0)
 {
    instance = this;
    trace ("Hypervisor created.\n");
 
-   trace ("Xenstore name: %s\n", xenstore.read ("name").c_str ()); 
+   name = xenstore.read ("name").c_str ();
+   domid = xenstore.read<domid_t>("domid");
+   trace ("Xenstore name: %s, %d\n", name.c_str (), domid); 
 
-   trace ("float math: %lf, %lf, %lf\n", 1.0 / 2638.0, 25 / 43219.0, 1 / 3.0);
+//   trace ("float math: %f, %f, %f\n", 1.0f / 2638.0f, 25 / 43219.0f, 1 / 3.0f);
+   trace ("double math: %lf, %lf, %lf\n", 1.0 / 2638.0, 25 / 43219.0, 1 / 3.0);
 
    trace ("binding to VIRQ_TIMER...\n");
    events.bind_virq (VIRQ_TIMER, virq_timer_event, this);
 
    events.bind (console.port, console.event_handler, &console);
+
+   
 }
 
 Hypervisor::~Hypervisor ()

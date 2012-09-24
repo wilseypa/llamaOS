@@ -192,6 +192,8 @@ void register_glibc_exports ()
    register_llamaos_raise (llamaos_raise);
 }
 
+void __libc_init_first (int argc, char *arg0, ...);
+
 void minimal_c_kernel (start_info_t *start_info)
 {
    if (verify_magic (start_info))
@@ -204,12 +206,27 @@ void minimal_c_kernel (start_info_t *start_info)
 
       // enable dynamic memory
       
+      // initialize glibc
+      __libc_init_first (1, "");
 
       trace ("registering llamaOS glibc call-backs...\n");
       register_glibc_exports ();
 
-      // loop forever
-      for (;;);
+      float f1 = 33.3f;
+      double d1 = 66.66;
+
+      trace ("f1: %f, d1: %lf\n", f1, d1);
+
+      if (f1 > 33.0f)
+      {
+         trace ("f1 %d > 33.0f %d\n", (int)f1, (int)33.0f);
+      }
+
+      trace ("f1 / 2.0f: %f\n", f1 / 2.0f);
+      trace ("d1 / 2.0f: %lf\n", d1 / 2.0);
+
+      // loop for a while
+      for (unsigned int i = 0; i < 1000000000; i++);
    }
 
    // error finding memory, so just leave

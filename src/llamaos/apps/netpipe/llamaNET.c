@@ -36,23 +36,25 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 void Init(ArgStruct *p, int* pargc, char*** pargv)
 {
+   p->tr = 0;     /* The transmitter will be set using the -h host flag. */
+   p->rcv = 1;
 }
 
 void Setup(ArgStruct *p)
 {
    if (p->tr)
    {
-      llamaNET_setup (1);
+      llamaNET_setup (0);
    }
    else
    {
-      llamaNET_setup (7);
+      llamaNET_setup (6);
    }
 }
 
 void Sync(ArgStruct *p)
 {
-   llamaNET_sync ();
+   llamaNET_sync ((p->tr) ? 1 : 0);
 }
 
 void PrepareToReceive(ArgStruct *p)
