@@ -88,7 +88,8 @@ int main(int argc, char **argv)
     args.use_sdp=0; /* default to no SDP */
     args.port = DEFPORT; /* just in case the user doesn't set this. */
 
-
+    int packageSep = -1;
+    perturbation = 0;
     /* TCGMSG launches NPtcgmsg with a -master master_hostname
      * argument, so ignore all arguments and set them manually
      * in netpipe.c instead.
@@ -97,7 +98,7 @@ int main(int argc, char **argv)
 #if ! defined(TCGMSG)
 
     /* Parse the arguments. See Usage for description */
-    while ((c = getopt(argc, argv, "AXSO:rIiPszgfaB2h:p:o:l:u:b:m:n:t:c:d:D:P:")) != -1)
+    while ((c = getopt(argc, argv, "AXSO:rIiPszgfaB2h:p:w:o:l:u:b:m:n:t:c:d:D:P:")) != -1)
     {
         switch(c)
         {
@@ -118,15 +119,10 @@ int main(int argc, char **argv)
                       }
                       printf("Transmit buffer offset: %d\nReceive buffer offset: %d\n",args.soffset,args.roffset);
                       break;
-            case 'p': perturbation = atoi(optarg);
-                      if( perturbation > 0 ) {
-                         printf("Using a perturbation value of %d\n\n", perturbation);
-                      } else {
-                         perturbation = 0;
-                         printf("Using no perturbations\n\n");
-                      }
+            case 'p': args.port = atoi(optarg);
                       break;
-
+            case 'w': packageSep = atoi(optarg);
+                      break;
             case 'B': if(integCheck == 1) {
                         fprintf(stderr, "Integrity check not supported with prepost burst\n");
                         exit(-1);
@@ -346,10 +342,6 @@ int main(int argc, char **argv)
                       }
                       break;
 #endif
-	    case 'P':
-		      args.port = atoi(optarg);
-		      break;
-
             case 'n': nrepeat_const = atoi(optarg);
                       break;
 
@@ -561,8 +553,11 @@ int main(int argc, char **argv)
    {
 
            /* Exponentially increase the block size.  */
-	   inc = 1;
-       //if (nq > 2) inc = ((nq % 2))? inc + inc: inc;
+	   if (packageSep == -1) {
+            if (nq > 2) inc = ((nq % 2))? inc + inc: inc;
+	   } else {
+		    inc = packageSep;
+	   }
 
           /* This is a perturbation loop to test nearby values */
 
@@ -582,8 +577,13 @@ int main(int argc, char **argv)
 /*               } else if (len == start) {*/
 /*                   nrepeat = MAX( RUNTM/( 0.000020 + start/(8*1000) ), TRIALS);*/
                } else {
-                   nrepeat = MAX((RUNTM / ((double)args.bufflen /
+				   if (packageSep == -1) {
+                       nrepeat = MAX((RUNTM / ((double)args.bufflen /
                                   (args.bufflen - inc + 1.0) * tlast)),TRIALS);
+				   } else {
+                       nrepeat = MAX((RUNTM / ((double)args.bufflen /
+                                  (args.bufflen) * tlast)),TRIALS);
+				   }
                }
                SendRepeat(&args, nrepeat);
            }
