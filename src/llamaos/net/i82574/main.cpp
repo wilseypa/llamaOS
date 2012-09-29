@@ -59,7 +59,7 @@ using namespace llamaos::net::i82574;
 #define DRIVER 1
 
 #define LATENCY_TRIAL 250000
-#define LATENCY_DATA 3840
+#define LATENCY_DATA 8
 #define LATENCY_SERVER 0
 #define LATENCY_CLIENT 0
 
@@ -427,7 +427,8 @@ int main (int /* argc */, char ** /* argv [] */)
 
    csr.write_TDBA (tx_desc_machine_address);
 //   csr.write_TDLEN (1024);    // 64 descriptors
-   csr.write_TDLEN (128);       // 8 descriptors
+//   csr.write_TDLEN (128);     // 8 descriptors
+   csr.write_TDLEN (PAGE_SIZE); // 256 descriptors
    cout << "TDBA: " << hex << csr.read_TDBA() << ", " << tx_desc_machine_address << endl;
 
    buffer_entry tx_buffers [8];
@@ -455,7 +456,8 @@ int main (int /* argc */, char ** /* argv [] */)
 
    csr.write_RDBA (rx_desc_machine_address);
 //   csr.write_RDLEN (1024);    // 64 descriptors
-   csr.write_RDLEN (128);       // 8 descriptors
+//   csr.write_RDLEN (128);     // 8 descriptors
+   csr.write_RDLEN (PAGE_SIZE); // 256 descriptors
    cout << "RDBA: " << hex << csr.read_RDBA() << ", " << rx_desc_machine_address << endl;
 
    buffer_entry rx_buffers [8];
@@ -484,6 +486,11 @@ int main (int /* argc */, char ** /* argv [] */)
    domid_t self_id = Hypervisor::get_instance ()->domid;
    cout << "self_id: " << self_id << endl;
    grant_ref_t llamaNET_ref = Hypervisor::get_instance ()->grant_table.grant_access (self_id+1, llamaNET_control);
+//   llamaNET_ref = Hypervisor::get_instance ()->grant_table.grant_access (self_id+2, llamaNET_control);
+//   llamaNET_ref = Hypervisor::get_instance ()->grant_table.grant_access (self_id+3, llamaNET_control);
+//   llamaNET_ref = Hypervisor::get_instance ()->grant_table.grant_access (self_id+4, llamaNET_control);
+//   llamaNET_ref = Hypervisor::get_instance ()->grant_table.grant_access (self_id+5, llamaNET_control);
+//   llamaNET_ref = Hypervisor::get_instance ()->grant_table.grant_access (self_id+6, llamaNET_control);
    cout << "llamaNET_ref: " << dec << llamaNET_ref << endl;
 
    llamaNET_control->rx_buffer_size = 8;
@@ -493,32 +500,47 @@ int main (int /* argc */, char ** /* argv [] */)
    for (unsigned int i = 0; i < llamaNET_control->rx_buffer_size; i++)
    {
       llamaNET_control->tx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+1, tx_buffers [i].pointer);
+//      llamaNET_control->tx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+2, tx_buffers [i].pointer);
+//      llamaNET_control->tx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+3, tx_buffers [i].pointer);
+//      llamaNET_control->tx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+4, tx_buffers [i].pointer);
+//      llamaNET_control->tx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+5, tx_buffers [i].pointer);
+//      llamaNET_control->tx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+6, tx_buffers [i].pointer);
    }
 
    // allow rx_buffer guest access
    for (unsigned int i = 0; i < llamaNET_control->rx_buffer_size; i++)
    {
       llamaNET_control->rx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+1, rx_buffers [i].pointer);
+//      llamaNET_control->rx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+2, rx_buffers [i].pointer);
+//      llamaNET_control->rx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+3, rx_buffers [i].pointer);
+//      llamaNET_control->rx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+4, rx_buffers [i].pointer);
+//      llamaNET_control->rx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+5, rx_buffers [i].pointer);
+//      llamaNET_control->rx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+6, rx_buffers [i].pointer);
    }
 
    llamaNET_control->driver.online = true;
    cout << "starting forever loop..." << endl;
 
+   int cleanup_delay = 0;
+   unsigned int head = 0;
+
 #if DRIVER
    for (;;)
    {
-      if (rx_head != csr.read_RDH())
+//      if (rx_head != csr.read_RDH())
+      if (rx_desc [rx_head].status != 0)
       {
-         buffer_entry rx_buffer = rx_hw.front();
-         rx_hw.pop ();
-
-         unsigned int head = llamaNET_control->app [0].rx_head;
+         head = llamaNET_control->driver.rx_head;
          head++;
          head %= 8;
-         llamaNET_control->app [0].rx_head = head;
+         llamaNET_control->driver.rx_head = head;
 
          rx_head++;
-         rx_head %= 8;
+         rx_head %= 256;
+
+         // !bam can't do this until all guest tail is updated
+         buffer_entry rx_buffer = rx_hw.front();
+         rx_hw.pop ();
 
          rx_desc [rx_tail].buffer = rx_buffer.address;
          rx_desc [rx_tail].checksum = 0;
@@ -528,18 +550,19 @@ int main (int /* argc */, char ** /* argv [] */)
          rx_desc [rx_tail].vlan = 0;
          rx_hw.push(rx_buffer);
          rx_tail++;
-         rx_tail %= 8;
+         rx_tail %= 256;
          csr.write_RDT (rx_tail);
       }
-      else if (llamaNET_control->app [0].tx_head != llamaNET_control->app [0].tx_tail)
+
+      unsigned int tail = llamaNET_control->app [0].tx_tail;
+
+//      if (llamaNET_control->app [0].tx_head != llamaNET_control->app [0].tx_tail)
+      if (llamaNET_control->app [0].tx_head != tail)
       {
-         buffer_entry tx_buffer = tx_sw.front();
-         tx_sw.pop ();
-         tx_hw.push(tx_buffer);
+//         buffer_entry tx_buffer = tx_sw.front();
 
-         unsigned int tail = llamaNET_control->app [0].tx_tail;
-
-         tx_desc [tx_tail].buffer = tx_buffer.address;
+//         tx_desc [tx_tail].buffer = tx_buffer.address;
+         tx_desc [tx_tail].buffer = tx_buffers [tail].address;
          tx_desc [tx_tail].length = llamaNET_control->app [0].tx_length [tail];
          tx_desc [tx_tail].CSO = 0;
          tx_desc [tx_tail].CMD = 0x0B;
@@ -548,23 +571,30 @@ int main (int /* argc */, char ** /* argv [] */)
          tx_desc [tx_tail].VLAN = 0;
 
          tx_tail++;
-         tx_tail %= 8;
+         tx_tail %= 256;
          csr.write_TDT (tx_tail);
 
+//         tx_sw.pop ();
+//         tx_hw.push(tx_buffer);
+
+//         unsigned int tail = llamaNET_control->app [0].tx_tail;
          tail++;
          tail %= 8;
          llamaNET_control->app [0].tx_tail = tail;
       }
-      else
+
+      if (++cleanup_delay > 1000)
       {
+         cleanup_delay = 0;
+
          // cleanup tx while waiting
-         if (tx_head != csr.read_TDH())
-         {
-            tx_sw.push(tx_hw.front());
-            tx_hw.pop();
-            tx_head++;
-            tx_head %= 8;
-         }
+//         while (tx_head != csr.read_TDH())
+//         {
+//            tx_sw.push(tx_hw.front());
+//            tx_hw.pop();
+//            tx_head++;
+//            tx_head %= 256;
+//         }
 
          if (llamaNET_control->close_driver)
          {
@@ -584,7 +614,7 @@ int main (int /* argc */, char ** /* argv [] */)
    rx_hw.pop ();
 
    rx_head++;
-   rx_head %= 8;
+   rx_head %= 256;
 
    cout << "received client message..." << endl;
    verify_data_alpha (&rx_buffer.pointer [14], LATENCY_DATA);
@@ -597,7 +627,7 @@ int main (int /* argc */, char ** /* argv [] */)
    rx_desc [rx_tail].vlan = 0;
    rx_hw.push(rx_buffer);
    rx_tail++;
-   rx_tail %= 8;
+   rx_tail %= 256;
    csr.write_RDT (rx_tail);
 
    buffer_entry tx_buffer = tx_sw.front();
@@ -633,12 +663,13 @@ int main (int /* argc */, char ** /* argv [] */)
    tx_desc [tx_tail].VLAN = 0;
 
    tx_tail++;
-   tx_tail %= 8;
+   tx_tail %= 256;
    csr.write_TDT (tx_tail);
 
    for (unsigned long i = 0; i < LATENCY_TRIAL; i++)
    {
-      while (rx_head == csr.read_RDH())
+//      while (rx_head == csr.read_RDH())
+      while (rx_desc [rx_head].status == 0)
       {
          // cleanup tx while waiting
          if (tx_head != csr.read_TDH())
@@ -646,7 +677,7 @@ int main (int /* argc */, char ** /* argv [] */)
             tx_sw.push(tx_hw.front());
             tx_hw.pop();
             tx_head++;
-            tx_head %= 8;
+            tx_head %= 256;
          }
       }
 
@@ -654,7 +685,7 @@ int main (int /* argc */, char ** /* argv [] */)
       rx_hw.pop ();
 
       rx_head++;
-      rx_head %= 8;
+      rx_head %= 256;
 
       rx_desc [rx_tail].buffer = rx_buffer.address;
       rx_desc [rx_tail].checksum = 0;
@@ -664,7 +695,7 @@ int main (int /* argc */, char ** /* argv [] */)
       rx_desc [rx_tail].vlan = 0;
       rx_hw.push(rx_buffer);
       rx_tail++;
-      rx_tail %= 8;
+      rx_tail %= 256;
       csr.write_RDT (rx_tail);
 
       buffer_entry tx_buffer = tx_sw.front();
@@ -698,7 +729,7 @@ int main (int /* argc */, char ** /* argv [] */)
       tx_desc [tx_tail].VLAN = 0;
 
       tx_tail++;
-      tx_tail %= 8;
+      tx_tail %= 256;
       csr.write_TDT (tx_tail);
    }
 
@@ -737,7 +768,7 @@ int main (int /* argc */, char ** /* argv [] */)
    tx_desc [tx_tail].VLAN = 0;
 
    tx_tail++;
-   tx_tail %= 8;
+   tx_tail %= 256;
    csr.write_TDT (tx_tail);
 
    cout << "waiting for server message..." << endl;
@@ -747,7 +778,7 @@ int main (int /* argc */, char ** /* argv [] */)
    rx_hw.pop ();
 
    rx_head++;
-   rx_head %= 8;
+   rx_head %= 256;
 
    cout << "received server message..." << endl;
    verify_data_numeric (&rx_buffer.pointer [14], LATENCY_DATA);
@@ -760,7 +791,7 @@ int main (int /* argc */, char ** /* argv [] */)
    rx_desc [rx_tail].vlan = 0;
    rx_hw.push(rx_buffer);
    rx_tail++;
-   rx_tail %= 8;
+   rx_tail %= 256;
    csr.write_RDT (rx_tail);
 
    for (unsigned long i = 0; i < LATENCY_TRIAL; i++)
@@ -793,14 +824,15 @@ int main (int /* argc */, char ** /* argv [] */)
       tx_desc [tx_tail].VLAN = 0;
 
       tx_tail++;
-      tx_tail %= 8;
+      tx_tail %= 256;
 
       // get initial timestamp
       tsc1 = rdtsc ();
 
       csr.write_TDT (tx_tail);
 
-      while (rx_head == csr.read_RDH())
+//      while (rx_head == csr.read_RDH())
+      while (rx_desc [rx_head].status == 0)
       {
          // cleanup tx while waiting
          if (tx_head != csr.read_TDH())
@@ -808,7 +840,7 @@ int main (int /* argc */, char ** /* argv [] */)
             tx_sw.push(tx_hw.front());
             tx_hw.pop();
             tx_head++;
-            tx_head %= 8;
+            tx_head %= 256;
          }
       }
 
@@ -818,7 +850,7 @@ int main (int /* argc */, char ** /* argv [] */)
       rx_hw.pop ();
 
       rx_head++;
-      rx_head %= 8;
+      rx_head %= 256;
 
       if (*(reinterpret_cast<unsigned long *>(&rx_buffer.pointer[14])) != i)
       {
@@ -835,7 +867,7 @@ int main (int /* argc */, char ** /* argv [] */)
       rx_desc [rx_tail].vlan = 0;
       rx_hw.push(rx_buffer);
       rx_tail++;
-      rx_tail %= 8;
+      rx_tail %= 256;
       csr.write_RDT (rx_tail);
    }
 

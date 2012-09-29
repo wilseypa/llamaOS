@@ -61,12 +61,26 @@ public:
 
    static const unsigned int HEADER_LENGTH;
 
-   class State
+   class Driver_state
    {
    public:
       volatile bool online;
 
       volatile unsigned int rx_head;
+//      volatile unsigned int rx_tail;
+
+//      volatile unsigned int tx_head;
+//      volatile unsigned int tx_tail;
+//      volatile unsigned int tx_length [64];
+
+   };
+
+   class App_state
+   {
+   public:
+      volatile bool online;
+
+//      volatile unsigned int rx_head;
       volatile unsigned int rx_tail;
 
       volatile unsigned int tx_head;
@@ -78,8 +92,8 @@ public:
    class Control
    {
    public:
-      State driver;
-      State app [6];
+      Driver_state driver;
+      App_state app [6];
 
       volatile unsigned int rx_buffer_size;
       volatile grant_ref_t rx_refs [64];

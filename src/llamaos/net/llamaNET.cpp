@@ -89,13 +89,13 @@ llamaNET::~llamaNET ()
 bool llamaNET::recv_poll ()
 {
    // only check for message arrival
-   return (control->app [0].rx_head != control->app [0].rx_tail);
+   return (control->driver.rx_head != control->app [0].rx_tail);
 }
 
 llamaNET::Protocol_header *llamaNET::recv ()
 {
    // spin until message arrives
-   while (control->app [0].rx_head == control->app [0].rx_tail);
+   while (!recv_poll ());
 
    return rx_buffers [control->app [0].rx_tail]->get_pointer ();
 }
@@ -127,6 +127,8 @@ void llamaNET::release_recv_buffer ()
 
 llamaNET::Protocol_header *llamaNET::get_send_buffer ()
 {
+//   __sync_fetch_and_add (&control->app [0].tx_head, 1);
+
    // need atomic increment before this works with multiple llamaNET instances
    return tx_buffers [control->app [0].tx_head]->get_pointer ();
 }
