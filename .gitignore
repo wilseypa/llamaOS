@@ -6,6 +6,7 @@ build/include/
 build/include-fixed/
 build/lib/
 build/obj/
+build/test/
 bin/
 lib/
 obj/
