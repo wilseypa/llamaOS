@@ -486,11 +486,11 @@ int main (int /* argc */, char ** /* argv [] */)
    domid_t self_id = Hypervisor::get_instance ()->domid;
    cout << "self_id: " << self_id << endl;
    grant_ref_t llamaNET_ref = Hypervisor::get_instance ()->grant_table.grant_access (self_id+1, llamaNET_control);
-//   llamaNET_ref = Hypervisor::get_instance ()->grant_table.grant_access (self_id+2, llamaNET_control);
-//   llamaNET_ref = Hypervisor::get_instance ()->grant_table.grant_access (self_id+3, llamaNET_control);
-//   llamaNET_ref = Hypervisor::get_instance ()->grant_table.grant_access (self_id+4, llamaNET_control);
-//   llamaNET_ref = Hypervisor::get_instance ()->grant_table.grant_access (self_id+5, llamaNET_control);
-//   llamaNET_ref = Hypervisor::get_instance ()->grant_table.grant_access (self_id+6, llamaNET_control);
+   llamaNET_ref = Hypervisor::get_instance ()->grant_table.grant_access (self_id+2, llamaNET_control);
+   llamaNET_ref = Hypervisor::get_instance ()->grant_table.grant_access (self_id+3, llamaNET_control);
+   llamaNET_ref = Hypervisor::get_instance ()->grant_table.grant_access (self_id+4, llamaNET_control);
+   llamaNET_ref = Hypervisor::get_instance ()->grant_table.grant_access (self_id+5, llamaNET_control);
+   llamaNET_ref = Hypervisor::get_instance ()->grant_table.grant_access (self_id+6, llamaNET_control);
    cout << "llamaNET_ref: " << dec << llamaNET_ref << endl;
 
    llamaNET_control->rx_buffer_size = 8;
@@ -499,23 +499,23 @@ int main (int /* argc */, char ** /* argv [] */)
    // allow tx_buffer guest access
    for (unsigned int i = 0; i < llamaNET_control->rx_buffer_size; i++)
    {
-      llamaNET_control->tx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+1, tx_buffers [i].pointer);
-//      llamaNET_control->tx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+2, tx_buffers [i].pointer);
-//      llamaNET_control->tx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+3, tx_buffers [i].pointer);
-//      llamaNET_control->tx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+4, tx_buffers [i].pointer);
-//      llamaNET_control->tx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+5, tx_buffers [i].pointer);
-//      llamaNET_control->tx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+6, tx_buffers [i].pointer);
+      llamaNET_control->app [0].tx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+1, tx_buffers [i].pointer);
+      llamaNET_control->app [1].tx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+2, tx_buffers [i].pointer);
+      llamaNET_control->app [2].tx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+3, tx_buffers [i].pointer);
+      llamaNET_control->app [3].tx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+4, tx_buffers [i].pointer);
+      llamaNET_control->app [4].tx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+5, tx_buffers [i].pointer);
+      llamaNET_control->app [5].tx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+6, tx_buffers [i].pointer);
    }
 
    // allow rx_buffer guest access
    for (unsigned int i = 0; i < llamaNET_control->rx_buffer_size; i++)
    {
-      llamaNET_control->rx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+1, rx_buffers [i].pointer);
-//      llamaNET_control->rx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+2, rx_buffers [i].pointer);
-//      llamaNET_control->rx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+3, rx_buffers [i].pointer);
-//      llamaNET_control->rx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+4, rx_buffers [i].pointer);
-//      llamaNET_control->rx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+5, rx_buffers [i].pointer);
-//      llamaNET_control->rx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+6, rx_buffers [i].pointer);
+      llamaNET_control->app [0].rx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+1, rx_buffers [i].pointer);
+      llamaNET_control->app [1].rx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+2, rx_buffers [i].pointer);
+      llamaNET_control->app [2].rx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+3, rx_buffers [i].pointer);
+      llamaNET_control->app [3].rx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+4, rx_buffers [i].pointer);
+      llamaNET_control->app [4].rx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+5, rx_buffers [i].pointer);
+      llamaNET_control->app [5].rx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+6, rx_buffers [i].pointer);
    }
 
    llamaNET_control->driver.online = true;
@@ -554,6 +554,7 @@ int main (int /* argc */, char ** /* argv [] */)
          csr.write_RDT (rx_tail);
       }
 
+#if 0
       unsigned int tail = llamaNET_control->app [0].tx_tail;
 
 //      if (llamaNET_control->app [0].tx_head != llamaNET_control->app [0].tx_tail)
@@ -581,6 +582,27 @@ int main (int /* argc */, char ** /* argv [] */)
          tail++;
          tail %= 8;
          llamaNET_control->app [0].tx_tail = tail;
+      }
+#endif
+
+      for (int i = 0; i < 6; i++)
+      {
+         if (llamaNET_control->app [i].tx_request)
+         {
+            tx_desc [tx_tail].buffer = tx_buffers [llamaNET_control->app [i].tx_index].address;
+            tx_desc [tx_tail].length = llamaNET_control->app [i].tx_length;
+            tx_desc [tx_tail].CSO = 0;
+            tx_desc [tx_tail].CMD = 0x0B;
+            tx_desc [tx_tail].STA = 0;
+            tx_desc [tx_tail].CSS = 0;
+            tx_desc [tx_tail].VLAN = 0;
+
+            tx_tail++;
+            tx_tail %= 256;
+            csr.write_TDT (tx_tail);
+
+            llamaNET_control->app [i].tx_request = false;
+         }
       }
 
       if (++cleanup_delay > 1000)

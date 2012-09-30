@@ -45,8 +45,8 @@ const unsigned int llamaNET::HEADER_LENGTH = sizeof(llamaNET::Protocol_header);
 
 llamaNET::llamaNET (int domd_id, int index)
    :  domd_id(domd_id),
-      index(0),
-      control(domd_id, 510),    // hardcoded 510 for now, eventually use the xenstore
+      index(index),
+      control(domd_id, 510 - index),    // hardcoded 510 for now, eventually use the xenstore
       rx_buffers(),
       tx_buffers()
 {
@@ -57,12 +57,12 @@ llamaNET::llamaNET (int domd_id, int index)
 
    for (unsigned int i = 0; i < control->tx_buffer_size; i++)
    {
-      tx_buffers.push_back (new Grant_map<Protocol_header>(domd_id, control->tx_refs [i]));
+      tx_buffers.push_back (new Grant_map<Protocol_header>(domd_id, control->app [index].tx_refs [i]));
    }
 
    for (unsigned int i = 0; i < control->rx_buffer_size; i++)
    {
-      rx_buffers.push_back (new Grant_map<Protocol_header>(domd_id, control->rx_refs [i], true));
+      rx_buffers.push_back (new Grant_map<Protocol_header>(domd_id, control->app [index].rx_refs [i], true));
    }
 
    cout << "mapping buffers finished" << endl;
@@ -89,7 +89,7 @@ llamaNET::~llamaNET ()
 bool llamaNET::recv_poll ()
 {
    // only check for message arrival
-   return (control->driver.rx_head != control->app [0].rx_tail);
+   return (control->driver.rx_head != control->app [index].rx_tail);
 }
 
 llamaNET::Protocol_header *llamaNET::recv ()
@@ -97,7 +97,7 @@ llamaNET::Protocol_header *llamaNET::recv ()
    // spin until message arrives
    while (!recv_poll ());
 
-   return rx_buffers [control->app [0].rx_tail]->get_pointer ();
+   return rx_buffers [control->app [index].rx_tail]->get_pointer ();
 }
 
 llamaNET::Protocol_header *llamaNET::recv (uint32_t node)
@@ -119,23 +119,27 @@ llamaNET::Protocol_header *llamaNET::recv (uint32_t node)
 
 void llamaNET::release_recv_buffer ()
 {
-   unsigned int tail = control->app [0].rx_tail;
+   unsigned int tail = control->app [index].rx_tail;
    tail++;
    tail %= control->rx_buffer_size;
-   control->app [0].rx_tail = tail;
+   control->app [index].rx_tail = tail;
 }
 
 llamaNET::Protocol_header *llamaNET::get_send_buffer ()
 {
-//   __sync_fetch_and_add (&control->app [0].tx_head, 1);
+   // wait for last buffer to send
+   while (control->app [index].tx_request);
+
+   // get next index
+   control->app [index].tx_index = __sync_fetch_and_add (&control->driver.next_tx_index, 1) & 7;
 
    // need atomic increment before this works with multiple llamaNET instances
-   return tx_buffers [control->app [0].tx_head]->get_pointer ();
+   return tx_buffers [control->app [index].tx_index]->get_pointer ();
 }
 
-void llamaNET::send ()
+void llamaNET::send (Protocol_header *header)
 {
-   Protocol_header *header = reinterpret_cast<Protocol_header *>(get_send_buffer ());
+//   Protocol_header *header = reinterpret_cast<Protocol_header *>(get_send_buffer ());
 
    // !BAM get these in a config soon
    // dalai node 0 mac 00-1b-21-d5-66-ef
@@ -196,13 +200,16 @@ void llamaNET::send ()
 
    header->eth_type = 0x0C09;
 
-   unsigned int head = control->app [0].tx_head;
-   control->app [0].tx_length [head] = HEADER_LENGTH + header->len;
+//   unsigned int head = control->app [0].tx_head;
+//   control->app [0].tx_length [head] = HEADER_LENGTH + header->len;
+   control->app [index].tx_length = HEADER_LENGTH + header->len;
 
    // ensure write is processed
    wmb();
 
-   head++;
-   head %= control->tx_buffer_size;
-   control->app [0].tx_head = head;
+   control->app [index].tx_request = true;
+
+//   head++;
+//   head %= control->tx_buffer_size;
+//   control->app [0].tx_head = head;
 }

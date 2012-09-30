@@ -70,7 +70,7 @@ static uint32_t parse_node (int argc, char **argv)
 static domid_t get_domd_id (int node)
 {
    // for now it's just self minus node % 6
-   domid_t self_id = Hypervisor::get_instance ()->xenstore.read<domid_t>("domid");
+   domid_t self_id = Hypervisor::get_instance ()->domid;
 
    return (self_id - 1 - (node % 6));
 }
@@ -80,7 +80,7 @@ llamaNET::llamaNET (int argc, char **argv)
       node(parse_node (argc, argv)),
       interface(get_domd_id (node), (node % 6))
 {
-   // dalai 1-6 always starts the experiments
+   // dalai 0-5 always starts the experiments
    client = (node < 6);
 
    cout << "llamaNET running as node " << dec << node << endl;
@@ -108,8 +108,8 @@ bool llamaNET::verify ()
    if (client)
    {
       header = interface.get_send_buffer ();
-      header->dest = 6;
-      header->src = 0;
+      header->dest = (node >= 6) ? (node - 6) : (node + 6);;
+      header->src = node;
       header->type = 1;
       header->seq = seq++;
       header->len = length;
@@ -123,7 +123,7 @@ bool llamaNET::verify ()
       cout << "dalai sending packet..." << endl;
 
       // send/recv and verify the data has been changed to numerals (1,2,3,...)
-      interface.send ();
+      interface.send (header);
       header = interface.recv (node);
 
       // get pointer to data section of buffer
@@ -150,8 +150,8 @@ bool llamaNET::verify ()
          interface.release_recv_buffer ();
 
          header = interface.get_send_buffer ();
-         header->dest = 0;
-         header->src = 6;
+         header->dest = (node >= 6) ? (node - 6) : (node + 6);;
+         header->src = node;
          header->type = 1;
          header->seq = seq++;
          header->len = length;
@@ -163,7 +163,7 @@ bool llamaNET::verify ()
          mark_data_numeric (data, length);
 
          cout << "redpj sending packet..." << endl;
-         interface.send ();
+         interface.send (header);
          return true;
       }
    }
@@ -180,13 +180,13 @@ bool llamaNET::run_trial (unsigned long trial)
    if (client)
    {
       header = interface.get_send_buffer ();
-      header->dest = 6;
-      header->src = 0;
+      header->dest = (node >= 6) ? (node - 6) : (node + 6);;
+      header->src = node;
       header->type = 1;
       header->seq = seq++;
       header->len = length;
 
-      interface.send ();
+      interface.send (header);
       header = interface.recv (node);
 
       // get pointer to data section of buffer
@@ -209,8 +209,8 @@ bool llamaNET::run_trial (unsigned long trial)
       interface.release_recv_buffer ();
 
       header = interface.get_send_buffer ();
-      header->dest = 0;
-      header->src = 6;
+      header->dest = (node >= 6) ? (node - 6) : (node + 6);;
+      header->src = node;
       header->type = 1;
       header->seq = seq++;
       header->len = length;
@@ -221,7 +221,7 @@ bool llamaNET::run_trial (unsigned long trial)
       // place trial number in first "int" for master to verify
       *(reinterpret_cast<unsigned long *>(data)) = trial;
 
-      interface.send ();
+      interface.send (header);
       return true;
    }
 

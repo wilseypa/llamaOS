@@ -85,7 +85,7 @@ void llamaNET_sync (int client)
       strcpy (data, sync_string);
 
       // send/recv and verify the data has been changed
-      interface->send ();
+      interface->send (header);
 
       for (;;)
       {
@@ -132,7 +132,7 @@ void llamaNET_sync (int client)
       strcpy (data, sync_string);
 
       // send/recv and verify the data has been changed
-      interface->send ();
+      interface->send (header);
    }
 }
 
@@ -158,7 +158,7 @@ void llamaNET_send_data (const char *_data, unsigned int length)
       memcpy (data, _data, length);
 
       // send/recv and verify the data has been changed
-      interface->send ();
+      interface->send (header);
    }
 }
 
@@ -205,7 +205,7 @@ void llamaNET_send_time (double t)
    *data = static_cast<uint32_t>(t * 1.e8);
 
    // send/recv and verify the data has been changed
-   interface->send ();
+   interface->send (header);
 }
 
 extern "C"
@@ -247,7 +247,7 @@ void llamaNET_send_repeat (int rpt)
    *data = static_cast<uint32_t>(rpt);
 
    // send/recv and verify the data has been changed
-   interface->send ();
+   interface->send (header);
 }
 
 extern "C"
@@ -293,7 +293,7 @@ void llamaNET_cleanup (int client)
       strcpy (data, quit);
 
       // send/recv and verify the data has been changed
-      interface->send ();
+      interface->send (header);
 
       for (;;)
       {
@@ -339,7 +339,7 @@ void llamaNET_cleanup (int client)
       strcpy (data, quit);
 
       // send/recv and verify the data has been changed
-      interface->send ();
+      interface->send (header);
    }
 
    delete interface;

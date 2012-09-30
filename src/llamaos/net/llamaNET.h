@@ -73,6 +73,8 @@ public:
 //      volatile unsigned int tx_tail;
 //      volatile unsigned int tx_length [64];
 
+      volatile unsigned int next_tx_index;
+
    };
 
    class App_state
@@ -83,9 +85,16 @@ public:
 //      volatile unsigned int rx_head;
       volatile unsigned int rx_tail;
 
-      volatile unsigned int tx_head;
-      volatile unsigned int tx_tail;
-      volatile unsigned int tx_length [64];
+//      volatile unsigned int tx_head;
+//      volatile unsigned int tx_tail;
+//      volatile unsigned int tx_length [64];
+
+      volatile bool tx_request;
+      volatile unsigned int tx_index;
+      volatile unsigned int tx_length;
+
+      volatile grant_ref_t rx_refs [8];
+      volatile grant_ref_t tx_refs [8];
 
    };
 
@@ -96,10 +105,7 @@ public:
       App_state app [6];
 
       volatile unsigned int rx_buffer_size;
-      volatile grant_ref_t rx_refs [64];
-
       volatile unsigned int tx_buffer_size;
-      volatile grant_ref_t tx_refs [64];
 
       volatile unsigned int close_driver;
 
@@ -114,7 +120,7 @@ public:
    void release_recv_buffer ();
 
    Protocol_header *get_send_buffer ();
-   void send ();
+   void send (Protocol_header *header);
 
    const int domd_id;
    const int index;
