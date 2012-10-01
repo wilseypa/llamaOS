@@ -235,7 +235,6 @@ void entry_llamaOS (start_info_t *start_info)
 //      }
 
       string cl (reinterpret_cast<char *>(start_info->cmd_line));
-      cout << "splitting cl " << cl << endl;
       vector<string> args = split (cl);
 
       trace ("args size is %d\n", args.size ());

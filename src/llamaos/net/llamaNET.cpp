@@ -50,11 +50,6 @@ llamaNET::llamaNET (int domd_id, int index)
       rx_buffers(),
       tx_buffers()
 {
-   cout << "mapping buffers..." << endl;
-   cout.flush();
-   cout << "mapping buffers... " << control.get_pointer ()->tx_buffer_size << endl;
-   cout.flush();
-
    for (unsigned int i = 0; i < control->tx_buffer_size; i++)
    {
       tx_buffers.push_back (new Grant_map<Protocol_header>(domd_id, control->app [index].tx_refs [i]));
@@ -64,8 +59,6 @@ llamaNET::llamaNET (int domd_id, int index)
    {
       rx_buffers.push_back (new Grant_map<Protocol_header>(domd_id, control->app [index].rx_refs [i], true));
    }
-
-   cout << "mapping buffers finished" << endl;
 }
 
 llamaNET::~llamaNET ()
