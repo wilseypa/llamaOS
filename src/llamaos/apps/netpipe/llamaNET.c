@@ -42,7 +42,7 @@ void Init(ArgStruct *p, int* pargc, char*** pargv)
 
 void Setup(ArgStruct *p)
 {
-   llamaNET_setup (p->node);
+   llamaNET_setup ((p->tr) ? 0 : 6);
 }
 
 void Sync(ArgStruct *p)
