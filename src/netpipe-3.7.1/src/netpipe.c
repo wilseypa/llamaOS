@@ -87,6 +87,7 @@ int main(int argc, char **argv)
     args.syncflag=0; /* use normal mpi_send */
     args.use_sdp=0; /* default to no SDP */
     args.port = DEFPORT; /* just in case the user doesn't set this. */
+    args.node = 0;
 
     int packageSep = -1;
     perturbation = 0;
@@ -98,7 +99,7 @@ int main(int argc, char **argv)
 #if ! defined(TCGMSG)
 
     /* Parse the arguments. See Usage for description */
-    while ((c = getopt(argc, argv, "AXSO:rIiPszgfaB2h:p:w:o:l:u:b:m:n:t:c:d:D:P:")) != -1)
+    while ((c = getopt(argc, argv, "AXSO:rIiPszgfaB2h:p:w:o:l:u:b:m:n:N:t:c:d:D:P:")) != -1)
     {
         switch(c)
         {
@@ -194,6 +195,8 @@ int main(int argc, char **argv)
                       args.host = (char *)malloc(strlen(optarg)+1);
                       strcpy(args.host, optarg);
                       break;
+            case 'N': args.node = atoi(optarg);
+            		  break;
 
 #ifdef DISK
             case 'd': args.tr = 1;      /* -d to specify input/output file */
@@ -595,8 +598,8 @@ int main(int argc, char **argv)
            args.bufflen = len + pert;
 
            if( args.tr )
-               fprintf(stderr,"%3d: %7d bytes %6d times --> ",
-                       n,args.bufflen,nrepeat);
+               fprintf(stderr,"Node%d %3d: %7d bytes %6d times --> ",
+                       args.node,n,args.bufflen,nrepeat);
 
            if (args.cache) /* Allow cache effects.  We use only one buffer */
            {
