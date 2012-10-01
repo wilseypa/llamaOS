@@ -1,16 +1,16 @@
 #define FINAL
 #undef FINAL
 /*****************************************************************************/
-/* "NetPIPE" -- Network Protocol Independent Performance Evaluator.          */
-/* Copyright 1997, 1998 Iowa State University Research Foundation, Inc.      */
-/*                                                                           */
-/* This program is free software; you can redistribute it and/or modify      */
-/* it under the terms of the GNU General Public License as published by      */
-/* the Free Software Foundation.  You should have received a copy of the     */
-/* GNU General Public License along with this program; if not, write to the  */
-/* Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.   */
-/*                                                                           */
-/*     * netpipe.h          ---- General include file                        */
+/* "NetPIPE" -- Network Protocol Independent Performance Evaluator. */
+/* Copyright 1997, 1998 Iowa State University Research Foundation, Inc. */
+/* */
+/* This program is free software; you can redistribute it and/or modify */
+/* it under the terms of the GNU General Public License as published by */
+/* the Free Software Foundation. You should have received a copy of the */
+/* GNU General Public License along with this program; if not, write to the */
+/* Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. */
+/* */
+/* * netpipe.h ---- General include file */
 /*****************************************************************************/
 #include <ctype.h>
 #include <errno.h>
@@ -18,10 +18,10 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/types.h>
-#include <sys/time.h>       /* struct timeval */
-#include <sys/resource.h>   /* getrusage() */
-#include <stdlib.h>         /* malloc(3) */
-#include <unistd.h>         /* getopt, read, write, ... */
+#include <sys/time.h> /* struct timeval */
+#include <sys/resource.h> /* getrusage() */
+#include <stdlib.h> /* malloc(3) */
+#include <unistd.h> /* getopt, read, write, ... */
 
 /* Handle the case of building on MacOS X */
 #if defined(__APPLE__)
@@ -33,33 +33,33 @@
 #endif
 
 #ifdef OPENIB
-#include <infiniband/verbs.h>	/* enum ibv_mtu */
+#include <infiniband/verbs.h> /* enum ibv_mtu */
 #endif
 
 #ifdef FINAL
-  #define  TRIALS             7
-  #define  RUNTM              0.25
+  #define TRIALS 7
+  #define RUNTM 0.25
 #else
-  #define  TRIALS             3
-  #define  RUNTM              0.10
+  #define TRIALS 3
+  #define RUNTM 0.10
 #endif
 
-#define  MEMSIZE            10000000
-#define  DEFPORT            5002
-#define  NSAMP              8000
-#define  DEFPERT            3
-#define  LONGTIME           1e99
-#define  CHARSIZE           8
-#define  STOPTM             1.0
-#define  MAXINT             10000000
-/*#define  MAXINT             1048576*/
+#define MEMSIZE 10000000
+#define DEFPORT 5002
+#define NSAMP 8000
+#define DEFPERT 3
+#define LONGTIME 1e99
+#define CHARSIZE 8
+#define STOPTM 1.0
+#define MAXINT 10000000
+/*#define MAXINT 1048576*/
 
-#define     ABS(x)     (((x) < 0)?(-(x)):(x))
-#define     MIN(x,y)   (((x) < (y))?(x):(y))
-#define     MAX(x,y)   (((x) > (y))?(x):(y))
+#define ABS(x) (((x) < 0)?(-(x)):(x))
+#define MIN(x,y) (((x) < (y))?(x):(y))
+#define MAX(x,y) (((x) > (y))?(x):(y))
 
-/* Need to include the protocol structure header file.                       */
-/* Change this to reflect the protocol                                       */
+/* Need to include the protocol structure header file. */
+/* Change this to reflect the protocol */
 
 #if defined(TCP)
   #include <netdb.h>
@@ -71,36 +71,36 @@
   typedef struct protocolstruct ProtocolStruct;
   struct protocolstruct
   {
-      struct sockaddr_in      sin1,   /* socket structure #1              */
-                              sin2;   /* socket structure #2              */
-      int                     nodelay;  /* Flag for TCP nodelay           */
-      struct hostent          *addr;    /* Address of host                */
-      int                     sndbufsz, /* Size of TCP send buffer        */
-                              rcvbufsz; /* Size of TCP receive buffer     */
+      struct sockaddr_in sin1, /* socket structure #1 */
+                              sin2; /* socket structure #2 */
+      int nodelay; /* Flag for TCP nodelay */
+      struct hostent *addr; /* Address of host */
+      int sndbufsz, /* Size of TCP send buffer */
+                              rcvbufsz; /* Size of TCP receive buffer */
 #if defined(INFINIBAND)
-      IB_mtu_t                ib_mtu;   /* MTU Size for Infiniband HCA    */
-      int                     commtype; /* Communications type            */
-      int                     comptype; /* Completion type                */
+      IB_mtu_t ib_mtu; /* MTU Size for Infiniband HCA */
+      int commtype; /* Communications type */
+      int comptype; /* Completion type */
 #endif
 #if defined(OPENIB)
-      enum ibv_mtu            ib_mtu;   /* MTU Size for Infiniband HCA    */
-      int                     commtype; /* Communications type            */
-      int                     comptype; /* Completion type                */
-      char                    *device_and_port; /* Local port specification */
+      enum ibv_mtu ib_mtu; /* MTU Size for Infiniband HCA */
+      int commtype; /* Communications type */
+      int comptype; /* Completion type */
+      char *device_and_port; /* Local port specification */
 #endif
   };
 
 #if defined(INFINIBAND) || defined(OPENIB)
 enum completion_types {
-   NP_COMP_LOCALPOLL,  /* Poll locally on last byte of data     */
-   NP_COMP_VAPIPOLL,   /* Poll using vapi function              */
-   NP_COMP_EVENT       /* Don't poll, use vapi event completion */
+   NP_COMP_LOCALPOLL, /* Poll locally on last byte of data */
+   NP_COMP_VAPIPOLL, /* Poll using vapi function */
+   NP_COMP_EVENT /* Don't poll, use vapi event completion */
 };
 enum communication_types {
-   NP_COMM_SENDRECV,           /* Communication with send/receive            */
-   NP_COMM_SENDRECV_WITH_IMM,  /* Communication with send/receive & imm data */
-   NP_COMM_RDMAWRITE,          /* Communication with rdma write              */
-   NP_COMM_RDMAWRITE_WITH_IMM, /* Communication with rdma write & imm data   */
+   NP_COMM_SENDRECV, /* Communication with send/receive */
+   NP_COMM_SENDRECV_WITH_IMM, /* Communication with send/receive & imm data */
+   NP_COMM_RDMAWRITE, /* Communication with rdma write */
+   NP_COMM_RDMAWRITE_WITH_IMM, /* Communication with rdma write & imm data */
 };
 #endif
 
@@ -114,12 +114,12 @@ enum communication_types {
   typedef struct protocolstruct ProtocolStruct;
   struct protocolstruct
   {
-      struct sockaddr_in6     sin1;   /* socket structure #1              */
-      struct sockaddr_in6     sin2;   /* socket structure #2              */
-      int                     nodelay;  /* Flag for TCP nodelay           */
-      struct hostent          *addr;    /* Address of host                */
-      int                     sndbufsz; /* Size of TCP send buffer        */
-      int                     rcvbufsz; /* Size of TCP receive buffer     */
+      struct sockaddr_in6 sin1; /* socket structure #1 */
+      struct sockaddr_in6 sin2; /* socket structure #2 */
+      int nodelay; /* Flag for TCP nodelay */
+      struct hostent *addr; /* Address of host */
+      int sndbufsz; /* Size of TCP send buffer */
+      int rcvbufsz; /* Size of TCP receive buffer */
   };
 
 #elif defined(SCTP)
@@ -132,12 +132,12 @@ enum communication_types {
   typedef struct protocolstruct ProtocolStruct;
   struct protocolstruct
   {
-      struct sockaddr_in      sin1,   /* socket structure #1              */
-                              sin2;   /* socket structure #2              */
-      int                     nodelay;  /* Flag for TCP nodelay           */
-      struct hostent          *addr;    /* Address of host                */
-      int                     sndbufsz, /* Size of TCP send buffer        */
-                              rcvbufsz; /* Size of TCP receive buffer     */
+      struct sockaddr_in sin1, /* socket structure #1 */
+                              sin2; /* socket structure #2 */
+      int nodelay; /* Flag for TCP nodelay */
+      struct hostent *addr; /* Address of host */
+      int sndbufsz, /* Size of TCP send buffer */
+                              rcvbufsz; /* Size of TCP receive buffer */
   };
 
 #elif defined(TCP6)
@@ -150,12 +150,12 @@ enum communication_types {
   typedef struct protocolstruct ProtocolStruct;
   struct protocolstruct
   {
-      struct sockaddr_in6     sin1;   /* socket structure #1              */
-      struct sockaddr_in6     sin2;   /* socket structure #2              */
-      int                     nodelay;  /* Flag for TCP nodelay           */
-      struct hostent          *addr;    /* Address of host                */
-      int                     sndbufsz; /* Size of TCP send buffer        */
-      int                     rcvbufsz; /* Size of TCP receive buffer     */
+      struct sockaddr_in6 sin1; /* socket structure #1 */
+      struct sockaddr_in6 sin2; /* socket structure #2 */
+      int nodelay; /* Flag for TCP nodelay */
+      struct hostent *addr; /* Address of host */
+      int sndbufsz; /* Size of TCP send buffer */
+      int rcvbufsz; /* Size of TCP receive buffer */
   };
 
 #elif defined(IPX)
@@ -166,10 +166,10 @@ enum communication_types {
   typedef struct protocolstruct ProtocolStruct;
   struct protocolstruct
   {
-      struct sockaddr_ipx     sipx1;   /* socket structure #1              */
-      struct sockaddr_ipx     sipx2;   /* socket structure #2              */
-      int                     sndbufsz; /* Size of send buffer        */
-      int                     rcvbufsz; /* Size of receive buffer     */
+      struct sockaddr_ipx sipx1; /* socket structure #1 */
+      struct sockaddr_ipx sipx2; /* socket structure #2 */
+      int sndbufsz; /* Size of send buffer */
+      int rcvbufsz; /* Size of receive buffer */
   };
 
 #elif defined(MPI)
@@ -186,28 +186,25 @@ enum communication_types {
 
   struct protocolstruct
   {
-    int     mytid; /* Keep track of our task id */
-    int     othertid; /* Keep track of the other's task id */
+    int mytid; /* Keep track of our task id */
+    int othertid; /* Keep track of the other's task id */
   };
 
 /*
-  Choose one of the following to determine the type of data
-  encoding for the PVM message passing.
+Choose one of the following to determine the type of data
+encoding for the PVM message passing.
+DataDefault means that PVM uses XDR encoding which ensures that
+the data can be packed / unpacked across non-homogeneous machines.
+If you know that the machines are the same, then you can use DataRaw
+and save some time (DDT - does not seem to help).
+DataInPlace means that the data is not copied at pack time, but is
+copied directly from memory at send time (DDT - this helps a lot).
 
-  DataDefault means that PVM uses XDR encoding which ensures that
-  the data can be packed / unpacked across non-homogeneous machines.
-
-  If you know that the machines are the same, then you can use DataRaw
-  and save some time (DDT - does not seem to help).
-
-  DataInPlace means that the data is not copied at pack time, but is
-  copied directly from memory at send time (DDT - this helps a lot).
-
-#define PVMDATA     PvmDataDefault
-#define PVMDATA     PvmDataRaw
-#define PVMDATA     PvmDataInPlace
+#define PVMDATA PvmDataDefault
+#define PVMDATA PvmDataRaw
+#define PVMDATA PvmDataInPlace
 */
-#define PVMDATA     PvmDataInPlace
+#define PVMDATA PvmDataInPlace
 
 
 #elif defined(TCGMSG)
@@ -233,8 +230,8 @@ enum communication_types {
 
 #elif defined(ARMCI)
     /* basically same as for GPSHMEM */
-  double   *pTime;
-  int      *pNrepeat;
+  double *pTime;
+  int *pNrepeat;
   typedef struct protocolstruct ProtocolStruct;
   struct protocolstruct
   {
@@ -263,8 +260,8 @@ enum communication_types {
   typedef struct protocolstruct ProtocolStruct;
   struct protocolstruct
   {
-      port_id id_self,       /* My port id */
-              id_nbor;       /* My neighbor's port id */
+      port_id id_self, /* My port id */
+              id_nbor; /* My neighbor's port id */
   }
 
 #elif defined(MEMCPY)
@@ -276,13 +273,14 @@ enum communication_types {
   struct protocolstruct {
      char *dfile_name;
      int read;
-     char read_type;   /* c-char  d-double  s-stream */
+     char read_type; /* c-char d-double s-stream */
   };
 
 // !BAM
 #elif defined(LLAMANET)
   typedef struct protocolstruct ProtocolStruct;
   struct protocolstruct { int nothing; };
+
 #else
   #error "One of TCP, TCP6, SCTP, SCTP6, IPX, MPI, PVM, TCGMSG, LAPI, SHMEM, ATOLL, MEMCPY, DISK must be defined during compilation"
 
@@ -292,38 +290,37 @@ enum communication_types {
 typedef struct argstruct ArgStruct;
 struct argstruct
 {
-    /* This is the common information that is needed for all tests           */
-    int      cache;         /* Cache flag, 0 => limit cache, 1=> use cache   */
-    char     *host;         /* Name of receiving host                        */
+    /* This is the common information that is needed for all tests */
+    int cache; /* Cache flag, 0 => limit cache, 1=> use cache */
+    char *host; /* Name of receiving host */
 
-    int      servicefd,     /* File descriptor of the network socket         */
-             commfd;        /* Communication file descriptor                 */
-    short    port;          /* Port used for connection                      */
-    char     *r_buff;       /* Aligned receive buffer                        */
-    char     *r_buff_orig;  /* Original unaligned receive buffer             */
+    int servicefd, /* File descriptor of the network socket */
+             commfd; /* Communication file descriptor */
+    short port; /* Port used for connection */
+    char *r_buff; /* Aligned receive buffer */
+    char *r_buff_orig; /* Original unaligned receive buffer */
 #if defined(USE_VOLATILE_RPTR)
-    volatile                /* use volatile if polling on buffer in module   */
+    volatile /* use volatile if polling on buffer in module */
 #endif
-    char     *r_ptr;        /* Pointer to current location in send buffer    */
-    char     *r_ptr_saved;  /* Pointer for saving value of r_ptr             */
-    char     *s_buff;       /* Aligned send buffer                           */
-    char     *s_buff_orig;  /* Original unaligned send buffer                */
-    char     *s_ptr;        /* Pointer to current location in send buffer    */
+    char *r_ptr; /* Pointer to current location in send buffer */
+    char *r_ptr_saved; /* Pointer for saving value of r_ptr */
+    char *s_buff; /* Aligned send buffer */
+    char *s_buff_orig; /* Original unaligned send buffer */
+    char *s_ptr; /* Pointer to current location in send buffer */
 
-    int      bufflen,       /* Length of transmitted buffer                  */
-             upper,         /* Upper limit to bufflen                        */
-             tr,rcv,        /* Transmit and Recv flags, or maybe neither     */
-             bidir,         /* Bi-directional flag                           */
-             nbuff;         /* Number of buffers to transmit                 */
+    int bufflen, /* Length of transmitted buffer */
+             upper, /* Upper limit to bufflen */
+             tr,rcv, /* Transmit and Recv flags, or maybe neither */
+             bidir, /* Bi-directional flag */
+             nbuff; /* Number of buffers to transmit */
 
-    int      source_node;   /* Set to -1 (MPI_ANY_SOURCE) if -z specified    */
-    int      preburst;      /* Burst preposted receives before timed runs    */
-    int      reset_conn;    /* Reset connection flag                         */
-    int      soffset,roffset;
-    int      syncflag; /* flag for using sync sends vs. normal sends in MPI mod*/
-    int	     use_sdp;       /* Use AF_INET_SDP instead of AF_INET */
-    int		 node;
-    /* Now we work with a union of information for protocol dependent stuff  */
+    int source_node; /* Set to -1 (MPI_ANY_SOURCE) if -z specified */
+    int preburst; /* Burst preposted receives before timed runs */
+    int reset_conn; /* Reset connection flag */
+    int soffset,roffset;
+    int syncflag; /* flag for using sync sends vs. normal sends in MPI mod*/
+    int	use_sdp; /* Use AF_INET_SDP instead of AF_INET */
+    /* Now we work with a union of information for protocol dependent stuff */
     ProtocolStruct prot;
 };
 
@@ -333,8 +330,8 @@ struct data
     double t;
     double bps;
     double variance;
-    int    bits;
-    int    repeat;
+    int bits;
+    int repeat;
 };
 
 double When();
