@@ -96,7 +96,7 @@ void llamaNET_sync (int client)
 
          if (0 == strncmp (data, sync_string, strlen(sync_string)))
          {
-            interface->release_recv_buffer ();
+            interface->release_recv_buffer (header);
             break;
          }
          cout << "found wrong data in sync..." << endl;
@@ -114,7 +114,7 @@ void llamaNET_sync (int client)
 
          if (0 == strncmp (data, sync_string, strlen(sync_string)))
          {
-            interface->release_recv_buffer ();
+            interface->release_recv_buffer (header);
             break;
          }
          cout << "found wrong data in sync..." << endl;
@@ -178,7 +178,7 @@ void llamaNET_recv_data (char *_data, unsigned int length)
       // !BAM can I loose this?
       memcpy (_data, data, length);
 
-      interface->release_recv_buffer ();
+      interface->release_recv_buffer (header);
    }
 }
 
@@ -223,7 +223,7 @@ double llamaNET_recv_time ()
    /* Result is ltime (in microseconds) divided by 1.0e8 to get seconds */
    double t = *data / 1.0e8;
 
-   interface->release_recv_buffer ();
+   interface->release_recv_buffer (header);
 
    return t;
 }
@@ -264,7 +264,7 @@ int llamaNET_recv_repeat (void)
 
    int rpt = static_cast<int>(*data);
 
-   interface->release_recv_buffer ();
+   interface->release_recv_buffer (header);
 
    return rpt;
 }
@@ -305,7 +305,7 @@ void llamaNET_cleanup (int client)
          if (0 == strncmp (data, quit, strlen(quit)))
          {
             cout << "QUIT RECVED!!!!" << endl;
-            interface->release_recv_buffer ();
+            interface->release_recv_buffer (header);
             break;
          }
       }
@@ -322,7 +322,7 @@ void llamaNET_cleanup (int client)
          if (0 == strcmp (data, quit))
          {
             cout << "QUIT RECVED!!!!" << endl;
-            interface->release_recv_buffer ();
+            interface->release_recv_buffer (header);
             break;
          }
       }

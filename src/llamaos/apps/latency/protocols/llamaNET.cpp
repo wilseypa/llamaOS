@@ -131,7 +131,7 @@ bool llamaNET::verify ()
 
       if (verify_data_numeric (data, length))
       {
-         interface.release_recv_buffer ();
+         interface.release_recv_buffer (header);
 
          cout << "dalai recv'ed packet..." << endl;
          return true;
@@ -147,7 +147,7 @@ bool llamaNET::verify ()
 
       if (verify_data_alpha (data, length))
       {
-         interface.release_recv_buffer ();
+         interface.release_recv_buffer (header);
 
          header = interface.get_send_buffer ();
          header->dest = (node >= 6) ? (node - 6) : (node + 6);;
@@ -194,19 +194,19 @@ bool llamaNET::run_trial (unsigned long trial)
 
       if (*(reinterpret_cast<unsigned long *>(data)) == trial)
       {
-         interface.release_recv_buffer ();
+         interface.release_recv_buffer (header);
          return true;
       }
       else
       {
-         interface.release_recv_buffer ();
+         interface.release_recv_buffer (header);
          return false;
       }
    }
    else
    {
       header = interface.recv (node);
-      interface.release_recv_buffer ();
+      interface.release_recv_buffer (header);
 
       header = interface.get_send_buffer ();
       header->dest = (node >= 6) ? (node - 6) : (node + 6);;

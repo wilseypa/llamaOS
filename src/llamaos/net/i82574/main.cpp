@@ -524,10 +524,11 @@ int main (int /* argc */, char ** /* argv [] */)
    int cleanup_delay = 0;
    unsigned int head = 0;
 
+   queue<unsigned int> tx_indexes;
+
 #if DRIVER
    for (;;)
    {
-//      if (rx_head != csr.read_RDH())
       if (rx_desc [rx_head].status != 0)
       {
          head = llamaNET_control->driver.rx_head;
@@ -535,61 +536,28 @@ int main (int /* argc */, char ** /* argv [] */)
          head %= 8;
          llamaNET_control->driver.rx_head = head;
 
-         rx_head++;
-         rx_head %= 256;
-
          // !bam can't do this until all guest tail is updated
-         buffer_entry rx_buffer = rx_hw.front();
-         rx_hw.pop ();
-
-         rx_desc [rx_tail].buffer = rx_buffer.address;
+         rx_desc [rx_tail].buffer = rx_desc [rx_head].buffer;
          rx_desc [rx_tail].checksum = 0;
          rx_desc [rx_tail].error = 0;
          rx_desc [rx_tail].length = 0;
          rx_desc [rx_tail].status = 0;
          rx_desc [rx_tail].vlan = 0;
-         rx_hw.push(rx_buffer);
          rx_tail++;
          rx_tail %= 256;
          csr.write_RDT (rx_tail);
+
+         rx_head++;
+         rx_head %= 256;
       }
-
-#if 0
-      unsigned int tail = llamaNET_control->app [0].tx_tail;
-
-//      if (llamaNET_control->app [0].tx_head != llamaNET_control->app [0].tx_tail)
-      if (llamaNET_control->app [0].tx_head != tail)
-      {
-//         buffer_entry tx_buffer = tx_sw.front();
-
-//         tx_desc [tx_tail].buffer = tx_buffer.address;
-         tx_desc [tx_tail].buffer = tx_buffers [tail].address;
-         tx_desc [tx_tail].length = llamaNET_control->app [0].tx_length [tail];
-         tx_desc [tx_tail].CSO = 0;
-         tx_desc [tx_tail].CMD = 0x0B;
-         tx_desc [tx_tail].STA = 0;
-         tx_desc [tx_tail].CSS = 0;
-         tx_desc [tx_tail].VLAN = 0;
-
-         tx_tail++;
-         tx_tail %= 256;
-         csr.write_TDT (tx_tail);
-
-//         tx_sw.pop ();
-//         tx_hw.push(tx_buffer);
-
-//         unsigned int tail = llamaNET_control->app [0].tx_tail;
-         tail++;
-         tail %= 8;
-         llamaNET_control->app [0].tx_tail = tail;
-      }
-#endif
 
       for (int i = 0; i < 6; i++)
       {
          if (llamaNET_control->app [i].tx_request)
          {
-            tx_desc [tx_tail].buffer = tx_buffers [llamaNET_control->app [i].tx_index].address;
+            unsigned int index = llamaNET_control->app [i].tx_index;
+
+            tx_desc [tx_tail].buffer = tx_buffers [index].address;
             tx_desc [tx_tail].length = llamaNET_control->app [i].tx_length;
             tx_desc [tx_tail].CSO = 0;
             tx_desc [tx_tail].CMD = 0x0B;
@@ -600,6 +568,28 @@ int main (int /* argc */, char ** /* argv [] */)
             tx_tail++;
             tx_tail %= 256;
             csr.write_TDT (tx_tail);
+
+            if (llamaNET_control->driver.tx_head == index)
+            {
+               head = llamaNET_control->driver.tx_head;
+               head++;
+               head %= 8;
+               llamaNET_control->driver.tx_head = head;
+
+               while (llamaNET_control->driver.tx_head == tx_indexes.front ())
+               {
+                  head = llamaNET_control->driver.tx_head;
+                  head++;
+                  head %= 8;
+                  llamaNET_control->driver.tx_head = head;
+
+                  tx_indexes.pop ();
+               }
+            }
+            else
+            {
+               tx_indexes.push(index);
+            }
 
             llamaNET_control->app [i].tx_request = false;
          }

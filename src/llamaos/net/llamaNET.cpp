@@ -89,15 +89,28 @@ llamaNET::~llamaNET ()
 bool llamaNET::recv_poll ()
 {
    // only check for message arrival
-   return (control->driver.rx_head != control->app [index].rx_tail);
+   return (   (control->driver.rx_head != control->app [index].rx_tail)
+           || (control->driver.tx_head != control->app [index].tx_tail));
 }
 
 llamaNET::Protocol_header *llamaNET::recv ()
 {
    // spin until message arrives
-   while (!recv_poll ());
+   for (;;)
+   {
+      if (control->driver.rx_head != control->app [index].rx_tail)
+      {
+         return rx_buffers [control->app [index].rx_tail]->get_pointer ();
+      }
 
-   return rx_buffers [control->app [index].rx_tail]->get_pointer ();
+      if (control->driver.tx_head != control->app [index].tx_tail)
+      {
+         return tx_buffers [control->app [index].tx_tail]->get_pointer ();
+      }
+   }
+//      while (!recv_poll ());
+
+//   return rx_buffers [control->app [index].rx_tail]->get_pointer ();
 }
 
 llamaNET::Protocol_header *llamaNET::recv (uint32_t node)
@@ -113,16 +126,26 @@ llamaNET::Protocol_header *llamaNET::recv (uint32_t node)
          return header;
       }
 
-      release_recv_buffer ();
+      release_recv_buffer (header);
    }
 }
 
-void llamaNET::release_recv_buffer ()
+void llamaNET::release_recv_buffer (Protocol_header *header)
 {
-   unsigned int tail = control->app [index].rx_tail;
-   tail++;
-   tail %= control->rx_buffer_size;
-   control->app [index].rx_tail = tail;
+   if (header == rx_buffers [control->app [index].rx_tail]->get_pointer ())
+   {
+      unsigned int tail = control->app [index].rx_tail;
+      tail++;
+      tail %= control->rx_buffer_size;
+      control->app [index].rx_tail = tail;
+   }
+   else if (header == tx_buffers [control->app [index].tx_tail]->get_pointer ())
+   {
+      unsigned int tail = control->app [index].tx_tail;
+      tail++;
+      tail %= control->tx_buffer_size;
+      control->app [index].tx_tail = tail;
+   }
 }
 
 llamaNET::Protocol_header *llamaNET::get_send_buffer ()

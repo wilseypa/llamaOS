@@ -69,7 +69,7 @@ public:
       volatile unsigned int rx_head;
 //      volatile unsigned int rx_tail;
 
-//      volatile unsigned int tx_head;
+      volatile unsigned int tx_head;
 //      volatile unsigned int tx_tail;
 //      volatile unsigned int tx_length [64];
 
@@ -86,7 +86,7 @@ public:
       volatile unsigned int rx_tail;
 
 //      volatile unsigned int tx_head;
-//      volatile unsigned int tx_tail;
+      volatile unsigned int tx_tail;
 //      volatile unsigned int tx_length [64];
 
       volatile bool tx_request;
@@ -117,7 +117,7 @@ public:
    bool recv_poll ();
    Protocol_header *recv ();
    Protocol_header *recv (uint32_t node);
-   void release_recv_buffer ();
+   void release_recv_buffer (Protocol_header *header);
 
    Protocol_header *get_send_buffer ();
    void send (Protocol_header *header);
