@@ -3,15 +3,17 @@ CS="sudo xl create -c netpipe-llamaNET-"
 if [ -z "$1" ]
 then
 	echo "Number of processes must be defined"
-	echo "Usage: bash llamaMultiple.sh <#processes> [h]"
+	echo "Usage: bash llamaMultiple.sh <#processes> <offset>"
 	exit
 fi
 
 if [ -z "$2" ]
 then
-	OFFSET=0
+	echo "Offset must be defined"
+	echo "Usage: bash llamaMultiple.sh <#processes> <offset>"
+	exit
 else
-	OFFSET=6
+	OFFSET=$2
 fi
 
 echo "Launching $1 processes"

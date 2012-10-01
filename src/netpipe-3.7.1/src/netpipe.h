@@ -26,7 +26,7 @@
 /* Handle the case of building on MacOS X */
 #if defined(__APPLE__)
 #include <stdint.h>
-#endif 
+#endif
 
 #ifdef INFINIBAND
 #include <ib_defs.h> /* ib_mtu_t */
@@ -44,7 +44,7 @@
   #define  RUNTM              0.10
 #endif
 
-#define  MEMSIZE            10000000 
+#define  MEMSIZE            10000000
 #define  DEFPORT            5002
 #define  NSAMP              8000
 #define  DEFPERT            3
@@ -67,7 +67,7 @@
   #include <netinet/in.h>
   #include <netinet/tcp.h>
   #include <arpa/inet.h>
-  
+
   typedef struct protocolstruct ProtocolStruct;
   struct protocolstruct
   {
@@ -110,7 +110,7 @@ enum communication_types {
   #include <netinet/in.h>
   #include <netinet/sctp.h>
   #include <arpa/inet.h>
-  
+
   typedef struct protocolstruct ProtocolStruct;
   struct protocolstruct
   {
@@ -128,7 +128,7 @@ enum communication_types {
   #include <netinet/in.h>
   #include <netinet/sctp.h>
   #include <arpa/inet.h>
-  
+
   typedef struct protocolstruct ProtocolStruct;
   struct protocolstruct
   {
@@ -146,7 +146,7 @@ enum communication_types {
   #include <netinet/in.h>
   #include <netinet/tcp.h>
   #include <arpa/inet.h>
-  
+
   typedef struct protocolstruct ProtocolStruct;
   struct protocolstruct
   {
@@ -162,7 +162,7 @@ enum communication_types {
   #include <netdb.h>
   #include <sys/socket.h>
   #include <netipx/ipx.h>
-  
+
   typedef struct protocolstruct ProtocolStruct;
   struct protocolstruct
   {
@@ -174,8 +174,8 @@ enum communication_types {
 
 #elif defined(MPI)
   typedef struct protocolstruct ProtocolStruct;
-  struct protocolstruct 
-  { 
+  struct protocolstruct
+  {
     int nbor, iproc;
     int use_get;
     int no_fence;
@@ -193,13 +193,13 @@ enum communication_types {
 /*
   Choose one of the following to determine the type of data
   encoding for the PVM message passing.
-  
+
   DataDefault means that PVM uses XDR encoding which ensures that
   the data can be packed / unpacked across non-homogeneous machines.
-  
+
   If you know that the machines are the same, then you can use DataRaw
   and save some time (DDT - does not seem to help).
-  
+
   DataInPlace means that the data is not copied at pack time, but is
   copied directly from memory at send time (DDT - this helps a lot).
 
@@ -215,7 +215,7 @@ enum communication_types {
   struct protocolstruct { long nbor, nid; };
 
 #elif defined(LAPI)
-  typedef struct protocolstruct ProtocolStruct;   
+  typedef struct protocolstruct ProtocolStruct;
   struct protocolstruct { int nbor; };
 
 #elif defined(SHMEM)
@@ -247,8 +247,8 @@ enum communication_types {
   #include "gm.h"
   typedef struct protocolstruct ProtocolStruct;
   struct protocolstruct
-  { 
-     int nbor, iproc, num_stokens; 
+  {
+     int nbor, iproc, num_stokens;
      unsigned short host_id; /* Host id in routing info of myrinet card */
   };
 
@@ -259,7 +259,7 @@ enum communication_types {
 #elif defined(ATOLL)
 
   #include <atoll.h>
-  
+
   typedef struct protocolstruct ProtocolStruct;
   struct protocolstruct
   {
@@ -283,7 +283,6 @@ enum communication_types {
 #elif defined(LLAMANET)
   typedef struct protocolstruct ProtocolStruct;
   struct protocolstruct { int nothing; };
-
 #else
   #error "One of TCP, TCP6, SCTP, SCTP6, IPX, MPI, PVM, TCGMSG, LAPI, SHMEM, ATOLL, MEMCPY, DISK must be defined during compilation"
 
@@ -291,7 +290,7 @@ enum communication_types {
 
 
 typedef struct argstruct ArgStruct;
-struct argstruct 
+struct argstruct
 {
     /* This is the common information that is needed for all tests           */
     int      cache;         /* Cache flag, 0 => limit cache, 1=> use cache   */
@@ -323,6 +322,7 @@ struct argstruct
     int      soffset,roffset;
     int      syncflag; /* flag for using sync sends vs. normal sends in MPI mod*/
     int	     use_sdp;       /* Use AF_INET_SDP instead of AF_INET */
+    int		 node;
     /* Now we work with a union of information for protocol dependent stuff  */
     ProtocolStruct prot;
 };
