@@ -321,6 +321,7 @@ struct argstruct
     int syncflag; /* flag for using sync sends vs. normal sends in MPI mod*/
     int	use_sdp; /* Use AF_INET_SDP instead of AF_INET */
     /* Now we work with a union of information for protocol dependent stuff */
+    int node;
     ProtocolStruct prot;
 };
 

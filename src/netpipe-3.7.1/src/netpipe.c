@@ -87,6 +87,7 @@ function that requires argc and argv */
     args.syncflag=0; /* use normal mpi_send */
     args.use_sdp=0; /* default to no SDP */
     args.port = DEFPORT; /* just in case the user doesn't set this. */
+    args.node=0;
 
 
     /* TCGMSG launches NPtcgmsg with a -master master_hostname
@@ -97,7 +98,7 @@ function that requires argc and argv */
 #if ! defined(TCGMSG)
 
     /* Parse the arguments. See Usage for description */
-    while ((c = getopt(argc, argv, "AXSO:rIiPszgfaB2h:p:o:l:u:b:m:n:t:c:d:D:P:")) != -1)
+    while ((c = getopt(argc, argv, "AXSO:rIiPszgfaB2h:p:o:l:u:b:m:n:t:c:d:D:N:P:")) != -1)
     {
         switch(c)
         {
@@ -198,6 +199,8 @@ break;
                       args.host = (char *)malloc(strlen(optarg)+1);
                       strcpy(args.host, optarg);
                       break;
+            case 'N': args.host = atoi(optarg);
+            		  break;
 
 #ifdef DISK
             case 'd': args.tr = 1; /* -d to specify input/output file */
@@ -595,8 +598,8 @@ for(i=0;i<10000;i++){};
            args.bufflen = len + pert;
 
            if( args.tr )
-               fprintf(stderr,"%3d: %7d bytes %6d times --> ",
-                       n,args.bufflen,nrepeat);
+               fprintf(stderr,"Node%d %3d: %7d bytes %6d times --> ",
+                       args.node,n,args.bufflen,nrepeat);
 
            if (args.cache) /* Allow cache effects. We use only one buffer */
            {
