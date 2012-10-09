@@ -34,9 +34,9 @@
 MAKEFLAGS = --silent
 
 # compiler tools
-CC = /opt/gcc-4.7.1/bin/gcc
-CXX = /opt/gcc-4.7.1/bin/g++
-LD = /opt/gcc-4.7.1/bin/gcc
+CC = gcc
+CXX = g++
+LD = gcc
 
 # assembler/compiler/linker options
 # notes from manual:
@@ -350,3 +350,5 @@ CPPFLAGS = $(XFLAGS) \
 
 LDFLAGS = -nostdlib
 # -nostartfiles -nodefaultlibs 
+
+-include custom-flags.mk

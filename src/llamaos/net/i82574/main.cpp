@@ -569,27 +569,28 @@ int main (int /* argc */, char ** /* argv [] */)
             tx_tail %= 256;
             csr.write_TDT (tx_tail);
 
-            if (llamaNET_control->driver.tx_head == index)
-            {
+// ignore the ordering problem for now
+//            if (llamaNET_control->driver.tx_head == index)
+//            {
                head = llamaNET_control->driver.tx_head;
                head++;
                head %= 8;
                llamaNET_control->driver.tx_head = head;
 
-               while (llamaNET_control->driver.tx_head == tx_indexes.front ())
-               {
-                  head = llamaNET_control->driver.tx_head;
-                  head++;
-                  head %= 8;
-                  llamaNET_control->driver.tx_head = head;
+//               while (llamaNET_control->driver.tx_head == tx_indexes.front ())
+//               {
+//                  head = llamaNET_control->driver.tx_head;
+//                  head++;
+//                  head %= 8;
+//                  llamaNET_control->driver.tx_head = head;
 
-                  tx_indexes.pop ();
-               }
-            }
-            else
-            {
-               tx_indexes.push(index);
-            }
+//                  tx_indexes.pop ();
+//               }
+//            }
+//            else
+//            {
+//               tx_indexes.push(index);
+//            }
 
             llamaNET_control->app [i].tx_request = false;
          }
