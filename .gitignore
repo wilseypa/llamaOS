@@ -13,8 +13,7 @@ obj/
 
 # User make files #
 ###################
-custom.mk
-apps.mk
+build/custom-flags.mk
 
 # KDevelop files #
 # ############## #
