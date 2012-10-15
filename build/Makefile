@@ -48,14 +48,15 @@ all:
 	@$(MAKE) -f llamaOS-xen-test.mk xen
 	@$(MAKE) -f apps/hello.mk xen
 	@$(MAKE) -f apps/latency-llamaNET.mk
-	@$(MAKE) -f apps/latency-tcp.mk
-	@$(MAKE) -f apps/latency-tcpnb.mk
 	@$(MAKE) -f apps/netpipe-llamaNET.mk
-	@$(MAKE) -f apps/netpipe-tcp.mk
 	@$(MAKE) -f minimal/minimal.mk xen
 	@$(MAKE) -f minimal/minimal-glibc.mk xen
 	@$(MAKE) -f minimal/minimal-gcc.mk xen
 	@$(MAKE) -f net/i82574.mk xen
+
+#	@$(MAKE) -f apps/latency-tcp.mk
+#	@$(MAKE) -f apps/latency-tcpnb.mk
+#	@$(MAKE) -f apps/netpipe-tcp.mk
 
 .PHONY: install
 install:
