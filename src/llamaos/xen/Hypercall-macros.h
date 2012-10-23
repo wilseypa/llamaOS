@@ -46,6 +46,7 @@ extern char hypercall_page [];
 
 // Taken straight from Linux source
 // linux-3.6-rc3/arch/x86/include/asm/xen/hypercall.h
+#if 0
 
 // extern struct { char _entry[32]; } hypercall_page[];
 
@@ -186,6 +187,88 @@ privcmd_call(unsigned call,
 
 	return (long)__res;
 }
+#else
+#define __STR(x) #x
+#define STR(x) __STR(x)
+
+// extern char hypercall_page[PAGE_SIZE];
+
+#define _hypercall0(type, name)                 \
+({                                              \
+        long __res;                             \
+        asm volatile (                          \
+                "call hypercall_page + (" STR(__HYPERVISOR_##name) " * 32)"\
+                : "=a" (__res)                  \
+                :                               \
+                : "memory" );                   \
+        (type)__res;                            \
+})
+
+#define _hypercall1(type, name, a1)                             \
+({                                                              \
+        long __res, __ign1;                                     \
+        asm volatile (                                          \
+                "call hypercall_page + (" STR(__HYPERVISOR_##name) " * 32)"\
+                : "=a" (__res), "=D" (__ign1)                   \
+                : "1" ((long)(a1))                              \
+                : "memory" );                                   \
+        (type)__res;                                            \
+})
+
+#define _hypercall2(type, name, a1, a2)                         \
+({                                                              \
+        long __res, __ign1, __ign2;                             \
+        asm volatile (                                          \
+                "call hypercall_page + (" STR(__HYPERVISOR_##name) " * 32)"\
+                : "=a" (__res), "=D" (__ign1), "=S" (__ign2)    \
+                : "1" ((long)(a1)), "2" ((long)(a2))            \
+                : "memory" );                                   \
+        (type)__res;                                            \
+})
+
+#define _hypercall3(type, name, a1, a2, a3)                     \
+({                                                              \
+        long __res, __ign1, __ign2, __ign3;                     \
+        asm volatile (                                          \
+                "call hypercall_page + (" STR(__HYPERVISOR_##name) " * 32)"\
+                : "=a" (__res), "=D" (__ign1), "=S" (__ign2),   \
+                "=d" (__ign3)                                   \
+                : "1" ((long)(a1)), "2" ((long)(a2)),           \
+                "3" ((long)(a3))                                \
+                : "memory" );                                   \
+        (type)__res;                                            \
+})
+
+#define _hypercall4(type, name, a1, a2, a3, a4)                 \
+({                                                              \
+        long __res, __ign1, __ign2, __ign3;                     \
+        asm volatile (                                          \
+                "movq %7,%%r10; "                               \
+                "call hypercall_page + (" STR(__HYPERVISOR_##name) " * 32)"\
+                : "=a" (__res), "=D" (__ign1), "=S" (__ign2),   \
+                "=d" (__ign3)                                   \
+                : "1" ((long)(a1)), "2" ((long)(a2)),           \
+                "3" ((long)(a3)), "g" ((long)(a4))              \
+                : "memory", "r10" );                            \
+        (type)__res;                                            \
+})
+
+#define _hypercall5(type, name, a1, a2, a3, a4, a5)             \
+({                                                              \
+        long __res, __ign1, __ign2, __ign3;                     \
+        asm volatile (                                          \
+                "movq %7,%%r10; movq %8,%%r8; "                 \
+                "call hypercall_page + (" STR(__HYPERVISOR_##name) " * 32)"\
+                : "=a" (__res), "=D" (__ign1), "=S" (__ign2),   \
+                "=d" (__ign3)                                   \
+                : "1" ((long)(a1)), "2" ((long)(a2)),           \
+                "3" ((long)(a3)), "g" ((long)(a4)),             \
+                "g" ((long)(a5))                                \
+                : "memory", "r10", "r8" );                      \
+        (type)__res;                                            \
+})
+
+#endif
 
 static inline int
 HYPERVISOR_set_trap_table(struct trap_info *table)
