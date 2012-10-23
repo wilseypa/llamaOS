@@ -46,7 +46,7 @@ extern char hypercall_page [];
 
 // Taken straight from Linux source
 // linux-3.6-rc3/arch/x86/include/asm/xen/hypercall.h
-#if 0
+#if 1
 
 // extern struct { char _entry[32]; } hypercall_page[];
 

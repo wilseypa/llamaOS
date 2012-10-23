@@ -33,11 +33,6 @@
 # make parameters
 MAKEFLAGS = --silent
 
-# compiler tools
-CC = gcc
-CXX = g++
-LD = gcc
-
 # assembler/compiler/linker options
 # notes from manual:
 
