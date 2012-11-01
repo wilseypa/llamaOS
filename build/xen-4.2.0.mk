@@ -30,28 +30,34 @@
 # contributors.
 #
 
-# include common flag variables
-include llamaOS-flags.mk
+# include common variables
+include common.mk
 
-MAKEFILE_SOURCES = common.mk llamaOS-flags.mk
+MAKEFILE_SOURCES += xen-$(XEN_VERSION).mk
 
-# shared common paths
-BINDIR = bin
-LIBDIR = lib
-OBJDIR = obj
-INCDIR = include
-INC2DIR = include-fixed
+HEADERS = \
+  $(INCDIR)/xen/arch-x86/xen-mca.h \
+  $(INCDIR)/xen/arch-x86/xen-x86_64.h \
+  $(INCDIR)/xen/arch-x86/xen.h \
+  $(INCDIR)/xen/io/console.h \
+  $(INCDIR)/xen/io/pciif.h \
+  $(INCDIR)/xen/io/xenbus.h \
+  $(INCDIR)/xen/io/xs_wire.h \
+  $(INCDIR)/xen/event_channel.h \
+  $(INCDIR)/xen/features.h \
+  $(INCDIR)/xen/grant_table.h \
+  $(INCDIR)/xen/physdev.h \
+  $(INCDIR)/xen/platform.h \
+  $(INCDIR)/xen/sched.h \
+  $(INCDIR)/xen/tmem.h \
+  $(INCDIR)/xen/version.h \
+  $(INCDIR)/xen/xen-compat.h \
+  $(INCDIR)/xen/xen.h
 
-SRCDIR = ../src
-VPATH = $(SRCDIR)
+.PHONY: all
+all : $(HEADERS)
 
-GLIBC_VERSION = 2.16.0
-GCC_VERSION = 4.7.1
-# XEN_VERSION = 4.1.2
-# XEN_VERSION = 4.1.3
-XEN_VERSION = 4.2.0
-# XEN_VERSION = unstable
-GTEST_VERSION = 1.6.0
-
-# auto dependency generation
-DEPENDS = 
+$(INCDIR)/xen/% : $(SRCDIR)/xen-$(XEN_VERSION)/xen/include/public/%
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo copying: $@ from $<
+	cp $< $@
