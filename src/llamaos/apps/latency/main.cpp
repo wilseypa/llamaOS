@@ -37,43 +37,36 @@ using namespace latency;
 
 int main (int argc, char *argv [])
 {
-   // most implementations will require more
-   if (argc < 1)//3)
+   // create the chosen experiment class
+   Experiment *experiment = Experiment_factory::create (argc, argv);
+
+   if (nullptr == experiment)
    {
-      cout << "too few program arguments." << endl;
+      cout << "failed to create experiment instance." << endl;
    }
+   // run once to test and sync multiple nodes
    else
    {
-      Experiment *experiment = Experiment_factory::create (argc, argv);
-
-      if (nullptr == experiment)
+      if (!experiment->verify ())
       {
-         cout << "failed to create experiment instance." << endl;
+         cout << "failed to verify experiment data (first trial)." << endl;
       }
-      // run once to test and sync multiple nodes
-      else
+      else if (!experiment->run_trials ())
       {
-         if (!experiment->verify ())
-         {
-            cout << "failed to verify experiment data (first trial)." << endl;
-         }
-         else if (!experiment->run_trials ())
-         {
-            cout << "failed to complete all trials." << endl;
-         }
-         // run again to ensure valid
-         else if (!experiment->verify ())
-         {
-            cout << "failed to verify experiment data (last trial)." << endl;
-         }
-         else
-         {
-            experiment->compute_statistics ();
-         }
-
-         delete experiment;
-         return 0;
+         cout << "failed to complete all trials." << endl;
       }
+      // run again to ensure valid
+      else if (!experiment->verify ())
+      {
+         cout << "failed to verify experiment data (last trial)." << endl;
+      }
+      else if (experiment->root_node ())
+      {
+         experiment->compute_statistics ();
+      }
+
+      delete experiment;
+      return 0;
    }
 
    return -1;

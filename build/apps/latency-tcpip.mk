@@ -31,62 +31,42 @@
 #
 
 # include common variables
-include common.mk
+include native-flags.mk
 
-MAKEFILE_SOURCES += Makefile
+MAKEFILE_SOURCES += apps/latency-tcpip.mk
 
-INSTALL_DIR = /opt
-INSTALL_FOLDER = $(INSTALL_DIR)/llamaOS-1.0
+# shared common paths
+BINDIR = bin
+LIBDIR = lib
+OBJDIR = obj
 
-.PHONY: all
-all:
-	@$(MAKE) -f glibc-$(GLIBC_VERSION).mk
-	@$(MAKE) -f gcc-$(GCC_VERSION).mk
-	@$(MAKE) -f xen-$(XEN_VERSION).mk
-	@$(MAKE) -f llamaOS.mk xen
-	@$(MAKE) -f apps/latency-tcpip.mk
+CPPFLAGS += \
+  -I ../src/apps
 
-#	@$(MAKE) -f gtest-$(GTEST_VERSION).mk
-#	@$(MAKE) -f llamaOS-xen-test.mk xen
-#	@$(MAKE) -f apps/hello.mk xen
-#	@$(MAKE) -f apps/latency-llamaNET.mk
-#	@$(MAKE) -f apps/netpipe-llamaNET.mk
-#	@$(MAKE) -f minimal/minimal.mk xen
-#	@$(MAKE) -f minimal/minimal-glibc.mk xen
-#	@$(MAKE) -f minimal/minimal-gcc.mk xen
-#	@$(MAKE) -f net/i82574.mk xen
+# source paths
+SRCDIR = ../src
+VPATH = $(SRCDIR)
 
-#	@$(MAKE) -f apps/latency-tcp.mk
-#	@$(MAKE) -f apps/latency-tcpnb.mk
-#	@$(MAKE) -f apps/netpipe-tcp.mk
+# auto dependency generation
+DEPENDS = 
 
-.PHONY: install
-install:
-	@echo installing llamaOS into $(INSTALL_FOLDER) folder...
-	@[ -d $(INSTALL_FOLDER) ] || (mkdir -p $(INSTALL_FOLDER))
-	@cp -r bin $(INSTALL_FOLDER)/bin
-	@cp -r include $(INSTALL_FOLDER)/include
-	@cp -r include-fixed $(INSTALL_FOLDER)/include-fixed
-	@cp -r lib $(INSTALL_FOLDER)/lib
-	@cp -r ../script $(INSTALL_FOLDER)/script
-	@cp llamaOS-flags.mk $(INSTALL_FOLDER)/llamaOS-flags.mk
-	@cp llamaOS.lds $(INSTALL_FOLDER)/llamaOS.lds
-	@echo adjusting file attributes...
-	@chmod -R o+r $(INSTALL_FOLDER)
-	@echo install complete.
-	@echo 
+SOURCES = \
+  apps/latency/protocols/TCPIP.cpp \
+  apps/latency/Latency.cpp \
+  apps/latency/main.cpp \
+  apps/latency/verify.cpp
 
+OBJECTS = $(SOURCES:%.cpp=$(OBJDIR)/%.o)
+DEPENDS = $(OBJECTS:%.o=%.d)
 
-.PHONY: clean
-clean:
-	@echo cleaning build folder...
-	@echo removing: $(OBJDIR)
-	@rm -rf $(OBJDIR)
-	@echo removing: $(BINDIR)
-	@rm -rf $(BINDIR)
-	@echo removing: $(LIBDIR)
-	@rm -rf $(LIBDIR)
-	@echo removing: $(INCDIR)
-	@rm -rf $(INCDIR)
-	@echo removing: include-fixed
-	@rm -rf include-fixed
+$(BINDIR)/native/latency-tcpip: $(OBJECTS)
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo linking: $@
+	@$(CXX) $(LDFLAGS) -o $@ $^
+	@echo successfully built: $@
+	@echo
+
+include rules.mk
+
+# include auto-generated dependencies
+-include $(DEPENDS)

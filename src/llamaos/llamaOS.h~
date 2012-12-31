@@ -28,53 +28,67 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#ifndef latency_experiment_h_
-#define latency_experiment_h_
+#ifndef llamaos_config_h_
+#define llamaos_config_h_
 
-#include <string>
+#define __STR(x) #x
+#define STR(x) __STR(x)
 
-namespace latency {
+// llamaOS version
+#define LLAMAOS_VERSION_MAJOR 1
+#define LLAMAOS_VERSION_MINOR 0
+#define LLAMAOS_VERSION_TEXT  "llamaOS-" STR(LLAMAOS_VERSION_MAJOR) "." STR(LLAMAOS_VERSION_MINOR)
 
-class Experiment
-{
-public:
-   Experiment (int argc, char **argv);
-   virtual ~Experiment ();
+#define LLAMAOS_STACK_SIZE     0x4000000  // 64MB
+#define LLAMAOS_IRQ_STACK_SIZE 0x400000  // 4MB
+//#define LLAMAOS_STACK_SIZE     0x1E00000
+//#define LLAMAOS_IRQ_STACK_SIZE 0x10000
 
-   virtual bool root_node () = 0;
-   virtual bool verify () = 0;
-   virtual bool run_trial (unsigned long trial) = 0;
+#define LLAMAOS_PAGE_SIZE      0x1000  // 4KB
 
-   bool run_trials ();
-   void compute_statistics ();
+#ifdef __cplusplus
 
-   void mark_data_alpha (volatile unsigned char *buffer, unsigned long length);
-   bool verify_data_alpha (const volatile unsigned char *buffer, unsigned long length);
-   void mark_data_numeric (volatile unsigned char *buffer, unsigned long length);
-   bool verify_data_numeric (const volatile unsigned char *buffer, unsigned long length);
+namespace llamaos {
 
-   const std::string name;
-   const unsigned long trials;
-   const unsigned long length;
+/**
+ * @brief llamaOS major version number.
+ *
+ */
+static const unsigned int VERSION_MAJOR = LLAMAOS_VERSION_MAJOR;
 
-   unsigned long *const results;
+/**
+ * @brief llamaOS minor version number.
+ *
+ */
+static const unsigned int VERSION_MINOR = LLAMAOS_VERSION_MINOR;
 
-   bool client;
+/**
+ * @brief llamaOS version text.
+ *
+ */
+static const char VERSION_TEXT[] = LLAMAOS_VERSION_TEXT;
 
-private:
-   Experiment ();
-   Experiment (const Experiment &);
-   Experiment &operator= (const Experiment &);
+/**
+ * @brief General system stack size.
+ *
+ */
+// be sure to make this a power-of-2 number
+static const unsigned long STACK_SIZE = LLAMAOS_STACK_SIZE;
 
-};
+/**
+ * @brief Interrupt context stack size.
+ *
+ */
+// be sure to make this a power-of-2 number
+static const unsigned long IRQ_STACK_SIZE = LLAMAOS_IRQ_STACK_SIZE;
 
-class Experiment_factory
-{
-public:
-   static Experiment *create (int argc, char **argv);
-
-};
+/**
+ * @brief System memory page size.
+ *
+ */
+static const unsigned long PAGE_SIZE = LLAMAOS_PAGE_SIZE;
 
 }
 
-#endif  // latency_experiment_h_
+#endif  // __cplusplus
+#endif  // llamaos_config_h_

@@ -28,53 +28,54 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#ifndef latency_experiment_h_
-#define latency_experiment_h_
-
-#include <string>
-
-namespace latency {
-
-class Experiment
+template <typename T>
+static T convert (const std::string &s)
 {
-public:
-   Experiment (int argc, char **argv);
-   virtual ~Experiment ();
+   std::stringstream ss (s);
+   T t;
+   ss >> t;
 
-   virtual bool root_node () = 0;
-   virtual bool verify () = 0;
-   virtual bool run_trial (unsigned long trial) = 0;
+   if (!ss.fail ())
+   {
+      return t;
+   }
 
-   bool run_trials ();
-   void compute_statistics ();
-
-   void mark_data_alpha (volatile unsigned char *buffer, unsigned long length);
-   bool verify_data_alpha (const volatile unsigned char *buffer, unsigned long length);
-   void mark_data_numeric (volatile unsigned char *buffer, unsigned long length);
-   bool verify_data_numeric (const volatile unsigned char *buffer, unsigned long length);
-
-   const std::string name;
-   const unsigned long trials;
-   const unsigned long length;
-
-   unsigned long *const results;
-
-   bool client;
-
-private:
-   Experiment ();
-   Experiment (const Experiment &);
-   Experiment &operator= (const Experiment &);
-
-};
-
-class Experiment_factory
-{
-public:
-   static Experiment *create (int argc, char **argv);
-
-};
-
+   std::stringstream err;
+   err << "failed to convert string: " << s;
+   throw std::runtime_error (err.str ());
 }
 
-#endif  // latency_experiment_h_
+template <typename T>
+static T parse (int argc, char *argv [], const std::string &arg, const T &value)
+{
+   for (int i = 1; i < argc; i++)
+   {
+      if (arg == argv [i])
+      {
+         if ((i + 1) >= argc)
+         {
+            std::stringstream err;
+            err << "missing argument value for " << arg;
+            throw std::runtime_error (err.str ());
+         }
+
+         return convert<T> (argv [i + 1]);
+      }
+   }
+
+   return value;
+}
+
+template <>
+bool parse (int argc, char *argv [], const std::string &arg, const bool &value)
+{
+   for (int i = 1; i < argc; i++)
+   {
+      if (arg == argv [i])
+      {
+         return true;
+      }
+   }
+
+   return value;
+}

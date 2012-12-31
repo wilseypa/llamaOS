@@ -409,6 +409,7 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/posix/geteuid.c \
   glibc-$(GLIBC_VERSION)/posix/getgid.c \
   glibc-$(GLIBC_VERSION)/posix/getopt.c \
+  glibc-$(GLIBC_VERSION)/posix/getopt1.c \
   glibc-$(GLIBC_VERSION)/posix/getuid.c \
   glibc-$(GLIBC_VERSION)/posix/pause.c \
   glibc-$(GLIBC_VERSION)/posix/regex.c \

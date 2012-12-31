@@ -28,53 +28,16 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#ifndef latency_experiment_h_
-#define latency_experiment_h_
-
-#include <string>
+#ifndef latency_verify_h_
+#define latency_verify_h_
 
 namespace latency {
 
-class Experiment
-{
-public:
-   Experiment (int argc, char **argv);
-   virtual ~Experiment ();
-
-   virtual bool root_node () = 0;
-   virtual bool verify () = 0;
-   virtual bool run_trial (unsigned long trial) = 0;
-
-   bool run_trials ();
-   void compute_statistics ();
-
-   void mark_data_alpha (volatile unsigned char *buffer, unsigned long length);
-   bool verify_data_alpha (const volatile unsigned char *buffer, unsigned long length);
-   void mark_data_numeric (volatile unsigned char *buffer, unsigned long length);
-   bool verify_data_numeric (const volatile unsigned char *buffer, unsigned long length);
-
-   const std::string name;
-   const unsigned long trials;
-   const unsigned long length;
-
-   unsigned long *const results;
-
-   bool client;
-
-private:
-   Experiment ();
-   Experiment (const Experiment &);
-   Experiment &operator= (const Experiment &);
-
-};
-
-class Experiment_factory
-{
-public:
-   static Experiment *create (int argc, char **argv);
-
-};
+void mark_data_alpha (unsigned char *buffer, unsigned long length);
+bool verify_data_alpha (const unsigned char *buffer, unsigned long length);
+void mark_data_numeric (unsigned char *buffer, unsigned long length);
+bool verify_data_numeric (const unsigned char *buffer, unsigned long length);
 
 }
 
-#endif  // latency_experiment_h_
+#endif  // latency_verify_h_

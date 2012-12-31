@@ -28,53 +28,29 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#ifndef latency_experiment_h_
-#define latency_experiment_h_
-
-#include <string>
+#ifndef latency_protocol_h_
+#define latency_protocol_h_
 
 namespace latency {
 
-class Experiment
+class Protocol
 {
 public:
-   Experiment (int argc, char **argv);
-   virtual ~Experiment ();
+   static Protocol *create (int argc, char *argv []);
+
+   Protocol () { }
+   virtual ~Protocol () { }
 
    virtual bool root_node () = 0;
-   virtual bool verify () = 0;
-   virtual bool run_trial (unsigned long trial) = 0;
 
-   bool run_trials ();
-   void compute_statistics ();
+   virtual bool startup (unsigned long max_msg_size) = 0;
+   virtual bool cleanup () = 0;
 
-   void mark_data_alpha (volatile unsigned char *buffer, unsigned long length);
-   bool verify_data_alpha (const volatile unsigned char *buffer, unsigned long length);
-   void mark_data_numeric (volatile unsigned char *buffer, unsigned long length);
-   bool verify_data_numeric (const volatile unsigned char *buffer, unsigned long length);
-
-   const std::string name;
-   const unsigned long trials;
-   const unsigned long length;
-
-   unsigned long *const results;
-
-   bool client;
-
-private:
-   Experiment ();
-   Experiment (const Experiment &);
-   Experiment &operator= (const Experiment &);
-
-};
-
-class Experiment_factory
-{
-public:
-   static Experiment *create (int argc, char **argv);
+   virtual bool run_verify (unsigned long msg_size) = 0;
+   virtual bool run_trial (unsigned long msg_size, unsigned long trial_number) = 0;
 
 };
 
 }
 
-#endif  // latency_experiment_h_
+#endif  // latency_protocol_h_

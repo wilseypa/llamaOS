@@ -28,53 +28,68 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#ifndef latency_experiment_h_
-#define latency_experiment_h_
+#include <iostream>
 
-#include <string>
+#include <latency/verify.h>
 
-namespace latency {
+using namespace std;
 
-class Experiment
+void latency::mark_data_alpha (unsigned char *buffer, unsigned long length)
 {
-public:
-   Experiment (int argc, char **argv);
-   virtual ~Experiment ();
+   unsigned long j = 0;
 
-   virtual bool root_node () = 0;
-   virtual bool verify () = 0;
-   virtual bool run_trial (unsigned long trial) = 0;
-
-   bool run_trials ();
-   void compute_statistics ();
-
-   void mark_data_alpha (volatile unsigned char *buffer, unsigned long length);
-   bool verify_data_alpha (const volatile unsigned char *buffer, unsigned long length);
-   void mark_data_numeric (volatile unsigned char *buffer, unsigned long length);
-   bool verify_data_numeric (const volatile unsigned char *buffer, unsigned long length);
-
-   const std::string name;
-   const unsigned long trials;
-   const unsigned long length;
-
-   unsigned long *const results;
-
-   bool client;
-
-private:
-   Experiment ();
-   Experiment (const Experiment &);
-   Experiment &operator= (const Experiment &);
-
-};
-
-class Experiment_factory
-{
-public:
-   static Experiment *create (int argc, char **argv);
-
-};
-
+   // put alpha data (A B C D ...)
+   for (unsigned long i = 0; i < length; i++)
+   {
+      buffer [i] = ('A' + (++j % 26));
+   }
 }
 
-#endif  // latency_experiment_h_
+bool latency::verify_data_alpha (const unsigned char *buffer, unsigned long length)
+{
+   unsigned long j = 0;
+   unsigned char c;
+
+   for (unsigned long i = 0; i < length; i++)
+   {
+      c = 'A' + (++j % 26);
+
+      if (buffer [i] != c)
+      {
+         cout << "verify alpha failed (" << buffer [i] << " != " << c << ") @ index " << i << endl;
+         return false;
+      }
+   }
+
+   return true;
+}
+
+void latency::mark_data_numeric (unsigned char *buffer, unsigned long length)
+{
+   unsigned long j = 0;
+
+   // put num data (0 1 2 3 ...)
+   for (unsigned long i = 0; i < length; i++)
+   {
+      buffer [i] = ('0' + (++j % 10));
+   }
+}
+
+bool latency::verify_data_numeric (const unsigned char *buffer, unsigned long length)
+{
+   unsigned long j = 0;
+   unsigned char c;
+
+   for (unsigned long i = 0; i < length; i++)
+   {
+      c = '0' + (++j % 10);
+
+      if (buffer [i] != c)
+      {
+         cout << "verify numeric failed (" << buffer [i] << " != " << c << ") @ index " << i << endl;
+         return false;
+      }
+   }
+
+   return true;
+}

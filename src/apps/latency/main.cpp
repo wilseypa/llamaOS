@@ -28,53 +28,25 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#ifndef latency_experiment_h_
-#define latency_experiment_h_
+#include <iostream>
 
-#include <string>
+#include <latency/Latency.h>
 
-namespace latency {
+using namespace std;
+using namespace latency;
 
-class Experiment
+int main (int argc, char *argv [])
 {
-public:
-   Experiment (int argc, char **argv);
-   virtual ~Experiment ();
+   try
+   {
+      Latency latency (argc, argv);
 
-   virtual bool root_node () = 0;
-   virtual bool verify () = 0;
-   virtual bool run_trial (unsigned long trial) = 0;
+      return latency.run () ? 0 : -1;
+   }
+   catch (const exception &e)
+   {
+      cout << "exception: " << e.what () << endl;
+   }
 
-   bool run_trials ();
-   void compute_statistics ();
-
-   void mark_data_alpha (volatile unsigned char *buffer, unsigned long length);
-   bool verify_data_alpha (const volatile unsigned char *buffer, unsigned long length);
-   void mark_data_numeric (volatile unsigned char *buffer, unsigned long length);
-   bool verify_data_numeric (const volatile unsigned char *buffer, unsigned long length);
-
-   const std::string name;
-   const unsigned long trials;
-   const unsigned long length;
-
-   unsigned long *const results;
-
-   bool client;
-
-private:
-   Experiment ();
-   Experiment (const Experiment &);
-   Experiment &operator= (const Experiment &);
-
-};
-
-class Experiment_factory
-{
-public:
-   static Experiment *create (int argc, char **argv);
-
-};
-
+   return -1;
 }
-
-#endif  // latency_experiment_h_

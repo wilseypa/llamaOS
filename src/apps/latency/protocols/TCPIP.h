@@ -28,53 +28,61 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#ifndef latency_experiment_h_
-#define latency_experiment_h_
+#ifndef latency_protocols_tcpip_h_
+#define latency_protocols_tcpip_h_
 
-#include <string>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+
+#include <latency/Protocol.h>
 
 namespace latency {
+namespace protocols {
 
-class Experiment
+class TCPIP : public Protocol
 {
 public:
-   Experiment (int argc, char **argv);
-   virtual ~Experiment ();
+   static Protocol *create (int argc, char *argv []);
 
-   virtual bool root_node () = 0;
-   virtual bool verify () = 0;
-   virtual bool run_trial (unsigned long trial) = 0;
+   TCPIP (int argc, char *argv []);
+   virtual ~TCPIP ();
 
-   bool run_trials ();
-   void compute_statistics ();
+   virtual bool root_node ();
 
-   void mark_data_alpha (volatile unsigned char *buffer, unsigned long length);
-   bool verify_data_alpha (const volatile unsigned char *buffer, unsigned long length);
-   void mark_data_numeric (volatile unsigned char *buffer, unsigned long length);
-   bool verify_data_numeric (const volatile unsigned char *buffer, unsigned long length);
+   virtual bool startup (unsigned long max_msg_size);
+   virtual bool cleanup ();
 
-   const std::string name;
-   const unsigned long trials;
-   const unsigned long length;
-
-   unsigned long *const results;
-
-   bool client;
+   virtual bool run_verify (unsigned long msg_size);
+   virtual bool run_trial (unsigned long msg_size, unsigned long trial_number);
 
 private:
-   Experiment ();
-   Experiment (const Experiment &);
-   Experiment &operator= (const Experiment &);
+   TCPIP ();
+   TCPIP (const TCPIP &);
+   TCPIP &operator= (const TCPIP &);
+
+   bool tcp_client_init ();
+   bool tcp_server_init ();
+
+   bool udp_client_init ();
+   bool udp_server_init ();
+
+   bool set_nonblocking ();
+
+   bool recv_buffer (unsigned long length);
+   bool send_buffer (unsigned long length);
+
+   const std::string host_ip;
+   const bool client;
+   const bool datagram;
+   const bool blocking;
+
+   unsigned char *const buffer;
+
+   struct sockaddr_in sock_addr;
+   int socket;
 
 };
 
-class Experiment_factory
-{
-public:
-   static Experiment *create (int argc, char **argv);
+} }
 
-};
-
-}
-
-#endif  // latency_experiment_h_
+#endif  // latency_protocols_tcpip_h_
