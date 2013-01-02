@@ -64,13 +64,13 @@ static void compute_statistics (const vector<unsigned long> &results)
    } var_op (mean);
 
    unsigned long variance = accumulate (results.begin (), results.end (), 0UL, var_op) / (results.size () - 1);
-   unsigned long std_dev = static_cast<unsigned long>(sqrt (variance));
+//   unsigned long std_dev = static_cast<unsigned long>(sqrt (variance));
 
    unsigned long min_latency = *min_element (results.begin (), results.end ());
    unsigned long max_latency = *max_element (results.begin (), results.end ());
 
    cout << dec << setw(6) << mean <<
-           " " << setw(6) << std_dev <<
+           " " << setw(6) << variance <<
            " " << setw(6) << min_latency <<
            " " << setw(6) << max_latency << endl;
 }
@@ -90,7 +90,7 @@ Latency::Latency (int argc, char *argv [])
    {
       results.reserve (num_trials);
 
-      cout << setw(6) << "size" << " " << setw(6) << "mean" << " " << setw(6) << "std" << " " << setw(6) << "min" << " " << setw(6) << "max" << endl;
+      cout << setw(6) << "size" << " " << setw(6) << "mean" << " " << setw(6) << "var" << " " << setw(6) << "min" << " " << setw(6) << "max" << endl;
    }
 }
 

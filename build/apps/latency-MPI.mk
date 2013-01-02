@@ -31,19 +31,27 @@
 #
 
 # include common variables
-include common.mk
+include native-flags.mk
 
-MAKEFILE_SOURCES += apps/latency-llamaNET.mk
+MAKEFILE_SOURCES += apps/latency-MPI.mk
+
+# shared common paths
+BINDIR = bin
+LIBDIR = lib
+OBJDIR = obj
 
 CPPFLAGS += \
-  -I $(INCDIR) \
-  -I $(SRCDIR) \
   -I ../src/apps
-  -D__XEN_INTERFACE_VERSION__=0x00030205 \
-  -include $(SRCDIR)/llamaos/__thread.h
+
+# source paths
+SRCDIR = ../src
+VPATH = $(SRCDIR)
+
+# auto dependency generation
+DEPENDS = 
 
 SOURCES = \
-  apps/latency/protocols/llamaNET.cpp \
+  apps/latency/protocols/MPI.cpp \
   apps/latency/Latency.cpp \
   apps/latency/main.cpp \
   apps/latency/verify.cpp
@@ -51,15 +59,10 @@ SOURCES = \
 OBJECTS = $(SOURCES:%.cpp=$(OBJDIR)/%.o)
 DEPENDS = $(OBJECTS:%.o=%.d)
 
-.PHONY: xen
-xen : $(BINDIR)/xen/latency-llamaNET
-
-# the entry object must be the first object listed here or the guest will crash!
-$(BINDIR)/xen/latency-llamaNET: $(LIBDIR)/xen/Entry.o $(OBJECTS) $(LIBDIR)/xen/llamaOS.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
+$(BINDIR)/native/latency-MPI: $(OBJECTS)
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
-	@$(LD) $(LDFLAGS) -T llamaOS.lds -o $@ $^
-	@gzip -c -f --best $@ >$@.gz
+	@$(CXX) $(LDFLAGS) -o $@ $^
 	@echo successfully built: $@
 	@echo
 

@@ -63,6 +63,7 @@ CPPFLAGS += \
   -include $(SRCDIR)/llamaos/__thread.h
 
 HEADERS = \
+  $(INCDIR)/backward/auto_ptr.h \
   $(INCDIR)/backward/binders.h \
   $(INCDIR)/bits/algorithmfwd.h \
   $(INCDIR)/bits/alloc_traits.h \
@@ -114,6 +115,8 @@ HEADERS = \
   $(INCDIR)/bits/random.h \
   $(INCDIR)/bits/random.tcc \
   $(INCDIR)/bits/range_access.h \
+  $(INCDIR)/bits/shared_ptr.h \
+  $(INCDIR)/bits/shared_ptr_base.h \
   $(INCDIR)/bits/sstream.tcc \
   $(INCDIR)/bits/stl_algo.h \
   $(INCDIR)/bits/stl_algobase.h \
@@ -132,6 +135,7 @@ HEADERS = \
   $(INCDIR)/bits/stl_numeric.h \
   $(INCDIR)/bits/stl_pair.h \
   $(INCDIR)/bits/stl_queue.h \
+  $(INCDIR)/bits/stl_raw_storage_iter.h \
   $(INCDIR)/bits/stl_relops.h \
   $(INCDIR)/bits/stl_set.h \
   $(INCDIR)/bits/stl_tempbuf.h \
@@ -143,11 +147,13 @@ HEADERS = \
   $(INCDIR)/bits/streambuf_iterator.h \
   $(INCDIR)/bits/stringfwd.h \
   $(INCDIR)/bits/time_members.h \
+  $(INCDIR)/bits/unique_ptr.h \
   $(INCDIR)/bits/uses_allocator.h \
   $(INCDIR)/bits/vector.tcc \
   $(INCDIR)/debug/debug.h \
   $(INCDIR)/ext/alloc_traits.h \
   $(INCDIR)/ext/atomicity.h \
+  $(INCDIR)/ext/concurrence.h \
   $(INCDIR)/ext/new_allocator.h \
   $(INCDIR)/ext/numeric_traits.h \
   $(INCDIR)/ext/string_conversions.h \
@@ -184,6 +190,7 @@ HEADERS = \
   $(INCDIR)/list \
   $(INCDIR)/locale \
   $(INCDIR)/map \
+  $(INCDIR)/memory \
   $(INCDIR)/new \
   $(INCDIR)/numeric \
   $(INCDIR)/ostream \

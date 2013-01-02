@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012, William Magato
+Copyright (c) 2013, William Magato
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,58 +28,37 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <sstream>
-#include <stdexcept>
-#include <string>
+#ifndef latency_protocols_mpi_h_
+#define latency_protocols_mpi_h_
 
-template <typename T>
-static T convert (const std::string &s)
+#include <latency/Protocol.h>
+
+namespace latency {
+namespace protocols {
+
+class MPI : public Protocol
 {
-   std::stringstream ss (s);
-   T t;
-   ss >> t;
+public:
+   static Protocol *create (int argc, char *argv []);
 
-   if (!ss.fail ())
-   {
-      return t;
-   }
+   MPI (int argc, char *argv []);
+   virtual ~MPI ();
 
-   std::stringstream err;
-   err << "failed to convert string: " << s;
-   throw std::runtime_error (err.str ());
-}
+   virtual bool root_node ();
 
-template <typename T>
-static T parse (int argc, char *argv [], const std::string &arg, const T &value)
-{
-   for (int i = 1; i < argc; i++)
-   {
-      if (arg == argv [i])
-      {
-         if ((i + 1) >= argc)
-         {
-            std::stringstream err;
-            err << "missing argument value for " << arg;
-            throw std::runtime_error (err.str ());
-         }
+   virtual bool startup (unsigned long max_msg_size);
+   virtual bool cleanup ();
 
-         return convert<T> (argv [i + 1]);
-      }
-   }
+   virtual bool run_verify (unsigned long msg_size);
+   virtual bool run_trial (unsigned long msg_size, unsigned long trial_number);
 
-   return value;
-}
+private:
+   MPI ();
+   MPI (const MPI &);
+   MPI &operator= (const MPI &);
 
-template <>
-bool parse (int argc, char *argv [], const std::string &arg, const bool &value)
-{
-   for (int i = 1; i < argc; i++)
-   {
-      if (arg == argv [i])
-      {
-         return true;
-      }
-   }
+};
 
-   return value;
-}
+} }
+
+#endif  // latency_protocols_mpi_h_

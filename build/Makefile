@@ -44,6 +44,8 @@ all:
 	@$(MAKE) -f gcc-$(GCC_VERSION).mk
 	@$(MAKE) -f xen-$(XEN_VERSION).mk
 	@$(MAKE) -f llamaOS.mk xen
+	@$(MAKE) -f apps/latency-llamaNET.mk
+	@$(MAKE) -f apps/latency-MPI.mk
 	@$(MAKE) -f apps/latency-tcpip.mk
 
 #	@$(MAKE) -f gtest-$(GTEST_VERSION).mk

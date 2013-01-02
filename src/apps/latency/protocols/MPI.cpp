@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012, William Magato
+Copyright (c) 2013, William Magato
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,58 +28,52 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <sstream>
-#include <stdexcept>
-#include <string>
+#include <iostream>
 
-template <typename T>
-static T convert (const std::string &s)
+#include <latency/protocols/MPI.h>
+#include <latency/parse_args.cpp>
+#include <latency/verify.h>
+
+using namespace std;
+using namespace latency;
+using namespace latency::protocols;
+
+Protocol *Protocol::create (int argc, char *argv [])
 {
-   std::stringstream ss (s);
-   T t;
-   ss >> t;
-
-   if (!ss.fail ())
-   {
-      return t;
-   }
-
-   std::stringstream err;
-   err << "failed to convert string: " << s;
-   throw std::runtime_error (err.str ());
+   return new MPI (argc, argv);
 }
 
-template <typename T>
-static T parse (int argc, char *argv [], const std::string &arg, const T &value)
+MPI::MPI (int argc, char *argv [])
 {
-   for (int i = 1; i < argc; i++)
-   {
-      if (arg == argv [i])
-      {
-         if ((i + 1) >= argc)
-         {
-            std::stringstream err;
-            err << "missing argument value for " << arg;
-            throw std::runtime_error (err.str ());
-         }
-
-         return convert<T> (argv [i + 1]);
-      }
-   }
-
-   return value;
+   cout << "latency-MPI" << endl;
 }
 
-template <>
-bool parse (int argc, char *argv [], const std::string &arg, const bool &value)
+MPI::~MPI ()
 {
-   for (int i = 1; i < argc; i++)
-   {
-      if (arg == argv [i])
-      {
-         return true;
-      }
-   }
 
-   return value;
+}
+
+bool MPI::root_node ()
+{
+   return false;
+}
+
+bool MPI::startup (unsigned long max_msg_size)
+{
+   return false;
+}
+
+bool MPI::cleanup ()
+{
+   return true;
+}
+
+bool MPI::run_verify (unsigned long msg_size)
+{
+   return false;
+}
+
+bool MPI::run_trial (unsigned long msg_size, unsigned long trial_number)
+{
+   return true;
 }
