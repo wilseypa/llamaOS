@@ -32,6 +32,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #define latency_protocols_llamanet_h_
 
 #include <latency/Protocol.h>
+#include <llamaos/net/llamaNET.h>
 
 namespace latency {
 namespace protocols {
@@ -56,6 +57,10 @@ private:
    llamaNET ();
    llamaNET (const llamaNET &);
    llamaNET &operator= (const llamaNET &);
+
+   const uint32_t node;
+   const bool client;
+   llamaos::net::llamaNET interface;
 
 };
 

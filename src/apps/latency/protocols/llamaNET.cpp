@@ -33,19 +33,37 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <latency/protocols/llamaNET.h>
 #include <latency/parse_args.cpp>
 #include <latency/verify.h>
+#include <llamaos/api/sleep.h>
+#include <llamaos/xen/Hypervisor.h>
 
 using namespace std;
 using namespace latency;
 using namespace latency::protocols;
+using namespace llamaos;
+using namespace llamaos::xen;
 
 Protocol *Protocol::create (int argc, char *argv [])
 {
    return new llamaNET (argc, argv);
 }
 
-llamaNET::llamaNET (int argc, char *argv [])
+static uint32_t seq = 1;
+
+static domid_t get_domd_id (int node)
 {
-   cout << "latency-llamaNET" << endl;
+   // for now it's just self minus node % 6
+   domid_t self_id = Hypervisor::get_instance ()->domid;
+
+   return (self_id - 1 - (node % 6));
+}
+
+llamaNET::llamaNET (int argc, char *argv [])
+   :  node(parse<uint32_t>(argc, argv, "--node", 0U)),
+      client(node < 6),
+      interface(get_domd_id (node), (node % 6))
+{
+   cout << "latency-llamaNET" << endl
+        << "  node: " << node << endl;
 }
 
 llamaNET::~llamaNET ()
@@ -55,25 +73,154 @@ llamaNET::~llamaNET ()
 
 bool llamaNET::root_node ()
 {
-   return false;
+   return client;
 }
 
 bool llamaNET::startup (unsigned long max_msg_size)
 {
-   return false;
+   return true;
 }
 
 bool llamaNET::cleanup ()
 {
-   return false;
+   api::sleep (2);
+
+   // release interface ?
+   return true;
 }
 
 bool llamaNET::run_verify (unsigned long msg_size)
 {
+   // TCP doesn't send anything for a zero length message, so make it 8 bytes
+   msg_size = max (8UL, msg_size);
+
+   // llamaNET is configured for 1 page max message and has a 36 byte header, so make it 4060 bytes
+   msg_size = min (4060UL, msg_size);
+
+   net::llamaNET::Protocol_header *header;
+   unsigned char *data;
+
+   // dalai initiates the trial
+   if (client)
+   {
+      header = interface.get_send_buffer ();
+      header->dest = (node >= 6) ? (node - 6) : (node + 6);;
+      header->src = node;
+      header->type = 1;
+      header->seq = seq++;
+      header->len = msg_size;
+
+      // get pointer to data section of buffer
+      data = reinterpret_cast<unsigned char *>(header + 1);
+
+      // marks all bytes with alpha chars (a,b,c,...)
+      mark_data_alpha (data, msg_size);
+
+      // send/recv and verify the data has been changed to numerals (1,2,3,...)
+      interface.send (header);
+      header = interface.recv (node);
+
+      // get pointer to data section of buffer
+      data = reinterpret_cast<unsigned char *>(header + 1);
+
+      if (verify_data_numeric (data, msg_size))
+      {
+         interface.release_recv_buffer (header);
+
+         return true;
+      }
+   }
+   else
+   {
+      header = interface.recv (node);
+
+      // get pointer to data section of buffer
+      data = reinterpret_cast<unsigned char *>(header + 1);
+
+      if (verify_data_alpha (data, msg_size))
+      {
+         interface.release_recv_buffer (header);
+
+         header = interface.get_send_buffer ();
+         header->dest = (node >= 6) ? (node - 6) : (node + 6);;
+         header->src = node;
+         header->type = 1;
+         header->seq = seq++;
+         header->len = msg_size;
+
+         // get pointer to data section of buffer
+         data = reinterpret_cast<unsigned char *>(header + 1);
+
+         // marks all bytes with numerals and send
+         mark_data_numeric (data, msg_size);
+
+         interface.send (header);
+         return true;
+      }
+   }
+
    return false;
 }
 
 bool llamaNET::run_trial (unsigned long msg_size, unsigned long trial_number)
 {
+   // TCP doesn't send anything for a zero length message, so make it 8 bytes
+   msg_size = max (8UL, msg_size);
+
+   // llamaNET is configured for 1 page max message and has a 36 byte header, so make it 4060 bytes
+   msg_size = min (4060UL, msg_size);
+
+   net::llamaNET::Protocol_header *header;
+   unsigned char *data;
+
+   // dalai initiates the trial
+   if (client)
+   {
+      header = interface.get_send_buffer ();
+      header->dest = (node >= 6) ? (node - 6) : (node + 6);;
+      header->src = node;
+      header->type = 1;
+      header->seq = seq++;
+      header->len = msg_size;
+
+      interface.send (header);
+      header = interface.recv (node);
+
+      // get pointer to data section of buffer
+      data = reinterpret_cast<unsigned char *>(header + 1);
+
+      if (*(reinterpret_cast<unsigned long *>(data)) == trial_number)
+      {
+         interface.release_recv_buffer (header);
+         return true;
+      }
+      else
+      {
+         interface.release_recv_buffer (header);
+         return false;
+      }
+   }
+   else
+   {
+      header = interface.recv (node);
+      interface.release_recv_buffer (header);
+
+      header = interface.get_send_buffer ();
+      header->dest = (node >= 6) ? (node - 6) : (node + 6);;
+      header->src = node;
+      header->type = 1;
+      header->seq = seq++;
+      header->len = msg_size;
+
+      // get pointer to data section of buffer
+      data = reinterpret_cast<unsigned char *>(header + 1);
+
+      // place trial number in first "int" for master to verify
+      *(reinterpret_cast<unsigned long *>(data)) = trial_number;
+
+      interface.send (header);
+      return true;
+   }
+
    return false;
 }
