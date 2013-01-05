@@ -33,6 +33,11 @@
 # include common variables
 include native-flags.mk
 
+# compiler tools
+CC = /opt/mpich-3.0.1/bin/mpicc
+CXX = /opt/mpich-3.0.1/bin/mpicxx
+LD = /opt/mpich-3.0.1/bin/mpicxx
+
 MAKEFILE_SOURCES += apps/latency-MPI.mk
 
 # shared common paths
@@ -41,6 +46,7 @@ LIBDIR = lib
 OBJDIR = obj
 
 CPPFLAGS += \
+  -I /opt/mpich-3.0.1/include \
   -I ../src/apps
 
 # source paths
@@ -59,10 +65,10 @@ SOURCES = \
 OBJECTS = $(SOURCES:%.cpp=$(OBJDIR)/%.o)
 DEPENDS = $(OBJECTS:%.o=%.d)
 
-$(BINDIR)/native/latency-MPI: $(OBJECTS)
+$(BINDIR)/native/latency-MPI: $(OBJECTS) /opt/mpich-3.0.1/lib/libmpich.a /opt/mpich-3.0.1/lib/libmpl.a
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
-	@$(CXX) $(LDFLAGS) -o $@ $^
+	@$(CXX) $(LDFLAGS) -o $@ $^ -pthread
 	@echo successfully built: $@
 	@echo
 

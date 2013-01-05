@@ -57,6 +57,15 @@ private:
    MPI (const MPI &);
    MPI &operator= (const MPI &);
 
+   bool recv_buffer (unsigned long length);
+   bool send_buffer (unsigned long length);
+
+   const int node;
+   const bool client;
+   const bool blocking;
+
+   unsigned char *const buffer;
+
 };
 
 } }

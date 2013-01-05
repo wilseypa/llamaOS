@@ -28,52 +28,174 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
+#include <cstdlib>
+#include <cstring>
+
 #include <iostream>
 
 #include <latency/protocols/MPI.h>
 #include <latency/parse_args.cpp>
 #include <latency/verify.h>
 
+#include <mpi.h>
+
 using namespace std;
 using namespace latency;
-using namespace latency::protocols;
+// using namespace latency::protocols;
 
 Protocol *Protocol::create (int argc, char *argv [])
 {
-   return new MPI (argc, argv);
+   return new protocols::MPI (argc, argv);
 }
 
-MPI::MPI (int argc, char *argv [])
+static int get_node (int argc, char *argv [])
 {
-   cout << "latency-MPI" << endl;
+   MPI_Init (&argc, &argv);
+
+   int rank;
+   MPI_Comm_rank (MPI_COMM_WORLD, &rank);
+
+   return rank;
 }
 
-MPI::~MPI ()
+static unsigned char *alloc_buffer ()
 {
+   void *mem;
+   posix_memalign (&mem, 4096, 4096);
 
+   return reinterpret_cast<unsigned char *>(mem);
 }
 
-bool MPI::root_node ()
+protocols::MPI::MPI (int argc, char *argv [])
+   :  node(get_node(argc, argv)),
+      client(node == 0),
+      blocking(parse<bool>(argc, argv, "--blocking", false)),
+      buffer(alloc_buffer ())
 {
-   return false;
+   memset (buffer, '\0', 4096);
+
+   if (client)
+   {
+      cout << "latency-MPI" << endl
+           << "  node: " << node << endl;
+   }
 }
 
-bool MPI::startup (unsigned long max_msg_size)
+protocols::MPI::~MPI ()
 {
-   return false;
+   MPI_Finalize ();
 }
 
-bool MPI::cleanup ()
+bool protocols::MPI::root_node ()
+{
+   return client;
+}
+
+bool protocols::MPI::startup (unsigned long max_msg_size)
 {
    return true;
 }
 
-bool MPI::run_verify (unsigned long msg_size)
+bool protocols::MPI::cleanup ()
 {
+   return true;
+}
+
+bool protocols::MPI::run_verify (unsigned long msg_size)
+{
+   // TCP doesn't send anything for a zero length message, so make it 8 bytes
+   msg_size = max (8UL, msg_size);
+
+   // client initiates the trial
+   if (client)
+   {
+      // marks all bytes with alpha chars (a,b,c,...)
+      mark_data_alpha (buffer, msg_size);
+
+      // send/recv and verify the data has been changed to numerals (1,2,3,...)
+      if (   (send_buffer (msg_size))
+          && (recv_buffer (msg_size))
+          && (verify_data_numeric (buffer, msg_size)))
+      {
+         return true;
+      }
+   }
+   else
+   {
+      // wait for mesg and verify alpha chars
+      if (   (recv_buffer (msg_size))
+          && (verify_data_alpha (buffer, msg_size)))
+      {
+         // marks all bytes with numerals and send
+         mark_data_numeric (buffer, msg_size);
+         return send_buffer (msg_size);
+      }
+   }
+
    return false;
 }
 
-bool MPI::run_trial (unsigned long msg_size, unsigned long trial_number)
+bool protocols::MPI::run_trial (unsigned long msg_size, unsigned long trial_number)
 {
+   // TCP doesn't send anything for a zero length message, so make it 8 bytes
+   msg_size = max (8UL, msg_size);
+
+   // client initiates the trial
+   if (client)
+   {
+      // send/recv mesg, check first "int" in buffer is the trial number just
+      // as a low cost sanity check to verify both machines are in sync
+      if (   (send_buffer (msg_size))
+          && (recv_buffer (msg_size))
+          && (*(reinterpret_cast<unsigned long *>(buffer)) == trial_number))
+      {
+         return true;
+      }
+   }
+   else
+   {
+      // wait for message to arrive
+      if (recv_buffer (msg_size))
+      {
+         // place trial number in first "int" for master to verify
+         *(reinterpret_cast<unsigned long *>(buffer)) = trial_number;
+         return send_buffer (msg_size);
+      }
+   }
+
+   return true;
+}
+
+bool protocols::MPI::recv_buffer (unsigned long length)
+{
+   MPI_Status status;
+
+   if (MPI_SUCCESS == MPI_Recv (buffer,
+                                length,
+                                MPI_UNSIGNED_CHAR,
+                                (node == 0) ? 1 : 0,
+                                0,
+                                MPI_COMM_WORLD,
+                                &status
+                               ))
+   {
+      return true;//(node == status.MPI_SOURCE);
+   }
+
+   return false;
+}
+
+bool protocols::MPI::send_buffer (unsigned long length)
+{
+   if (MPI_SUCCESS == MPI_Send (buffer,
+                                length,
+                                MPI_UNSIGNED_CHAR,
+                                (node == 0) ? 1 : 0,
+                                0,
+                                MPI_COMM_WORLD))
+   {
+      return true;
+   }
+
    return true;
 }
