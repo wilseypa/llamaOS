@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2012, William Magato
+# Copyright (c) 2013, William Magato
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -33,59 +33,34 @@
 # include common variables
 include common.mk
 
-MAKEFILE_SOURCES += Makefile
+# make file list
+MAKEFILE_SOURCES += net/i80003es2lan.mk
 
-INSTALL_DIR = /opt
-INSTALL_FOLDER = $(INSTALL_DIR)/llamaOS-1.0
+CPPFLAGS += \
+  -I $(INCDIR) \
+  -I $(SRCDIR) \
+  -D__XEN_INTERFACE_VERSION__=0x00030205 \
+  -include $(SRCDIR)/llamaos/__thread.h
 
-.PHONY: all
-all:
-	@$(MAKE) -f glibc-$(GLIBC_VERSION).mk
-	@$(MAKE) -f gcc-$(GCC_VERSION).mk
-	@$(MAKE) -f xen-$(XEN_VERSION).mk
-	@$(MAKE) -f llamaOS.mk xen
-	@$(MAKE) -f apps/latency-llamaNET.mk
-	@$(MAKE) -f apps/latency-MPI.mk
-	@$(MAKE) -f apps/latency-TCPIP.mk
-	@$(MAKE) -f net/i82574.mk xen
-	@$(MAKE) -f net/i80003es2lan.mk xen
+SOURCES = \
+  llamaos/net/i80003es2lan/main.cpp
 
-#	@$(MAKE) -f gtest-$(GTEST_VERSION).mk
-#	@$(MAKE) -f llamaOS-xen-test.mk xen
-#	@$(MAKE) -f apps/hello.mk xen
-#	@$(MAKE) -f apps/netpipe-llamaNET.mk
-#	@$(MAKE) -f minimal/minimal.mk xen
-#	@$(MAKE) -f minimal/minimal-glibc.mk xen
-#	@$(MAKE) -f minimal/minimal-gcc.mk xen
-#	@$(MAKE) -f net/i82574.mk xen
+OBJECTS = $(SOURCES:%.cpp=$(OBJDIR)/%.o)
+DEPENDS = $(OBJECTS:%.o=%.d)
 
-.PHONY: install
-install:
-	@echo installing llamaOS into $(INSTALL_FOLDER) folder...
-	@[ -d $(INSTALL_FOLDER) ] || (mkdir -p $(INSTALL_FOLDER))
-	@cp -r bin $(INSTALL_FOLDER)/bin
-	@cp -r include $(INSTALL_FOLDER)/include
-	@cp -r include-fixed $(INSTALL_FOLDER)/include-fixed
-	@cp -r lib $(INSTALL_FOLDER)/lib
-	@cp -r ../script $(INSTALL_FOLDER)/script
-	@cp llamaOS-flags.mk $(INSTALL_FOLDER)/llamaOS-flags.mk
-	@cp llamaOS.lds $(INSTALL_FOLDER)/llamaOS.lds
-	@echo adjusting file attributes...
-	@chmod -R o+r $(INSTALL_FOLDER)
-	@echo install complete.
-	@echo 
+.PHONY: xen
+xen : $(BINDIR)/xen/i80003es2lan
 
+# the entry object must be the first object listed here or the guest will crash!
+$(BINDIR)/xen/i80003es2lan: $(LIBDIR)/xen/Entry.o $(OBJECTS) $(LIBDIR)/xen/llamaOS.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo linking: $@
+	@$(LD) $(LDFLAGS) -T llamaOS.lds -o $@ $^
+	@gzip -c -f --best $@ >$@.gz
+	@echo successfully built: $@
+	@echo
 
-.PHONY: clean
-clean:
-	@echo cleaning build folder...
-	@echo removing: $(OBJDIR)
-	@rm -rf $(OBJDIR)
-	@echo removing: $(BINDIR)
-	@rm -rf $(BINDIR)
-	@echo removing: $(LIBDIR)
-	@rm -rf $(LIBDIR)
-	@echo removing: $(INCDIR)
-	@rm -rf $(INCDIR)
-	@echo removing: include-fixed
-	@rm -rf include-fixed
+include rules.mk
+
+# include auto-generated dependencies
+-include $(DEPENDS)
