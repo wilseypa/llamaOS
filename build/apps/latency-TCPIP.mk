@@ -33,7 +33,7 @@
 # include common variables
 include native-flags.mk
 
-MAKEFILE_SOURCES += apps/latency-tcpip.mk
+MAKEFILE_SOURCES += apps/latency-TCPIP.mk
 
 # shared common paths
 BINDIR = bin
