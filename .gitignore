@@ -13,6 +13,7 @@ obj/
 
 # User make files #
 ###################
+build/custom-mpi-flags.mk
 build/custom-flags.mk
 
 # KDevelop files #
