@@ -33,15 +33,15 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 #include <iostream>
 
+#include <mpi.h>
+
 #include <latency/protocols/MPI.h>
 #include <latency/parse_args.cpp>
 #include <latency/verify.h>
 
-#include <mpi.h>
 
 using namespace std;
 using namespace latency;
-// using namespace latency::protocols;
 
 Protocol *Protocol::create (int argc, char *argv [])
 {
@@ -68,13 +68,13 @@ static unsigned char *alloc_buffer ()
 
 protocols::MPI::MPI (int argc, char *argv [])
    :  node(get_node(argc, argv)),
-      client(node == 0),
+      client((node % 2) == 0),
       blocking(parse<bool>(argc, argv, "--blocking", false)),
       buffer(alloc_buffer ())
 {
    memset (buffer, '\0', 4096);
 
-   if (client)
+   if (node == 0)
    {
       cout << "latency-MPI" << endl
            << "  node: " << node << endl;
@@ -88,7 +88,7 @@ protocols::MPI::~MPI ()
 
 bool protocols::MPI::root_node ()
 {
-   return client;
+   return (node == 0);
 }
 
 bool protocols::MPI::startup (unsigned long max_msg_size)
@@ -169,17 +169,45 @@ bool protocols::MPI::run_trial (unsigned long msg_size, unsigned long trial_numb
 bool protocols::MPI::recv_buffer (unsigned long length)
 {
    MPI_Status status;
+   int peer = (node % 2) ? (node - 1) : (node + 1);
 
-   if (MPI_SUCCESS == MPI_Recv (buffer,
-                                length,
-                                MPI_UNSIGNED_CHAR,
-                                (node == 0) ? 1 : 0,
-                                0,
-                                MPI_COMM_WORLD,
-                                &status
-                               ))
+   if (blocking)
    {
-      return true;//(node == status.MPI_SOURCE);
+      if (MPI_SUCCESS == MPI_Recv (buffer,
+                                 length,
+                                 MPI_UNSIGNED_CHAR,
+                                 peer,
+                                 0,
+                                 MPI_COMM_WORLD,
+                                 &status))
+      {
+         return (peer == status.MPI_SOURCE);
+      }
+   }
+   else
+   {
+      MPI_Request request;
+
+      if (MPI_SUCCESS == MPI_Irecv (buffer,
+                                    length,
+                                    MPI_UNSIGNED_CHAR,
+                                    peer,
+                                    0,
+                                    MPI_COMM_WORLD,
+                                    &request))
+      {
+         int flag = 0;
+
+         for (;;)
+         {
+            MPI_Test (&request, &flag, &status);
+
+            if (flag)
+            {
+               return (peer == status.MPI_SOURCE);
+            }
+         }
+      }
    }
 
    return false;
@@ -187,15 +215,46 @@ bool protocols::MPI::recv_buffer (unsigned long length)
 
 bool protocols::MPI::send_buffer (unsigned long length)
 {
-   if (MPI_SUCCESS == MPI_Send (buffer,
-                                length,
-                                MPI_UNSIGNED_CHAR,
-                                (node == 0) ? 1 : 0,
-                                0,
-                                MPI_COMM_WORLD))
+   int peer = (node % 2) ? (node - 1) : (node + 1);
+
+   if (blocking)
    {
-      return true;
+      if (MPI_SUCCESS == MPI_Send (buffer,
+                                 length,
+                                 MPI_UNSIGNED_CHAR,
+                                 peer,
+                                 0,
+                                 MPI_COMM_WORLD))
+      {
+         return true;
+      }
+   }
+   else
+   {
+      MPI_Request request;
+
+      if (MPI_SUCCESS == MPI_Isend (buffer,
+                                    length,
+                                    MPI_UNSIGNED_CHAR,
+                                    peer,
+                                    0,
+                                    MPI_COMM_WORLD,
+                                    &request))
+      {
+         int flag = 0;
+         MPI_Status status;
+
+         for (;;)
+         {
+            MPI_Test (&request, &flag, &status);
+
+            if (flag)
+            {
+               return true;
+            }
+         }
+      }
    }
 
-   return true;
+   return false;
 }
