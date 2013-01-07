@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2012, William Magato
+# Copyright (c) 2013, William Magato
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -33,7 +33,7 @@
 # include common variables
 include native-flags.mk
 
-MAKEFILE_SOURCES += apps/latency-TCPIP.mk
+MAKEFILE_SOURCES += apps/latency-Infiniband.mk
 
 # shared common paths
 BINDIR = bin
@@ -51,7 +51,7 @@ VPATH = $(SRCDIR)
 DEPENDS = 
 
 SOURCES = \
-  apps/latency/protocols/TCPIP.cpp \
+  apps/latency/protocols/Infiniband.cpp \
   apps/latency/Latency.cpp \
   apps/latency/main.cpp \
   apps/latency/verify.cpp
@@ -59,7 +59,7 @@ SOURCES = \
 OBJECTS = $(SOURCES:%.cpp=$(OBJDIR)/%.o)
 DEPENDS = $(OBJECTS:%.o=%.d)
 
-$(BINDIR)/native/latency-TCPIP: $(OBJECTS)
+$(BINDIR)/native/latency-Infiniband: $(OBJECTS)
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
 	@$(CXX) $(LDFLAGS) -o $@ $^

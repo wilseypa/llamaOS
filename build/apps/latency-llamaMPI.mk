@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2012, William Magato
+# Copyright (c) 2013, William Magato
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -31,27 +31,19 @@
 #
 
 # include common variables
-include native-flags.mk
+include common.mk
 
-MAKEFILE_SOURCES += apps/latency-TCPIP.mk
-
-# shared common paths
-BINDIR = bin
-LIBDIR = lib
-OBJDIR = obj
+MAKEFILE_SOURCES += apps/latency-llamaMPI.mk
 
 CPPFLAGS += \
+  -I $(INCDIR) \
+  -I $(SRCDIR) \
   -I ../src/apps
-
-# source paths
-SRCDIR = ../src
-VPATH = $(SRCDIR)
-
-# auto dependency generation
-DEPENDS = 
+  -D__XEN_INTERFACE_VERSION__=0x00030205 \
+  -include $(SRCDIR)/llamaos/__thread.h
 
 SOURCES = \
-  apps/latency/protocols/TCPIP.cpp \
+  apps/latency/protocols/MPI.cpp \
   apps/latency/Latency.cpp \
   apps/latency/main.cpp \
   apps/latency/verify.cpp
@@ -59,10 +51,15 @@ SOURCES = \
 OBJECTS = $(SOURCES:%.cpp=$(OBJDIR)/%.o)
 DEPENDS = $(OBJECTS:%.o=%.d)
 
-$(BINDIR)/native/latency-TCPIP: $(OBJECTS)
+.PHONY: xen
+xen : $(BINDIR)/xen/latency-llamaMPI
+
+# the entry object must be the first object listed here or the guest will crash!
+$(BINDIR)/xen/latency-llamaMPI: $(LIBDIR)/xen/Entry.o $(OBJECTS) $(LIBDIR)/xen/llamaOS.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
-	@$(CXX) $(LDFLAGS) -o $@ $^
+	@$(LD) $(LDFLAGS) -T llamaOS.lds -o $@ $^
+	@gzip -c -f --best $@ >$@.gz
 	@echo successfully built: $@
 	@echo
 
