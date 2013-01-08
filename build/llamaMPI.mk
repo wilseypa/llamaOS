@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2012, William Magato
+# Copyright (c) 2013, William Magato
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -31,40 +31,38 @@
 #
 
 # include common variables
-include native-flags.mk
+include common.mk
 
-MAKEFILE_SOURCES += apps/latency-TCPIP.mk
-
-# shared common paths
-BINDIR = bin
-LIBDIR = lib
-OBJDIR = obj/native
+# make file list
+MAKEFILE_SOURCES += llamaOS.mk
 
 CPPFLAGS += \
-  -I ../src/apps
+  -I $(INCDIR) \
+  -I $(SRCDIR) \
+  -include $(SRCDIR)/llamaos/__thread.h \
+  -D__XEN_INTERFACE_VERSION__=0x00030205
 
-# source paths
-SRCDIR = ../src
-VPATH = $(SRCDIR)
+CPP_SOURCES += \
+  llamaos/mpi/mpi.cpp
 
-# auto dependency generation
-DEPENDS = 
+HEADERS = \
+  $(INCDIR)/llamaos/mpi/mpi.h
 
-SOURCES = \
-  apps/latency/protocols/TCPIP.cpp \
-  apps/latency/Latency.cpp \
-  apps/latency/main.cpp \
-  apps/latency/verify.cpp
-
-OBJECTS = $(SOURCES:%.cpp=$(OBJDIR)/%.o)
+# generate object list
+OBJECTS = $(CPP_SOURCES:%.cpp=$(OBJDIR)/%.o)
 DEPENDS = $(OBJECTS:%.o=%.d)
 
-$(BINDIR)/native/latency-TCPIP: $(OBJECTS)
+$(LIBDIR)/xen/llamaMPI.a: $(OBJECTS)
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
-	@$(CXX) $(LDFLAGS) -o $@ $^
+	@$(AR) r $@ $^
 	@echo successfully built: $@
 	@echo
+
+$(INCDIR)/% : $(SRCDIR)/%
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo copying: $@ from $<
+	cp $< $@
 
 include rules.mk
 

@@ -38,7 +38,7 @@ MAKEFILE_SOURCES += apps/latency-Infiniband.mk
 # shared common paths
 BINDIR = bin
 LIBDIR = lib
-OBJDIR = obj
+OBJDIR = obj/native
 
 CPPFLAGS += \
   -I ../src/apps

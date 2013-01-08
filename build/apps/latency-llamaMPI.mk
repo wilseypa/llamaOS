@@ -38,6 +38,7 @@ MAKEFILE_SOURCES += apps/latency-llamaMPI.mk
 CPPFLAGS += \
   -I $(INCDIR) \
   -I $(SRCDIR) \
+  -I $(SRCDIR)/llamaos/mpi \
   -I ../src/apps
   -D__XEN_INTERFACE_VERSION__=0x00030205 \
   -include $(SRCDIR)/llamaos/__thread.h
@@ -55,7 +56,7 @@ DEPENDS = $(OBJECTS:%.o=%.d)
 xen : $(BINDIR)/xen/latency-llamaMPI
 
 # the entry object must be the first object listed here or the guest will crash!
-$(BINDIR)/xen/latency-llamaMPI: $(LIBDIR)/xen/Entry.o $(OBJECTS) $(LIBDIR)/xen/llamaOS.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
+$(BINDIR)/xen/latency-llamaMPI: $(LIBDIR)/xen/Entry.o $(OBJECTS) $(LIBDIR)/xen/llamaMPI.a $(LIBDIR)/xen/llamaOS.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
 	@$(LD) $(LDFLAGS) -T llamaOS.lds -o $@ $^

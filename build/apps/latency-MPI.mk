@@ -46,7 +46,7 @@ MAKEFILE_SOURCES += apps/latency-MPI.mk
 # shared common paths
 BINDIR = bin
 LIBDIR = lib
-OBJDIR = obj
+OBJDIR = obj/native
 
 CPPFLAGS += \
   -I ../src/apps

@@ -51,7 +51,7 @@ LDFLAGS =
 # shared common paths
 BINDIR = bin
 LIBDIR = lib
-OBJDIR = obj
+OBJDIR = obj/native
 INCDIR = include
 INC2DIR = include-fixed
 
