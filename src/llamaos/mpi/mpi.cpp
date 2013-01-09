@@ -34,6 +34,8 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <stdexcept>
 #include <string>
 
+#include <iostream>
+
 template <typename T>
 static T convert (const std::string &s)
 {
@@ -54,8 +56,10 @@ static T convert (const std::string &s)
 template <typename T>
 static T parse (int argc, char *argv [], const std::string &arg, const T &value)
 {
+std::cout << "parsing args" << std::endl;
    for (int i = 1; i < argc; i++)
    {
+std::cout << " " << argv [i] << std::endl;
       if (arg == argv [i])
       {
          if ((i + 1) >= argc)
