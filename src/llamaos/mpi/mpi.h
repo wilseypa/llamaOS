@@ -35,7 +35,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #define MPI_SUCCESS          0      /* Successful return code */
 
 typedef int MPI_Datatype;
-#define MPI_UNSIGNED_CHAR  ((MPI_Datatype)0)
+#define MPI_UNSIGNED_CHAR  ((MPI_Datatype)1)
 
 typedef int MPI_Comm;
 #define MPI_COMM_WORLD ((MPI_Comm)0x44000000)
