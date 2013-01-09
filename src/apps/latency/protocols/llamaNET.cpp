@@ -54,13 +54,13 @@ static domid_t get_domd_id (int node)
    // for now it's just self minus node % 6
    domid_t self_id = Hypervisor::get_instance ()->domid;
 
-   return (self_id - 1 - (node % 6));
+   return (self_id - 1 - (node / 2));
 }
 
 llamaNET::llamaNET (int argc, char *argv [])
    :  node(parse<uint32_t>(argc, argv, "--node", 0U)),
-      client(node < 6),
-      interface(get_domd_id (node), (node % 6))
+      client((node % 2) == 0),
+      interface(get_domd_id (node), (node / 2))
 {
    cout << "latency-llamaNET" << endl
         << "  node: " << node << endl;
@@ -104,7 +104,7 @@ bool llamaNET::run_verify (unsigned long msg_size)
    if (client)
    {
       header = interface.get_send_buffer ();
-      header->dest = (node >= 6) ? (node - 6) : (node + 6);;
+      header->dest = (node % 2) ? (node - 1) : (node + 1);
       header->src = node;
       header->type = 1;
       header->seq = seq++;
@@ -142,7 +142,7 @@ bool llamaNET::run_verify (unsigned long msg_size)
          interface.release_recv_buffer (header);
 
          header = interface.get_send_buffer ();
-         header->dest = (node >= 6) ? (node - 6) : (node + 6);;
+         header->dest = (node % 2) ? (node - 1) : (node + 1);
          header->src = node;
          header->type = 1;
          header->seq = seq++;
@@ -177,7 +177,7 @@ bool llamaNET::run_trial (unsigned long msg_size, unsigned long trial_number)
    if (client)
    {
       header = interface.get_send_buffer ();
-      header->dest = (node >= 6) ? (node - 6) : (node + 6);;
+      header->dest = (node % 2) ? (node - 1) : (node + 1);
       header->src = node;
       header->type = 1;
       header->seq = seq++;
@@ -206,7 +206,7 @@ bool llamaNET::run_trial (unsigned long msg_size, unsigned long trial_number)
       interface.release_recv_buffer (header);
 
       header = interface.get_send_buffer ();
-      header->dest = (node >= 6) ? (node - 6) : (node + 6);;
+      header->dest = (node % 2) ? (node - 1) : (node + 1);
       header->src = node;
       header->type = 1;
       header->seq = seq++;

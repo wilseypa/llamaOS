@@ -91,7 +91,13 @@ static domid_t get_domd_id (int node)
    // for now it's just self minus node % 6
    domid_t self_id = Hypervisor::get_instance ()->domid;
 
-   return (self_id - 1);
+   //  0,  2,  4,  6,  8, 10
+   // -1, -2, -3, -4, -5, -6
+
+   //  1,  3,  5,  7,  9, 11
+   // -1, -2, -3, -4, -5, -6
+
+   return (self_id - 1 - (node / 2));
 }
 
 static net::llamaNET *interface = nullptr;
@@ -100,7 +106,7 @@ static int node;
 int MPI_Init (int *argc, char ***argv) 
 {
    node = parse<int>(*argc, *argv, "--node", 0);
-   interface = new net::llamaNET (get_domd_id (node), (node % 6));
+   interface = new net::llamaNET (get_domd_id (node), (node / 2));
 
    return MPI_SUCCESS;
 }
@@ -167,6 +173,10 @@ int MPI_Send(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI
    header->type = 1;
    header->seq = seq++;
    header->len = count;
+
+   unsigned char *data = reinterpret_cast<unsigned char *>(header + 1);
+
+   memcpy (data, buf, count);
 
    interface->send (header);
 
