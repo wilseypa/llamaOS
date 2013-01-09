@@ -91,7 +91,7 @@ static domid_t get_domd_id (int node)
    // for now it's just self minus node % 6
    domid_t self_id = Hypervisor::get_instance ()->domid;
 
-   return (self_id - 1 - (node % 6));
+   return (self_id - 1);
 }
 
 static net::llamaNET *interface = nullptr;
