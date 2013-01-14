@@ -45,6 +45,7 @@ using namespace latency;
 
 Protocol *Protocol::create (int argc, char *argv [])
 {
+   cout << "creating MPI protocol" << endl;
    return new protocols::MPI (argc, argv);
 }
 
@@ -68,11 +69,23 @@ static unsigned char *alloc_buffer ()
 
 protocols::MPI::MPI (int argc, char *argv [])
    :  node(get_node(argc, argv)),
-      client((node % 2) == 0),
+      client((node % 2) == 1),
       blocking(parse<bool>(argc, argv, "--blocking", false)),
       buffer(alloc_buffer ())
 {
    memset (buffer, '\0', 4096);
+
+   cout << "Node number " << node << endl;
+   if (client) {
+      cout << "I am the client" << endl;
+   } else {
+      cout << "I am the server" << endl;
+   }
+   if (blocking) {
+      cout << "Running in blocking mode" << endl;
+   } else {
+      cout << "Running in non-blocking mode" << endl;
+   }
 
    if (node == 0)
    {

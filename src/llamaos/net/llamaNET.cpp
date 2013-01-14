@@ -160,6 +160,7 @@ void llamaNET::send (Protocol_header *header)
    // !BAM get these in a config soon
    // dalai node 0 mac 00-1b-21-d5-66-ef
    // redpj node 1 mac 68-05-ca-01-f7-db
+/*
 #if 0
    if (   (header->dest >= 0)
        && (header->dest < 6))
@@ -221,48 +222,48 @@ void llamaNET::send (Protocol_header *header)
 
    if ((header->dest % 2) == 0)
    {
-      // sending to dalai
-      header->eth_dest [0] = 0x00;
-      header->eth_dest [1] = 0x1b;
-      header->eth_dest [2] = 0x21;
-      header->eth_dest [3] = 0xd5;
-      header->eth_dest [4] = 0x66;
-      header->eth_dest [5] = 0xef;
-   }
-   else
-   {
-      // sending to redpj
+      // sending to thor
       header->eth_dest [0] = 0x68;
       header->eth_dest [1] = 0x05;
       header->eth_dest [2] = 0xca;
-      header->eth_dest [3] = 0x01;
+      header->eth_dest [3] = 0x06;
+      header->eth_dest [4] = 0xde;
+      header->eth_dest [5] = 0xc0;
+   }
+   else
+   {
+      // sending to wiley
+      header->eth_dest [0] = 0x68;
+      header->eth_dest [1] = 0x05;
+      header->eth_dest [2] = 0xca;
+      header->eth_dest [3] = 0x06;
       header->eth_dest [4] = 0xf7;
-      header->eth_dest [5] = 0xdb;
+      header->eth_dest [5] = 0x72;
    }
 
    if ((header->src % 2) == 0)
    {
-      // sending from dalai
-      header->eth_src [0] = 0x00;
-      header->eth_src [1] = 0x1b;
-      header->eth_src [2] = 0x21;
-      header->eth_src [3] = 0xd5;
-      header->eth_src [4] = 0x66;
-      header->eth_src [5] = 0xef;
-   }
-   else
-   {
-      // sending from redpj
+      // sending from thor
       header->eth_src [0] = 0x68;
       header->eth_src [1] = 0x05;
       header->eth_src [2] = 0xca;
-      header->eth_src [3] = 0x01;
+      header->eth_src [3] = 0x06;
+      header->eth_src [4] = 0xde;
+      header->eth_src [5] = 0xc0;
+   }
+   else
+   {
+      // sending from wiley
+      header->eth_src [0] = 0x68;
+      header->eth_src [1] = 0x05;
+      header->eth_src [2] = 0xca;
+      header->eth_src [3] = 0x06;
       header->eth_src [4] = 0xf7;
-      header->eth_src [5] = 0xdb;
+      header->eth_src [5] = 0x72;
    }
 
 #endif
-
+*/
    header->eth_type = 0x0C09;
 
 //   unsigned int head = control->app [0].tx_head;

@@ -39,6 +39,7 @@ int main (int argc, char *argv [])
 {
    try
    {
+      cout << "starting latency app..." << endl;
       Latency latency (argc, argv);
 
       return latency.run () ? 0 : -1;
