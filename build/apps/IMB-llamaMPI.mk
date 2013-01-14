@@ -33,30 +33,42 @@
 # include common variables
 include common.mk
 
-MAKEFILE_SOURCES += apps/latency-llamaMPI.mk
+MAKEFILE_SOURCES += apps/IMB-llamaMPI.mk
 
-CPPFLAGS += \
+CFLAGS += \
   -I $(INCDIR) \
+  -I $(INC2DIR) \
   -I $(SRCDIR) \
   -I $(SRCDIR)/llamaos/mpi \
   -I ../src/apps \
   -D__XEN_INTERFACE_VERSION__=0x00030205 \
-  -include $(SRCDIR)/llamaos/__thread.h
+  -include $(SRCDIR)/llamaos/__thread.h \
+  -DMPI1
 
 SOURCES = \
-  apps/latency/protocols/MPI.cpp \
-  apps/latency/Latency.cpp \
-  apps/latency/main.cpp \
-  apps/latency/verify.cpp
+  apps/imb-3.2.3/src/IMB.c \
+  apps/imb-3.2.3/src/IMB_benchlist.c \
+  apps/imb-3.2.3/src/IMB_cpu_exploit.c \
+  apps/imb-3.2.3/src/IMB_declare.c \
+  apps/imb-3.2.3/src/IMB_err_handler.c \
+  apps/imb-3.2.3/src/IMB_exchange.c \
+  apps/imb-3.2.3/src/IMB_g_info.c \
+  apps/imb-3.2.3/src/IMB_init.c \
+  apps/imb-3.2.3/src/IMB_init_transfer.c \
+  apps/imb-3.2.3/src/IMB_mem_manager.c \
+  apps/imb-3.2.3/src/IMB_output.c \
+  apps/imb-3.2.3/src/IMB_parse_name_mpi1.c \
+  apps/imb-3.2.3/src/IMB_strgs.c \
+  apps/imb-3.2.3/src/IMB_warm_up.c
 
-OBJECTS = $(SOURCES:%.cpp=$(OBJDIR)/%.o)
+OBJECTS = $(SOURCES:%.c=$(OBJDIR)/%.o)
 DEPENDS = $(OBJECTS:%.o=%.d)
 
 .PHONY: xen
-xen : $(BINDIR)/xen/latency-llamaMPI
+xen : $(BINDIR)/xen/IMB-llamaMPI
 
 # the entry object must be the first object listed here or the guest will crash!
-$(BINDIR)/xen/latency-llamaMPI: $(LIBDIR)/xen/Entry.o $(OBJECTS) $(LIBDIR)/xen/llamaMPI.a $(LIBDIR)/xen/llamaOS.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
+$(BINDIR)/xen/IMB-llamaMPI: $(LIBDIR)/xen/Entry.o $(OBJECTS) $(LIBDIR)/xen/llamaMPI.a $(LIBDIR)/xen/llamaOS.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
 	@$(LD) $(LDFLAGS) -T llamaOS.lds -o $@ $^

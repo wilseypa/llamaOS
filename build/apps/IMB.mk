@@ -31,36 +31,71 @@
 #
 
 # include common variables
-include common.mk
+include native-flags.mk
 
-MAKEFILE_SOURCES += apps/latency-llamaMPI.mk
+# compiler tools
+CC = mpicc
+CXX = mpicxx
+LD = mpicxx
 
-CPPFLAGS += \
-  -I $(INCDIR) \
-  -I $(SRCDIR) \
-  -I $(SRCDIR)/llamaos/mpi \
-  -I ../src/apps \
-  -D__XEN_INTERFACE_VERSION__=0x00030205 \
-  -include $(SRCDIR)/llamaos/__thread.h
+# include custom flags if exists
+-include custom-mpi-flags.mk
+
+MAKEFILE_SOURCES += apps/IMB.mk
+
+# shared common paths
+BINDIR = bin
+LIBDIR = lib
+OBJDIR = obj/native
+
+CFLAGS += -DMPI1
+
+# source paths
+SRCDIR = ../src
+VPATH = $(SRCDIR)
+
+# auto dependency generation
+DEPENDS = 
 
 SOURCES = \
-  apps/latency/protocols/MPI.cpp \
-  apps/latency/Latency.cpp \
-  apps/latency/main.cpp \
-  apps/latency/verify.cpp
+  apps/imb-3.2.3/src/IMB.c \
+  apps/imb-3.2.3/src/IMB_allgather.c \
+  apps/imb-3.2.3/src/IMB_allgatherv.c \
+  apps/imb-3.2.3/src/IMB_allreduce.c \
+  apps/imb-3.2.3/src/IMB_alltoall.c \
+  apps/imb-3.2.3/src/IMB_alltoallv.c \
+  apps/imb-3.2.3/src/IMB_barrier.c \
+  apps/imb-3.2.3/src/IMB_bcast.c \
+  apps/imb-3.2.3/src/IMB_benchlist.c \
+  apps/imb-3.2.3/src/IMB_cpu_exploit.c \
+  apps/imb-3.2.3/src/IMB_declare.c \
+  apps/imb-3.2.3/src/IMB_err_handler.c \
+  apps/imb-3.2.3/src/IMB_exchange.c \
+  apps/imb-3.2.3/src/IMB_g_info.c \
+  apps/imb-3.2.3/src/IMB_gather.c \
+  apps/imb-3.2.3/src/IMB_gatherv.c \
+  apps/imb-3.2.3/src/IMB_init.c \
+  apps/imb-3.2.3/src/IMB_init_transfer.c \
+  apps/imb-3.2.3/src/IMB_mem_manager.c \
+  apps/imb-3.2.3/src/IMB_output.c \
+  apps/imb-3.2.3/src/IMB_parse_name_mpi1.c \
+  apps/imb-3.2.3/src/IMB_pingpong.c \
+  apps/imb-3.2.3/src/IMB_pingping.c \
+  apps/imb-3.2.3/src/IMB_reduce.c \
+  apps/imb-3.2.3/src/IMB_reduce_scatter.c \
+  apps/imb-3.2.3/src/IMB_scatter.c \
+  apps/imb-3.2.3/src/IMB_scatterv.c \
+  apps/imb-3.2.3/src/IMB_sendrecv.c \
+  apps/imb-3.2.3/src/IMB_strgs.c \
+  apps/imb-3.2.3/src/IMB_warm_up.c
 
-OBJECTS = $(SOURCES:%.cpp=$(OBJDIR)/%.o)
+OBJECTS = $(SOURCES:%.c=$(OBJDIR)/%.o)
 DEPENDS = $(OBJECTS:%.o=%.d)
 
-.PHONY: xen
-xen : $(BINDIR)/xen/latency-llamaMPI
-
-# the entry object must be the first object listed here or the guest will crash!
-$(BINDIR)/xen/latency-llamaMPI: $(LIBDIR)/xen/Entry.o $(OBJECTS) $(LIBDIR)/xen/llamaMPI.a $(LIBDIR)/xen/llamaOS.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
+$(BINDIR)/native/IMB: $(OBJECTS)
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
-	@$(LD) $(LDFLAGS) -T llamaOS.lds -o $@ $^
-	@gzip -c -f --best $@ >$@.gz
+	@$(CXX) $(LDFLAGS) -o $@ $^
 	@echo successfully built: $@
 	@echo
 

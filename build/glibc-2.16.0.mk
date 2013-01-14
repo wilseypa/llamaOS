@@ -171,6 +171,7 @@ HEADERS = \
   $(INCDIR)/bits/types.h \
   $(INCDIR)/bits/typesizes.h \
   $(INCDIR)/bits/uio.h \
+  $(INCDIR)/bits/utsname.h \
   $(INCDIR)/bits/waitflags.h \
   $(INCDIR)/bits/waitstatus.h \
   $(INCDIR)/bits/wchar.h \
@@ -195,6 +196,7 @@ HEADERS = \
   $(INCDIR)/sys/types.h \
   $(INCDIR)/sys/ucontext.h \
   $(INCDIR)/sys/uio.h \
+  $(INCDIR)/sys/utsname.h \
   $(INCDIR)/_G_config.h \
   $(INCDIR)/alloca.h \
   $(INCDIR)/assert.h \
@@ -566,6 +568,8 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/sigsuspend_nocancel.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/syscall.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/gettimeofday.c \
+  glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/time.c \
+  glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/uname.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/write.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/writev.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/dl-libc.c \
@@ -589,6 +593,7 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/time/settimeofday.c \
   glibc-$(GLIBC_VERSION)/time/strftime.c \
   glibc-$(GLIBC_VERSION)/time/strftime_l.c \
+  glibc-$(GLIBC_VERSION)/time/time.c \
   glibc-$(GLIBC_VERSION)/time/tzfile.c \
   glibc-$(GLIBC_VERSION)/time/tzset.c \
   glibc-$(GLIBC_VERSION)/time/wcsftime.c \

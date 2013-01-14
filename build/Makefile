@@ -45,6 +45,7 @@ all:
 	@$(MAKE) -f xen-$(XEN_VERSION).mk
 	@$(MAKE) -f llamaOS.mk xen
 	@$(MAKE) -f llamaMPI.mk
+	@$(MAKE) -f apps/IMB.mk
 	@$(MAKE) -f apps/latency-Infiniband.mk
 	@$(MAKE) -f apps/latency-llamaMPI.mk
 	@$(MAKE) -f apps/latency-llamaNET.mk
@@ -53,6 +54,7 @@ all:
 	@$(MAKE) -f net/i82574.mk xen
 	@$(MAKE) -f net/i80003es2lan.mk xen
 
+#	@$(MAKE) -f apps/IMB-llamaMPI.mk
 
 #	@$(MAKE) -f gtest-$(GTEST_VERSION).mk
 #	@$(MAKE) -f llamaOS-xen-test.mk xen

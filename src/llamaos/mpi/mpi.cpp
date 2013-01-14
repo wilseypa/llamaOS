@@ -192,3 +192,23 @@ int MPI_Test(MPI_Request *request, int *flag, MPI_Status *status)
 {
    return 0;
 }
+
+int MPI_Barrier(MPI_Comm comm)
+{
+   return MPI_SUCCESS;
+}
+
+int MPI_Type_size(MPI_Datatype datatype, int *size)
+{
+   return MPI_SUCCESS;
+}
+
+double MPI_Wtime(void)
+{
+   return 0.0;
+}
+
+double MPI_Wtick(void)
+{
+   return 0.0;
+}
