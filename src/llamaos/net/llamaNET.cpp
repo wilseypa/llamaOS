@@ -41,6 +41,8 @@ using namespace llamaos::memory;
 using namespace llamaos::net;
 using namespace llamaos::xen;
 
+//#define HARD_CODED_MACS
+
 const unsigned int llamaNET::HEADER_LENGTH = sizeof(llamaNET::Protocol_header);
 
 llamaNET::llamaNET (int domd_id, int index)
@@ -160,7 +162,7 @@ void llamaNET::send (Protocol_header *header)
    // !BAM get these in a config soon
    // dalai node 0 mac 00-1b-21-d5-66-ef
    // redpj node 1 mac 68-05-ca-01-f7-db
-/*
+#ifdef HARD_CODED_MACS
 #if 0
    if (   (header->dest >= 0)
        && (header->dest < 6))
@@ -263,7 +265,7 @@ void llamaNET::send (Protocol_header *header)
    }
 
 #endif
-*/
+#endif
    header->eth_type = 0x0C09;
 
 //   unsigned int head = control->app [0].tx_head;

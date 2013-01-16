@@ -43,7 +43,7 @@ using namespace llamaos;
 using namespace llamaos::net;
 using namespace llamaos::xen;
 
-#define MPI_COUT_EVERY_MESSAGE
+//#define MPI_COUT_EVERY_MESSAGE
 #define MPI_MAX_NODES 256
 
 typedef struct MpiHostTable_T {
