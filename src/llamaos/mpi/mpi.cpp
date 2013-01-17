@@ -192,6 +192,11 @@ int MPI_Comm_rank (MPI_Comm comm, int *rank) {
    return MPI_SUCCESS;
 }
 
+int MPI_Comm_size (MPI_Comm comm, int *size) {
+   (*size) = mpiData.totNodes;
+   return MPI_SUCCESS;
+}
+
 int MPI_Recv(void *buf, int count, MPI_Datatype datatype, int source, int tag, MPI_Comm comm, MPI_Status *status) {
    // Print receive request
    #ifdef MPI_COUT_EVERY_MESSAGE
