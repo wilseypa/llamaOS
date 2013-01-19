@@ -427,6 +427,8 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/stdio-common/fprintf.c \
   glibc-$(GLIBC_VERSION)/stdio-common/funlockfile.c \
   glibc-$(GLIBC_VERSION)/stdio-common/fxprintf.c \
+  glibc-$(GLIBC_VERSION)/stdio-common/isoc99_sscanf.c \
+  glibc-$(GLIBC_VERSION)/stdio-common/isoc99_vsscanf.c \
   glibc-$(GLIBC_VERSION)/stdio-common/itoa-digits.c \
   glibc-$(GLIBC_VERSION)/stdio-common/itoa-udigits.c \
   glibc-$(GLIBC_VERSION)/stdio-common/itowa-digits.c \
@@ -439,6 +441,7 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/stdio-common/reg-modifier.c \
   glibc-$(GLIBC_VERSION)/stdio-common/reg-printf.c \
   glibc-$(GLIBC_VERSION)/stdio-common/reg-type.c \
+  glibc-$(GLIBC_VERSION)/stdio-common/scanf.c \
   glibc-$(GLIBC_VERSION)/stdio-common/snprintf.c \
   glibc-$(GLIBC_VERSION)/stdio-common/sprintf.c \
   glibc-$(GLIBC_VERSION)/stdio-common/sscanf.c \
@@ -585,6 +588,7 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/sysdeps/wordsize-64/strtoul.c \
   glibc-$(GLIBC_VERSION)/sysdeps/wordsize-64/strtoul_l.c \
   glibc-$(GLIBC_VERSION)/time/alt_digit.c \
+  glibc-$(GLIBC_VERSION)/time/asctime.c \
   glibc-$(GLIBC_VERSION)/time/era.c \
   glibc-$(GLIBC_VERSION)/time/lc-time-cleanup.c \
   glibc-$(GLIBC_VERSION)/time/localtime.c \
