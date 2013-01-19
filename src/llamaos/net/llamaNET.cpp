@@ -114,7 +114,8 @@ llamaNET::Protocol_header *llamaNET::recv (uint32_t node)
    {
       header = recv ();
 
-      if (header->dest == node)
+      if (   (header->eth_type == 0x0C09)
+          && (header->dest == node))
       {
          return header;
       }
