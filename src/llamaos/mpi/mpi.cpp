@@ -28,6 +28,70 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
+#include <llamaos/mpi/mpi.h>
+
+extern "C"
+int MPI_Init (int *argc, char ***argv)
+{
+   return MPI_SUCCESS;
+}
+
+extern "C"
+int MPI_Finalize (void)
+{
+   return MPI_SUCCESS;
+}
+
+extern "C"
+int MPI_Comm_rank (MPI_Comm comm, int *rank)
+{
+   return MPI_SUCCESS;
+}
+
+extern "C"
+int MPI_Comm_size (MPI_Comm comm, int *size)
+{
+   return MPI_SUCCESS;
+}
+
+extern "C"
+int MPI_Recv (void *buf, int count, MPI_Datatype datatype, int source, int tag, MPI_Comm comm, MPI_Status *status)
+{
+   return MPI_SUCCESS;
+}
+
+extern "C"
+int MPI_Irecv (void *buf, int count, MPI_Datatype datatype, int source, int tag, MPI_Comm comm, MPI_Request *request)
+{
+   return MPI_SUCCESS;
+}
+
+extern "C"
+int MPI_Send (void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm)
+{
+   return MPI_SUCCESS;
+}
+
+extern "C"
+int MPI_Isend (void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm, MPI_Request *request)
+{
+   return MPI_SUCCESS;
+}
+
+extern "C"
+int MPI_Test (MPI_Request *request, int *flag, MPI_Status *status)
+{
+   return MPI_SUCCESS;
+}
+
+
+
+
+
+
+
+#if 0
+
 #include <cstring>
 
 #include <sstream>
@@ -212,3 +276,5 @@ double MPI_Wtick(void)
 {
    return 0.0;
 }
+
+#endif
