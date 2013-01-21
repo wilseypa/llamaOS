@@ -58,6 +58,7 @@ SOURCES = \
   apps/imb-3.2.3/src/IMB_mem_manager.c \
   apps/imb-3.2.3/src/IMB_output.c \
   apps/imb-3.2.3/src/IMB_parse_name_mpi1.c \
+  apps/imb-3.2.3/src/IMB_pingpong.c \
   apps/imb-3.2.3/src/IMB_strgs.c \
   apps/imb-3.2.3/src/IMB_warm_up.c
 

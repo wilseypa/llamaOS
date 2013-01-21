@@ -159,6 +159,8 @@ typedef int MPI_Op;
 #define MPI_LOCK_EXCLUSIVE  234
 #define MPI_LOCK_SHARED     235
 
+typedef int MPI_Errhandler;
+
 /* MPI request opjects */
 typedef int MPI_Request;
 
@@ -308,6 +310,35 @@ int MPI_Isend (void *buf, int count, MPI_Datatype datatype, int dest, int tag, M
 
 int MPI_Test (MPI_Request *request, int *flag, MPI_Status *status);
 
+int MPI_Barrier (MPI_Comm comm);
+
+int MPI_Type_size (MPI_Datatype datatype, int *size);
+
+double MPI_Wtime (void);
+
+int MPI_Error_string (int errorcode, char *string, int *resultlen);
+
+int MPI_Abort (MPI_Comm comm, int errorcode);
+
+int MPI_Waitall (int count, MPI_Request array_of_requests[], MPI_Status array_of_statuses[]);
+
+int MPI_Get_version (int *version, int *subversion);
+
+int MPI_Bcast (void *buffer, int count, MPI_Datatype datatype, int root, MPI_Comm comm);
+
+int MPI_Comm_free (MPI_Comm *comm);
+
+int MPI_Comm_split (MPI_Comm comm, int color, int key, MPI_Comm *newcomm);
+
+int MPI_Comm_group (MPI_Comm comm, MPI_Group *group);
+
+int MPI_Group_translate_ranks (MPI_Group group1, int n, int *ranks1, MPI_Group group2, int *ranks2);
+
+int MPI_Get_count (MPI_Status *status,  MPI_Datatype datatype, int *count);
+
+int MPI_Allreduce (void *sendbuf, void *recvbuf, int count, MPI_Datatype datatype, MPI_Op op, MPI_Comm comm);
+
+int MPI_Gather (void *sendbuf, int sendcnt, MPI_Datatype sendtype, void *recvbuf, int recvcnt, MPI_Datatype recvtype, int root, MPI_Comm comm);
 
 #if 0
 

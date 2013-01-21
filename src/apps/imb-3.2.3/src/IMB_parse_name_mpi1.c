@@ -183,6 +183,8 @@ In/out variables:
           type 			= SingleTransfer;
           Bmark->scale_time 	= 0.5;
     }
+// !BAM
+#if 0
     else if (!strcmp(Bmark->name,"pingping"))
     { 
 	strcpy(Bmark->name,"PingPing");
@@ -319,6 +321,8 @@ In/out variables:
 	type = Collective;
 	Bmark->bench_comments = &Alltoallv_cmt[0];
     }
+// !BAM
+#endif
     else 
     {
 	type = BTYPE_INVALID;
