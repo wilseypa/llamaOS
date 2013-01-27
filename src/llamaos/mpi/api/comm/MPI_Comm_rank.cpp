@@ -28,9 +28,9 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include "iGlobals.h"
+#include <iGlobals.h>
 
-int MPI_Recv(void *buf, int count, MPI_Datatype datatype, int source, int tag, MPI_Comm comm, MPI_Status *status) {
-   iReceive(buf, count, datatype, source, tag, comm, MPI_CONTEXT_PT2PT, status);
+int MPI_Comm_rank (MPI_Comm comm, int *rank) {
+   (*rank) = mpiData.rank;
    return MPI_SUCCESS;
 }

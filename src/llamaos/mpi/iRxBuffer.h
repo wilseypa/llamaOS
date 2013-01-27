@@ -31,7 +31,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #ifndef I_RXBUFFER_H_
 #define I_RXBUFFER_H_
 
-#include "iGlobals.h"
+#include <iGlobals.h>
 #include <list>
 
 typedef struct MpiRxMessage_T {

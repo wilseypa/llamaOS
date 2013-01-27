@@ -28,10 +28,9 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include "iGlobals.h"
-#include "llamaConn.h"
+#include <iGlobals.h>
 
-int MPI_Finalize (void) {
-   delete llamaNetInterface;
+int MPI_Send(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm) {
+   iSend(buf, count, datatype, dest, tag, comm, MPI_CONTEXT_PT2PT);
    return MPI_SUCCESS;
 }

@@ -36,9 +36,9 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #define MAP_TYPE std::map
 #include <map>
 
-#include "mpi.h"
-#include "iGroup.h"
-#include "iComm.h"
+#include <mpi.h>
+#include <iGroup.h>
+#include <iComm.h>
 
 class iGroup;
 class iComm;

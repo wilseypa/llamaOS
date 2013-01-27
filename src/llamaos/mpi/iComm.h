@@ -31,9 +31,9 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #ifndef I_COMM_H_
 #define I_COMM_H_
 
-#include "iGlobals.h"
-#include "iGroup.h"
-#include "iRxBuffer.h"
+#include <iGlobals.h>
+#include <iGroup.h>
+#include <iRxBuffer.h>
 
 class iGroup;
 class iRxBuffer;

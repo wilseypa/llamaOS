@@ -28,8 +28,8 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include "iGlobals.h"
-#include "llamaConn.h"
+#include <iGlobals.h>
+#include <llamaConn.h>
 #include <llamaos/mpi/mpi.h>
 #include <llamaos/net/llamaNET.h>
 #include <llamaos/xen/Hypervisor.h>

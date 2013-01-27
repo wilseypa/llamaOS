@@ -31,7 +31,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #ifndef I_GROUP_H_
 #define I_GROUP_H_
 
-#include "iGlobals.h"
+#include <iGlobals.h>
 #include <vector>
 
 typedef int IGROUP_CREATE_TYPE;

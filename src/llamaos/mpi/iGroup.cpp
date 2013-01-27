@@ -28,11 +28,8 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include "iGroup.h"
+#include <iGroup.h>
 #include <string.h>
-#include <iostream>
-
-using namespace std;
 
 // Return the next unique identifier
 MPI_Group iGroup::getNextId() {

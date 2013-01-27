@@ -28,7 +28,7 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include "iGlobals.h"
+#include <iGlobals.h>
 
 // GLOBAL VARIABLES
 MpiData_T mpiData;

@@ -28,7 +28,7 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include "iComm.h"
+#include <iComm.h>
 
 // Create Comm based on new id and associated group
 iComm::iComm(MPI_Comm nId, iGroup *nGroup) {

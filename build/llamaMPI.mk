@@ -39,6 +39,7 @@ MAKEFILE_SOURCES += llamaOS.mk
 CPPFLAGS += \
   -I $(INCDIR) \
   -I $(SRCDIR) \
+  -I $(SRCDIR)/llamaos/mpi \
   -include $(SRCDIR)/llamaos/__thread.h \
   -D__XEN_INTERFACE_VERSION__=0x00030205
 
@@ -51,13 +52,13 @@ CPP_SOURCES += \
   llamaos/mpi/iComm.cpp \
   llamaos/mpi/iReceive.cpp \
   llamaos/mpi/iSend.cpp \
-  llamaos/mpi/MPI_Init.cpp \
   llamaos/mpi/tools.cpp \
-  llamaos/mpi/MPI_Recv.cpp \
-  llamaos/mpi/MPI_Send.cpp \
-  llamaos/mpi/MPI_Comm_rank.cpp \
-  llamaos/mpi/MPI_Comm_size.cpp \
-  llamaos/mpi/MPI_Finalize.cpp 
+  llamaos/mpi/api/pt2pt/MPI_Recv.cpp \
+  llamaos/mpi/api/pt2pt/MPI_Send.cpp \
+  llamaos/mpi/api/comm/MPI_Comm_rank.cpp \
+  llamaos/mpi/api/comm/MPI_Comm_size.cpp \
+  llamaos/mpi/api/sys/MPI_Init.cpp \
+  llamaos/mpi/api/sys/MPI_Finalize.cpp
 
 HEADERS = \
   $(INCDIR)/llamaos/mpi/mpi.h

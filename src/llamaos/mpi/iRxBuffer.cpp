@@ -28,8 +28,8 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include "iRxBuffer.h"
-#include "string.h"
+#include <iRxBuffer.h>
+#include <string.h>
 #include <cstdlib>
 
 void iRxBuffer::pushMessage(unsigned char *buf, int size, int source, int tag) {

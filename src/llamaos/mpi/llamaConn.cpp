@@ -28,6 +28,6 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include "llamaConn.h"
+#include <llamaConn.h>
 
 llamaos::net::llamaNET *llamaNetInterface;
