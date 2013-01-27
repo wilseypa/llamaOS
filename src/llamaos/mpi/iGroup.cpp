@@ -30,6 +30,9 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 #include "iGroup.h"
 #include <string.h>
+#include <iostream>
+
+using namespace std;
 
 // Return the next unique identifier
 MPI_Group iGroup::getNextId() {
@@ -44,9 +47,11 @@ iGroup::iGroup(IGROUP_CREATE_TYPE type) {
          id = getNextId();
          size = mpiData.totNodes;
          localRank = mpiData.rank;
+         localWorldRank = mpiData.rank;
          rankToWorldRank.resize(size);
          for (int i = 0; i < size; i++) {
             rankToWorldRank[i] = i;
+            worldRankToRank[i] = i;
          }
          break;
       }
@@ -54,6 +59,7 @@ iGroup::iGroup(IGROUP_CREATE_TYPE type) {
          id = MPI_GROUP_EMPTY;
          size = 0;
          localRank = MPI_UNDEFINED;
+         localWorldRank = MPI_UNDEFINED;
          rankToWorldRank.resize(size);
          break;
       }
@@ -61,8 +67,10 @@ iGroup::iGroup(IGROUP_CREATE_TYPE type) {
          id = getNextId();
          size = 1;
          localRank = mpiData.rank;
+         localWorldRank = mpiData.rank;
          rankToWorldRank.resize(size);
          rankToWorldRank[0] = localRank;
+         worldRankToRank[0] = localRank;
          break;
       }
    }
@@ -72,4 +80,23 @@ iGroup::iGroup(IGROUP_CREATE_TYPE type) {
 // Destroy the reference to the id in the global hash map
 iGroup::~iGroup() {
    mpiData.group.erase(id);
+}
+
+// Translate the comm rank to the world rank
+int iGroup::getWorldRankFromRank(int rank) {
+   if (rank >= 0 && rank < size) {
+      return rankToWorldRank[rank];
+   } else {
+      return MPI_UNDEFINED;
+   }
+}
+
+// Translate the world rank to the comm rank
+int iGroup::getRankFromWorldRank(int worldRank) {
+   MAP_TYPE<int,int>::iterator it = worldRankToRank.find(worldRank);
+   if (it != worldRankToRank.end()) {
+      return it->second;
+   } else {
+      return MPI_UNDEFINED;
+   }
 }

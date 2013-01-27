@@ -45,11 +45,16 @@ class iGroup {
       ~iGroup();
       MPI_Group getId() {return id;}
       int getLocalRank() {return localRank;}
+      int getLocalWorldRank() {return localWorldRank;}
+      int getWorldRankFromRank(int rank);
+      int getRankFromWorldRank(int worldRank);
    private:
       MPI_Group id;
       int size;
-      int localRank;
+      int localRank;      // Rank of local process node in comm
+      int localWorldRank; // Rank of local process node in world
       std::vector<int> rankToWorldRank;	// Conversion of rank in comm to world rank
+      MAP_TYPE<int,int> worldRankToRank; // Conversion of world rank to rank in comm
 
       MPI_Group getNextId();
 };

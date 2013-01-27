@@ -146,7 +146,7 @@ int MPI_Init (int *argc, char ***argv) {
    //Initialize Communicators
    cout << "Initializing communicators... ";
    new iComm(MPI_COMM_WORLD, new iGroup(IGROUP_CREATE_WORLD));
-   new iComm(MPI_COMM_WORLD, new iGroup(IGROUP_CREATE_SELF));
+   new iComm(MPI_COMM_SELF, new iGroup(IGROUP_CREATE_SELF));
    cout << "DONE" << endl;
 
    //Initialize llamaNET connection

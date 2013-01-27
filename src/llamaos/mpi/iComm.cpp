@@ -35,6 +35,7 @@ iComm::iComm(MPI_Comm nId, iGroup *nGroup) {
    id = nId;
    group = nGroup;
    localRank = group->getLocalRank();
+   localWorldRank = group->getLocalWorldRank();
    mpiData.comm[id] = this;
    pt2ptRxBuffer = new iRxBuffer();
    collectiveRxBuffer = new iRxBuffer();
@@ -45,4 +46,14 @@ iComm::~iComm() {
    mpiData.comm.erase(id);
    delete pt2ptRxBuffer;
    delete collectiveRxBuffer;
+}
+
+// Translate the comm rank to the world rank
+int iComm::getWorldRankFromRank(int rank) {
+   return group->getWorldRankFromRank(rank);
+}
+
+// Translate the world rank to the comm rank
+int iComm::getRankFromWorldRank(int worldRank) {
+   return group->getRankFromWorldRank(worldRank);
 }

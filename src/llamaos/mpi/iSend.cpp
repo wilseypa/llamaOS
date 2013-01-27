@@ -39,20 +39,26 @@ void iSend(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_C
    static uint32_t seq = 1;
    net::llamaNET::Protocol_header *header;
 
-   map<MPI_Comm,iComm*>::iterator it = mpiData.comm.find(comm);
+   MAP_TYPE<MPI_Comm,iComm*>::iterator it = mpiData.comm.find(comm);
    if (it == mpiData.comm.end()) {  // Comm does not exist
       cout << "WARNING: Comm " << comm << " does not exist" << endl;
       return;
    }
+   iComm *commPtr = it->second;
 
    // TODO: Determine based on datatype and comm
    int sizeInBytes = count;
-   int destWorldRank = dest;
+
+   // Translate comm ranks into world ranks
+   int destWorldRank = commPtr->getWorldRankFromRank(dest);
+   if (destWorldRank == MPI_UNDEFINED) {return;} // Destination rank is not in comm
+   int srcWorldRank = commPtr->getLocalWorldRank();
+   if (srcWorldRank == MPI_UNDEFINED) {return;} // Source rank is not in comm
    int commContext = comm | context;
 
    header = llamaNetInterface->get_send_buffer();
    header->dest = static_cast<uint32_t>(destWorldRank);
-   header->src = static_cast<uint32_t>(mpiData.rank); // TODO: Determine src rank in comm
+   header->src = static_cast<uint32_t>(srcWorldRank);
    header->type = 1;
    header->seq = seq++; 
    header->len = sizeInBytes + 8;

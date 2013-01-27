@@ -37,7 +37,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 typedef struct MpiRxMessage_T {
    unsigned char *buf;
    int size;
-   int source;
+   int source; // Comm Rank
    int tag;
 } MpiRxMessage_T;
 

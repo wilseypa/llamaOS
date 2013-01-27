@@ -31,12 +31,14 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #ifndef I_GLOBALS_H_
 #define I_GLOBALS_H_
 
+#include <cstdint>
+#include <vector>
+#define MAP_TYPE std::map
+#include <map>
+
 #include "mpi.h"
 #include "iGroup.h"
 #include "iComm.h"
-#include <cstdint>
-#include <vector>
-#include <map>
 
 class iGroup;
 class iComm;
@@ -60,8 +62,8 @@ typedef struct MpiData_T {
    uint32_t pid;	// The current node pid on machine (0 - #nodes on machine)
    uint32_t totNodes;	// The total nodes in the world
    std::vector<MpiHostTable_T> hostTable;	// The vector of all MAC addresses and pid per world rank
-   std::map<MPI_Comm,iComm*> comm;
-   std::map<MPI_Group,iGroup*> group;
+   MAP_TYPE<MPI_Comm,iComm*> comm;	// Map of integer handles to communicators
+   MAP_TYPE<MPI_Group,iGroup*> group; // Map of integer handles to groups
 } MpiData_T;
 
 

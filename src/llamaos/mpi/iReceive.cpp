@@ -43,18 +43,10 @@ void iReceive(void *buf, int count, MPI_Datatype datatype, int source, int tag,
 			MPI_Comm comm, MPI_Context context, MPI_Status *status) {
    // TODO: Determine based on datatype and comm
    int sizeInBytes = count;
-   int srcWorldRank = source;
-
-   // Print receive request
-   #ifdef MPI_COUT_EVERY_MESSAGE
-   cout << "Waiting for message from src " << srcWorldRank << " from MAC address ";
-   iPrintMAC(mpiData.hostTable[srcWorldRank].address);
-   cout << endl;
-   #endif
 
    // Get receive buffer
    iRxBuffer *rxBuff;
-   map<MPI_Comm,iComm*>::iterator it = mpiData.comm.find(comm);
+   MAP_TYPE<MPI_Comm,iComm*>::iterator it = mpiData.comm.find(comm);
    if (it != mpiData.comm.end()) { // Comm is declared
       // Get receive buffer
       if (context == MPI_CONTEXT_PT2PT) {
@@ -66,6 +58,18 @@ void iReceive(void *buf, int count, MPI_Datatype datatype, int source, int tag,
       cout << "WARNING: Comm " << comm << " does not exist" << endl;
       return;
    }
+   iComm *commPtr = it->second;
+
+   // Determine source world rank from comm
+   int srcWorldRank = commPtr->getWorldRankFromRank(source);
+   if (srcWorldRank == MPI_UNDEFINED) {return;} // Source rank is not in comm
+
+   // Print receive request
+   #ifdef MPI_COUT_EVERY_MESSAGE
+   cout << "Waiting for message from src " << srcWorldRank << " from MAC address ";
+   iPrintMAC(mpiData.hostTable[srcWorldRank].address);
+   cout << endl;
+   #endif
 
    // Check through receive buffer
    if (rxBuff->popMessage(source, tag, buf, sizeInBytes, status)) { // Message has been popped
@@ -105,7 +109,8 @@ void iReceive(void *buf, int count, MPI_Datatype datatype, int source, int tag,
             return;
          }
          memcpy(buf, data, header->len - 8);
-         status->MPI_SOURCE = header->src; // TODO: Convert to rank in comm
+         status->MPI_SOURCE = commPtr->getRankFromWorldRank(header->src);
+         if (status->MPI_SOURCE == MPI_UNDEFINED) {return;} // rank is not in comm
          status->MPI_TAG = rxTag;
          status->MPI_ERROR = MPI_SUCCESS;
          llamaNetInterface->release_recv_buffer(header); // Release llama rx message buffer
@@ -121,8 +126,10 @@ void iReceive(void *buf, int count, MPI_Datatype datatype, int source, int tag,
             }
             
             // Add to receive buffer
-            // TODO: Convert to rank in comm
-            rxBuff->pushMessage((unsigned char*)data, header->len - 8, header->src, rxTag);
+            int rxCommRank = it->second->getRankFromWorldRank(header->src);
+            if (rxCommRank != MPI_UNDEFINED) { // rank is in comm
+               rxBuff->pushMessage((unsigned char*)data, header->len - 8, rxCommRank, rxTag);
+            }
          } else {
             cout << "WARNING: Received comm " << rxComm << " does not exist" << endl;
          }
