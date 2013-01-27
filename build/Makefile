@@ -45,18 +45,20 @@ all:
 	@$(MAKE) -f xen-$(XEN_VERSION).mk
 	@$(MAKE) -f llamaOS.mk xen
 	@$(MAKE) -f llamaMPI.mk
-#	@$(MAKE) -f apps/latency-Infiniband.mk
+	@$(MAKE) -f apps/hello.mk xen
 	@$(MAKE) -f apps/latency-llamaMPI.mk
 	@$(MAKE) -f apps/latency-llamaNET.mk
 #	@$(MAKE) -f apps/latency-MPI.mk
 	@$(MAKE) -f apps/latency-TCPIP.mk
 	@$(MAKE) -f net/i82574.mk xen
 	@$(MAKE) -f net/i80003es2lan.mk xen
+	@$(MAKE) -f apps/IMB-llamaMPI.mk
 
+#	@$(MAKE) -f apps/IMB.mk
+#	@$(MAKE) -f apps/latency-Infiniband.mk
 
 #	@$(MAKE) -f gtest-$(GTEST_VERSION).mk
 #	@$(MAKE) -f llamaOS-xen-test.mk xen
-	@$(MAKE) -f apps/hello.mk xen
 #	@$(MAKE) -f apps/netpipe-llamaNET.mk
 #	@$(MAKE) -f minimal/minimal.mk xen
 #	@$(MAKE) -f minimal/minimal-glibc.mk xen

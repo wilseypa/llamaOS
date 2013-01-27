@@ -94,6 +94,8 @@ HEADERS = \
   $(INCDIR)/bits/gthr.h \
   $(INCDIR)/bits/gthr-default.h \
   $(INCDIR)/bits/hash_bytes.h \
+  $(INCDIR)/bits/hashtable.h \
+  $(INCDIR)/bits/hashtable_policy.h \
   $(INCDIR)/bits/ios_base.h \
   $(INCDIR)/bits/istream.tcc \
   $(INCDIR)/bits/list.tcc \
@@ -148,6 +150,8 @@ HEADERS = \
   $(INCDIR)/bits/stringfwd.h \
   $(INCDIR)/bits/time_members.h \
   $(INCDIR)/bits/unique_ptr.h \
+  $(INCDIR)/bits/unordered_map.h \
+  $(INCDIR)/bits/unordered_set.h \
   $(INCDIR)/bits/uses_allocator.h \
   $(INCDIR)/bits/vector.tcc \
   $(INCDIR)/debug/debug.h \
@@ -160,12 +164,15 @@ HEADERS = \
   $(INCDIR)/ext/type_traits.h \
   $(INCDIR)/tr1/tuple \
   $(INCDIR)/algorithm \
+  $(INCDIR)/array \
+  $(INCDIR)/bitset \
   $(INCDIR)/cassert \
   $(INCDIR)/cctype \
   $(INCDIR)/cerrno \
   $(INCDIR)/climits \
   $(INCDIR)/clocale \
   $(INCDIR)/cmath \
+  $(INCDIR)/complex \
   $(INCDIR)/cstdarg \
   $(INCDIR)/cstdint \
   $(INCDIR)/cstdio \
@@ -178,6 +185,8 @@ HEADERS = \
   $(INCDIR)/deque \
   $(INCDIR)/exception \
   $(INCDIR)/float.h \
+  $(INCDIR)/forward_list \
+  $(INCDIR)/fstream \
   $(INCDIR)/functional \
   $(INCDIR)/initializer_list \
   $(INCDIR)/iomanip \
@@ -196,17 +205,25 @@ HEADERS = \
   $(INCDIR)/ostream \
   $(INCDIR)/queue \
   $(INCDIR)/random \
+  $(INCDIR)/ratio \
+  $(INCDIR)/regex \
+  $(INCDIR)/scoped_allocator \
   $(INCDIR)/set \
   $(INCDIR)/sstream \
+  $(INCDIR)/stack \
   $(INCDIR)/stdarg.h \
   $(INCDIR)/stddef.h \
   $(INCDIR)/stdexcept \
   $(INCDIR)/streambuf \
   $(INCDIR)/string \
+  $(INCDIR)/system_error \
   $(INCDIR)/tuple \
   $(INCDIR)/type_traits \
   $(INCDIR)/typeinfo \
+  $(INCDIR)/unordered_map \
+  $(INCDIR)/unordered_set \
   $(INCDIR)/utility \
+  $(INCDIR)/valarray \
   $(INCDIR)/vector
 
 C_SOURCES = \
@@ -268,6 +285,8 @@ CC_SOURCES = \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++11/functexcept.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++11/functional.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++11/future.cc \
+  gcc-$(GCC_VERSION)/libstdc++-v3/src/c++11/hash_c++0x.cc \
+  gcc-$(GCC_VERSION)/libstdc++-v3/src/c++11/hashtable_c++0x.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++11/limits.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++11/mutex.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++11/placeholders.cc \

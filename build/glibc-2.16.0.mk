@@ -171,6 +171,7 @@ HEADERS = \
   $(INCDIR)/bits/types.h \
   $(INCDIR)/bits/typesizes.h \
   $(INCDIR)/bits/uio.h \
+  $(INCDIR)/bits/utsname.h \
   $(INCDIR)/bits/waitflags.h \
   $(INCDIR)/bits/waitstatus.h \
   $(INCDIR)/bits/wchar.h \
@@ -195,6 +196,7 @@ HEADERS = \
   $(INCDIR)/sys/types.h \
   $(INCDIR)/sys/ucontext.h \
   $(INCDIR)/sys/uio.h \
+  $(INCDIR)/sys/utsname.h \
   $(INCDIR)/_G_config.h \
   $(INCDIR)/alloca.h \
   $(INCDIR)/assert.h \
@@ -425,6 +427,8 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/stdio-common/fprintf.c \
   glibc-$(GLIBC_VERSION)/stdio-common/funlockfile.c \
   glibc-$(GLIBC_VERSION)/stdio-common/fxprintf.c \
+  glibc-$(GLIBC_VERSION)/stdio-common/isoc99_sscanf.c \
+  glibc-$(GLIBC_VERSION)/stdio-common/isoc99_vsscanf.c \
   glibc-$(GLIBC_VERSION)/stdio-common/itoa-digits.c \
   glibc-$(GLIBC_VERSION)/stdio-common/itoa-udigits.c \
   glibc-$(GLIBC_VERSION)/stdio-common/itowa-digits.c \
@@ -437,6 +441,7 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/stdio-common/reg-modifier.c \
   glibc-$(GLIBC_VERSION)/stdio-common/reg-printf.c \
   glibc-$(GLIBC_VERSION)/stdio-common/reg-type.c \
+  glibc-$(GLIBC_VERSION)/stdio-common/scanf.c \
   glibc-$(GLIBC_VERSION)/stdio-common/snprintf.c \
   glibc-$(GLIBC_VERSION)/stdio-common/sprintf.c \
   glibc-$(GLIBC_VERSION)/stdio-common/sscanf.c \
@@ -529,6 +534,8 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/string/strtok_r.c \
   glibc-$(GLIBC_VERSION)/string/strxfrm.c \
   glibc-$(GLIBC_VERSION)/string/strxfrm_l.c \
+  glibc-$(GLIBC_VERSION)/sysdeps/ieee754/dbl-64/wordsize-64/s_ceil.c \
+  glibc-$(GLIBC_VERSION)/sysdeps/ieee754/dbl-64/wordsize-64/s_floor.c \
   glibc-$(GLIBC_VERSION)/sysdeps/ieee754/dbl-64/dbl2mpn.c \
   glibc-$(GLIBC_VERSION)/sysdeps/ieee754/dbl-64/mpn2dbl.c \
   glibc-$(GLIBC_VERSION)/sysdeps/ieee754/dbl-64/s_isinf.c \
@@ -537,6 +544,8 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/sysdeps/ieee754/flt-32/mpn2flt.c \
   glibc-$(GLIBC_VERSION)/sysdeps/ieee754/ldbl-128/ldbl2mpn.c \
   glibc-$(GLIBC_VERSION)/sysdeps/ieee754/ldbl-128/mpn2ldbl.c \
+  glibc-$(GLIBC_VERSION)/sysdeps/ieee754/ldbl-128/s_ceill.c \
+  glibc-$(GLIBC_VERSION)/sysdeps/ieee754/ldbl-128/s_floorl.c \
   glibc-$(GLIBC_VERSION)/sysdeps/ieee754/ldbl-128/s_isinfl.c \
   glibc-$(GLIBC_VERSION)/sysdeps/ieee754/ldbl-128/s_isnanl.c \
   glibc-$(GLIBC_VERSION)/sysdeps/ieee754/ldbl-128/s_signbitl.c \
@@ -566,6 +575,8 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/sigsuspend_nocancel.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/syscall.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/gettimeofday.c \
+  glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/time.c \
+  glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/uname.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/write.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/writev.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/dl-libc.c \
@@ -581,6 +592,7 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/sysdeps/wordsize-64/strtoul.c \
   glibc-$(GLIBC_VERSION)/sysdeps/wordsize-64/strtoul_l.c \
   glibc-$(GLIBC_VERSION)/time/alt_digit.c \
+  glibc-$(GLIBC_VERSION)/time/asctime.c \
   glibc-$(GLIBC_VERSION)/time/era.c \
   glibc-$(GLIBC_VERSION)/time/lc-time-cleanup.c \
   glibc-$(GLIBC_VERSION)/time/localtime.c \
@@ -589,6 +601,7 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/time/settimeofday.c \
   glibc-$(GLIBC_VERSION)/time/strftime.c \
   glibc-$(GLIBC_VERSION)/time/strftime_l.c \
+  glibc-$(GLIBC_VERSION)/time/time.c \
   glibc-$(GLIBC_VERSION)/time/tzfile.c \
   glibc-$(GLIBC_VERSION)/time/tzset.c \
   glibc-$(GLIBC_VERSION)/time/wcsftime.c \
