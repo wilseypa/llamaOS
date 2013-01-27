@@ -534,6 +534,8 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/string/strtok_r.c \
   glibc-$(GLIBC_VERSION)/string/strxfrm.c \
   glibc-$(GLIBC_VERSION)/string/strxfrm_l.c \
+  glibc-$(GLIBC_VERSION)/sysdeps/ieee754/dbl-64/wordsize-64/s_ceil.c \
+  glibc-$(GLIBC_VERSION)/sysdeps/ieee754/dbl-64/wordsize-64/s_floor.c \
   glibc-$(GLIBC_VERSION)/sysdeps/ieee754/dbl-64/dbl2mpn.c \
   glibc-$(GLIBC_VERSION)/sysdeps/ieee754/dbl-64/mpn2dbl.c \
   glibc-$(GLIBC_VERSION)/sysdeps/ieee754/dbl-64/s_isinf.c \
@@ -542,6 +544,8 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/sysdeps/ieee754/flt-32/mpn2flt.c \
   glibc-$(GLIBC_VERSION)/sysdeps/ieee754/ldbl-128/ldbl2mpn.c \
   glibc-$(GLIBC_VERSION)/sysdeps/ieee754/ldbl-128/mpn2ldbl.c \
+  glibc-$(GLIBC_VERSION)/sysdeps/ieee754/ldbl-128/s_ceill.c \
+  glibc-$(GLIBC_VERSION)/sysdeps/ieee754/ldbl-128/s_floorl.c \
   glibc-$(GLIBC_VERSION)/sysdeps/ieee754/ldbl-128/s_isinfl.c \
   glibc-$(GLIBC_VERSION)/sysdeps/ieee754/ldbl-128/s_isnanl.c \
   glibc-$(GLIBC_VERSION)/sysdeps/ieee754/ldbl-128/s_signbitl.c \
