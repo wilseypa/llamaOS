@@ -43,7 +43,7 @@ using namespace llamaos;
 using namespace llamaos::net;
 using namespace llamaos::xen;
 
-#define MPI_COUT_EVERY_MESSAGE
+//#define MPI_COUT_EVERY_MESSAGE
 #define MPI_MAX_NODES 256
 
 typedef struct MpiHostTable_T {
@@ -189,6 +189,11 @@ int MPI_Finalize (void) {
 
 int MPI_Comm_rank (MPI_Comm comm, int *rank) {
    (*rank) = mpiData.rank;
+   return MPI_SUCCESS;
+}
+
+int MPI_Comm_size (MPI_Comm comm, int *size) {
+   (*size) = mpiData.totNodes;
    return MPI_SUCCESS;
 }
 
