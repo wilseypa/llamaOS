@@ -28,17 +28,28 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include "mpi.h"
+#ifndef I_COMM_H_
+#define I_COMM_H_
 
-// TEST FUNCTIONS
-int MPI_Irecv(void *buf, int count, MPI_Datatype datatype, int source, int tag, MPI_Comm comm, MPI_Request *request) {
-   return 0;
-}
+#include "iGlobals.h"
+#include "iGroup.h"
+#include "iRxBuffer.h"
 
-int MPI_Isend(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm, MPI_Request *request) {
-   return 0;
-}
+class iGroup;
+class iRxBuffer;
 
-int MPI_Test(MPI_Request *request, int *flag, MPI_Status *status) {
-   return 0;
-}
+class iComm {
+   public:
+      iComm(MPI_Comm nId, iGroup *nGroup);
+      ~iComm();
+      iRxBuffer* getPt2ptRxBuffer() {return pt2ptRxBuffer;}
+      iRxBuffer* getCollectiveRxBuffer() {return collectiveRxBuffer;}
+   private:
+      MPI_Comm id; 	// Unique identifier for communicator
+      int localRank;	// Rank of local process node in comm
+      iGroup *group;    // Group of nodes in comm
+      iRxBuffer *pt2ptRxBuffer;		// Receive buffer for point to point communication
+      iRxBuffer *collectiveRxBuffer;	// Receive buffer for collective communication
+};
+
+#endif

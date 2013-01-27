@@ -28,17 +28,27 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include "mpi.h"
+#ifndef I_RXBUFFER_H_
+#define I_RXBUFFER_H_
 
-// TEST FUNCTIONS
-int MPI_Irecv(void *buf, int count, MPI_Datatype datatype, int source, int tag, MPI_Comm comm, MPI_Request *request) {
-   return 0;
-}
+#include "iGlobals.h"
+#include <list>
 
-int MPI_Isend(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm, MPI_Request *request) {
-   return 0;
-}
+typedef struct MpiRxMessage_T {
+   unsigned char *buf;
+   int size;
+   int source;
+   int tag;
+} MpiRxMessage_T;
 
-int MPI_Test(MPI_Request *request, int *flag, MPI_Status *status) {
-   return 0;
-}
+class iRxBuffer {
+   public:
+      iRxBuffer() {}
+      ~iRxBuffer() {}
+      void pushMessage(unsigned char *buf, int size, int source, int tag);
+      bool popMessage(int source, int tag, void *buf, int size, MPI_Status *status);
+   private:
+      std::list<MpiRxMessage_T> buffer;
+};
+
+#endif

@@ -28,17 +28,17 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include "mpi.h"
+#ifndef LLAMA_CONN_H_
+#define LLAMA_CONN_H_
 
-// TEST FUNCTIONS
-int MPI_Irecv(void *buf, int count, MPI_Datatype datatype, int source, int tag, MPI_Comm comm, MPI_Request *request) {
-   return 0;
-}
+#include <llamaos/mpi/mpi.h>
+#include <llamaos/net/llamaNET.h>
+#include <llamaos/xen/Hypervisor.h>
 
-int MPI_Isend(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm, MPI_Request *request) {
-   return 0;
-}
+using namespace llamaos;
+using namespace llamaos::net;
+using namespace llamaos::xen;
 
-int MPI_Test(MPI_Request *request, int *flag, MPI_Status *status) {
-   return 0;
-}
+extern llamaos::net::llamaNET *llamaNetInterface;
+
+#endif

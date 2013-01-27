@@ -28,17 +28,19 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include "mpi.h"
+#include "iGlobals.h"
+#include <iostream>
+#include <iomanip>
 
-// TEST FUNCTIONS
-int MPI_Irecv(void *buf, int count, MPI_Datatype datatype, int source, int tag, MPI_Comm comm, MPI_Request *request) {
-   return 0;
-}
+using namespace std;
 
-int MPI_Isend(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm, MPI_Request *request) {
-   return 0;
-}
-
-int MPI_Test(MPI_Request *request, int *flag, MPI_Status *status) {
-   return 0;
+void iPrintMAC(uint8_t mac[]) {
+   int macPart;
+   for (macPart = 0; macPart < 6; macPart++) {
+      cout << hex << setfill('0') << setw(2) << (unsigned int)mac[macPart];
+      if (macPart != 5) {
+         cout << ":";
+      }
+   }
+   cout << dec << setfill(' ');
 }

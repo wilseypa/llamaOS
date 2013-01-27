@@ -28,17 +28,9 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include "mpi.h"
+#include "iGlobals.h"
 
-// TEST FUNCTIONS
-int MPI_Irecv(void *buf, int count, MPI_Datatype datatype, int source, int tag, MPI_Comm comm, MPI_Request *request) {
-   return 0;
-}
-
-int MPI_Isend(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm, MPI_Request *request) {
-   return 0;
-}
-
-int MPI_Test(MPI_Request *request, int *flag, MPI_Status *status) {
-   return 0;
+int MPI_Send(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm) {
+   iSend(buf, count, datatype, dest, tag, comm, MPI_CONTEXT_PT2PT);
+   return MPI_SUCCESS;
 }

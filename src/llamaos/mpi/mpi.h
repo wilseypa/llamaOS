@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2013, William Magato
+Copyright (c) 2013, John Gideon
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -31,6 +31,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #ifndef llamaos_mpi_mpi_h_
 #define llamaos_mpi_mpi_h_
 
+// MPI TYPEDEF AND DEFINES
 /* MPI's error classes */
 #define MPI_SUCCESS          0      /* Successful return code */
 
@@ -38,30 +39,36 @@ typedef int MPI_Datatype;
 #define MPI_UNSIGNED_CHAR  ((MPI_Datatype)1)
 
 typedef int MPI_Comm;
-#define MPI_COMM_WORLD ((MPI_Comm)0x44000000)
-#define MPI_COMM_SELF  ((MPI_Comm)0x44000001)
+#define MPI_COMM_NULL  ((MPI_Comm)0x00000000)
+#define MPI_COMM_WORLD ((MPI_Comm)0x7FFFFFFF)
+#define MPI_COMM_SELF  ((MPI_Comm)0x7FFFFFFE)
+
+typedef int MPI_Group;
+#define MPI_GROUP_NULL  ((MPI_Group)0x00000000)
+#define MPI_GROUP_EMPTY ((MPI_Group)0xFFFFFFFF)
 
 typedef int MPI_Count;
+typedef int MPI_Request;
 
-/* The order of these elements must match that in mpif.h */
+#define MPI_UNDEFINED (-1)
+
+#define MPI_ANY_SOURCE (0xFFFFFFFF)
+
+
+// MPI STRUCTURES
 typedef struct MPI_Status {
     int MPI_SOURCE;
     int MPI_TAG;
     int MPI_ERROR;
-    MPI_Count count;
-    int cancelled;
-    int abi_slush_fund[2];
-//    @EXTRA_STATUS_DECL@
 } MPI_Status;
 
 
+// MPI FUNCTIONS
 int MPI_Init (int *argc, char ***argv);
 int MPI_Finalize (void);
 
 int MPI_Comm_rank (MPI_Comm comm, int *rank);
 int MPI_Comm_size (MPI_Comm comm, int *size);
-
-typedef int MPI_Request;
 
 int MPI_Recv(void *buf, int count, MPI_Datatype datatype, int source, int tag, MPI_Comm comm, MPI_Status *status);
 int MPI_Irecv(void *buf, int count, MPI_Datatype datatype, int source, int tag, MPI_Comm comm, MPI_Request *request);
@@ -70,6 +77,5 @@ int MPI_Send(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI
 int MPI_Isend(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm, MPI_Request *request);
 
 int MPI_Test(MPI_Request *request, int *flag, MPI_Status *status);
-
 
 #endif  // llamaos_mpi_mpi_h_

@@ -28,17 +28,44 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include "mpi.h"
+#include "iRxBuffer.h"
+#include "string.h"
+#include <cstdlib>
 
-// TEST FUNCTIONS
-int MPI_Irecv(void *buf, int count, MPI_Datatype datatype, int source, int tag, MPI_Comm comm, MPI_Request *request) {
-   return 0;
+void iRxBuffer::pushMessage(unsigned char *buf, int size, int source, int tag) {
+   unsigned char *newData = (unsigned char*)malloc(size);
+   memcpy(newData, buf, size);
+   MpiRxMessage_T newRxMessage;
+   newRxMessage.buf = newData;
+   newRxMessage.size = size;
+   newRxMessage.source = source;
+   newRxMessage.tag = tag;
+   buffer.push_back(newRxMessage);
 }
 
-int MPI_Isend(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm, MPI_Request *request) {
-   return 0;
-}
+bool iRxBuffer::popMessage(int source, int tag, void *buf, int size, MPI_Status *status) {
+   for (std::list<MpiRxMessage_T>::iterator it = buffer.begin(); it != buffer.end(); it++) {
+      if ((it->source == source || static_cast<uint32_t>(source) == MPI_ANY_SOURCE) && (it->tag == tag)) {
+         // Verify length
+         if (size < it->size) { // Will not fit in buffer - discard
+            free(it->buf);
+            buffer.erase(it);
+            return false;
+         }
 
-int MPI_Test(MPI_Request *request, int *flag, MPI_Status *status) {
-   return 0;
+         // Copy data into buffer
+         memcpy(buf, it->buf, it->size);
+
+         // Copy data into status
+         status->MPI_SOURCE = it->source;
+         status->MPI_TAG = it->tag;
+         status->MPI_ERROR = MPI_SUCCESS;
+
+         // Clean up list
+         free(it->buf);
+         buffer.erase(it);
+         return true;
+      }
+   }
+   return false;
 }

@@ -28,17 +28,30 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include "mpi.h"
+#ifndef I_GROUP_H_
+#define I_GROUP_H_
 
-// TEST FUNCTIONS
-int MPI_Irecv(void *buf, int count, MPI_Datatype datatype, int source, int tag, MPI_Comm comm, MPI_Request *request) {
-   return 0;
-}
+#include "iGlobals.h"
+#include <vector>
 
-int MPI_Isend(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm, MPI_Request *request) {
-   return 0;
-}
+typedef int IGROUP_CREATE_TYPE;
+#define IGROUP_CREATE_WORLD ((IGROUP_CREATE_TYPE)1)
+#define IGROUP_CREATE_EMPTY ((IGROUP_CREATE_TYPE)2)
+#define IGROUP_CREATE_SELF ((IGROUP_CREATE_TYPE)3)
 
-int MPI_Test(MPI_Request *request, int *flag, MPI_Status *status) {
-   return 0;
-}
+class iGroup {
+   public:
+      iGroup(IGROUP_CREATE_TYPE type);
+      ~iGroup();
+      MPI_Group getId() {return id;}
+      int getLocalRank() {return localRank;}
+   private:
+      MPI_Group id;
+      int size;
+      int localRank;
+      std::vector<int> rankToWorldRank;	// Conversion of rank in comm to world rank
+
+      MPI_Group getNextId();
+};
+
+#endif

@@ -28,17 +28,48 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include "mpi.h"
+#include "iGroup.h"
+#include <string.h>
 
-// TEST FUNCTIONS
-int MPI_Irecv(void *buf, int count, MPI_Datatype datatype, int source, int tag, MPI_Comm comm, MPI_Request *request) {
-   return 0;
+// Return the next unique identifier
+MPI_Group iGroup::getNextId() {
+   static MPI_Group nextId = 1;
+   return nextId++;
 }
 
-int MPI_Isend(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm, MPI_Request *request) {
-   return 0;
+// Creating completely new group from scratch (only used internally)
+iGroup::iGroup(IGROUP_CREATE_TYPE type) {
+   switch (type) {
+      case IGROUP_CREATE_WORLD: {
+         id = getNextId();
+         size = mpiData.totNodes;
+         localRank = mpiData.rank;
+         rankToWorldRank.resize(size);
+         for (int i = 0; i < size; i++) {
+            rankToWorldRank[i] = i;
+         }
+         break;
+      }
+      case IGROUP_CREATE_EMPTY: {
+         id = MPI_GROUP_EMPTY;
+         size = 0;
+         localRank = MPI_UNDEFINED;
+         rankToWorldRank.resize(size);
+         break;
+      }
+      case IGROUP_CREATE_SELF: {
+         id = getNextId();
+         size = 1;
+         localRank = mpiData.rank;
+         rankToWorldRank.resize(size);
+         rankToWorldRank[0] = localRank;
+         break;
+      }
+   }
+   mpiData.group[id] = this;
 }
 
-int MPI_Test(MPI_Request *request, int *flag, MPI_Status *status) {
-   return 0;
+// Destroy the reference to the id in the global hash map
+iGroup::~iGroup() {
+   mpiData.group.erase(id);
 }
