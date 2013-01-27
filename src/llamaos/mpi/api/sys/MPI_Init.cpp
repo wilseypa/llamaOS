@@ -90,7 +90,7 @@ int MPI_Init (int *argc, char ***argv) {
    cout << "Host Table Arguments: " << hostTableSize << endl;
 
    //Check for partial host table - running alone
-   if (hostTableIndex + (hostTableSize*2) >= *argc) {
+   if (hostTableIndex + (hostTableSize*2) > *argc) {
       cout << "Partial host table: running alone" << endl;
       mpiData.rank = 0;
       mpiData.totNodes = 1;
