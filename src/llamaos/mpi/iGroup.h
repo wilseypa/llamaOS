@@ -44,6 +44,7 @@ class iGroup {
       iGroup(IGROUP_CREATE_TYPE type);
       ~iGroup();
       MPI_Group getId() {return id;}
+      int getSize() {return size;}
       int getLocalRank() {return localRank;}
       int getLocalWorldRank() {return localWorldRank;}
       int getWorldRankFromRank(int rank);

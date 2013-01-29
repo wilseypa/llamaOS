@@ -32,6 +32,10 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <llamaConn.h>
 
 int MPI_Finalize (void) {
+   //The process waits for the sync to start
+   MPI_Barrier(MPI_COMM_WORLD);
+
+   //Cleanup
    delete llamaNetInterface;
    return MPI_SUCCESS;
 }

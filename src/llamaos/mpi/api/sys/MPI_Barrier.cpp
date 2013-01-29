@@ -30,7 +30,27 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 #include <iGlobals.h>
 
-int MPI_Comm_rank (MPI_Comm comm, int *rank) {
-   (*rank) = mpiData.comm[comm]->getLocalRank();
+int MPI_Barrier (MPI_Comm comm) {
+   // Determine process rank
+   int rank; 
+   MPI_Comm_rank(comm, &rank);
+
+   // Linear Method
+   unsigned char buf;
+   if (rank == MPI_RANK_ROOT) {
+      // If root, wait for all other ranks to send message with tag MPI_FUNC_TAG_BARRIER
+      // inorder
+      int size;
+      MPI_Comm_rank(comm, &size);
+      for (int i = 1; i < size; i++) {
+         iReceive(&buf, 1, MPI_UNSIGNED_CHAR, i, MPI_FUNC_TAG_BARRIER, comm, MPI_CONTEXT_COLLECTIVE, 0);
+      }
+   } else {
+      // If not root, send message to root
+      iSend(&buf, 1, MPI_UNSIGNED_CHAR, MPI_RANK_ROOT, MPI_FUNC_TAG_BARRIER, comm, MPI_CONTEXT_COLLECTIVE);
+   }
+   // Wait until root sends out message to everyone
+   MPI_Bcast(&buf, 1, MPI_UNSIGNED_CHAR, MPI_RANK_ROOT, comm);
+
    return MPI_SUCCESS;
 }

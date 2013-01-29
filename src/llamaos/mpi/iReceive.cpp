@@ -102,17 +102,19 @@ void iReceive(void *buf, int count, MPI_Datatype datatype, int source, int tag,
       // Check if desired message type
       if ((header->src == static_cast<uint32_t>(srcWorldRank) || 
                static_cast<uint32_t>(srcWorldRank) == MPI_ANY_SOURCE) &&
-               (rxComm == comm) && (rxContext == context) && (rxTag == tag)) {
+               (rxComm == comm) && (rxContext == context) && 
+               (rxTag == tag || static_cast<uint32_t>(tag) == MPI_ANY_TAG)) {
          // Verify length
          if (static_cast<uint32_t>(sizeInBytes) < header->len - 8) { // Will not fit in buffer - discard
             llamaNetInterface->release_recv_buffer (header);
             return;
          }
          memcpy(buf, data, header->len - 8);
-         status->MPI_SOURCE = commPtr->getRankFromWorldRank(header->src);
-         if (status->MPI_SOURCE == MPI_UNDEFINED) {return;} // rank is not in comm
-         status->MPI_TAG = rxTag;
-         status->MPI_ERROR = MPI_SUCCESS;
+         if (status != 0) {
+            status->MPI_SOURCE = commPtr->getRankFromWorldRank(header->src);
+            status->MPI_TAG = rxTag;
+            status->MPI_ERROR = MPI_SUCCESS;
+         }
          llamaNetInterface->release_recv_buffer(header); // Release llama rx message buffer
          return;
       } else { // Store in receive buffer

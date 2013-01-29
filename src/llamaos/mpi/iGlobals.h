@@ -49,7 +49,12 @@ typedef int MPI_Context;
 #define MPI_COMM_MASK (0x7FFFFFFF)
 #define MPI_CONTEXT_MASK (0x80000000)
 #define MPI_CONTEXT_PT2PT (0x00000000)
-#define MPI_CONTEXT_COLLECTIVE 2 (0x80000000)
+#define MPI_CONTEXT_COLLECTIVE (0x80000000)
+
+#define MPI_RANK_ROOT (0)
+
+#define MPI_FUNC_TAG_BARRIER (0xFFFFFFFE)
+#define MPI_FUNC_TAG_BROADCAST (0xFFFFFFFD)
 
 typedef struct MpiHostTable_T {
    uint8_t address[6];

@@ -31,6 +31,6 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <iGlobals.h>
 
 int MPI_Comm_size (MPI_Comm comm, int *size) {
-   (*size) = mpiData.totNodes;
+   (*size) = mpiData.comm[comm]->getSize();
    return MPI_SUCCESS;
 }

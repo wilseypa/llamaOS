@@ -58,7 +58,9 @@ CPP_SOURCES += \
   llamaos/mpi/api/comm/MPI_Comm_rank.cpp \
   llamaos/mpi/api/comm/MPI_Comm_size.cpp \
   llamaos/mpi/api/sys/MPI_Init.cpp \
-  llamaos/mpi/api/sys/MPI_Finalize.cpp
+  llamaos/mpi/api/sys/MPI_Finalize.cpp \
+  llamaos/mpi/api/sys/MPI_Barrier.cpp \
+  llamaos/mpi/api/collective/MPI_Bcast.cpp
 
 HEADERS = \
   $(INCDIR)/llamaos/mpi/mpi.h

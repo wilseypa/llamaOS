@@ -36,6 +36,7 @@ iComm::iComm(MPI_Comm nId, iGroup *nGroup) {
    group = nGroup;
    localRank = group->getLocalRank();
    localWorldRank = group->getLocalWorldRank();
+   size = group->getSize();
    mpiData.comm[id] = this;
    pt2ptRxBuffer = new iRxBuffer();
    collectiveRxBuffer = new iRxBuffer();

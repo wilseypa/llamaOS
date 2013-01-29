@@ -156,8 +156,7 @@ int MPI_Init (int *argc, char ***argv) {
    cout << "DONE" << endl;
    cout.flush();
 
-   //The process sends a message to the root node saying it is ready
-
-   //The process waits for the sync start signal from the root node
+   //The process waits for the sync to start
+   MPI_Barrier(MPI_COMM_WORLD);
    return MPI_SUCCESS;
 }

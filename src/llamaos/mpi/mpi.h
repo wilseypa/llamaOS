@@ -53,6 +53,7 @@ typedef int MPI_Request;
 #define MPI_UNDEFINED (-1)
 
 #define MPI_ANY_SOURCE (0xFFFFFFFF)
+#define MPI_ANY_TAG (0xFFFFFFFF)
 
 
 // MPI STRUCTURES
@@ -77,5 +78,8 @@ int MPI_Send(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI
 int MPI_Isend(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm, MPI_Request *request);
 
 int MPI_Test(MPI_Request *request, int *flag, MPI_Status *status);
+
+int MPI_Bcast(void *buffer, int count, MPI_Datatype datatype, int root, MPI_Comm comm );
+int MPI_Barrier (MPI_Comm comm);
 
 #endif  // llamaos_mpi_mpi_h_
