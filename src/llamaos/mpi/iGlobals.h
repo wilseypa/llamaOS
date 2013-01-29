@@ -46,15 +46,15 @@ class iComm;
 //#define MPI_COUT_EVERY_MESSAGE
 
 typedef int MPI_Context;
-#define MPI_COMM_MASK (0x7FFFFFFF)
-#define MPI_CONTEXT_MASK (0x80000000)
-#define MPI_CONTEXT_PT2PT (0x00000000)
-#define MPI_CONTEXT_COLLECTIVE (0x80000000)
+#define MPI_COMM_MASK ((int)0x7FFFFFFF)
+#define MPI_CONTEXT_MASK ((int)0x80000000)
+#define MPI_CONTEXT_PT2PT ((int)0x00000000)
+#define MPI_CONTEXT_COLLECTIVE ((int)0x80000000)
 
-#define MPI_RANK_ROOT (0)
+#define MPI_RANK_ROOT ((int)0)
 
-#define MPI_FUNC_TAG_BARRIER (0xFFFFFFFE)
-#define MPI_FUNC_TAG_BROADCAST (0xFFFFFFFD)
+#define MPI_FUNC_TAG_BARRIER ((int)0xFFFFFFFE)
+#define MPI_FUNC_TAG_BROADCAST ((int)0xFFFFFFFD)
 
 typedef struct MpiHostTable_T {
    uint8_t address[6];

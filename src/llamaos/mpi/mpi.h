@@ -52,8 +52,8 @@ typedef int MPI_Request;
 
 #define MPI_UNDEFINED (-1)
 
-#define MPI_ANY_SOURCE (0xFFFFFFFF)
-#define MPI_ANY_TAG (0xFFFFFFFF)
+#define MPI_ANY_SOURCE ((int)0xFFFFFFFF)
+#define MPI_ANY_TAG ((int)0xFFFFFFFF)
 
 
 // MPI STRUCTURES

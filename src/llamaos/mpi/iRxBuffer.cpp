@@ -45,8 +45,8 @@ void iRxBuffer::pushMessage(unsigned char *buf, int size, int source, int tag) {
 
 bool iRxBuffer::popMessage(int source, int tag, void *buf, int size, MPI_Status *status) {
    for (std::list<MpiRxMessage_T>::iterator it = buffer.begin(); it != buffer.end(); it++) {
-      if ((it->source == source || static_cast<uint32_t>(source) == MPI_ANY_SOURCE) &&
-               (it->tag == tag || static_cast<uint32_t>(tag) == MPI_ANY_TAG)) {
+      if (((it->source == source) || (source == MPI_ANY_SOURCE)) &&
+               ((it->tag == tag) || (tag == MPI_ANY_TAG))) {
          // Verify length
          if (size < it->size) { // Will not fit in buffer - discard
             free(it->buf);
