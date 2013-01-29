@@ -28,58 +28,31 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <mpi.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <iostream>
-#include <llamaos/api/sleep.h>
+#include <iGlobals.h>
 
 using namespace std;
 
-int main(int argc, char *argv []) {
-   MPI_Init (&argc, &argv);
-
-   int rank, totNodes;
-   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-   MPI_Comm_size(MPI_COMM_WORLD, &totNodes);
-
-   if (rank == 0) {
-      llamaos::api::sleep(5);
-      for (int source = 1; source < totNodes; source++) {
-         char buf[100];
-         MPI_Status status;
-         MPI_Recv(&buf, 100, MPI_UNSIGNED_CHAR, source, 0, MPI_COMM_WORLD, &status);
-         cout << buf << endl;
+int MPI_Gather(void *sendbuf, int sendcnt, MPI_Datatype sendtype, 
+               void *recvbuf, int recvcnt, MPI_Datatype recvtype, 
+               int root, MPI_Comm comm) {
+   // Determine process rank
+   int rank; 
+   MPI_Comm_rank(comm, &rank);
+   // Linear Method
+   // Send message to root with tag MPI_FUNC_TAG_GATHER
+   iSend(sendbuf, sendcnt, sendtype, root, MPI_FUNC_TAG_GATHER, comm, MPI_CONTEXT_COLLECTIVE);
+   // If root, wait for all other ranks to send message with tag MPI_FUNC_TAG_GATHER
+   if (rank == root) {
+      // inorder
+      int size;
+      MPI_Comm_size(comm, &size);
+      char *bufPartPtr = reinterpret_cast<char*>(recvbuf); 
+      for (int i = 0; i < size; i++) {
+         iReceive(bufPartPtr, recvcnt, recvtype, i, MPI_FUNC_TAG_GATHER, 
+               comm, MPI_CONTEXT_COLLECTIVE, 0);
+         bufPartPtr += recvcnt; // TODO: Change for different data types
       }
-   } else {
-      char buf[100];
-      sprintf(buf, "Received message from node %d", rank);
-      MPI_Send(&buf, 100, MPI_UNSIGNED_CHAR, 0, 0, MPI_COMM_WORLD);
-      cout << "Sent message from node " << rank << endl;
    }
 
-   int rootRank = rank;
-   MPI_Bcast(&rootRank, 4, MPI_UNSIGNED_CHAR, 2, MPI_COMM_WORLD);
-   cout << "Root Rank: " << rootRank << endl;
-
-   MPI_Barrier(MPI_COMM_WORLD);
-
-   char *strBuf;
-   if (rank == 1) {
-      strcpy(strBuf, "microelectronics");
-   } else {
-      strcpy(strBuf, "not affected");
-   }
-   char subStrBuf[4];
-   MPI_Scatter(strBuf, 4, MPI_UNSIGNED_CHAR, subStrBuf, 4, MPI_UNSIGNED_CHAR, 1, MPI_COMM_WORLD);
-   for (int i = 0; i < 4; i++) {
-      subStrBuf[i] = toupper(subStrBuf[i]);
-   }
-   MPI_Gather(subStrBuf, 4, MPI_UNSIGNED_CHAR, strBuf, 4, MPI_UNSIGNED_CHAR, 1, MPI_COMM_WORLD);
-   cout << "Resulting word is: " << strBuf << endl;
-
-   MPI_Finalize();
-
-   return 0;
+   return MPI_SUCCESS;
 }

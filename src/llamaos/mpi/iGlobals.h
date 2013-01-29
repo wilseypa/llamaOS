@@ -55,6 +55,8 @@ typedef int MPI_Context;
 
 #define MPI_FUNC_TAG_BARRIER ((int)0xFFFFFFFE)
 #define MPI_FUNC_TAG_BROADCAST ((int)0xFFFFFFFD)
+#define MPI_FUNC_TAG_GATHER ((int)0xFFFFFFFC)
+#define MPI_FUNC_TAG_SCATTER ((int)0xFFFFFFFB)
 
 typedef struct MpiHostTable_T {
    uint8_t address[6];

@@ -79,7 +79,14 @@ int MPI_Isend(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MP
 
 int MPI_Test(MPI_Request *request, int *flag, MPI_Status *status);
 
+// Collective
 int MPI_Bcast(void *buffer, int count, MPI_Datatype datatype, int root, MPI_Comm comm );
 int MPI_Barrier (MPI_Comm comm);
+int MPI_Gather(void *sendbuf, int sendcnt, MPI_Datatype sendtype, 
+               void *recvbuf, int recvcnt, MPI_Datatype recvtype, 
+               int root, MPI_Comm comm);
+int MPI_Scatter(void *sendbuf, int sendcnt, MPI_Datatype sendtype, 
+               void *recvbuf, int recvcnt, MPI_Datatype recvtype, int root, 
+               MPI_Comm comm);
 
 #endif  // llamaos_mpi_mpi_h_

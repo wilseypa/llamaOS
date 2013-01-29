@@ -36,18 +36,18 @@ int MPI_Bcast(void *buffer, int count, MPI_Datatype datatype, int root, MPI_Comm
    // Determine process rank
    int rank; 
    MPI_Comm_rank(comm, &rank);
-   
-   if (rank == MPI_RANK_ROOT) { // Send a message to all nodes if process is root
-      // linear
+   // linear
+   // Send a message to all nodes if process is root
+   if (rank == root) { 
       int size;
       MPI_Comm_size(comm, &size);
-      for (int i = 1; i < size; i++) {
+      for (int i = 0; i < size; i++) {
          iSend(buffer, count, datatype, i, MPI_FUNC_TAG_BROADCAST, comm, MPI_CONTEXT_COLLECTIVE);
       }
-   } else { // Receive the broadcast message if process is not root
-      iReceive(buffer, count, datatype, MPI_RANK_ROOT, MPI_FUNC_TAG_BROADCAST, 
-                       comm, MPI_CONTEXT_COLLECTIVE, 0);
    }
+   // Receive the broadcast message
+   iReceive(buffer, count, datatype, MPI_RANK_ROOT, MPI_FUNC_TAG_BROADCAST, 
+                    comm, MPI_CONTEXT_COLLECTIVE, 0);
 
    return MPI_SUCCESS;
 }
