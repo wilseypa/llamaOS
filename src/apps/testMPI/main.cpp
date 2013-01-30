@@ -44,6 +44,8 @@ int main(int argc, char *argv []) {
    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
    MPI_Comm_size(MPI_COMM_WORLD, &totNodes);
 
+   cout << "Starting app..." << endl;
+
    if (rank == 0) {
       llamaos::api::sleep(5);
       for (int source = 1; source < totNodes; source++) {
@@ -56,28 +58,27 @@ int main(int argc, char *argv []) {
       char buf[100];
       sprintf(buf, "Received message from node %d", rank);
       MPI_Send(&buf, 100, MPI_UNSIGNED_CHAR, 0, 0, MPI_COMM_WORLD);
-      cout << "Sent message from node " << rank << endl;
+      cout << "Sent message to root" << endl;
    }
 
    int rootRank = rank;
-   MPI_Bcast(&rootRank, 4, MPI_UNSIGNED_CHAR, 2, MPI_COMM_WORLD);
+   MPI_Bcast(&rootRank, 4, MPI_UNSIGNED_CHAR, 1, MPI_COMM_WORLD);
    cout << "Root Rank: " << rootRank << endl;
 
    MPI_Barrier(MPI_COMM_WORLD);
 
-   char *strBuf;
-   if (rank == 1) {
-      strcpy(strBuf, "microelectronics");
-   } else {
-      strcpy(strBuf, "not affected");
-   }
-   char subStrBuf[4];
-   MPI_Scatter(strBuf, 4, MPI_UNSIGNED_CHAR, subStrBuf, 4, MPI_UNSIGNED_CHAR, 1, MPI_COMM_WORLD);
+   int intBuf[8] = {4,7,9,1,4,0,1,5};
+   int subIntBuf[4];
+   MPI_Scatter(intBuf, 4*4, MPI_UNSIGNED_CHAR, subIntBuf, 4*4, MPI_UNSIGNED_CHAR, 0, MPI_COMM_WORLD);
    for (int i = 0; i < 4; i++) {
-      subStrBuf[i] = toupper(subStrBuf[i]);
+      subIntBuf[i] += 1000;
    }
-   MPI_Gather(subStrBuf, 4, MPI_UNSIGNED_CHAR, strBuf, 4, MPI_UNSIGNED_CHAR, 1, MPI_COMM_WORLD);
-   cout << "Resulting word is: " << strBuf << endl;
+   MPI_Gather(subIntBuf, 4*4, MPI_UNSIGNED_CHAR, intBuf, 4*4, MPI_UNSIGNED_CHAR, 0, MPI_COMM_WORLD);
+   cout << "Result is:" << endl;
+   for (int i = 0; i < 8; i++) {
+      cout << intBuf[i] << " ";
+   } 
+   cout << endl;
 
    MPI_Finalize();
 

@@ -46,7 +46,7 @@ int MPI_Bcast(void *buffer, int count, MPI_Datatype datatype, int root, MPI_Comm
       }
    }
    // Receive the broadcast message
-   iReceive(buffer, count, datatype, MPI_RANK_ROOT, MPI_FUNC_TAG_BROADCAST, 
+   iReceive(buffer, count, datatype, root, MPI_FUNC_TAG_BROADCAST, 
                     comm, MPI_CONTEXT_COLLECTIVE, 0);
 
    return MPI_SUCCESS;
