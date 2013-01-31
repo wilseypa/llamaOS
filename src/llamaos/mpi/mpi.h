@@ -36,7 +36,26 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #define MPI_SUCCESS          0      /* Successful return code */
 
 typedef int MPI_Datatype;
-#define MPI_UNSIGNED_CHAR  ((MPI_Datatype)1)
+#define MPI_CHAR		((MPI_Datatype)1)
+#define MPI_BYTE		((MPI_Datatype)2)
+#define MPI_SHORT		((MPI_Datatype)3)
+#define MPI_INT			((MPI_Datatype)4)
+#define MPI_LONG		((MPI_Datatype)5)
+#define MPI_FLOAT		((MPI_Datatype)6)
+#define MPI_DOUBLE		((MPI_Datatype)7)
+#define MPI_UNSIGNED_CHAR	((MPI_Datatype)8)
+#define MPI_UNSIGNED_SHORT	((MPI_Datatype)9)
+#define MPI_UNSIGNED		((MPI_Datatype)10)
+#define MPI_UNSIGNED_LONG	((MPI_Datatype)11)
+#define MPI_LONG_DOUBLE		((MPI_Datatype)12)
+#define MPI_LONG_LONG_INT	((MPI_Datatype)13)
+
+#define MPI_FLOAT_INT		((MPI_Datatype)14)
+#define MPI_LONG_INT		((MPI_Datatype)15)
+#define MPI_DOUBLE_INT		((MPI_Datatype)16)
+#define MPI_SHORT_INT		((MPI_Datatype)17)
+#define MPI_2INT		((MPI_Datatype)18)
+#define MPI_LONG_DOUBLE_INT	((MPI_Datatype)19)
 
 typedef int MPI_Comm;
 #define MPI_COMM_NULL  ((MPI_Comm)0x00000000)

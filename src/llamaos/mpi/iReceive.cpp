@@ -41,8 +41,8 @@ using namespace llamaos::xen;
 
 void iReceive(void *buf, int count, MPI_Datatype datatype, int source, int tag, 
 			MPI_Comm comm, MPI_Context context, MPI_Status *status) {
-   // TODO: Determine based on datatype and comm
-   unsigned int sizeInBytes = count;
+   // Determine actual send size in bytes
+   unsigned int sizeInBytes = count*iSizeof(datatype);
 
    // Get receive buffer
    iRxBuffer *rxBuff;

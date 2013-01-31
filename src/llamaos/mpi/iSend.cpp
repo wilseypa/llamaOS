@@ -46,8 +46,8 @@ void iSend(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_C
    }
    iComm *commPtr = it->second;
 
-   // TODO: Determine based on datatype and comm
-   int sizeInBytes = count;
+   // Determine actual send size in bytes
+   unsigned int sizeInBytes = count*iSizeof(datatype);
 
    // Translate comm ranks into world ranks
    int destWorldRank = commPtr->getWorldRankFromRank(dest);

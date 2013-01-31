@@ -78,11 +78,11 @@ int main(int argc, char *argv []) {
       }
    }
    int subIntBuf[4];
-   MPI_Scatter(intBuf, 4*4, MPI_UNSIGNED_CHAR, subIntBuf, 4*4, MPI_UNSIGNED_CHAR, 0, MPI_COMM_WORLD);
+   MPI_Scatter(intBuf, 4, MPI_INT, subIntBuf, 4, MPI_INT, 0, MPI_COMM_WORLD);
    for (int i = 0; i < 4; i++) {
       subIntBuf[i] += 1000;
    }
-   MPI_Gather(subIntBuf, 4*4, MPI_UNSIGNED_CHAR, intBuf, 4*4, MPI_UNSIGNED_CHAR, 0, MPI_COMM_WORLD);
+   MPI_Gather(subIntBuf, 4, MPI_INT, intBuf, 4, MPI_INT, 0, MPI_COMM_WORLD);
    cout << "Result is:" << endl;
    for (int i = 0; i < 8; i++) {
       cout << intBuf[i] << " ";
@@ -90,7 +90,7 @@ int main(int argc, char *argv []) {
    cout << endl;
 
    cout << "Allgather test" << endl;
-   MPI_Allgather(subIntBuf, 4*4, MPI_UNSIGNED_CHAR, intBuf, 4*4, MPI_UNSIGNED_CHAR, MPI_COMM_WORLD);
+   MPI_Allgather(subIntBuf, 4, MPI_INT, intBuf, 4, MPI_INT, MPI_COMM_WORLD);
    cout << "Result is:" << endl;
    for (int i = 0; i < 8; i++) {
       cout << intBuf[i] << " ";
@@ -103,7 +103,7 @@ int main(int argc, char *argv []) {
       intBuf[i] = i + (10*rank);
       ataBuf[i] = -1;
    }
-   MPI_Alltoall(intBuf, 4*4, MPI_UNSIGNED_CHAR, ataBuf, 4*4, MPI_UNSIGNED_CHAR, MPI_COMM_WORLD);
+   MPI_Alltoall(intBuf, 4, MPI_INT, ataBuf, 4, MPI_INT, MPI_COMM_WORLD);
    cout << "Result is:" << endl;
    for (int i = 0; i < 8; i++) {
       cout << ataBuf[i] << " ";

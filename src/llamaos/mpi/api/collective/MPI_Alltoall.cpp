@@ -43,13 +43,13 @@ int MPI_Alltoall(void *sendbuf, int sendcount, MPI_Datatype sendtype,
    for (int i = 0; i < size; i++) {
       iSend(bufPartPtr, sendcount, sendtype, i, 
             MPI_FUNC_TAG_ALLTOALL, comm, MPI_CONTEXT_COLLECTIVE); 
-      bufPartPtr += sendcount; //TODO: Datatypes
+      bufPartPtr += sendcount*iSizeof(sendtype);
    }
    bufPartPtr = reinterpret_cast<char*>(recvbuf);
    for (int i = 0; i < size; i++) {
       iReceive(bufPartPtr, recvcount, recvtype, i, 
             MPI_FUNC_TAG_ALLTOALL, comm, MPI_CONTEXT_COLLECTIVE, 0);
-      bufPartPtr += recvcount; //TODO: Datatypes
+      bufPartPtr += recvcount*iSizeof(recvtype);
    }
 
    return MPI_SUCCESS;

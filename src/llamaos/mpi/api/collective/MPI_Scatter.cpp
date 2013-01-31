@@ -47,7 +47,7 @@ int MPI_Scatter(void *sendbuf, int sendcnt, MPI_Datatype sendtype,
       char *bufPartPtr = reinterpret_cast<char*>(sendbuf); 
       for (int i = 0; i < size; i++) {
          iSend(bufPartPtr, sendcnt, sendtype, i, MPI_FUNC_TAG_SCATTER, comm, MPI_CONTEXT_COLLECTIVE);
-         bufPartPtr += sendcnt; // TODO: Change for different data types
+         bufPartPtr += sendcnt*iSizeof(sendtype);
       }
    }
    // Receive message from root with tag MPI_FUNC_TAG_SCATTER

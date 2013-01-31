@@ -45,6 +45,27 @@ class iComm;
 
 //#define MPI_COUT_EVERY_MESSAGE
 
+typedef char MPI_CHAR_T;
+typedef unsigned char MPI_BYTE_T;		
+typedef short MPI_SHORT_T;		
+typedef int MPI_INT_T;		
+typedef long MPI_LONG_T;		
+typedef float MPI_FLOAT_T;		
+typedef double MPI_DOUBLE_T;		
+typedef unsigned char MPI_UNSIGNED_CHAR_T;	
+typedef short MPI_UNSIGNED_SHORT_T;	
+typedef unsigned MPI_UNSIGNED_T;		
+typedef unsigned long MPI_UNSIGNED_LONG_T;	
+typedef long double MPI_LONG_DOUBLE_T;	
+typedef long long int MPI_LONG_LONG_INT_T;	
+
+typedef struct {MPI_FLOAT_T a; MPI_INT_T b;} MPI_FLOAT_INT_T;
+typedef struct {MPI_LONG_T a; MPI_INT_T b;} MPI_LONG_INT_T;
+typedef struct {MPI_DOUBLE_T a; MPI_INT_T b;} MPI_DOUBLE_INT_T;
+typedef struct {MPI_SHORT_T a; MPI_INT_T b;} MPI_SHORT_INT_T;
+typedef struct {MPI_INT_T a; MPI_INT_T b;} MPI_2INT_T;
+typedef struct {MPI_LONG_DOUBLE_T a; MPI_INT_T b;} MPI_LONG_DOUBLE_INT_T;
+
 typedef int MPI_Context;
 #define MPI_COMM_MASK ((int)0x7FFFFFFF)
 #define MPI_CONTEXT_MASK ((int)0x80000000)

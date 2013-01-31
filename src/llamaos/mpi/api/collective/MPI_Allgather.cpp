@@ -42,9 +42,9 @@ int MPI_Allgather(void *sendbuf, int sendcnt, MPI_Datatype sendtype,
    // Broadcast each part out to all nodes
    char *bufPartPtr = reinterpret_cast<char*>(recvbuf); 
    for (int i = 0; i < size; i++) {
-      memcpy(bufPartPtr, sendbuf, sendcnt); // TODO: Change for different data types
+      memcpy(bufPartPtr, sendbuf, sendcnt*iSizeof(sendtype)); // Move from send into recv (mainly for i)
       MPI_Bcast(bufPartPtr, sendcnt, sendtype, i, comm); // Broadcast out message
-      bufPartPtr += recvcnt; // TODO: Change for different data types
+      bufPartPtr += recvcnt*iSizeof(recvtype);
    }
 
    return MPI_SUCCESS;

@@ -50,7 +50,7 @@ int MPI_Gather(void *sendbuf, int sendcnt, MPI_Datatype sendtype,
       for (int i = 0; i < size; i++) {
          iReceive(bufPartPtr, recvcnt, recvtype, i, MPI_FUNC_TAG_GATHER, 
                comm, MPI_CONTEXT_COLLECTIVE, 0);
-         bufPartPtr += recvcnt; // TODO: Change for different data types
+         bufPartPtr += recvcnt*iSizeof(recvtype);
       }
    }
 

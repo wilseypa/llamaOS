@@ -31,5 +31,28 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <iGlobals.h>
 
 int iSizeof(MPI_Datatype type) {
-   return 1;
+   switch (type) {
+      case MPI_CHAR:		return sizeof(MPI_CHAR_T);
+      case MPI_BYTE:		return sizeof(MPI_BYTE_T);
+      case MPI_SHORT:	 	return sizeof(MPI_SHORT_T);
+      case MPI_INT:		return sizeof(MPI_INT_T);
+      case MPI_LONG:		return sizeof(MPI_LONG_T);
+      case MPI_FLOAT:		return sizeof(MPI_FLOAT_T);
+      case MPI_DOUBLE:		return sizeof(MPI_DOUBLE_T);
+      case MPI_UNSIGNED_CHAR:	return sizeof(MPI_UNSIGNED_CHAR_T);
+      case MPI_UNSIGNED_SHORT:	return sizeof(MPI_UNSIGNED_SHORT_T);
+      case MPI_UNSIGNED:	return sizeof(MPI_UNSIGNED_T);
+      case MPI_UNSIGNED_LONG:	return sizeof(MPI_UNSIGNED_LONG_T);
+      case MPI_LONG_DOUBLE:	return sizeof(MPI_LONG_DOUBLE_T);
+      case MPI_LONG_LONG_INT:	return sizeof(MPI_LONG_LONG_INT_T);
+
+      case MPI_FLOAT_INT:	return sizeof(MPI_FLOAT_INT_T);
+      case MPI_LONG_INT:	return sizeof(MPI_LONG_INT_T);
+      case MPI_DOUBLE_INT:	return sizeof(MPI_DOUBLE_INT_T);
+      case MPI_SHORT_INT:	return sizeof(MPI_SHORT_INT_T);
+      case MPI_2INT:		return sizeof(MPI_2INT_T);
+      case MPI_LONG_DOUBLE_INT:	return sizeof(MPI_LONG_DOUBLE_INT_T);
+	
+      default:			return 0;
+   }
 }
