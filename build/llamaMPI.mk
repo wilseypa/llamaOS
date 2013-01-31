@@ -46,6 +46,7 @@ CPPFLAGS += \
 CPP_SOURCES += \
   llamaos/mpi/mpi.cpp \
   llamaos/mpi/iGlobals.cpp \
+  llamaos/mpi/iSizeof.cpp \
   llamaos/mpi/iGroup.cpp \
   llamaos/mpi/iRxBuffer.cpp \
   llamaos/mpi/llamaConn.cpp \
@@ -62,7 +63,9 @@ CPP_SOURCES += \
   llamaos/mpi/api/collective/MPI_Barrier.cpp \
   llamaos/mpi/api/collective/MPI_Bcast.cpp \
   llamaos/mpi/api/collective/MPI_Scatter.cpp \
-  llamaos/mpi/api/collective/MPI_Gather.cpp
+  llamaos/mpi/api/collective/MPI_Gather.cpp \
+  llamaos/mpi/api/collective/MPI_Allgather.cpp \
+  llamaos/mpi/api/collective/MPI_Alltoall.cpp  
 
 HEADERS = \
   $(INCDIR)/llamaos/mpi/mpi.h

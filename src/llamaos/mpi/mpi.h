@@ -88,5 +88,12 @@ int MPI_Gather(void *sendbuf, int sendcnt, MPI_Datatype sendtype,
 int MPI_Scatter(void *sendbuf, int sendcnt, MPI_Datatype sendtype, 
                void *recvbuf, int recvcnt, MPI_Datatype recvtype, int root, 
                MPI_Comm comm);
+int MPI_Allgather(void *sendbuf, int sendcount, MPI_Datatype sendtype, 
+               void *recvbuf, int recvcount, MPI_Datatype recvtype, 
+               MPI_Comm comm);
+int MPI_Alltoall(void *sendbuf, int sendcount, MPI_Datatype sendtype, 
+                 void *recvbuf, int recvcount, MPI_Datatype recvtype, 
+                 MPI_Comm comm);
+
 
 #endif  // llamaos_mpi_mpi_h_

@@ -57,6 +57,7 @@ typedef int MPI_Context;
 #define MPI_FUNC_TAG_BROADCAST ((int)0xFFFFFFFD)
 #define MPI_FUNC_TAG_GATHER ((int)0xFFFFFFFC)
 #define MPI_FUNC_TAG_SCATTER ((int)0xFFFFFFFB)
+#define MPI_FUNC_TAG_ALLTOALL ((int)0xFFFFFFFA)
 
 typedef struct MpiHostTable_T {
    uint8_t address[6];
@@ -83,6 +84,7 @@ extern MpiData_T mpiData;
 void iSend(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm, MPI_Context context);
 void iReceive(void *buf, int count, MPI_Datatype datatype, int source, int tag, 
 			MPI_Comm comm, MPI_Context context, MPI_Status *status);
+int iSizeof(MPI_Datatype type);
 
 
 // Tools

@@ -46,6 +46,7 @@ int main(int argc, char *argv []) {
 
    cout << "Starting app..." << endl;
 
+   cout << "Pt2pt test..." << endl;
    if (rank == 0) {
       llamaos::api::sleep(5);
       for (int source = 1; source < totNodes; source++) {
@@ -61,13 +62,21 @@ int main(int argc, char *argv []) {
       cout << "Sent message to root" << endl;
    }
 
+   cout << "Broadcast test" << endl;
    int rootRank = rank;
    MPI_Bcast(&rootRank, 4, MPI_UNSIGNED_CHAR, 1, MPI_COMM_WORLD);
    cout << "Root Rank: " << rootRank << endl;
 
+   cout << "Barrier test" << endl;
    MPI_Barrier(MPI_COMM_WORLD);
 
-   int intBuf[8] = {4,7,9,1,4,0,1,5};
+   cout << "Scatter/Gather test" << endl;
+   int intBuf[8] = {0,0,0,0,0,0,0,0};
+   if (rank == 0) {
+      for (int i = 0; i < 8; i++) {
+         intBuf[i] = i;
+      }
+   }
    int subIntBuf[4];
    MPI_Scatter(intBuf, 4*4, MPI_UNSIGNED_CHAR, subIntBuf, 4*4, MPI_UNSIGNED_CHAR, 0, MPI_COMM_WORLD);
    for (int i = 0; i < 4; i++) {
@@ -80,6 +89,28 @@ int main(int argc, char *argv []) {
    } 
    cout << endl;
 
+   cout << "Allgather test" << endl;
+   MPI_Allgather(subIntBuf, 4*4, MPI_UNSIGNED_CHAR, intBuf, 4*4, MPI_UNSIGNED_CHAR, MPI_COMM_WORLD);
+   cout << "Result is:" << endl;
+   for (int i = 0; i < 8; i++) {
+      cout << intBuf[i] << " ";
+   } 
+   cout << endl;
+
+   cout << "Alltoall test" << endl;
+   int ataBuf[8];
+   for (int i = 0; i < 8; i++) {
+      intBuf[i] = i + (10*rank);
+      ataBuf[i] = -1;
+   }
+   MPI_Alltoall(intBuf, 4*4, MPI_UNSIGNED_CHAR, ataBuf, 4*4, MPI_UNSIGNED_CHAR, MPI_COMM_WORLD);
+   cout << "Result is:" << endl;
+   for (int i = 0; i < 8; i++) {
+      cout << ataBuf[i] << " ";
+   } 
+   cout << endl;
+
+   cout << "Ending program" << endl;
    MPI_Finalize();
 
    return 0;
