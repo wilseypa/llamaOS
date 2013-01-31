@@ -35,6 +35,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <vector>
 #define MAP_TYPE std::map
 #include <map>
+#include <limits>
 
 #include <mpi.h>
 #include <iGroup.h>
@@ -59,12 +60,12 @@ typedef unsigned long MPI_UNSIGNED_LONG_T;
 typedef long double MPI_LONG_DOUBLE_T;	
 typedef long long int MPI_LONG_LONG_INT_T;	
 
-typedef struct {MPI_FLOAT_T a; MPI_INT_T b;} MPI_FLOAT_INT_T;
-typedef struct {MPI_LONG_T a; MPI_INT_T b;} MPI_LONG_INT_T;
-typedef struct {MPI_DOUBLE_T a; MPI_INT_T b;} MPI_DOUBLE_INT_T;
-typedef struct {MPI_SHORT_T a; MPI_INT_T b;} MPI_SHORT_INT_T;
-typedef struct {MPI_INT_T a; MPI_INT_T b;} MPI_2INT_T;
-typedef struct {MPI_LONG_DOUBLE_T a; MPI_INT_T b;} MPI_LONG_DOUBLE_INT_T;
+struct MPI_FLOAT_INT_T {MPI_FLOAT_T value; MPI_INT_T index;};
+struct MPI_LONG_INT_T {MPI_LONG_T value; MPI_INT_T index;};
+struct MPI_DOUBLE_INT_T {MPI_DOUBLE_T value; MPI_INT_T index;};
+struct MPI_SHORT_INT_T {MPI_SHORT_T value; MPI_INT_T index;};
+struct MPI_2INT_T {MPI_INT_T value; MPI_INT_T index;};
+struct MPI_LONG_DOUBLE_INT_T {MPI_LONG_DOUBLE_T value; MPI_INT_T index;};
 
 typedef int MPI_Context;
 #define MPI_COMM_MASK ((int)0x7FFFFFFF)
@@ -79,6 +80,7 @@ typedef int MPI_Context;
 #define MPI_FUNC_TAG_GATHER ((int)0xFFFFFFFC)
 #define MPI_FUNC_TAG_SCATTER ((int)0xFFFFFFFB)
 #define MPI_FUNC_TAG_ALLTOALL ((int)0xFFFFFFFA)
+#define MPI_FUNC_TAG_REDUCE ((int)0xFFFFFFF9)
 
 typedef struct MpiHostTable_T {
    uint8_t address[6];
@@ -93,6 +95,7 @@ typedef struct MpiData_T {
    std::vector<MpiHostTable_T> hostTable;	// The vector of all MAC addresses and pid per world rank
    MAP_TYPE<MPI_Comm,iComm*> comm;	// Map of integer handles to communicators
    MAP_TYPE<MPI_Group,iGroup*> group; // Map of integer handles to groups
+   bool isPerformingOp;
 } MpiData_T;
 
 
@@ -106,7 +109,8 @@ void iSend(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_C
 void iReceive(void *buf, int count, MPI_Datatype datatype, int source, int tag, 
 			MPI_Comm comm, MPI_Context context, MPI_Status *status);
 int iSizeof(MPI_Datatype type);
-
+int iPerformOp(void *runningTotal, void *newValue, int count, MPI_Datatype type, MPI_Op op);
+int iStartOp(void *runningTotal, int count, MPI_Datatype type, MPI_Op op);
 
 // Tools
 void iPrintMAC(uint8_t mac[]);

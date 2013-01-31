@@ -57,6 +57,20 @@ typedef int MPI_Datatype;
 #define MPI_2INT		((MPI_Datatype)18)
 #define MPI_LONG_DOUBLE_INT	((MPI_Datatype)19)
 
+typedef int MPI_Op;
+#define MPI_MAX       ((MPI_Op)1)      //maximum
+#define MPI_MIN       ((MPI_Op)2)      //minimum
+#define MPI_SUM       ((MPI_Op)3)      //sum
+#define MPI_PROD      ((MPI_Op)4)      //product
+#define MPI_LAND      ((MPI_Op)5)      //logical and
+#define MPI_BAND      ((MPI_Op)6)      //bit-wise and
+#define MPI_LOR       ((MPI_Op)7)      //logical or
+#define MPI_BOR       ((MPI_Op)8)      //bit-wise or
+#define MPI_LXOR      ((MPI_Op)9)      //logical xor
+#define MPI_BXOR      ((MPI_Op)10)     //bit-wise xor
+#define MPI_MAXLOC    ((MPI_Op)11)     //max value and location
+#define MPI_MINLOC    ((MPI_Op)12)     //min value and location
+
 typedef int MPI_Comm;
 #define MPI_COMM_NULL  ((MPI_Comm)0x00000000)
 #define MPI_COMM_WORLD ((MPI_Comm)0x7FFFFFFF)
@@ -113,6 +127,7 @@ int MPI_Allgather(void *sendbuf, int sendcount, MPI_Datatype sendtype,
 int MPI_Alltoall(void *sendbuf, int sendcount, MPI_Datatype sendtype, 
                  void *recvbuf, int recvcount, MPI_Datatype recvtype, 
                  MPI_Comm comm);
-
+int MPI_Reduce(void *sendbuf, void *recvbuf, int count, MPI_Datatype datatype, 
+               MPI_Op op, int root, MPI_Comm comm);
 
 #endif  // llamaos_mpi_mpi_h_

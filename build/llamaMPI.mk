@@ -54,6 +54,7 @@ CPP_SOURCES += \
   llamaos/mpi/iReceive.cpp \
   llamaos/mpi/iSend.cpp \
   llamaos/mpi/tools.cpp \
+  llamaos/mpi/op/iPerformOp.cpp \
   llamaos/mpi/api/pt2pt/MPI_Recv.cpp \
   llamaos/mpi/api/pt2pt/MPI_Send.cpp \
   llamaos/mpi/api/comm/MPI_Comm_rank.cpp \
@@ -65,7 +66,8 @@ CPP_SOURCES += \
   llamaos/mpi/api/collective/MPI_Scatter.cpp \
   llamaos/mpi/api/collective/MPI_Gather.cpp \
   llamaos/mpi/api/collective/MPI_Allgather.cpp \
-  llamaos/mpi/api/collective/MPI_Alltoall.cpp  
+  llamaos/mpi/api/collective/MPI_Alltoall.cpp \
+  llamaos/mpi/api/collective/MPI_Reduce.cpp
 
 HEADERS = \
   $(INCDIR)/llamaos/mpi/mpi.h
