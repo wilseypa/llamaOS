@@ -49,6 +49,7 @@ class iComm {
       int getLocalWorldRank() {return localWorldRank;}
       int getWorldRankFromRank(int rank);
       int getRankFromWorldRank(int worldRank);
+      MPI_Group getGroupId();
       
    private:
       MPI_Comm id; 	// Unique identifier for communicator

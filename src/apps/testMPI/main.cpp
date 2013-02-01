@@ -38,12 +38,14 @@ either expressed or implied, of the copyright holder(s) or contributors.
 using namespace std;
 
 void duoTest();
+void commTest();
 
 int main(int argc, char *argv []) {
    MPI_Init (&argc, &argv);
    cout << "Starting program" << endl;
 
-   duoTest();
+   //duoTest();
+   commTest();
 
    cout << "Ending program" << endl;
    MPI_Finalize();
@@ -51,11 +53,26 @@ int main(int argc, char *argv []) {
    return 0;
 }
 
+void commTest() {
+   MPI_Group MPI_GROUP_WORLD;
+   int gRank, gSize;
+   MPI_Comm_group(MPI_COMM_WORLD, &MPI_GROUP_WORLD);
+   
+   MPI_Group MPI_NEW_GROUP;
+   int groupList[2] = {2,1};
+   MPI_Group_incl(MPI_GROUP_WORLD, 2, groupList, &MPI_NEW_GROUP);
+   MPI_Group_rank(MPI_NEW_GROUP, &gRank);
+   MPI_Group_size(MPI_NEW_GROUP, &gSize);
+   cout << "In group " << MPI_NEW_GROUP << " of size " << gSize << " with rank " << gRank << endl;
+}
+
 void duoTest() {
-   cout << "Starting duo test" << endl;
    int rank, totNodes;
    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
    MPI_Comm_size(MPI_COMM_WORLD, &totNodes);
+
+   if (rank >= 2) {return;}
+   cout << "Starting duo test" << endl;
 
    cout << "Pt2pt test..." << endl;
    if (rank == 0) {

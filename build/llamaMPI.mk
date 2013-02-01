@@ -57,8 +57,12 @@ CPP_SOURCES += \
   llamaos/mpi/op/iPerformOp.cpp \
   llamaos/mpi/api/pt2pt/MPI_Recv.cpp \
   llamaos/mpi/api/pt2pt/MPI_Send.cpp \
+  llamaos/mpi/api/group/MPI_Group_rank.cpp \
+  llamaos/mpi/api/group/MPI_Group_size.cpp \
+  llamaos/mpi/api/group/MPI_Group_incl.cpp \
   llamaos/mpi/api/comm/MPI_Comm_rank.cpp \
   llamaos/mpi/api/comm/MPI_Comm_size.cpp \
+  llamaos/mpi/api/comm/MPI_Comm_group.cpp \
   llamaos/mpi/api/sys/MPI_Init.cpp \
   llamaos/mpi/api/sys/MPI_Finalize.cpp \
   llamaos/mpi/api/collective/MPI_Barrier.cpp \

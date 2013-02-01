@@ -98,18 +98,25 @@ typedef struct MPI_Status {
 
 
 // MPI FUNCTIONS
+// System functions
 int MPI_Init (int *argc, char ***argv);
 int MPI_Finalize (void);
 
+// Groups
+int MPI_Group_rank (MPI_Group group, int *rank);
+int MPI_Group_size (MPI_Group group, int *size);
+int MPI_Group_incl(MPI_Group group, int n, int *ranks, MPI_Group *newgroup);
+
+// Communicators
 int MPI_Comm_rank (MPI_Comm comm, int *rank);
 int MPI_Comm_size (MPI_Comm comm, int *size);
+int MPI_Comm_group(MPI_Comm comm, MPI_Group *group);
 
-int MPI_Recv(void *buf, int count, MPI_Datatype datatype, int source, int tag, MPI_Comm comm, MPI_Status *status);
-int MPI_Irecv(void *buf, int count, MPI_Datatype datatype, int source, int tag, MPI_Comm comm, MPI_Request *request);
-
+// Point to Point
 int MPI_Send(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm);
 int MPI_Isend(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm, MPI_Request *request);
-
+int MPI_Recv(void *buf, int count, MPI_Datatype datatype, int source, int tag, MPI_Comm comm, MPI_Status *status);
+int MPI_Irecv(void *buf, int count, MPI_Datatype datatype, int source, int tag, MPI_Comm comm, MPI_Request *request);
 int MPI_Test(MPI_Request *request, int *flag, MPI_Status *status);
 
 // Collective

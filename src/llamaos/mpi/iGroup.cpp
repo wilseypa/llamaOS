@@ -47,8 +47,7 @@ iGroup::iGroup(IGROUP_CREATE_TYPE type) {
          localWorldRank = mpiData.rank;
          rankToWorldRank.resize(size);
          for (int i = 0; i < size; i++) {
-            rankToWorldRank[i] = i;
-            worldRankToRank[i] = i;
+            linkRankToWorldRank(i,i);
          }
          break;
       }
@@ -57,7 +56,7 @@ iGroup::iGroup(IGROUP_CREATE_TYPE type) {
          size = 0;
          localRank = MPI_UNDEFINED;
          localWorldRank = MPI_UNDEFINED;
-         rankToWorldRank.resize(size);
+         rankToWorldRank.resize(0);
          break;
       }
       case IGROUP_CREATE_SELF: {
@@ -66,12 +65,39 @@ iGroup::iGroup(IGROUP_CREATE_TYPE type) {
          localRank = mpiData.rank;
          localWorldRank = mpiData.rank;
          rankToWorldRank.resize(size);
-         rankToWorldRank[0] = localRank;
-         worldRankToRank[0] = localRank;
+         linkRankToWorldRank(0,localRank);
          break;
       }
    }
    mpiData.group[id] = this;
+}
+
+// Create new group based off of an old one and a list of ranks
+iGroup::iGroup(IGROUP_CREATE_TYPE type, MPI_Group group, int n, int *ranks) {
+   switch (type) {
+      case IGROUP_CREATE_INCL: {
+         id = getNextId();
+         size = n;
+         rankToWorldRank.resize(size);
+         for (int i = 0; i < n; i++) {
+            linkRankToWorldRank(i, mpiData.group[group]->getWorldRankFromRank(ranks[i]));
+         }
+         localRank = getRankFromWorldRank(mpiData.rank);
+         if (localRank == MPI_UNDEFINED) {
+            localWorldRank = MPI_UNDEFINED;
+         } else {
+            localWorldRank = mpiData.rank;
+         }
+         break;
+      }
+   }
+   mpiData.group[id] = this;
+}
+
+// Links a rank and world rank together
+void iGroup::linkRankToWorldRank(int rank, int worldRank) {
+   rankToWorldRank[rank] = worldRank;
+   worldRankToRank[worldRank] = rank;
 }
 
 // Destroy the reference to the id in the global hash map

@@ -28,39 +28,9 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#ifndef I_GROUP_H_
-#define I_GROUP_H_
-
 #include <iGlobals.h>
-#include <vector>
 
-typedef int IGROUP_CREATE_TYPE;
-#define IGROUP_CREATE_WORLD ((IGROUP_CREATE_TYPE)1)
-#define IGROUP_CREATE_EMPTY ((IGROUP_CREATE_TYPE)2)
-#define IGROUP_CREATE_SELF ((IGROUP_CREATE_TYPE)3)
-#define IGROUP_CREATE_INCL ((IGROUP_CREATE_TYPE)4)
-
-class iGroup {
-   public:
-      iGroup(IGROUP_CREATE_TYPE type);
-      iGroup(IGROUP_CREATE_TYPE type, MPI_Group group, int n, int *ranks);
-      ~iGroup();
-      MPI_Group getId() {return id;}
-      int getSize() {return size;}
-      int getLocalRank() {return localRank;}
-      int getLocalWorldRank() {return localWorldRank;}
-      int getWorldRankFromRank(int rank);
-      int getRankFromWorldRank(int worldRank);
-   private:
-      MPI_Group id;
-      int size;
-      int localRank;      // Rank of local process node in comm
-      int localWorldRank; // Rank of local process node in world
-      std::vector<int> rankToWorldRank;	// Conversion of rank in comm to world rank
-      MAP_TYPE<int,int> worldRankToRank; // Conversion of world rank to rank in comm
-
-      MPI_Group getNextId();
-      void linkRankToWorldRank(int rank, int worldRank);
-};
-
-#endif
+int MPI_Comm_group(MPI_Comm comm, MPI_Group *group) {
+   (*group) = mpiData.comm[comm]->getGroupId();
+   return MPI_SUCCESS;
+}

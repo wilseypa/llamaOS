@@ -58,3 +58,8 @@ int iComm::getWorldRankFromRank(int rank) {
 int iComm::getRankFromWorldRank(int worldRank) {
    return group->getRankFromWorldRank(worldRank);
 }
+
+// Get the ID of the group in comm
+MPI_Group iComm::getGroupId() {
+   return group->getId();
+}
