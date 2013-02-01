@@ -60,6 +60,10 @@ CPP_SOURCES += \
   llamaos/mpi/api/group/MPI_Group_rank.cpp \
   llamaos/mpi/api/group/MPI_Group_size.cpp \
   llamaos/mpi/api/group/MPI_Group_incl.cpp \
+  llamaos/mpi/api/group/MPI_Group_excl.cpp \
+  llamaos/mpi/api/group/MPI_Group_union.cpp \
+  llamaos/mpi/api/group/MPI_Group_intersection.cpp \
+  llamaos/mpi/api/group/MPI_Group_difference.cpp \
   llamaos/mpi/api/comm/MPI_Comm_rank.cpp \
   llamaos/mpi/api/comm/MPI_Comm_size.cpp \
   llamaos/mpi/api/comm/MPI_Comm_group.cpp \

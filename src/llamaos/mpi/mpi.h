@@ -106,11 +106,16 @@ int MPI_Finalize (void);
 int MPI_Group_rank (MPI_Group group, int *rank);
 int MPI_Group_size (MPI_Group group, int *size);
 int MPI_Group_incl(MPI_Group group, int n, int *ranks, MPI_Group *newgroup);
+int MPI_Group_excl(MPI_Group group, int n, int *ranks, MPI_Group *newgroup);
+int MPI_Group_union(MPI_Group group1, MPI_Group group2, MPI_Group *newgroup);
+int MPI_Group_intersection(MPI_Group group1, MPI_Group group2, MPI_Group *newgroup);
+int MPI_Group_difference(MPI_Group group1, MPI_Group group2, MPI_Group *newgroup);
 
 // Communicators
 int MPI_Comm_rank (MPI_Comm comm, int *rank);
 int MPI_Comm_size (MPI_Comm comm, int *size);
 int MPI_Comm_group(MPI_Comm comm, MPI_Group *group);
+
 
 // Point to Point
 int MPI_Send(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm);

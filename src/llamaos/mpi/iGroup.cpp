@@ -73,14 +73,36 @@ iGroup::iGroup(IGROUP_CREATE_TYPE type) {
 }
 
 // Create new group based off of an old one and a list of ranks
-iGroup::iGroup(IGROUP_CREATE_TYPE type, MPI_Group group, int n, int *ranks) {
+iGroup::iGroup(IGROUP_CREATE_TYPE type, iGroup *group, int n, int *ranks) {
    switch (type) {
       case IGROUP_CREATE_INCL: {
          id = getNextId();
          size = n;
          rankToWorldRank.resize(size);
          for (int i = 0; i < n; i++) {
-            linkRankToWorldRank(i, mpiData.group[group]->getWorldRankFromRank(ranks[i]));
+            linkRankToWorldRank(i, group->getWorldRankFromRank(ranks[i]));
+         }
+         localRank = getRankFromWorldRank(mpiData.rank);
+         if (localRank == MPI_UNDEFINED) {
+            localWorldRank = MPI_UNDEFINED;
+         } else {
+            localWorldRank = mpiData.rank;
+         }
+         break;
+      }
+      case IGROUP_CREATE_EXCL: {
+         id = getNextId();
+         int oldSize = group->getSize();
+         size = oldSize-n;
+         rankToWorldRank.resize(size);
+         std::vector<bool> inNewGroup(oldSize,true);
+         for (int i = 0; i < n; i++) {
+            inNewGroup[ranks[i]] = false;
+         }
+         int oldRank = 0;
+         for (int newRank = 0; newRank < size; newRank++) {
+            while (!inNewGroup[oldRank]) {oldRank++;}          
+            linkRankToWorldRank(newRank, group->getWorldRankFromRank(oldRank++));
          }
          localRank = getRankFromWorldRank(mpiData.rank);
          if (localRank == MPI_UNDEFINED) {
@@ -94,15 +116,102 @@ iGroup::iGroup(IGROUP_CREATE_TYPE type, MPI_Group group, int n, int *ranks) {
    mpiData.group[id] = this;
 }
 
+// Create new group based on two old groups
+iGroup::iGroup(IGROUP_CREATE_TYPE type, iGroup *group1, iGroup *group2) {
+   // Set up merge data
+   MAP_TYPE<int,int> worldRankToNum;
+   for (int i = 0; i < group1->getSize(); i++) {
+      int iWorldRank = group1->getWorldRankFromRank(i);
+      worldRankToNum[iWorldRank] = 1;
+   }
+   for (int i = 0; i < group2->getSize(); i++) {
+      int iWorldRank = group2->getWorldRankFromRank(i);
+      MAP_TYPE<int,int>::iterator it = worldRankToNum.find(iWorldRank);
+      if (it == worldRankToNum.end()) { // Not in other group
+         worldRankToNum[iWorldRank] = 1;
+      } else { // In other group
+         worldRankToNum[iWorldRank] = 2;
+      }
+   }
+
+   // Merge dependant on type
+   switch (type) {
+      case IGROUP_CREATE_UNION: {
+         for (int i = 0; i < group1->getSize(); i++) {
+            int iWorldRank = group1->getWorldRankFromRank(i);
+            pushWorldRank(iWorldRank); 
+         }
+         for (int i = 0; i < group2->getSize(); i++) {
+            int iWorldRank = group2->getWorldRankFromRank(i);
+            if (worldRankToNum[iWorldRank] == 1) { // if not in other
+               pushWorldRank(iWorldRank); 
+            }
+         }
+         break;
+      }
+      case IGROUP_CREATE_INTER: {
+         for (int i = 0; i < group1->getSize(); i++) {
+            int iWorldRank = group1->getWorldRankFromRank(i);
+            if (worldRankToNum[iWorldRank] == 2) { // if in other
+               pushWorldRank(iWorldRank); 
+            }
+         }
+         break;
+      }
+      case IGROUP_CREATE_DIFF: {
+         for (int i = 0; i < group1->getSize(); i++) {
+            int iWorldRank = group1->getWorldRankFromRank(i);
+            if (worldRankToNum[iWorldRank] == 1) { // if not in other
+               pushWorldRank(iWorldRank); 
+            }
+         }
+         for (int i = 0; i < group2->getSize(); i++) {
+            int iWorldRank = group2->getWorldRankFromRank(i);
+            if (worldRankToNum[iWorldRank] == 1) { // if not in other
+               pushWorldRank(iWorldRank); 
+            }
+         }
+         break;
+      }
+   }
+
+   // Set ID and size
+   size = rankToWorldRank.size();
+   if (size == 0) {
+      id = MPI_GROUP_EMPTY;
+   } else {
+      id = getNextId();
+   }
+
+   // Set local values      
+   localRank = getRankFromWorldRank(mpiData.rank);
+   if (localRank == MPI_UNDEFINED) {
+      localWorldRank = MPI_UNDEFINED;
+   } else {
+      localWorldRank = mpiData.rank;
+   }
+
+   // Add to global map
+   mpiData.group[id] = this;
+}
+
 // Links a rank and world rank together
 void iGroup::linkRankToWorldRank(int rank, int worldRank) {
    rankToWorldRank[rank] = worldRank;
    worldRankToRank[worldRank] = rank;
 }
 
+// Adds a new rank and assigns world rank to it
+void iGroup::pushWorldRank(int worldRank) {
+   rankToWorldRank.push_back(worldRank);
+   worldRankToRank[worldRank] = rankToWorldRank.size()-1;
+}
+
 // Destroy the reference to the id in the global hash map
 iGroup::~iGroup() {
-   mpiData.group.erase(id);
+   if (id != IGROUP_CREATE_EMPTY) {
+      mpiData.group.erase(id);
+   }
 }
 
 // Translate the comm rank to the world rank

@@ -58,12 +58,37 @@ void commTest() {
    int gRank, gSize;
    MPI_Comm_group(MPI_COMM_WORLD, &MPI_GROUP_WORLD);
    
-   MPI_Group MPI_NEW_GROUP;
-   int groupList[2] = {2,1};
-   MPI_Group_incl(MPI_GROUP_WORLD, 2, groupList, &MPI_NEW_GROUP);
-   MPI_Group_rank(MPI_NEW_GROUP, &gRank);
-   MPI_Group_size(MPI_NEW_GROUP, &gSize);
-   cout << "In group " << MPI_NEW_GROUP << " of size " << gSize << " with rank " << gRank << endl;
+   MPI_Group MPI_NEW_GROUP1;
+   int groupInclList[2] = {2,1};
+   MPI_Group_incl(MPI_GROUP_WORLD, 2, groupInclList, &MPI_NEW_GROUP1);
+   MPI_Group_rank(MPI_NEW_GROUP1, &gRank);
+   MPI_Group_size(MPI_NEW_GROUP1, &gSize);
+   cout << "In incl group " << MPI_NEW_GROUP1 << " of size " << gSize << " with rank " << gRank << endl;
+
+   MPI_Group MPI_NEW_GROUP2;
+   int groupExclList[1] = {1};
+   MPI_Group_excl(MPI_GROUP_WORLD, 1, groupExclList, &MPI_NEW_GROUP2);
+   MPI_Group_rank(MPI_NEW_GROUP2, &gRank);
+   MPI_Group_size(MPI_NEW_GROUP2, &gSize);
+   cout << "In excl group " << MPI_NEW_GROUP2 << " of size " << gSize << " with rank " << gRank << endl;
+
+   MPI_Group MPI_NEW_GROUP3;
+   MPI_Group_union(MPI_NEW_GROUP1, MPI_NEW_GROUP2, &MPI_NEW_GROUP3);
+   MPI_Group_rank(MPI_NEW_GROUP3, &gRank);
+   MPI_Group_size(MPI_NEW_GROUP3, &gSize);
+   cout << "In union group " << MPI_NEW_GROUP3 << " of size " << gSize << " with rank " << gRank << endl;
+
+   MPI_Group MPI_NEW_GROUP4;
+   MPI_Group_intersection(MPI_NEW_GROUP1, MPI_NEW_GROUP2, &MPI_NEW_GROUP4);
+   MPI_Group_rank(MPI_NEW_GROUP4, &gRank);
+   MPI_Group_size(MPI_NEW_GROUP4, &gSize);
+   cout << "In intersection group " << MPI_NEW_GROUP4 << " of size " << gSize << " with rank " << gRank << endl;
+
+   MPI_Group MPI_NEW_GROUP5;
+   MPI_Group_difference(MPI_NEW_GROUP1, MPI_NEW_GROUP2, &MPI_NEW_GROUP5);
+   MPI_Group_rank(MPI_NEW_GROUP5, &gRank);
+   MPI_Group_size(MPI_NEW_GROUP5, &gSize);
+   cout << "In difference group " << MPI_NEW_GROUP5 << " of size " << gSize << " with rank " << gRank << endl;
 }
 
 void duoTest() {

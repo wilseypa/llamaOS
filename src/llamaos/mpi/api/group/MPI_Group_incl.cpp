@@ -32,7 +32,8 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 int MPI_Group_incl(MPI_Group group, int n, int *ranks, MPI_Group *newgroup) {
    if (n > 0) {
-      iGroup *nGroup = new iGroup(IGROUP_CREATE_INCL, group, n, ranks);
+      iGroup *prevGroup = mpiData.group[group];
+      iGroup *nGroup = new iGroup(IGROUP_CREATE_INCL, prevGroup, n, ranks);
       (*newgroup) = nGroup->getId();
    } else {
       (*newgroup) = MPI_GROUP_EMPTY;  

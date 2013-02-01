@@ -28,45 +28,15 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#ifndef I_GROUP_H_
-#define I_GROUP_H_
-
 #include <iGlobals.h>
-#include <vector>
 
-typedef int IGROUP_CREATE_TYPE;
-#define IGROUP_CREATE_WORLD ((IGROUP_CREATE_TYPE)1)
-#define IGROUP_CREATE_EMPTY ((IGROUP_CREATE_TYPE)2)
-#define IGROUP_CREATE_SELF ((IGROUP_CREATE_TYPE)3)
-#define IGROUP_CREATE_INCL ((IGROUP_CREATE_TYPE)4)
-#define IGROUP_CREATE_EXCL ((IGROUP_CREATE_TYPE)5)
-#define IGROUP_CREATE_UNION ((IGROUP_CREATE_TYPE)6)
-#define IGROUP_CREATE_INTER ((IGROUP_CREATE_TYPE)7)
-#define IGROUP_CREATE_DIFF ((IGROUP_CREATE_TYPE)8)
-
-class iGroup {
-   public:
-      iGroup(IGROUP_CREATE_TYPE type);
-      iGroup(IGROUP_CREATE_TYPE type, iGroup *group, int n, int *ranks);
-      iGroup(IGROUP_CREATE_TYPE type, iGroup *group1, iGroup *group2);
-      ~iGroup();
-      MPI_Group getId() {return id;}
-      int getSize() {return size;}
-      int getLocalRank() {return localRank;}
-      int getLocalWorldRank() {return localWorldRank;}
-      int getWorldRankFromRank(int rank);
-      int getRankFromWorldRank(int worldRank);
-   private:
-      MPI_Group id;
-      int size;
-      int localRank;      // Rank of local process node in comm
-      int localWorldRank; // Rank of local process node in world
-      std::vector<int> rankToWorldRank;	// Conversion of rank in comm to world rank
-      MAP_TYPE<int,int> worldRankToRank; // Conversion of world rank to rank in comm
-
-      MPI_Group getNextId();
-      void linkRankToWorldRank(int rank, int worldRank);
-      void pushWorldRank(int worldRank);
-};
-
-#endif
+int MPI_Group_union(MPI_Group group1, MPI_Group group2, MPI_Group *newgroup) {
+   iGroup *pGroup1 = mpiData.group[group1];
+   iGroup *pGroup2 = mpiData.group[group2];
+   iGroup *nGroup = new iGroup(IGROUP_CREATE_UNION, pGroup1, pGroup2);
+   (*newgroup) = nGroup->getId();
+   if (nGroup->getId() == MPI_GROUP_EMPTY) {
+      delete nGroup;
+   }
+   return MPI_SUCCESS;
+}
