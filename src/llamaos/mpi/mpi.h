@@ -83,8 +83,14 @@ typedef int MPI_Group;
 typedef int MPI_Count;
 typedef int MPI_Request;
 
-#define MPI_UNDEFINED (-1)
+// Compare results
+#define MPI_IDENT 1     //Identical
+#define MPI_CONGRUENT 2 //(only for MPI_COMM_COMPARE ) The groups are identical
+#define MPI_SIMILAR 3   //Same members, but in a different order
+#define MPI_UNEQUAL 4   //Different
 
+
+#define MPI_UNDEFINED (-1)
 #define MPI_ANY_SOURCE ((int)0xFFFFFFFF)
 #define MPI_ANY_TAG ((int)0xFFFFFFFF)
 
@@ -102,14 +108,20 @@ typedef struct MPI_Status {
 int MPI_Init (int *argc, char ***argv);
 int MPI_Finalize (void);
 
-// Groups
-int MPI_Group_rank (MPI_Group group, int *rank);
-int MPI_Group_size (MPI_Group group, int *size);
+// GROUPS - Constructors
 int MPI_Group_incl(MPI_Group group, int n, int *ranks, MPI_Group *newgroup);
 int MPI_Group_excl(MPI_Group group, int n, int *ranks, MPI_Group *newgroup);
 int MPI_Group_union(MPI_Group group1, MPI_Group group2, MPI_Group *newgroup);
 int MPI_Group_intersection(MPI_Group group1, MPI_Group group2, MPI_Group *newgroup);
 int MPI_Group_difference(MPI_Group group1, MPI_Group group2, MPI_Group *newgroup);
+// GROUPS - Accessors
+int MPI_Group_rank (MPI_Group group, int *rank);
+int MPI_Group_size (MPI_Group group, int *size);
+int MPI_Group_translate_ranks(MPI_Group group1, int n, int *ranks1, 
+                            MPI_Group group2, int *ranks2);
+int MPI_Group_compare(MPI_Group group1, MPI_Group group2, int *result);
+// GROUPS - Destructor
+int MPI_Group_free(MPI_Group *group);
 
 // Communicators
 int MPI_Comm_rank (MPI_Comm comm, int *rank);

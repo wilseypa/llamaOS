@@ -195,6 +195,34 @@ iGroup::iGroup(IGROUP_CREATE_TYPE type, iGroup *group1, iGroup *group2) {
    mpiData.group[id] = this;
 }
 
+// Compares two groups to determine similarity
+int iGroup::compare(iGroup *oGroup) {
+   // First test for unequal lengths
+   if (size != oGroup->getSize()) {
+      return MPI_UNEQUAL;
+   }
+
+   // Next test for MPI_IDENT
+   bool isDiff = false;
+   for (int i = 0; i < size; i++) {
+      if (getWorldRankFromRank(i) != oGroup->getWorldRankFromRank(i)) {
+         isDiff = true;
+         break;
+      }
+   }
+   if (!isDiff) {
+      return MPI_IDENT;
+   }
+
+   // Last test for MPI_SIMILAR
+   for (int i = 0; i < size; i++) {
+      if (getRankFromWorldRank(oGroup->getWorldRankFromRank(i)) == MPI_UNDEFINED) {
+         return MPI_UNEQUAL;
+      }
+   }
+   return MPI_SIMILAR;
+}
+
 // Links a rank and world rank together
 void iGroup::linkRankToWorldRank(int rank, int worldRank) {
    rankToWorldRank[rank] = worldRank;

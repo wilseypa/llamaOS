@@ -38,14 +38,14 @@ either expressed or implied, of the copyright holder(s) or contributors.
 using namespace std;
 
 void duoTest();
-void commTest();
+void groupTest();
 
 int main(int argc, char *argv []) {
    MPI_Init (&argc, &argv);
    cout << "Starting program" << endl;
 
    //duoTest();
-   commTest();
+   groupTest();
 
    cout << "Ending program" << endl;
    MPI_Finalize();
@@ -53,7 +53,9 @@ int main(int argc, char *argv []) {
    return 0;
 }
 
-void commTest() {
+void groupTest() {
+   cout << "Starting group test" << endl;
+   cout << "Running group constructor tests" << endl;
    MPI_Group MPI_GROUP_WORLD;
    int gRank, gSize;
    MPI_Comm_group(MPI_COMM_WORLD, &MPI_GROUP_WORLD);
@@ -89,6 +91,40 @@ void commTest() {
    MPI_Group_rank(MPI_NEW_GROUP5, &gRank);
    MPI_Group_size(MPI_NEW_GROUP5, &gSize);
    cout << "In difference group " << MPI_NEW_GROUP5 << " of size " << gSize << " with rank " << gRank << endl;
+
+   cout << "Running group accessor tests" << endl;
+   int groupRanks1[3] = {2,0,1};
+   int groupRanks2[3];
+   MPI_Group_translate_ranks(MPI_NEW_GROUP3, 3, groupRanks1, MPI_NEW_GROUP5, groupRanks2);
+   cout << "Translation: ";
+   for (int i = 0; i < 3; i++) {
+      cout << "(" << groupRanks1[i] << "-->" << groupRanks2[i] << ")";
+   }
+   cout << endl;
+
+   MPI_Group MPI_NEW_GROUP6;
+   int groupInclList2[2] = {2,1};
+   MPI_Group_incl(MPI_GROUP_WORLD, 2, groupInclList2, &MPI_NEW_GROUP6);
+   MPI_Group MPI_NEW_GROUP7;
+   int groupInclList3[2] = {1,2};
+   MPI_Group_incl(MPI_GROUP_WORLD, 2, groupInclList3, &MPI_NEW_GROUP7);
+   int resSame, resSim, resDif;
+   MPI_Group_compare(MPI_NEW_GROUP1, MPI_NEW_GROUP6, &resSame);
+   cout << "Same result: " << resSame << endl;
+   MPI_Group_compare(MPI_NEW_GROUP1, MPI_NEW_GROUP7, &resSim);
+   cout << "Similar result: " << resSim << endl;
+   MPI_Group_compare(MPI_NEW_GROUP1, MPI_NEW_GROUP5, &resDif);
+   cout << "Different result: " << resDif << endl;
+
+   cout << "Running group destructors...";
+   MPI_Group_free(&MPI_NEW_GROUP1);
+   MPI_Group_free(&MPI_NEW_GROUP2);
+   MPI_Group_free(&MPI_NEW_GROUP3);
+   MPI_Group_free(&MPI_NEW_GROUP4);
+   MPI_Group_free(&MPI_NEW_GROUP5);
+   MPI_Group_free(&MPI_NEW_GROUP6);
+   MPI_Group_free(&MPI_NEW_GROUP7);
+   cout << "DONE" << endl;
 }
 
 void duoTest() {

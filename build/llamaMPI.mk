@@ -64,6 +64,9 @@ CPP_SOURCES += \
   llamaos/mpi/api/group/MPI_Group_union.cpp \
   llamaos/mpi/api/group/MPI_Group_intersection.cpp \
   llamaos/mpi/api/group/MPI_Group_difference.cpp \
+  llamaos/mpi/api/group/MPI_Group_translate_ranks.cpp \
+  llamaos/mpi/api/group/MPI_Group_compare.cpp \
+  llamaos/mpi/api/group/MPI_Group_free.cpp \
   llamaos/mpi/api/comm/MPI_Comm_rank.cpp \
   llamaos/mpi/api/comm/MPI_Comm_size.cpp \
   llamaos/mpi/api/comm/MPI_Comm_group.cpp \
