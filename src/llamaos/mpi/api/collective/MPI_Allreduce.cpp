@@ -32,30 +32,10 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 using namespace std;
 
-int MPI_Reduce(void *sendbuf, void *recvbuf, int count, MPI_Datatype datatype, 
-               MPI_Op op, int root, MPI_Comm comm) {
-   // Determine process rank
-   int rank; 
-   MPI_Comm_rank(comm, &rank);
-   // Gather all messages into array at root
-   // Linear Method
-   // Send message to root with tag MPI_FUNC_TAG_REDUCE
-   iSend(sendbuf, count, datatype, root, MPI_FUNC_TAG_REDUCE, comm, MPI_CONTEXT_COLLECTIVE);
-   // If root, wait for all other ranks to send message with tag MPI_FUNC_TAG_REDUCE
-   if (rank == root) {
-      // inorder
-      int size;
-      MPI_Comm_size(comm, &size);
-      char *opBuf = new char[count*iSizeof(datatype)]; // Allocate temp buffer for receives
-      mpiData.isPerformingOp = false;
-      for (int i = 0; i < size; i++) {
-         iReceive(opBuf, count, datatype, i, MPI_FUNC_TAG_REDUCE, 
-               comm, MPI_CONTEXT_COLLECTIVE, 0); // Receive new message into temp buffer
-         iPerformOp(recvbuf, opBuf, count, datatype, op); // Perform operation on new values
-      }
-      mpiData.isPerformingOp = false;
-      delete[] opBuf;
-   }
-   
+int MPI_Allreduce ( void *sendbuf, void *recvbuf, int count, 
+                   MPI_Datatype datatype, MPI_Op op, MPI_Comm comm ) {
+   // Reduce and broadcast from root node
+   MPI_Reduce(sendbuf, recvbuf, count, datatype, op, MPI_RANK_ROOT, comm);
+   MPI_Bcast(recvbuf, count, datatype, MPI_RANK_ROOT, comm);
    return MPI_SUCCESS;
 }

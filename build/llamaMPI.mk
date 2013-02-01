@@ -67,7 +67,8 @@ CPP_SOURCES += \
   llamaos/mpi/api/collective/MPI_Gather.cpp \
   llamaos/mpi/api/collective/MPI_Allgather.cpp \
   llamaos/mpi/api/collective/MPI_Alltoall.cpp \
-  llamaos/mpi/api/collective/MPI_Reduce.cpp
+  llamaos/mpi/api/collective/MPI_Reduce.cpp \
+  llamaos/mpi/api/collective/MPI_Allreduce.cpp
 
 HEADERS = \
   $(INCDIR)/llamaos/mpi/mpi.h

@@ -203,8 +203,8 @@ void duoTest() {
    resPair_T subRp[4];
    resPair_T resRp[4];
    for (int i = 0; i < 8; i++) {
-      rpValue[i].value = ((short)((i+1+8+8+8)*0xc8527a969e6d7b9e))%256;
-      rpValue[i].index = (((int)((i+1+8+8+8+8)*0xc8527a969e6d7b9e))%128)+127;
+      rpValue[i].value = ((short)((i+1+(8*3))*0xc8527a969e6d7b9e))%256;
+      rpValue[i].index = (((int)((i+1+(8*4))*0xc8527a969e6d7b9e))%128)+127;
       cout << "(" << rpValue[i].value << "," << rpValue[i].index << ") ";
    }
    cout << endl;
@@ -216,5 +216,22 @@ void duoTest() {
    MPI_Reduce(subRp, resRp, 4, MPI_SHORT_INT, MPI_MINLOC, 0, MPI_COMM_WORLD);
    cout << "MINLOC Results: ";
    for (int i = 0; i < 4; i++) {cout << "(" << resRp[i].value << "," << resRp[i].index << ") ";}
+   cout << endl;
+
+   cout << "Allreduce tests" << endl;
+   cout << "Using integer values: ";
+   for (int i = 0; i < 8; i++) {
+      rValue[i] = ((short)((i+1+(8*5))*0xc8527a969e6d7b9e))%256;
+      cout << rValue[i] << " ";
+   }
+   cout << endl;
+   MPI_Scatter(rValue, 4, MPI_SHORT, subR, 4, MPI_SHORT, 0, MPI_COMM_WORLD);
+   MPI_Allreduce(subR, resR, 4, MPI_SHORT, MPI_MAX, MPI_COMM_WORLD);
+   cout << "MAX Results: ";
+   for (int i = 0; i < 4; i++) {cout << resR[i] << " ";}
+   cout << endl;
+   MPI_Allreduce(subR, resR, 4, MPI_SHORT, MPI_MIN, MPI_COMM_WORLD);
+   cout << "MIN Results: ";
+   for (int i = 0; i < 4; i++) {cout << resR[i] << " ";}
    cout << endl;
 }

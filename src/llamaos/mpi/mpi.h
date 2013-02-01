@@ -129,5 +129,9 @@ int MPI_Alltoall(void *sendbuf, int sendcount, MPI_Datatype sendtype,
                  MPI_Comm comm);
 int MPI_Reduce(void *sendbuf, void *recvbuf, int count, MPI_Datatype datatype, 
                MPI_Op op, int root, MPI_Comm comm);
+int MPI_Allreduce ( void *sendbuf, void *recvbuf, int count, 
+                   MPI_Datatype datatype, MPI_Op op, MPI_Comm comm );
+int MPI_Reduce_scatter(void *sendbuf, void *recvbuf, int *recvcnts, 
+                      MPI_Datatype datatype, MPI_Op op, MPI_Comm comm);
 
 #endif  // llamaos_mpi_mpi_h_
