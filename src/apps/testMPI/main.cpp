@@ -39,13 +39,15 @@ using namespace std;
 
 void duoTest();
 void groupTest();
+void commTest();
 
 int main(int argc, char *argv []) {
    MPI_Init (&argc, &argv);
    cout << "Starting program" << endl;
 
-   //duoTest();
-   groupTest();
+   //duoTest();   // for 2
+   //groupTest(); // for 2 or more
+   commTest();    // for 2 or more
 
    cout << "Ending program" << endl;
    MPI_Finalize();
@@ -53,12 +55,78 @@ int main(int argc, char *argv []) {
    return 0;
 }
 
-void groupTest() {
+void commTest() { // for 2 or more
+   cout << "Starting comm test" << endl;
+   cout << "Duplicating world comm" << endl;
+   int rank, totNodes;
+   MPI_Comm MPI_COMM_COPY_WORLD;
+   MPI_Comm_dup(MPI_COMM_WORLD, &MPI_COMM_COPY_WORLD);
+   MPI_Comm_rank(MPI_COMM_COPY_WORLD, &rank);
+   MPI_Comm_size(MPI_COMM_COPY_WORLD, &totNodes);
+   cout << "New duplicate comm with ID " << MPI_COMM_COPY_WORLD << " size " << totNodes;
+   cout << " and rank " << rank << endl;
+   cout << "Dual send test" << endl;
+   if (rank == 0) {
+      char buf;
+      MPI_Recv(&buf, 1, MPI_CHAR, 1, 0, MPI_COMM_COPY_WORLD, 0);
+      cout << "Received char: " << buf << endl;
+      MPI_Recv(&buf, 1, MPI_CHAR, 1, 0, MPI_COMM_WORLD, 0);
+      cout << "Received char: " << buf << endl;
+   } else if (rank == 1) {
+      char buf = 'A';
+      MPI_Send(&buf, 1, MPI_CHAR, 0, 0, MPI_COMM_WORLD);
+      buf = 'B';
+      MPI_Send(&buf, 1, MPI_CHAR, 0, 0, MPI_COMM_COPY_WORLD);
+   }
+
+   cout << "Testing comm create" << endl;
+   MPI_Group MPI_GROUP_WORLD, MPI_GROUP01, MPI_GROUP12, MPI_GROUP0;
+   MPI_Comm MPI_COMM01, MPI_COMM12, MPI_COMM0;
+   MPI_Comm_group(MPI_COMM_WORLD, &MPI_GROUP_WORLD);
+   int groupIncl01[2] = {0,1};
+   MPI_Group_incl(MPI_GROUP_WORLD, 2, groupIncl01, &MPI_GROUP01);
+   MPI_Comm_create(MPI_COMM_WORLD, MPI_GROUP01, &MPI_COMM01);
+   cout << "Comm01 = " << MPI_COMM01 << endl;
+   int groupIncl12[2] = {1,2};
+   MPI_Group_incl(MPI_GROUP_WORLD, 2, groupIncl12, &MPI_GROUP12);
+   MPI_Comm_create(MPI_COMM_WORLD, MPI_GROUP12, &MPI_COMM12);
+   cout << "Comm12 = " << MPI_COMM12 << endl;
+   int groupIncl0[1] = {0};
+   MPI_Group_incl(MPI_GROUP_WORLD, 1, groupIncl0, &MPI_GROUP0);
+   MPI_Comm_create(MPI_COMM_WORLD, MPI_GROUP0, &MPI_COMM0);
+   cout << "Comm0 = " << MPI_COMM0 << endl;
+
+llamaos::api::sleep(3);
+
+   if (MPI_COMM01 != MPI_COMM_NULL) {
+      int myVal = (rank+3);
+      cout << "Comm01 - My value: " << myVal;
+      MPI_Allreduce(&myVal, &myVal, 1, MPI_INT, MPI_SUM, MPI_COMM01);
+      cout << "     My sum: " << myVal << endl;
+   }
+   if (MPI_COMM12 != MPI_COMM_NULL) {
+      int myVal = (rank+3);
+      cout << "Comm12 - My value: " << myVal;
+      MPI_Allreduce(&myVal, &myVal, 1, MPI_INT, MPI_SUM, MPI_COMM12);
+      cout << "     My sum: " << myVal << endl;
+   }
+   if (MPI_COMM0 != MPI_COMM_NULL) {
+      int myVal = (rank+3);
+      cout << "Comm0 - My value: " << myVal;
+      MPI_Allreduce(&myVal, &myVal, 1, MPI_INT, MPI_SUM, MPI_COMM0);
+      cout << "     My sum: " << myVal << endl;
+   }
+}
+
+void groupTest() { // for 2 or more
    cout << "Starting group test" << endl;
    cout << "Running group constructor tests" << endl;
    MPI_Group MPI_GROUP_WORLD;
    int gRank, gSize;
    MPI_Comm_group(MPI_COMM_WORLD, &MPI_GROUP_WORLD);
+   MPI_Group_rank(MPI_GROUP_WORLD, &gRank);
+   MPI_Group_size(MPI_GROUP_WORLD, &gSize);
+   cout << "In world group " << MPI_GROUP_WORLD << " of size " << gSize << " with rank " << gRank << endl;
    
    MPI_Group MPI_NEW_GROUP1;
    int groupInclList[2] = {2,1};
@@ -124,10 +192,11 @@ void groupTest() {
    MPI_Group_free(&MPI_NEW_GROUP5);
    MPI_Group_free(&MPI_NEW_GROUP6);
    MPI_Group_free(&MPI_NEW_GROUP7);
+   MPI_Group_free(&MPI_GROUP_WORLD);
    cout << "DONE" << endl;
 }
 
-void duoTest() {
+void duoTest() { // for 2
    int rank, totNodes;
    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
    MPI_Comm_size(MPI_COMM_WORLD, &totNodes);

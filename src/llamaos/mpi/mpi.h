@@ -83,7 +83,7 @@ typedef int MPI_Group;
 typedef int MPI_Count;
 typedef int MPI_Request;
 
-// Compare results
+// MPI Compare Results
 #define MPI_IDENT 1     //Identical
 #define MPI_CONGRUENT 2 //(only for MPI_COMM_COMPARE ) The groups are identical
 #define MPI_SIMILAR 3   //Same members, but in a different order
@@ -123,10 +123,15 @@ int MPI_Group_compare(MPI_Group group1, MPI_Group group2, int *result);
 // GROUPS - Destructor
 int MPI_Group_free(MPI_Group *group);
 
-// Communicators
+// COMMUNICATORS - Constructors
+int MPI_Comm_dup(MPI_Comm comm, MPI_Comm *newcomm);
+int MPI_Comm_create(MPI_Comm comm, MPI_Group group, MPI_Comm *newcomm);
+// COMMUNICATORS - Accessors
 int MPI_Comm_rank (MPI_Comm comm, int *rank);
 int MPI_Comm_size (MPI_Comm comm, int *size);
-int MPI_Comm_group(MPI_Comm comm, MPI_Group *group);
+int MPI_Comm_group(MPI_Comm comm, MPI_Group *group); // Also functions as a group constructor
+// COMMUNICATORS - Destructors
+int MPI_Comm_free(MPI_Comm *comm);
 
 
 // Point to Point

@@ -41,15 +41,18 @@ class iRxBuffer;
 class iComm {
    public:
       iComm(MPI_Comm nId, iGroup *nGroup);
+      iComm(iComm *comm);
+      iComm(iComm *comm, iGroup *pgroup);
       ~iComm();
       iRxBuffer* getPt2ptRxBuffer() {return pt2ptRxBuffer;}
       iRxBuffer* getCollectiveRxBuffer() {return collectiveRxBuffer;}
+      MPI_Comm getId() {return id;}
       int getSize() {return size;}
       int getLocalRank() {return localRank;}
       int getLocalWorldRank() {return localWorldRank;}
       int getWorldRankFromRank(int rank);
       int getRankFromWorldRank(int worldRank);
-      MPI_Group getGroupId();
+      iGroup* getGroup();
       
    private:
       MPI_Comm id; 	// Unique identifier for communicator
@@ -59,6 +62,8 @@ class iComm {
       iGroup *group;    // Group of nodes in comm
       iRxBuffer *pt2ptRxBuffer;		// Receive buffer for point to point communication
       iRxBuffer *collectiveRxBuffer;	// Receive buffer for collective communication
+
+      MPI_Comm getNewId(MPI_Comm comm, bool join);
 };
 
 #endif

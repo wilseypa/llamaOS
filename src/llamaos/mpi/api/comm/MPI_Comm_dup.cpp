@@ -30,10 +30,8 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 #include <iGlobals.h>
 
-int MPI_Group_free(MPI_Group *group) {
-   if (*group != MPI_GROUP_EMPTY) {
-      delete mpiData.group[*group];
-   }
-   (*group) = MPI_GROUP_NULL;
+int MPI_Comm_dup(MPI_Comm comm, MPI_Comm *newcomm) {
+   iComm *nComm = new iComm(mpiData.comm[comm]);
+   (*newcomm) = nComm->getId();
    return MPI_SUCCESS;
 }

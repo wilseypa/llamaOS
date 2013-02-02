@@ -70,6 +70,8 @@ CPP_SOURCES += \
   llamaos/mpi/api/comm/MPI_Comm_rank.cpp \
   llamaos/mpi/api/comm/MPI_Comm_size.cpp \
   llamaos/mpi/api/comm/MPI_Comm_group.cpp \
+  llamaos/mpi/api/comm/MPI_Comm_dup.cpp \
+  llamaos/mpi/api/comm/MPI_Comm_create.cpp \
   llamaos/mpi/api/sys/MPI_Init.cpp \
   llamaos/mpi/api/sys/MPI_Finalize.cpp \
   llamaos/mpi/api/collective/MPI_Barrier.cpp \

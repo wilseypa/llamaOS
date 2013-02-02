@@ -42,11 +42,59 @@ iComm::iComm(MPI_Comm nId, iGroup *nGroup) {
    collectiveRxBuffer = new iRxBuffer();
 }
 
+// Copy comm from a previous one - also copy group - still gets a unique ID
+iComm::iComm(iComm *comm) {
+   id = getNewId(comm->getId(), true);
+   group = new iGroup(comm->group);
+   size = comm->size;
+   localRank = comm->localRank;	
+   localWorldRank = comm->localWorldRank;
+   mpiData.comm[id] = this;
+   pt2ptRxBuffer = new iRxBuffer();
+   collectiveRxBuffer = new iRxBuffer();
+}
+
+// Create a new comm from a group that is a subset of the old comm
+iComm::iComm(iComm *comm, iGroup *pgroup) {
+   size = pgroup->getSize();
+   localRank = pgroup->getLocalRank();
+   localWorldRank = pgroup->getLocalWorldRank();
+   bool join = !(localRank == MPI_UNDEFINED);
+   id = getNewId(comm->getId(), join);
+   if (join) {
+      pt2ptRxBuffer = new iRxBuffer();
+      collectiveRxBuffer = new iRxBuffer();
+      group = new iGroup(pgroup);
+      mpiData.comm[id] = this;
+   }
+}
+
 // Destroy the reference to the id in the global hash map
 iComm::~iComm() {
-   mpiData.comm.erase(id);
-   delete pt2ptRxBuffer;
-   delete collectiveRxBuffer;
+   if (id == MPI_COMM_NULL) {
+      mpiData.comm.erase(id);
+      delete group;
+      delete pt2ptRxBuffer;
+      delete collectiveRxBuffer;
+   }
+}
+
+// Get a unique identifier for a new comm from a current comm
+MPI_Comm iComm::getNewId(MPI_Comm comm, bool join) {
+   static MPI_Comm nextId = 1;
+   MPI_Comm newId;
+   if (join) {
+      newId = nextId;
+   } else {
+      newId = 0;
+   }
+   MPI_Allreduce (&newId, &newId, 1, MPI_INT, MPI_MAX, comm);
+   if (join) {
+      nextId = newId+1;
+      return newId;
+   } else {
+      return MPI_COMM_NULL;
+   }
 }
 
 // Translate the comm rank to the world rank
@@ -59,7 +107,7 @@ int iComm::getRankFromWorldRank(int worldRank) {
    return group->getRankFromWorldRank(worldRank);
 }
 
-// Get the ID of the group in comm
-MPI_Group iComm::getGroupId() {
-   return group->getId();
+// Get the group in comm
+iGroup* iComm::getGroup() {
+   return group;
 }

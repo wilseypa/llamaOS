@@ -35,7 +35,7 @@ int MPI_Group_intersection(MPI_Group group1, MPI_Group group2, MPI_Group *newgro
    iGroup *pGroup2 = mpiData.group[group2];
    iGroup *nGroup = new iGroup(IGROUP_CREATE_INTER, pGroup1, pGroup2);
    (*newgroup) = nGroup->getId();
-   if (nGroup->getId() == MPI_GROUP_EMPTY) {
+   if ((*newgroup) == MPI_GROUP_EMPTY) {
       delete nGroup;
    }
    return MPI_SUCCESS;

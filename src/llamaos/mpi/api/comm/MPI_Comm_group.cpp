@@ -31,6 +31,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <iGlobals.h>
 
 int MPI_Comm_group(MPI_Comm comm, MPI_Group *group) {
-   (*group) = mpiData.comm[comm]->getGroupId();
+   iGroup *nGroup = new iGroup(mpiData.comm[comm]->getGroup());
+   (*group) = nGroup->getId();
    return MPI_SUCCESS;
 }

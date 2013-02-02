@@ -31,6 +31,15 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <iGroup.h>
 #include <string.h>
 
+
+
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <iostream>
+
+using namespace std;
+
 // Return the next unique identifier
 MPI_Group iGroup::getNextId() {
    static MPI_Group nextId = 1;
@@ -41,7 +50,7 @@ MPI_Group iGroup::getNextId() {
 iGroup::iGroup(IGROUP_CREATE_TYPE type) {
    switch (type) {
       case IGROUP_CREATE_WORLD: {
-         id = getNextId();
+         id = IGROUP_CREATE_EMPTY; // Do not care or delete
          size = mpiData.totNodes;
          localRank = mpiData.rank;
          localWorldRank = mpiData.rank;
@@ -49,6 +58,7 @@ iGroup::iGroup(IGROUP_CREATE_TYPE type) {
          for (int i = 0; i < size; i++) {
             linkRankToWorldRank(i,i);
          }
+         // No way to access except from comm
          break;
       }
       case IGROUP_CREATE_EMPTY: {
@@ -57,19 +67,20 @@ iGroup::iGroup(IGROUP_CREATE_TYPE type) {
          localRank = MPI_UNDEFINED;
          localWorldRank = MPI_UNDEFINED;
          rankToWorldRank.resize(0);
+         mpiData.group[id] = this;
          break;
       }
       case IGROUP_CREATE_SELF: {
-         id = getNextId();
+         id = IGROUP_CREATE_EMPTY; // Do not care or delete
          size = 1;
          localRank = mpiData.rank;
          localWorldRank = mpiData.rank;
          rankToWorldRank.resize(size);
          linkRankToWorldRank(0,localRank);
+         // No way to access except from comm
          break;
       }
    }
-   mpiData.group[id] = this;
 }
 
 // Create new group based off of an old one and a list of ranks
@@ -191,6 +202,18 @@ iGroup::iGroup(IGROUP_CREATE_TYPE type, iGroup *group1, iGroup *group2) {
       localWorldRank = mpiData.rank;
    }
 
+   // Add to global map
+   mpiData.group[id] = this;
+}
+
+// Creates new group from an old group - only difference is ID
+iGroup::iGroup(iGroup *group) {
+   id = getNextId();
+   size = group->size;
+   localRank = group->localRank;      
+   localWorldRank = group->localWorldRank; 
+   rankToWorldRank = group->rankToWorldRank;
+   worldRankToRank = group->worldRankToRank;
    // Add to global map
    mpiData.group[id] = this;
 }

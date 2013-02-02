@@ -49,6 +49,7 @@ class iGroup {
       iGroup(IGROUP_CREATE_TYPE type);
       iGroup(IGROUP_CREATE_TYPE type, iGroup *group, int n, int *ranks);
       iGroup(IGROUP_CREATE_TYPE type, iGroup *group1, iGroup *group2);
+      iGroup(iGroup *group);
       ~iGroup();
       MPI_Group getId() {return id;}
       int getSize() {return size;}
