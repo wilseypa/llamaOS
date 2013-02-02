@@ -56,10 +56,10 @@ int main (int /* argc */, char ** /* argv [] */)
    uint16_t subvendor_id = pci.read_config_word (44);
 
    if (   (vendor_id != 0x8086)
-       || (   (device_id != 0x1096)
-           && (device_id != 0x10ba))
-       || (class_code != 0x020000)
-       || (subvendor_id != 0x8086))
+       || (device_id != 0x1096)
+//           && (device_id != 0x10ba))
+       || (class_code != 0x020000))
+//       || (subvendor_id != 0x8086))
    {
       cout << "PCI hardware detected is NOT 80003es2lan" << endl;
       cout << hex << "   vendor: " << vendor_id << endl;
