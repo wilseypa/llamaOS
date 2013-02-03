@@ -83,6 +83,17 @@ iGroup::iGroup(IGROUP_CREATE_TYPE type) {
    }
 }
 
+// Create a completely empty group with an eventual size
+iGroup::iGroup(IGROUP_CREATE_TYPE type, int psize) {
+   if (type == IGROUP_CREATE_NEW) {
+      id = getNextId();
+      size = psize;
+      rankToWorldRank.reserve(size);
+      // Add to global map
+      mpiData.group[id] = this;
+   }
+}
+
 // Create new group based off of an old one and a list of ranks
 iGroup::iGroup(IGROUP_CREATE_TYPE type, iGroup *group, int n, int *ranks) {
    switch (type) {
@@ -131,23 +142,29 @@ iGroup::iGroup(IGROUP_CREATE_TYPE type, iGroup *group, int n, int *ranks) {
 iGroup::iGroup(IGROUP_CREATE_TYPE type, iGroup *group1, iGroup *group2) {
    // Set up merge data
    MAP_TYPE<int,int> worldRankToNum;
+   int totUnion=0, totInter=0, totDiff=0;
    for (int i = 0; i < group1->getSize(); i++) {
       int iWorldRank = group1->getWorldRankFromRank(i);
       worldRankToNum[iWorldRank] = 1;
+      totUnion++;
    }
    for (int i = 0; i < group2->getSize(); i++) {
       int iWorldRank = group2->getWorldRankFromRank(i);
       MAP_TYPE<int,int>::iterator it = worldRankToNum.find(iWorldRank);
       if (it == worldRankToNum.end()) { // Not in other group
          worldRankToNum[iWorldRank] = 1;
+         totUnion++;
       } else { // In other group
          worldRankToNum[iWorldRank] = 2;
+         totInter++;
       }
    }
+   totDiff = totUnion - totInter;
 
    // Merge dependant on type
    switch (type) {
       case IGROUP_CREATE_UNION: {
+         rankToWorldRank.reserve(totUnion);
          for (int i = 0; i < group1->getSize(); i++) {
             int iWorldRank = group1->getWorldRankFromRank(i);
             pushWorldRank(iWorldRank); 
@@ -161,6 +178,7 @@ iGroup::iGroup(IGROUP_CREATE_TYPE type, iGroup *group1, iGroup *group2) {
          break;
       }
       case IGROUP_CREATE_INTER: {
+         rankToWorldRank.reserve(totInter);
          for (int i = 0; i < group1->getSize(); i++) {
             int iWorldRank = group1->getWorldRankFromRank(i);
             if (worldRankToNum[iWorldRank] == 2) { // if in other
@@ -170,6 +188,7 @@ iGroup::iGroup(IGROUP_CREATE_TYPE type, iGroup *group1, iGroup *group2) {
          break;
       }
       case IGROUP_CREATE_DIFF: {
+         rankToWorldRank.reserve(totDiff);
          for (int i = 0; i < group1->getSize(); i++) {
             int iWorldRank = group1->getWorldRankFromRank(i);
             if (worldRankToNum[iWorldRank] == 1) { // if not in other
@@ -195,12 +214,7 @@ iGroup::iGroup(IGROUP_CREATE_TYPE type, iGroup *group1, iGroup *group2) {
    }
 
    // Set local values      
-   localRank = getRankFromWorldRank(mpiData.rank);
-   if (localRank == MPI_UNDEFINED) {
-      localWorldRank = MPI_UNDEFINED;
-   } else {
-      localWorldRank = mpiData.rank;
-   }
+   calculateLocalRanks();
 
    // Add to global map
    mpiData.group[id] = this;
@@ -216,6 +230,16 @@ iGroup::iGroup(iGroup *group) {
    worldRankToRank = group->worldRankToRank;
    // Add to global map
    mpiData.group[id] = this;
+}
+
+// When a group is finished being built calculate the local ranks
+void iGroup::calculateLocalRanks() {
+   localRank = getRankFromWorldRank(mpiData.rank);
+   if (localRank == MPI_UNDEFINED) {
+      localWorldRank = MPI_UNDEFINED;
+   } else {
+      localWorldRank = mpiData.rank;
+   }
 }
 
 // Compares two groups to determine similarity

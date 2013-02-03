@@ -104,7 +104,7 @@ typedef struct MPI_Status {
 
 
 // MPI FUNCTIONS
-// System functions
+// SYSTEM FUNCTIONS
 int MPI_Init (int *argc, char ***argv);
 int MPI_Finalize (void);
 
@@ -117,8 +117,7 @@ int MPI_Group_difference(MPI_Group group1, MPI_Group group2, MPI_Group *newgroup
 // GROUPS - Accessors
 int MPI_Group_rank (MPI_Group group, int *rank);
 int MPI_Group_size (MPI_Group group, int *size);
-int MPI_Group_translate_ranks(MPI_Group group1, int n, int *ranks1, 
-                            MPI_Group group2, int *ranks2);
+int MPI_Group_translate_ranks(MPI_Group group1, int n, int *ranks1, MPI_Group group2, int *ranks2);
 int MPI_Group_compare(MPI_Group group1, MPI_Group group2, int *result);
 // GROUPS - Destructor
 int MPI_Group_free(MPI_Group *group);
@@ -126,24 +125,26 @@ int MPI_Group_free(MPI_Group *group);
 // COMMUNICATORS - Constructors
 int MPI_Comm_dup(MPI_Comm comm, MPI_Comm *newcomm);
 int MPI_Comm_create(MPI_Comm comm, MPI_Group group, MPI_Comm *newcomm);
+int MPI_Comm_split(MPI_Comm comm, int color, int key, MPI_Comm *newcomm);
 // COMMUNICATORS - Accessors
 int MPI_Comm_rank (MPI_Comm comm, int *rank);
 int MPI_Comm_size (MPI_Comm comm, int *size);
 int MPI_Comm_group(MPI_Comm comm, MPI_Group *group); // Also functions as a group constructor
+int MPI_Comm_compare(MPI_Comm comm1, MPI_Comm comm2, int *result);
 // COMMUNICATORS - Destructors
 int MPI_Comm_free(MPI_Comm *comm);
 
-
-// Point to Point
+// POINT TO POINT
 int MPI_Send(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm);
 int MPI_Isend(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm, MPI_Request *request);
 int MPI_Recv(void *buf, int count, MPI_Datatype datatype, int source, int tag, MPI_Comm comm, MPI_Status *status);
 int MPI_Irecv(void *buf, int count, MPI_Datatype datatype, int source, int tag, MPI_Comm comm, MPI_Request *request);
 int MPI_Test(MPI_Request *request, int *flag, MPI_Status *status);
 
-// Collective
-int MPI_Bcast(void *buffer, int count, MPI_Datatype datatype, int root, MPI_Comm comm );
+// COLLECTIVE - Program Synchronization
 int MPI_Barrier (MPI_Comm comm);
+// COLLECTIVE - Data Routing
+int MPI_Bcast(void *buffer, int count, MPI_Datatype datatype, int root, MPI_Comm comm );
 int MPI_Gather(void *sendbuf, int sendcnt, MPI_Datatype sendtype, 
                void *recvbuf, int recvcnt, MPI_Datatype recvtype, 
                int root, MPI_Comm comm);
@@ -156,11 +157,10 @@ int MPI_Allgather(void *sendbuf, int sendcount, MPI_Datatype sendtype,
 int MPI_Alltoall(void *sendbuf, int sendcount, MPI_Datatype sendtype, 
                  void *recvbuf, int recvcount, MPI_Datatype recvtype, 
                  MPI_Comm comm);
+// COLLECTIVE - Computational
 int MPI_Reduce(void *sendbuf, void *recvbuf, int count, MPI_Datatype datatype, 
                MPI_Op op, int root, MPI_Comm comm);
 int MPI_Allreduce ( void *sendbuf, void *recvbuf, int count, 
                    MPI_Datatype datatype, MPI_Op op, MPI_Comm comm );
-int MPI_Reduce_scatter(void *sendbuf, void *recvbuf, int *recvcnts, 
-                      MPI_Datatype datatype, MPI_Op op, MPI_Comm comm);
 
 #endif  // llamaos_mpi_mpi_h_

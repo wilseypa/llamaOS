@@ -46,8 +46,8 @@ int main(int argc, char *argv []) {
    cout << "Starting program" << endl;
 
    //duoTest();   // for 2
-   //groupTest(); // for 2 or more
-   commTest();    // for 2 or more
+   groupTest(); // for 3 or more
+   commTest();    // for 3 or more
 
    cout << "Ending program" << endl;
    MPI_Finalize();
@@ -55,7 +55,7 @@ int main(int argc, char *argv []) {
    return 0;
 }
 
-void commTest() { // for 2 or more
+void commTest() { // for 3 or more
    cout << "Starting comm test" << endl;
    cout << "Duplicating world comm" << endl;
    int rank, totNodes;
@@ -80,8 +80,8 @@ void commTest() { // for 2 or more
    }
 
    cout << "Testing comm create" << endl;
-   MPI_Group MPI_GROUP_WORLD, MPI_GROUP01, MPI_GROUP12, MPI_GROUP0;
-   MPI_Comm MPI_COMM01, MPI_COMM12, MPI_COMM0;
+   MPI_Group MPI_GROUP_WORLD, MPI_GROUP01, MPI_GROUP12, MPI_GROUP0, MPI_GROUP21;
+   MPI_Comm MPI_COMM01, MPI_COMM12, MPI_COMM0, MPI_COMM21, MPI_COMM12b;
    MPI_Comm_group(MPI_COMM_WORLD, &MPI_GROUP_WORLD);
    int groupIncl01[2] = {0,1};
    MPI_Group_incl(MPI_GROUP_WORLD, 2, groupIncl01, &MPI_GROUP01);
@@ -95,9 +95,6 @@ void commTest() { // for 2 or more
    MPI_Group_incl(MPI_GROUP_WORLD, 1, groupIncl0, &MPI_GROUP0);
    MPI_Comm_create(MPI_COMM_WORLD, MPI_GROUP0, &MPI_COMM0);
    cout << "Comm0 = " << MPI_COMM0 << endl;
-
-llamaos::api::sleep(3);
-
    if (MPI_COMM01 != MPI_COMM_NULL) {
       int myVal = (rank+3);
       cout << "Comm01 - My value: " << myVal;
@@ -116,9 +113,50 @@ llamaos::api::sleep(3);
       MPI_Allreduce(&myVal, &myVal, 1, MPI_INT, MPI_SUM, MPI_COMM0);
       cout << "     My sum: " << myVal << endl;
    }
+
+   cout << "Comparing comms" << endl;
+   MPI_Comm_create(MPI_COMM_WORLD, MPI_GROUP12, &MPI_COMM12b);
+   cout << "Comm12b = " << MPI_COMM12b << endl;
+   int groupIncl21[2] = {2,1};
+   MPI_Group_incl(MPI_GROUP_WORLD, 2, groupIncl21, &MPI_GROUP21);
+   MPI_Comm_create(MPI_COMM_WORLD, MPI_GROUP21, &MPI_COMM21);
+   cout << "Comm21 = " << MPI_COMM21 << endl;
+   if (rank == 1) {
+      int res;
+      MPI_Comm_compare(MPI_COMM12, MPI_COMM12, &res);
+      cout << "Identical result: " << res << endl;
+      MPI_Comm_compare(MPI_COMM12, MPI_COMM12b, &res);
+      cout << "Congruent result: " << res << endl;
+      MPI_Comm_compare(MPI_COMM12, MPI_COMM21, &res);
+      cout << "Similar result: " << res << endl;
+      MPI_Comm_compare(MPI_COMM12, MPI_COMM01, &res);
+      cout << "Different result: " << res << endl;
+   }
+
+   cout << "Testing comm split" << endl;
+   MPI_Comm MPI_COMM_S;
+   MPI_Comm_split(MPI_COMM_WORLD, rank%2, -rank, &MPI_COMM_S);
+   int rank2, totNodes2;
+   MPI_Comm_rank(MPI_COMM_S, &rank2);
+   MPI_Comm_size(MPI_COMM_S, &totNodes2);
+   cout << "New split comm with ID " << MPI_COMM_S << " size " << totNodes2;
+   cout << " and rank " << rank2 << endl;
+   int myVal = ((rank+1)*3);
+   cout << "CommS - My value: " << myVal;
+   MPI_Allreduce(&myVal, &myVal, 1, MPI_INT, MPI_PROD, MPI_COMM_S);
+   cout << "     My sum: " << myVal << endl;
+
+   cout << "Running comm destructors...";
+   MPI_Comm_free(&MPI_COMM_COPY_WORLD);
+   MPI_Comm_free(&MPI_COMM01);
+   MPI_Comm_free(&MPI_COMM12);
+   MPI_Comm_free(&MPI_COMM0);
+   MPI_Comm_free(&MPI_COMM21);
+   MPI_Comm_free(&MPI_COMM12b);
+   cout << "DONE" << endl;
 }
 
-void groupTest() { // for 2 or more
+void groupTest() { // for 3 or more
    cout << "Starting group test" << endl;
    cout << "Running group constructor tests" << endl;
    MPI_Group MPI_GROUP_WORLD;

@@ -31,7 +31,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <iGlobals.h>
 
 int MPI_Comm_free(MPI_Comm *comm) {
-   if ((*comm) != MPI_COMM_WORLD && (*comm) != MPI_COMM_SELF) {
+   if ((*comm) != MPI_COMM_WORLD && (*comm) != MPI_COMM_SELF && (*comm) != MPI_COMM_NULL) {
       delete mpiData.comm[*comm];
    }
    (*comm) = MPI_COMM_NULL;

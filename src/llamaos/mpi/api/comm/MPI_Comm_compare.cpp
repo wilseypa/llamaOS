@@ -28,44 +28,11 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#ifndef I_COMM_H_
-#define I_COMM_H_
-
 #include <iGlobals.h>
-#include <iGroup.h>
-#include <iRxBuffer.h>
 
-class iGroup;
-class iRxBuffer;
-
-class iComm {
-   public:
-      iComm(MPI_Comm nId, iGroup *nGroup);
-      iComm(iComm *comm);
-      iComm(iComm *comm, iGroup *pgroup);
-      iComm(iComm *comm, int color, int key);
-      ~iComm();
-      iRxBuffer* getPt2ptRxBuffer() {return pt2ptRxBuffer;}
-      iRxBuffer* getCollectiveRxBuffer() {return collectiveRxBuffer;}
-      MPI_Comm getId() {return id;}
-      int getSize() {return size;}
-      int getLocalRank() {return localRank;}
-      int getLocalWorldRank() {return localWorldRank;}
-      int getWorldRankFromRank(int rank);
-      int getRankFromWorldRank(int worldRank);
-      iGroup* getGroup();
-      int compare(iComm *oComm);
-      
-   private:
-      MPI_Comm id; 	// Unique identifier for communicator
-      int size;
-      int localRank;	// Rank of local process node in comm
-      int localWorldRank; // Rank of local process node in world
-      iGroup *group;    // Group of nodes in comm
-      iRxBuffer *pt2ptRxBuffer;		// Receive buffer for point to point communication
-      iRxBuffer *collectiveRxBuffer;	// Receive buffer for collective communication
-
-      MPI_Comm getNewId(MPI_Comm comm, bool join);
-};
-
-#endif
+int MPI_Comm_compare(MPI_Comm comm1, MPI_Comm comm2, int *result) {
+   iComm *pComm1 = mpiData.comm[comm1];
+   iComm *pComm2 = mpiData.comm[comm2];
+   (*result) = pComm1->compare(pComm2);
+   return MPI_SUCCESS;
+}

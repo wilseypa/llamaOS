@@ -43,10 +43,12 @@ typedef int IGROUP_CREATE_TYPE;
 #define IGROUP_CREATE_UNION ((IGROUP_CREATE_TYPE)6)
 #define IGROUP_CREATE_INTER ((IGROUP_CREATE_TYPE)7)
 #define IGROUP_CREATE_DIFF ((IGROUP_CREATE_TYPE)8)
+#define IGROUP_CREATE_NEW ((IGROUP_CREATE_TYPE)9)
 
 class iGroup {
    public:
       iGroup(IGROUP_CREATE_TYPE type);
+      iGroup(IGROUP_CREATE_TYPE type, int psize);
       iGroup(IGROUP_CREATE_TYPE type, iGroup *group, int n, int *ranks);
       iGroup(IGROUP_CREATE_TYPE type, iGroup *group1, iGroup *group2);
       iGroup(iGroup *group);
@@ -58,6 +60,8 @@ class iGroup {
       int getWorldRankFromRank(int rank);
       int getRankFromWorldRank(int worldRank);
       int compare(iGroup *oGroup);
+      void pushWorldRank(int worldRank);
+      void calculateLocalRanks();
    private:
       MPI_Group id;
       int size;
@@ -68,7 +72,6 @@ class iGroup {
 
       MPI_Group getNextId();
       void linkRankToWorldRank(int rank, int worldRank);
-      void pushWorldRank(int worldRank);
 };
 
 #endif

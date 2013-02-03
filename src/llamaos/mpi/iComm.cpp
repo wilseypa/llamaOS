@@ -29,6 +29,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 */
 
 #include <iComm.h>
+#include <list>
 
 // Create Comm based on new id and associated group
 iComm::iComm(MPI_Comm nId, iGroup *nGroup) {
@@ -59,7 +60,7 @@ iComm::iComm(iComm *comm, iGroup *pgroup) {
    size = pgroup->getSize();
    localRank = pgroup->getLocalRank();
    localWorldRank = pgroup->getLocalWorldRank();
-   bool join = !(localRank == MPI_UNDEFINED);
+   bool join = (localRank != MPI_UNDEFINED);
    id = getNewId(comm->getId(), join);
    if (join) {
       pt2ptRxBuffer = new iRxBuffer();
@@ -69,9 +70,55 @@ iComm::iComm(iComm *comm, iGroup *pgroup) {
    }
 }
 
+struct SplitData_T {
+   int worldRank;
+   int color;
+   int key;
+};
+bool isKeyLessThan(SplitData_T first, SplitData_T second) {
+   return first.key < second.key;
+}
+
+// Create a new comm using color and key - splits previous comm
+iComm::iComm(iComm *comm, int color, int key) {
+   bool join = (color != MPI_UNDEFINED);
+   id = getNewId(comm->getId(), join);
+   SplitData_T txData;
+   txData.worldRank = comm->getLocalWorldRank();
+   txData.color = color;
+   txData.key = key;
+   SplitData_T *rxData = new SplitData_T[comm->getSize()];
+   MPI_Allgather(&txData, 3, MPI_INT, rxData, 3, MPI_INT, comm->getId());
+   // id now holds unique id, rxData now contains all the previous comm trios of world rank, color, and key
+   if (join) {
+      // Add all ranks to a list that have the same color
+      std::list<SplitData_T> commList;
+      for (int i = 0; i < comm->getSize(); i++) {
+         if (rxData[i].color == color) {
+            commList.push_back(rxData[i]);
+         }
+      }
+      // Sort by key
+      commList.sort(isKeyLessThan);
+      // Create new group
+      size = commList.size();
+      group = new iGroup(IGROUP_CREATE_NEW, size);
+      for (std::list<SplitData_T>::iterator it=commList.begin(); it!=commList.end(); ++it) {
+         group->pushWorldRank(it->worldRank);
+      }
+      group->calculateLocalRanks();
+      localRank = group->getLocalRank();
+      localWorldRank = group->getLocalWorldRank();
+      pt2ptRxBuffer = new iRxBuffer();
+      collectiveRxBuffer = new iRxBuffer();
+      mpiData.comm[id] = this;
+   }
+   delete[] rxData;
+}
+
 // Destroy the reference to the id in the global hash map
 iComm::~iComm() {
-   if (id == MPI_COMM_NULL) {
+   if (id != MPI_COMM_NULL) {
       mpiData.comm.erase(id);
       delete group;
       delete pt2ptRxBuffer;
@@ -95,6 +142,18 @@ MPI_Comm iComm::getNewId(MPI_Comm comm, bool join) {
    } else {
       return MPI_COMM_NULL;
    }
+}
+
+// Compare the comm to another comm
+int iComm::compare(iComm *oComm) {
+   if (id == oComm->id) {
+      return MPI_IDENT;
+   }
+   int res = group->compare(oComm->group);
+   if (res == MPI_IDENT) {
+      return MPI_CONGRUENT;
+   }
+   return res;
 }
 
 // Translate the comm rank to the world rank
