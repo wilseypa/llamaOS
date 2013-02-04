@@ -58,15 +58,33 @@ bool iRxBuffer::popMessage(int source, int tag, void *buf, int size, MPI_Status 
          memcpy(buf, it->buf, it->size);
 
          // Copy data into status
-         if (status != 0) {
+         if (status != MPI_STATUS_IGNORE) {
             status->MPI_SOURCE = it->source;
             status->MPI_TAG = it->tag;
             status->MPI_ERROR = MPI_SUCCESS;
+            status->size = it->size;
          }
 
          // Clean up list
          free(it->buf);
          buffer.erase(it);
+         return true;
+      }
+   }
+   return false;
+}
+
+bool iRxBuffer::probeMessage(int source, int tag, MPI_Status *status) {
+   for (std::list<MpiRxMessage_T>::iterator it = buffer.begin(); it != buffer.end(); it++) {
+      if (((it->source == source) || (source == MPI_ANY_SOURCE)) &&
+               ((it->tag == tag) || (tag == MPI_ANY_TAG))) {
+         // Copy data into status
+         if (status != MPI_STATUS_IGNORE) {
+            status->MPI_SOURCE = it->source;
+            status->MPI_TAG = it->tag;
+            status->MPI_ERROR = MPI_SUCCESS;
+            status->size = it->size;
+         }
          return true;
       }
    }

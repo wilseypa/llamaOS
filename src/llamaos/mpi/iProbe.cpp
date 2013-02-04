@@ -39,11 +39,7 @@ using namespace llamaos;
 using namespace llamaos::net;
 using namespace llamaos::xen;
 
-void iReceive(void *buf, int count, MPI_Datatype datatype, int source, int tag, 
-			MPI_Comm comm, MPI_Context context, MPI_Status *status) {
-   // Determine actual send size in bytes
-   unsigned int sizeInBytes = count*iSizeof(datatype);
-
+void iProbe(int source, int tag, MPI_Comm comm, MPI_Context context, MPI_Status *status) {
    // Get receive buffer
    iRxBuffer *rxBuff;
    MAP_TYPE<MPI_Comm,iComm*>::iterator it = mpiData.comm.find(comm);
@@ -72,7 +68,7 @@ void iReceive(void *buf, int count, MPI_Datatype datatype, int source, int tag,
    #endif
 
    // Check through receive buffer
-   if (rxBuff->popMessage(source, tag, buf, sizeInBytes, status)) { // Message has been popped
+   if (rxBuff->probeMessage(source, tag, status)) { // Message has been popped
       return;
    }
 
@@ -99,43 +95,37 @@ void iReceive(void *buf, int count, MPI_Datatype datatype, int source, int tag,
       iPrintMAC(header->eth_dest);
       cout << endl;
       #endif
+ 
+      // Store in receive buffer
+      it = mpiData.comm.find(rxComm);
+      if (it != mpiData.comm.end()) { // Comm is declared
+         // Get receive buffer
+         if (rxContext == MPI_CONTEXT_PT2PT) {
+            rxBuff = it->second->getPt2ptRxBuffer();
+         } else {
+            rxBuff = it->second->getCollectiveRxBuffer();
+         }
+         
+         // Add to receive buffer
+         int rxCommRank = it->second->getRankFromWorldRank(rxSource);
+         if (rxCommRank != MPI_UNDEFINED) { // rank is in comm
+            rxBuff->pushMessage((unsigned char*)data, header->len - 8, rxCommRank, rxTag);
+         }
 
-      // Check if desired message type
-      if (((rxSource == srcWorldRank) || (srcWorldRank == MPI_ANY_SOURCE)) &&
-               (rxComm == comm) && (rxContext == context) && ((rxTag == tag) || (tag == MPI_ANY_TAG))) {
-         // Verify length
-         if (sizeInBytes < header->len - 8) { // Will not fit in buffer - discard
-            llamaNetInterface->release_recv_buffer(header);
+         // Check if desired message type - Block until received
+         if (((rxSource == srcWorldRank) || (srcWorldRank == MPI_ANY_SOURCE)) &&
+                  (rxComm == comm) && (rxContext == context) && ((rxTag == tag) || (tag == MPI_ANY_TAG))) {
+            if (status != MPI_STATUS_IGNORE) {
+               status->MPI_SOURCE = commPtr->getRankFromWorldRank(rxSource);
+               status->MPI_TAG = rxTag;
+               status->MPI_ERROR = MPI_SUCCESS;
+               status->size = header->len - 8;
+            }
             return;
          }
-         memcpy(buf, data, header->len - 8);
-         if (status != MPI_STATUS_IGNORE) {
-            status->MPI_SOURCE = commPtr->getRankFromWorldRank(rxSource);
-            status->MPI_TAG = rxTag;
-            status->MPI_ERROR = MPI_SUCCESS;
-            status->size = header->len - 8;
-         }
-         llamaNetInterface->release_recv_buffer(header); // Release llama rx message buffer
-         return;
-      } else { // Store in receive buffer
-         it = mpiData.comm.find(rxComm);
-         if (it != mpiData.comm.end()) { // Comm is declared
-            // Get receive buffer
-            if (rxContext == MPI_CONTEXT_PT2PT) {
-               rxBuff = it->second->getPt2ptRxBuffer();
-            } else {
-               rxBuff = it->second->getCollectiveRxBuffer();
-            }
-            
-            // Add to receive buffer
-            int rxCommRank = it->second->getRankFromWorldRank(rxSource);
-            if (rxCommRank != MPI_UNDEFINED) { // rank is in comm
-               rxBuff->pushMessage((unsigned char*)data, header->len - 8, rxCommRank, rxTag);
-            }
-         } else {
-            cout << "WARNING: Received comm " << rxComm << " does not exist" << endl;
-         }
-         llamaNetInterface->release_recv_buffer(header); // Release llama rx message buffer
+      } else {
+         cout << "WARNING: Received comm " << rxComm << " does not exist" << endl;
       }
+      llamaNetInterface->release_recv_buffer(header); // Release llama rx message buffer
    }
 }

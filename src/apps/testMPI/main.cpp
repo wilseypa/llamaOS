@@ -45,9 +45,9 @@ int main(int argc, char *argv []) {
    MPI_Init (&argc, &argv);
    cout << "Starting program" << endl;
 
-   //duoTest();   // for 2
-   groupTest(); // for 3 or more
-   commTest();    // for 3 or more
+   duoTest();   // for 2
+   //groupTest(); // for 3 or more
+   //commTest();    // for 3 or more
 
    cout << "Ending program" << endl;
    MPI_Finalize();
@@ -144,7 +144,7 @@ void commTest() { // for 3 or more
    int myVal = ((rank+1)*3);
    cout << "CommS - My value: " << myVal;
    MPI_Allreduce(&myVal, &myVal, 1, MPI_INT, MPI_PROD, MPI_COMM_S);
-   cout << "     My sum: " << myVal << endl;
+   cout << "     My product: " << myVal << endl;
 
    cout << "Running comm destructors...";
    MPI_Comm_free(&MPI_COMM_COPY_WORLD);
@@ -419,4 +419,23 @@ void duoTest() { // for 2
    cout << "MIN Results: ";
    for (int i = 0; i < 4; i++) {cout << resR[i] << " ";}
    cout << endl;
+
+   cout << "Testing probe" << endl;
+   if (rank == 0) {
+      for (int source = 1; source < totNodes; source++) {
+         char buf[100];
+         MPI_Status status;
+         MPI_Probe(source, 0, MPI_COMM_WORLD, &status);
+         int charCount;
+         MPI_Get_count(&status, MPI_UNSIGNED_CHAR, &charCount);
+         cout << "Ready to receive message of size " << charCount << " unsigned chars" << endl;
+         MPI_Recv(&buf, 100, MPI_UNSIGNED_CHAR, source, 0, MPI_COMM_WORLD, &status);
+         cout << buf << endl;
+      }
+   } else {
+      char buf[100];
+      sprintf(buf, "Received message from node %d", rank);
+      MPI_Send(&buf, 100, MPI_UNSIGNED_CHAR, 0, 0, MPI_COMM_WORLD);
+      cout << "Sent message to root" << endl;
+   }
 }

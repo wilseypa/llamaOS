@@ -51,12 +51,15 @@ CPP_SOURCES += \
   llamaos/mpi/iRxBuffer.cpp \
   llamaos/mpi/llamaConn.cpp \
   llamaos/mpi/iComm.cpp \
+  llamaos/mpi/iProbe.cpp \
   llamaos/mpi/iReceive.cpp \
   llamaos/mpi/iSend.cpp \
   llamaos/mpi/tools.cpp \
   llamaos/mpi/op/iPerformOp.cpp \
   llamaos/mpi/api/pt2pt/MPI_Recv.cpp \
   llamaos/mpi/api/pt2pt/MPI_Send.cpp \
+  llamaos/mpi/api/pt2pt/MPI_Probe.cpp \
+  llamaos/mpi/api/pt2pt/MPI_Get_count.cpp \
   llamaos/mpi/api/group/MPI_Group_rank.cpp \
   llamaos/mpi/api/group/MPI_Group_size.cpp \
   llamaos/mpi/api/group/MPI_Group_incl.cpp \

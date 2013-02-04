@@ -28,28 +28,9 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#ifndef I_RXBUFFER_H_
-#define I_RXBUFFER_H_
-
 #include <iGlobals.h>
-#include <list>
 
-typedef struct MpiRxMessage_T {
-   unsigned char *buf;
-   int size;
-   int source; // Comm Rank
-   int tag;
-} MpiRxMessage_T;
-
-class iRxBuffer {
-   public:
-      iRxBuffer() {}
-      ~iRxBuffer() {}
-      void pushMessage(unsigned char *buf, int size, int source, int tag);
-      bool popMessage(int source, int tag, void *buf, int size, MPI_Status *status);
-      bool probeMessage(int source, int tag, MPI_Status *status);
-   private:
-      std::list<MpiRxMessage_T> buffer;
-};
-
-#endif
+int MPI_Probe(int source, int tag, MPI_Comm comm, MPI_Status *status) {
+   iProbe(source, tag, comm, MPI_CONTEXT_PT2PT, status);
+   return MPI_SUCCESS;
+}

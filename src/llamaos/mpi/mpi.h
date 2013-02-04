@@ -89,7 +89,8 @@ typedef int MPI_Request;
 #define MPI_SIMILAR 3   //Same members, but in a different order
 #define MPI_UNEQUAL 4   //Different
 
-
+#define MPI_STATUS_IGNORE 0
+#define MPI_TAG_UB ((int)0x7FFFFFFF)
 #define MPI_UNDEFINED (-1)
 #define MPI_ANY_SOURCE ((int)0xFFFFFFFF)
 #define MPI_ANY_TAG ((int)0xFFFFFFFF)
@@ -100,6 +101,7 @@ typedef struct MPI_Status {
     int MPI_SOURCE;
     int MPI_TAG;
     int MPI_ERROR;
+    int size;
 } MPI_Status;
 
 
@@ -107,6 +109,16 @@ typedef struct MPI_Status {
 // SYSTEM FUNCTIONS
 int MPI_Init (int *argc, char ***argv);
 int MPI_Finalize (void);
+
+// POINT TO POINT
+int MPI_Send(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm);
+int MPI_Recv(void *buf, int count, MPI_Datatype datatype, int source, int tag, MPI_Comm comm, MPI_Status *status);
+int MPI_Probe(int source, int tag, MPI_Comm comm, MPI_Status *status);
+int MPI_Get_count( MPI_Status *status,  MPI_Datatype datatype, int *count );
+
+int MPI_Isend(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm, MPI_Request *request);
+int MPI_Irecv(void *buf, int count, MPI_Datatype datatype, int source, int tag, MPI_Comm comm, MPI_Request *request);
+int MPI_Test(MPI_Request *request, int *flag, MPI_Status *status);
 
 // GROUPS - Constructors
 int MPI_Group_incl(MPI_Group group, int n, int *ranks, MPI_Group *newgroup);
@@ -134,12 +146,6 @@ int MPI_Comm_compare(MPI_Comm comm1, MPI_Comm comm2, int *result);
 // COMMUNICATORS - Destructors
 int MPI_Comm_free(MPI_Comm *comm);
 
-// POINT TO POINT
-int MPI_Send(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm);
-int MPI_Isend(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm, MPI_Request *request);
-int MPI_Recv(void *buf, int count, MPI_Datatype datatype, int source, int tag, MPI_Comm comm, MPI_Status *status);
-int MPI_Irecv(void *buf, int count, MPI_Datatype datatype, int source, int tag, MPI_Comm comm, MPI_Request *request);
-int MPI_Test(MPI_Request *request, int *flag, MPI_Status *status);
 
 // COLLECTIVE - Program Synchronization
 int MPI_Barrier (MPI_Comm comm);
