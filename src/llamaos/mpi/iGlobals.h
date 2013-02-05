@@ -40,9 +40,11 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <mpi.h>
 #include <iGroup.h>
 #include <iComm.h>
+#include <iRequest.h>
 
 class iGroup;
 class iComm;
+class iRequest;
 
 //#define MPI_COUT_EVERY_MESSAGE
 
@@ -95,6 +97,7 @@ typedef struct MpiData_T {
    std::vector<MpiHostTable_T> hostTable;	// The vector of all MAC addresses and pid per world rank
    MAP_TYPE<MPI_Comm,iComm*> comm;	// Map of integer handles to communicators
    MAP_TYPE<MPI_Group,iGroup*> group; // Map of integer handles to groups
+   MAP_TYPE<MPI_Request,iRequest*> request; // Map of integer handles to requests
    bool isPerformingOp;
 } MpiData_T;
 
@@ -108,6 +111,8 @@ extern MpiData_T mpiData;
 void iSend(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm, MPI_Context context);
 void iReceive(void *buf, int count, MPI_Datatype datatype, int source, int tag, 
 			MPI_Comm comm, MPI_Context context, MPI_Status *status);
+void iReceiveNB(void *buf, int count, MPI_Datatype datatype, int source, int tag, 
+			MPI_Comm comm, MPI_Context context, MPI_Status *status, int *flag);
 void iProbe(int source, int tag, MPI_Comm comm, MPI_Context context, MPI_Status *status);
 int iSizeof(MPI_Datatype type);
 int iPerformOp(void *runningTotal, void *newValue, int count, MPI_Datatype type, MPI_Op op);

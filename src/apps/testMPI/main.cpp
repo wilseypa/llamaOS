@@ -40,19 +40,78 @@ using namespace std;
 void duoTest();
 void groupTest();
 void commTest();
+void nonBlockTest();
 
 int main(int argc, char *argv []) {
    MPI_Init (&argc, &argv);
    cout << "Starting program" << endl;
 
-   duoTest();   // for 2
+   //duoTest();   // for 2
    //groupTest(); // for 3 or more
    //commTest();    // for 3 or more
+   nonBlockTest(); // for 2 or more
 
    cout << "Ending program" << endl;
    MPI_Finalize();
 
    return 0;
+}
+
+void nonBlockTest() {
+   cout << "Starting non-blocking duo test" << endl;
+   int rank, totNodes;
+   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+   MPI_Comm_size(MPI_COMM_WORLD, &totNodes);
+
+   cout << "MPI_Wait test" << endl;
+   if (rank == 0) {
+      llamaos::api::sleep(5);
+      for (int source = 1; source < totNodes; source++) {
+         char buf[100];
+         MPI_Status status;
+         MPI_Request request;
+         MPI_Irecv(&buf, 100, MPI_UNSIGNED_CHAR, source, 0, MPI_COMM_WORLD, &request);
+         cout << "Request ID: " << request << endl;
+         MPI_Wait(&request, &status);
+         cout << buf << endl;
+      }
+   } else {
+      char buf[100];
+      sprintf(buf, "Received message from node %d", rank);
+      MPI_Request request;
+      MPI_Isend(&buf, 100, MPI_UNSIGNED_CHAR, 0, 0, MPI_COMM_WORLD, &request);
+      cout << "Request ID: " << request << endl;
+      MPI_Request_free(&request);
+      cout << "Sent message to root" << endl;
+   }
+
+   cout << "Barrier" << endl;
+   MPI_Barrier(MPI_COMM_WORLD);
+
+   cout << "MPI_Test test" << endl;
+   if (rank == 0) {
+      for (int source = 1; source < totNodes; source++) {
+         char buf[100];
+         MPI_Status status;
+         MPI_Request request;
+         int flag;
+         MPI_Irecv(&buf, 100, MPI_UNSIGNED_CHAR, source, 0, MPI_COMM_WORLD, &request);
+         do {
+            cout << "Waiting..." << endl;
+            MPI_Test(&request, &flag, &status);
+            llamaos::api::sleep(1);
+         } while(!flag);
+         cout << buf << endl;
+      }
+   } else {
+      llamaos::api::sleep(5);
+      char buf[100];
+      sprintf(buf, "Received message from node %d", rank);
+      MPI_Request request;
+      MPI_Isend(&buf, 100, MPI_UNSIGNED_CHAR, 0, 0, MPI_COMM_WORLD, &request);
+      MPI_Request_free(&request);
+      cout << "Sent message to root" << endl;
+   }
 }
 
 void commTest() { // for 3 or more

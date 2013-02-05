@@ -31,15 +31,6 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <iGroup.h>
 #include <string.h>
 
-
-
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <iostream>
-
-using namespace std;
-
 // Return the next unique identifier
 MPI_Group iGroup::getNextId() {
    static MPI_Group nextId = 1;

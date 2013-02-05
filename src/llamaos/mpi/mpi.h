@@ -81,7 +81,9 @@ typedef int MPI_Group;
 #define MPI_GROUP_EMPTY ((MPI_Group)0xFFFFFFFF)
 
 typedef int MPI_Count;
+
 typedef int MPI_Request;
+#define MPI_REQUEST_NULL ((MPI_Request)0)
 
 // MPI Compare Results
 #define MPI_IDENT 1     //Identical
@@ -89,7 +91,7 @@ typedef int MPI_Request;
 #define MPI_SIMILAR 3   //Same members, but in a different order
 #define MPI_UNEQUAL 4   //Different
 
-#define MPI_STATUS_IGNORE 0
+#define MPI_STATUS_IGNORE (0)
 #define MPI_TAG_UB ((int)0x7FFFFFFF)
 #define MPI_UNDEFINED (-1)
 #define MPI_ANY_SOURCE ((int)0xFFFFFFFF)
@@ -103,7 +105,7 @@ typedef struct MPI_Status {
     int MPI_ERROR;
     int size;
 } MPI_Status;
-
+#define MPI_STATUS_SIZE 4
 
 // MPI FUNCTIONS
 // SYSTEM FUNCTIONS
@@ -115,9 +117,10 @@ int MPI_Send(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI
 int MPI_Recv(void *buf, int count, MPI_Datatype datatype, int source, int tag, MPI_Comm comm, MPI_Status *status);
 int MPI_Probe(int source, int tag, MPI_Comm comm, MPI_Status *status);
 int MPI_Get_count( MPI_Status *status,  MPI_Datatype datatype, int *count );
-
 int MPI_Isend(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm, MPI_Request *request);
 int MPI_Irecv(void *buf, int count, MPI_Datatype datatype, int source, int tag, MPI_Comm comm, MPI_Request *request);
+int MPI_Request_free(MPI_Request *request);
+int MPI_Wait(MPI_Request *request, MPI_Status *status);
 int MPI_Test(MPI_Request *request, int *flag, MPI_Status *status);
 
 // GROUPS - Constructors

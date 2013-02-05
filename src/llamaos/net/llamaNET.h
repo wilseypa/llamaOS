@@ -117,6 +117,7 @@ public:
    bool recv_poll ();
    Protocol_header *recv ();
    Protocol_header *recv (uint32_t node);
+   Protocol_header *recvNB (uint32_t node);
    void release_recv_buffer (Protocol_header *header);
 
    Protocol_header *get_send_buffer ();

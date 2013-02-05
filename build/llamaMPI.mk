@@ -44,22 +44,28 @@ CPPFLAGS += \
   -D__XEN_INTERFACE_VERSION__=0x00030205
 
 CPP_SOURCES += \
-  llamaos/mpi/mpi.cpp \
   llamaos/mpi/iGlobals.cpp \
   llamaos/mpi/iSizeof.cpp \
   llamaos/mpi/iGroup.cpp \
   llamaos/mpi/iRxBuffer.cpp \
   llamaos/mpi/llamaConn.cpp \
   llamaos/mpi/iComm.cpp \
+  llamaos/mpi/iRequest.cpp \
   llamaos/mpi/iProbe.cpp \
   llamaos/mpi/iReceive.cpp \
   llamaos/mpi/iSend.cpp \
+  llamaos/mpi/iReceiveNB.cpp \
   llamaos/mpi/tools.cpp \
   llamaos/mpi/op/iPerformOp.cpp \
   llamaos/mpi/api/pt2pt/MPI_Recv.cpp \
   llamaos/mpi/api/pt2pt/MPI_Send.cpp \
   llamaos/mpi/api/pt2pt/MPI_Probe.cpp \
   llamaos/mpi/api/pt2pt/MPI_Get_count.cpp \
+  llamaos/mpi/api/pt2pt/MPI_Isend.cpp \
+  llamaos/mpi/api/pt2pt/MPI_Irecv.cpp \
+  llamaos/mpi/api/pt2pt/MPI_Request_free.cpp \
+  llamaos/mpi/api/pt2pt/MPI_Test.cpp \
+  llamaos/mpi/api/pt2pt/MPI_Wait.cpp \
   llamaos/mpi/api/group/MPI_Group_rank.cpp \
   llamaos/mpi/api/group/MPI_Group_size.cpp \
   llamaos/mpi/api/group/MPI_Group_incl.cpp \
