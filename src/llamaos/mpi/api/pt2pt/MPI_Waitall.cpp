@@ -29,14 +29,18 @@ either expressed or implied, of the copyright holder(s) or contributors.
 */
 
 #include <iGlobals.h>
-
-int MPI_Wait(MPI_Request *request, MPI_Status *status) {
-   MAP_TYPE<MPI_Request,iRequest*>::iterator it = mpiData.request.find(*request);
-   if (it != mpiData.request.end()) {
-      iRequest *pRequest = it->second;
-      pRequest->wait(status);
-      (*request) = MPI_REQUEST_NULL;
-      delete pRequest;
-   }
+int MPI_Waitall(int count, MPI_Request array_of_requests[], 
+               MPI_Status array_of_statuses[]) {
+   int numDone;
+   int *flag = new int[count];
+   do {
+      numDone = 0;
+      for (int i = 0; i < count; i++) {
+         MPI_Test(&array_of_requests[i], &flag[i], &array_of_statuses[i]);
+         if (flag[i]) {
+            numDone++;
+         }
+      }
+   } while (numDone == count);
    return MPI_SUCCESS;
 }

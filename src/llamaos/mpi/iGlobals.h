@@ -114,6 +114,7 @@ void iReceive(void *buf, int count, MPI_Datatype datatype, int source, int tag,
 void iReceiveNB(void *buf, int count, MPI_Datatype datatype, int source, int tag, 
 			MPI_Comm comm, MPI_Context context, MPI_Status *status, int *flag);
 void iProbe(int source, int tag, MPI_Comm comm, MPI_Context context, MPI_Status *status);
+void iProbeNB(int source, int tag, MPI_Comm comm, MPI_Context context, MPI_Status *status, int *flag);
 int iSizeof(MPI_Datatype type);
 int iPerformOp(void *runningTotal, void *newValue, int count, MPI_Datatype type, MPI_Op op);
 int iStartOp(void *runningTotal, int count, MPI_Datatype type, MPI_Op op);

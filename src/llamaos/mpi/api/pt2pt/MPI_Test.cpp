@@ -31,11 +31,16 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <iGlobals.h>
 
 int MPI_Test(MPI_Request *request, int *flag, MPI_Status *status) {
-   iRequest *pRequest = mpiData.request[(*request)];
-   pRequest->test(flag, status);
-   if ((*flag) == true) {
-      (*request) = MPI_REQUEST_NULL;
-      delete pRequest;
+   MAP_TYPE<MPI_Request,iRequest*>::iterator it = mpiData.request.find(*request);
+   if (it == mpiData.request.end()) {   
+      (*flag) = true;
+   } else {
+      iRequest *pRequest = it->second;
+      pRequest->test(flag, status);
+      if ((*flag) == true) {
+         (*request) = MPI_REQUEST_NULL;
+         delete pRequest;
+      }
    }
    return MPI_SUCCESS;
 }

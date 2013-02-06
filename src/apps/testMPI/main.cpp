@@ -65,7 +65,6 @@ void nonBlockTest() {
 
    cout << "MPI_Wait test" << endl;
    if (rank == 0) {
-      llamaos::api::sleep(5);
       for (int source = 1; source < totNodes; source++) {
          char buf[100];
          MPI_Status status;
@@ -104,12 +103,60 @@ void nonBlockTest() {
          cout << buf << endl;
       }
    } else {
-      llamaos::api::sleep(5);
+      llamaos::api::sleep(4);
       char buf[100];
       sprintf(buf, "Received message from node %d", rank);
       MPI_Request request;
       MPI_Isend(&buf, 100, MPI_UNSIGNED_CHAR, 0, 0, MPI_COMM_WORLD, &request);
       MPI_Request_free(&request);
+      cout << "Sent message to root" << endl;
+   }
+
+   cout << "Barrier" << endl;
+   MPI_Barrier(MPI_COMM_WORLD);
+
+   cout << "MPI_Iprobe test" << endl;
+   if (rank == 0) {
+      for (int source = 1; source < totNodes; source++) {
+         char buf[100];
+         MPI_Status status;
+         int flag;
+         do {
+            cout << "Probing..." << endl;
+            MPI_Iprobe(source, 0, MPI_COMM_WORLD, &flag, &status);
+            llamaos::api::sleep(1);
+         } while(!flag);
+         int charCount;
+         MPI_Get_count(&status, MPI_UNSIGNED_CHAR, &charCount);
+         cout << "Ready to receive message of size " << charCount << " unsigned chars" << endl;
+         MPI_Recv(&buf, charCount, MPI_UNSIGNED_CHAR, source, 0, MPI_COMM_WORLD, &status);
+         cout << buf << endl;
+      }
+   } else {
+      llamaos::api::sleep(4);
+      char buf[100];
+      sprintf(buf, "Received message from node %d", rank);
+      MPI_Send(&buf, 100, MPI_UNSIGNED_CHAR, 0, 0, MPI_COMM_WORLD);
+      cout << "Sent message to root" << endl;
+   }
+
+   cout << "MPI_Waitall test" << endl;
+   if (rank == 0) {
+      for (int source = 1; source < totNodes; source++) {
+         char buf[2][100];
+         MPI_Status status[2];
+         MPI_Request request[2];
+         MPI_Irecv(&buf[0], 100, MPI_UNSIGNED_CHAR, source, 1, MPI_COMM_WORLD, &request[0]);
+         MPI_Irecv(&buf[1], 100, MPI_UNSIGNED_CHAR, source, 0, MPI_COMM_WORLD, &request[1]);
+         MPI_Waitall(2, request, status);
+         cout << buf[0] << endl;
+         cout << buf[1] << endl;
+      }
+   } else {
+      char buf[100];
+      sprintf(buf, "Received message from node %d", rank);
+      MPI_Send(&buf, 100, MPI_UNSIGNED_CHAR, 0, 0, MPI_COMM_WORLD);
+      MPI_Send(&buf, 100, MPI_UNSIGNED_CHAR, 0, 1, MPI_COMM_WORLD);
       cout << "Sent message to root" << endl;
    }
 }

@@ -30,13 +30,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 #include <iGlobals.h>
 
-int MPI_Wait(MPI_Request *request, MPI_Status *status) {
-   MAP_TYPE<MPI_Request,iRequest*>::iterator it = mpiData.request.find(*request);
-   if (it != mpiData.request.end()) {
-      iRequest *pRequest = it->second;
-      pRequest->wait(status);
-      (*request) = MPI_REQUEST_NULL;
-      delete pRequest;
-   }
+int MPI_Iprobe(int source, int tag, MPI_Comm comm, int *flag, MPI_Status *status) {
+   iProbeNB(source, tag, comm, MPI_CONTEXT_PT2PT, status, flag);
    return MPI_SUCCESS;
 }
