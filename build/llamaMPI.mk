@@ -64,11 +64,13 @@ CPP_SOURCES += \
   llamaos/mpi/api/pt2pt/MPI_Get_count.cpp \
   llamaos/mpi/api/pt2pt/MPI_Isend.cpp \
   llamaos/mpi/api/pt2pt/MPI_Irecv.cpp \
-  llamaos/mpi/api/pt2pt/MPI_Iprobe.cpp \
+#  llamaos/mpi/api/pt2pt/MPI_Iprobe.cpp \
   llamaos/mpi/api/pt2pt/MPI_Request_free.cpp \
-  llamaos/mpi/api/pt2pt/MPI_Test.cpp \
+#  llamaos/mpi/api/pt2pt/MPI_Test.cpp \
   llamaos/mpi/api/pt2pt/MPI_Wait.cpp \
   llamaos/mpi/api/pt2pt/MPI_Waitall.cpp \
+#  llamaos/mpi/api/pt2pt/MPI_Waitany.cpp \
+#  llamaos/mpi/api/pt2pt/MPI_Waitsome.cpp \
   llamaos/mpi/api/group/MPI_Group_rank.cpp \
   llamaos/mpi/api/group/MPI_Group_size.cpp \
   llamaos/mpi/api/group/MPI_Group_incl.cpp \

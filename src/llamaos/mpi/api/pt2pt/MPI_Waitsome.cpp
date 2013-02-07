@@ -30,32 +30,41 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 #include <iGlobals.h>
 
-int MPI_Waitall(int count, MPI_Request array_of_requests[], 
-               MPI_Status array_of_statuses[]) {
-   for (int i = 0; i < count; i++) {
-      MPI_Wait(&array_of_requests[i], &array_of_statuses[i]);
-   }
-   return MPI_SUCCESS;
-}
 
-// UNSTABLE
-/*
+
 #include <llamaos/api/sleep.h>
-int MPI_Waitall(int count, MPI_Request array_of_requests[], 
-               MPI_Status array_of_statuses[]) {
-   int numDone;
-   int *flag = new int[count];
+
+
+
+int MPI_Waitsome(int incount, MPI_Request array_of_requests[], 
+                int *outcount, int array_of_indices[],
+                MPI_Status array_of_statuses[]) {
+   // Check to see if all requests are null
+   int nullCount = 0;
+   for (int i = 0; i < incount; i++) {
+      if (array_of_requests[i] == MPI_REQUEST_NULL) {
+         nullCount++;
+      }
+   }
+   if (nullCount == incount) {
+      (*outcount) = MPI_UNDEFINED;
+      return MPI_SUCCESS;
+   }
+
+   // Wait until at least one request completes
+   (*outcount) = 0;
+   int *flag = new int[incount];
    do {
 llamaos::api::sleep(1);
-      numDone = 0;
-      for (int i = 0; i < count; i++) {
-         MPI_Test(&array_of_requests[i], &flag[i], &array_of_statuses[i]);
-         if (flag[i]) {
-            numDone++;
+      for (int i = 0; i < incount; i++) {
+         if (array_of_requests[i] != MPI_REQUEST_NULL) {
+            MPI_Test(&array_of_requests[i], &flag[i], &array_of_statuses[i]);
+            if (flag[i]) {
+               array_of_indices[(*outcount)++] = i;
+            }
          }
       }
-   } while (numDone != count);
+   } while ((*outcount) <= 0);
    delete[] flag;
    return MPI_SUCCESS;
 }
-*/

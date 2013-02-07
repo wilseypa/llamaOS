@@ -76,7 +76,7 @@ void nonBlockTest() {
       }
    } else {
       char buf[100];
-      sprintf(buf, "Received message from node %d", rank);
+      sprintf(buf, "Received wait message from node %d", rank);
       MPI_Request request;
       MPI_Isend(&buf, 100, MPI_UNSIGNED_CHAR, 0, 0, MPI_COMM_WORLD, &request);
       cout << "Request ID: " << request << endl;
@@ -87,6 +87,8 @@ void nonBlockTest() {
    cout << "Barrier" << endl;
    MPI_Barrier(MPI_COMM_WORLD);
 
+// UNSTABLE
+/*
    cout << "MPI_Test test" << endl;
    if (rank == 0) {
       for (int source = 1; source < totNodes; source++) {
@@ -95,6 +97,7 @@ void nonBlockTest() {
          MPI_Request request;
          int flag;
          MPI_Irecv(&buf, 100, MPI_UNSIGNED_CHAR, source, 0, MPI_COMM_WORLD, &request);
+         cout << "Request ID: " << request << endl;
          do {
             cout << "Waiting..." << endl;
             MPI_Test(&request, &flag, &status);
@@ -105,7 +108,7 @@ void nonBlockTest() {
    } else {
       llamaos::api::sleep(4);
       char buf[100];
-      sprintf(buf, "Received message from node %d", rank);
+      sprintf(buf, "Received test message from node %d", rank);
       MPI_Request request;
       MPI_Isend(&buf, 100, MPI_UNSIGNED_CHAR, 0, 0, MPI_COMM_WORLD, &request);
       MPI_Request_free(&request);
@@ -135,10 +138,14 @@ void nonBlockTest() {
    } else {
       llamaos::api::sleep(4);
       char buf[100];
-      sprintf(buf, "Received message from node %d", rank);
+      sprintf(buf, "Received iprobe message from node %d", rank);
       MPI_Send(&buf, 100, MPI_UNSIGNED_CHAR, 0, 0, MPI_COMM_WORLD);
       cout << "Sent message to root" << endl;
    }
+
+   cout << "Barrier" << endl;
+   MPI_Barrier(MPI_COMM_WORLD);
+*/
 
    cout << "MPI_Waitall test" << endl;
    if (rank == 0) {
@@ -148,17 +155,92 @@ void nonBlockTest() {
          MPI_Request request[2];
          MPI_Irecv(&buf[0], 100, MPI_UNSIGNED_CHAR, source, 1, MPI_COMM_WORLD, &request[0]);
          MPI_Irecv(&buf[1], 100, MPI_UNSIGNED_CHAR, source, 0, MPI_COMM_WORLD, &request[1]);
+         cout << "Request0 ID: " << request[0] << endl;
+         cout << "Request1 ID: " << request[1] << endl;
          MPI_Waitall(2, request, status);
          cout << buf[0] << endl;
          cout << buf[1] << endl;
       }
    } else {
       char buf[100];
-      sprintf(buf, "Received message from node %d", rank);
+      sprintf(buf, "Received waitall message 0 from node %d", rank);
       MPI_Send(&buf, 100, MPI_UNSIGNED_CHAR, 0, 0, MPI_COMM_WORLD);
+      llamaos::api::sleep(4);
+      sprintf(buf, "Received waitall message 1 from node %d", rank);
       MPI_Send(&buf, 100, MPI_UNSIGNED_CHAR, 0, 1, MPI_COMM_WORLD);
-      cout << "Sent message to root" << endl;
+      cout << "Sent messages to root" << endl;
    }
+
+   cout << "Barrier" << endl;
+   MPI_Barrier(MPI_COMM_WORLD);
+
+// UNSTABLE
+/*
+   cout << "MPI_Waitany test" << endl;
+   if (rank == 0) {
+      for (int source = 1; source < totNodes; source++) {
+         char buf[2][100];
+         MPI_Status status;
+         MPI_Request request[2];
+         MPI_Irecv(&buf[0], 100, MPI_UNSIGNED_CHAR, source, 1, MPI_COMM_WORLD, &request[0]);
+         MPI_Irecv(&buf[1], 100, MPI_UNSIGNED_CHAR, source, 0, MPI_COMM_WORLD, &request[1]);
+         int index;
+         for (int i = 0; i < 2; i++) {
+            cout << "Request0 ID: " << request[0] << endl;
+            cout << "Request1 ID: " << request[1] << endl;
+            MPI_Waitany(2, request, &index, &status);
+            cout << "Index: " << index << "  -  " << buf[index] << endl;
+         }
+      }
+   } else {
+      char buf[100];
+      sprintf(buf, "Received waitany message 0 from node %d", rank);
+      MPI_Send(&buf, 100, MPI_UNSIGNED_CHAR, 0, 0, MPI_COMM_WORLD);
+      llamaos::api::sleep(4);
+      sprintf(buf, "Received waitany message 1 from node %d", rank);
+      MPI_Send(&buf, 100, MPI_UNSIGNED_CHAR, 0, 1, MPI_COMM_WORLD);
+      cout << "Sent messages to root" << endl;
+   }
+
+   cout << "Barrier" << endl;
+   MPI_Barrier(MPI_COMM_WORLD);
+
+   cout << "MPI_Waitsome test" << endl;
+   if (rank == 0) {
+      for (int source = 1; source < totNodes; source++) {
+         
+         char buf[3][100];
+         MPI_Status status[3];
+         MPI_Request request[3];
+         int indices[3];
+         int outcount;
+         int receivedCount = 0;
+         MPI_Irecv(&buf[0], 100, MPI_UNSIGNED_CHAR, source, 0, MPI_COMM_WORLD, &request[0]);
+         MPI_Irecv(&buf[1], 100, MPI_UNSIGNED_CHAR, source, 1, MPI_COMM_WORLD, &request[1]);
+         MPI_Irecv(&buf[2], 100, MPI_UNSIGNED_CHAR, source, 2, MPI_COMM_WORLD, &request[2]);
+         llamaos::api::sleep(1);
+         do {
+            MPI_Waitsome(3, request, &outcount, indices, status);
+            cout << "Receive some..." << endl;
+            for (int j = 0; j < outcount; j++) {
+               cout << "Index: " << indices[j] << "  -  " << buf[indices[j]] << endl;
+            }
+            llamaos::api::sleep(1);
+            receivedCount += outcount;
+         } while (receivedCount < 3);
+      }
+   } else {
+      char buf[100];
+      sprintf(buf, "Received waitsome message 0 from node %d", rank);
+      MPI_Send(&buf, 100, MPI_UNSIGNED_CHAR, 0, 0, MPI_COMM_WORLD);
+      sprintf(buf, "Received waitsome message 1 from node %d", rank);
+      MPI_Send(&buf, 100, MPI_UNSIGNED_CHAR, 0, 1, MPI_COMM_WORLD);
+      llamaos::api::sleep(4);
+      sprintf(buf, "Received waitsome message 2 from node %d", rank);
+      MPI_Send(&buf, 100, MPI_UNSIGNED_CHAR, 0, 2, MPI_COMM_WORLD);
+      cout << "Sent messages to root" << endl;
+   }
+*/
 }
 
 void commTest() { // for 3 or more

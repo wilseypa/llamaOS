@@ -30,32 +30,44 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 #include <iGlobals.h>
 
-int MPI_Waitall(int count, MPI_Request array_of_requests[], 
-               MPI_Status array_of_statuses[]) {
-   for (int i = 0; i < count; i++) {
-      MPI_Wait(&array_of_requests[i], &array_of_statuses[i]);
-   }
-   return MPI_SUCCESS;
-}
 
-// UNSTABLE
-/*
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <iostream>
 #include <llamaos/api/sleep.h>
-int MPI_Waitall(int count, MPI_Request array_of_requests[], 
-               MPI_Status array_of_statuses[]) {
-   int numDone;
-   int *flag = new int[count];
+
+using namespace std;
+
+
+
+int MPI_Waitany(int count, MPI_Request array_of_requests[], int *index, 
+               MPI_Status *status) {
+   // Check to see if all requests are null
+   int nullCount = 0;
+   for (int i = 0; i < count; i++) {
+      if (array_of_requests[i] == MPI_REQUEST_NULL) {
+         nullCount++;
+      }
+   }
+   if (nullCount == count) {
+      (*index) = MPI_UNDEFINED;
+      return MPI_SUCCESS;
+   }
+
+   // Wait until one request completes, ignoring null requests
    do {
 llamaos::api::sleep(1);
-      numDone = 0;
       for (int i = 0; i < count; i++) {
-         MPI_Test(&array_of_requests[i], &flag[i], &array_of_statuses[i]);
-         if (flag[i]) {
-            numDone++;
+         if (array_of_requests[i] != MPI_REQUEST_NULL) {
+            int flag;
+            MPI_Test(&array_of_requests[i], &flag, status);
+            if (flag) {
+               (*index) = i;
+               return MPI_SUCCESS;
+            }
          }
       }
-   } while (numDone != count);
-   delete[] flag;
-   return MPI_SUCCESS;
+   } while (true);
+   return MPI_SUCCESS; // Should never reach this
 }
-*/

@@ -118,7 +118,6 @@ void iReceiveNB(void *buf, int count, MPI_Datatype datatype, int source, int tag
          status->MPI_ERROR = MPI_SUCCESS;
          status->size = header->len - 8;
       }
-      llamaNetInterface->release_recv_buffer(header); // Release llama rx message buffer
       (*flag) = true;
    } else { // Store in receive buffer
       it = mpiData.comm.find(rxComm);
@@ -138,7 +137,7 @@ void iReceiveNB(void *buf, int count, MPI_Datatype datatype, int source, int tag
       } else {
          cout << "WARNING: Received comm " << rxComm << " does not exist" << endl;
       }
-      llamaNetInterface->release_recv_buffer(header); // Release llama rx message buffer
    }
+   llamaNetInterface->release_recv_buffer(header); // Release llama rx message buffer
    return;
 }

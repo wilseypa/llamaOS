@@ -30,32 +30,15 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 #include <iGlobals.h>
 
-int MPI_Waitall(int count, MPI_Request array_of_requests[], 
-               MPI_Status array_of_statuses[]) {
+int MPI_Testany(int count, MPI_Request array_of_requests[], int *index, 
+               int *flag, MPI_Status *status) {
    for (int i = 0; i < count; i++) {
-      MPI_Wait(&array_of_requests[i], &array_of_statuses[i]);
-   }
-   return MPI_SUCCESS;
-}
-
-// UNSTABLE
-/*
-#include <llamaos/api/sleep.h>
-int MPI_Waitall(int count, MPI_Request array_of_requests[], 
-               MPI_Status array_of_statuses[]) {
-   int numDone;
-   int *flag = new int[count];
-   do {
-llamaos::api::sleep(1);
-      numDone = 0;
-      for (int i = 0; i < count; i++) {
-         MPI_Test(&array_of_requests[i], &flag[i], &array_of_statuses[i]);
-         if (flag[i]) {
-            numDone++;
-         }
+      MPI_Test(&array_of_requests[i], flag, status);
+      if (*flag) {
+         (*index) = i;
+         return MPI_SUCCESS;
       }
-   } while (numDone != count);
-   delete[] flag;
+   }
+   (*flag) = false;
    return MPI_SUCCESS;
 }
-*/
