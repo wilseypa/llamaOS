@@ -94,9 +94,9 @@ CPP_SOURCES += \
   llamaos/mpi/api/collective/MPI_Alltoall.cpp \
   llamaos/mpi/api/collective/MPI_Reduce.cpp \
   llamaos/mpi/api/collective/MPI_Allreduce.cpp \
-  llamaos/mpi/api/time/MPI_Wtime.cpp 
+  llamaos/mpi/api/time/MPI_Wtime.cpp
 
-#  llamaos/mpi/api/time/MPI_Wtick.cpp
+# llamaos/mpi/api/time/MPI_Wtick.cpp
 
 ifdef BUILD_NB
 CPP_SOURCES += \
