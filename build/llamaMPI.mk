@@ -54,7 +54,6 @@ CPP_SOURCES += \
   llamaos/mpi/iProbe.cpp \
   llamaos/mpi/iReceive.cpp \
   llamaos/mpi/iSend.cpp \
-  llamaos/mpi/iReceiveNB.cpp \
   llamaos/mpi/iProbeNB.cpp \
   llamaos/mpi/tools.cpp \
   llamaos/mpi/op/iPerformOp.cpp \
@@ -64,13 +63,9 @@ CPP_SOURCES += \
   llamaos/mpi/api/pt2pt/MPI_Get_count.cpp \
   llamaos/mpi/api/pt2pt/MPI_Isend.cpp \
   llamaos/mpi/api/pt2pt/MPI_Irecv.cpp \
-#  llamaos/mpi/api/pt2pt/MPI_Iprobe.cpp \
   llamaos/mpi/api/pt2pt/MPI_Request_free.cpp \
-#  llamaos/mpi/api/pt2pt/MPI_Test.cpp \
   llamaos/mpi/api/pt2pt/MPI_Wait.cpp \
   llamaos/mpi/api/pt2pt/MPI_Waitall.cpp \
-#  llamaos/mpi/api/pt2pt/MPI_Waitany.cpp \
-#  llamaos/mpi/api/pt2pt/MPI_Waitsome.cpp \
   llamaos/mpi/api/group/MPI_Group_rank.cpp \
   llamaos/mpi/api/group/MPI_Group_size.cpp \
   llamaos/mpi/api/group/MPI_Group_incl.cpp \
@@ -98,7 +93,19 @@ CPP_SOURCES += \
   llamaos/mpi/api/collective/MPI_Allgather.cpp \
   llamaos/mpi/api/collective/MPI_Alltoall.cpp \
   llamaos/mpi/api/collective/MPI_Reduce.cpp \
-  llamaos/mpi/api/collective/MPI_Allreduce.cpp
+  llamaos/mpi/api/collective/MPI_Allreduce.cpp \
+  llamaos/mpi/api/time/MPI_Wtime.cpp 
+
+#  llamaos/mpi/api/time/MPI_Wtick.cpp
+
+ifdef BUILD_NB
+CPP_SOURCES += \
+  llamaos/mpi/iReceiveNB.cpp \
+  llamaos/mpi/api/pt2pt/MPI_Iprobe.cpp \
+  llamaos/mpi/api/pt2pt/MPI_Test.cpp \
+  llamaos/mpi/api/pt2pt/MPI_Waitany.cpp \
+  llamaos/mpi/api/pt2pt/MPI_Waitsome.cpp
+endif
 
 HEADERS = \
   $(INCDIR)/llamaos/mpi/mpi.h

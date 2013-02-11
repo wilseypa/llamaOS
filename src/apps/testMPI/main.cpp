@@ -45,12 +45,15 @@ void nonBlockTest();
 int main(int argc, char *argv []) {
    MPI_Init (&argc, &argv);
    cout << "Starting program" << endl;
+   double startTime = MPI_Wtime();
 
    //duoTest();   // for 2
    //groupTest(); // for 3 or more
    //commTest();    // for 3 or more
    nonBlockTest(); // for 2 or more
 
+   double stopTime = MPI_Wtime();
+   cout << "Tests completed in " << stopTime-startTime << " seconds" << endl;
    cout << "Ending program" << endl;
    MPI_Finalize();
 

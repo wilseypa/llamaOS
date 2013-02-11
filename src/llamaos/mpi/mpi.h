@@ -187,4 +187,8 @@ int MPI_Reduce(void *sendbuf, void *recvbuf, int count, MPI_Datatype datatype,
 int MPI_Allreduce ( void *sendbuf, void *recvbuf, int count, 
                    MPI_Datatype datatype, MPI_Op op, MPI_Comm comm );
 
+// TIME 
+double MPI_Wtime();
+double MPI_Wtick();
+
 #endif  // llamaos_mpi_mpi_h_
