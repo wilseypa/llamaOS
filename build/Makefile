@@ -48,6 +48,7 @@ all:
 	@$(MAKE) -f apps/hello.mk xen
 	@$(MAKE) -f apps/latency-llamaMPI.mk
 	@$(MAKE) -f apps/testMPI-llamaMPI.mk
+	@$(MAKE) -f apps/NAS/NAS.mk
 	@$(MAKE) -f apps/latency-llamaNET.mk
 #	@$(MAKE) -f apps/latency-MPI.mk
 	@$(MAKE) -f apps/latency-TCPIP.mk

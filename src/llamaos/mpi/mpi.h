@@ -31,6 +31,10 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #ifndef llamaos_mpi_mpi_h_
 #define llamaos_mpi_mpi_h_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // MPI TYPEDEF AND DEFINES
 /* MPI's error classes */
 #define MPI_SUCCESS          0      /* Successful return code */
@@ -190,5 +194,9 @@ int MPI_Allreduce ( void *sendbuf, void *recvbuf, int count,
 // TIME 
 double MPI_Wtime();
 double MPI_Wtick();
+
+#ifdef __cplusplus
+} //extern "C"
+#endif
 
 #endif  // llamaos_mpi_mpi_h_
