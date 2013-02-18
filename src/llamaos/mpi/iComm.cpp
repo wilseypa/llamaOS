@@ -28,21 +28,145 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include "iComm.h"
+#include <iComm.h>
+#include <list>
 
 // Create Comm based on new id and associated group
 iComm::iComm(MPI_Comm nId, iGroup *nGroup) {
    id = nId;
    group = nGroup;
    localRank = group->getLocalRank();
+   localWorldRank = group->getLocalWorldRank();
+   size = group->getSize();
    mpiData.comm[id] = this;
    pt2ptRxBuffer = new iRxBuffer();
    collectiveRxBuffer = new iRxBuffer();
 }
 
+// Copy comm from a previous one - also copy group - still gets a unique ID
+iComm::iComm(iComm *comm) {
+   id = getNewId(comm->getId(), true);
+   group = new iGroup(comm->group);
+   size = comm->size;
+   localRank = comm->localRank;	
+   localWorldRank = comm->localWorldRank;
+   mpiData.comm[id] = this;
+   pt2ptRxBuffer = new iRxBuffer();
+   collectiveRxBuffer = new iRxBuffer();
+}
+
+// Create a new comm from a group that is a subset of the old comm
+iComm::iComm(iComm *comm, iGroup *pgroup) {
+   size = pgroup->getSize();
+   localRank = pgroup->getLocalRank();
+   localWorldRank = pgroup->getLocalWorldRank();
+   bool join = (localRank != MPI_UNDEFINED);
+   id = getNewId(comm->getId(), join);
+   if (join) {
+      pt2ptRxBuffer = new iRxBuffer();
+      collectiveRxBuffer = new iRxBuffer();
+      group = new iGroup(pgroup);
+      mpiData.comm[id] = this;
+   }
+}
+
+struct SplitData_T {
+   int worldRank;
+   int color;
+   int key;
+};
+bool isKeyLessThan(SplitData_T first, SplitData_T second) {
+   return first.key < second.key;
+}
+
+// Create a new comm using color and key - splits previous comm
+iComm::iComm(iComm *comm, int color, int key) {
+   bool join = (color != MPI_UNDEFINED);
+   id = getNewId(comm->getId(), join);
+   SplitData_T txData;
+   txData.worldRank = comm->getLocalWorldRank();
+   txData.color = color;
+   txData.key = key;
+   SplitData_T *rxData = new SplitData_T[comm->getSize()];
+   MPI_Allgather(&txData, 3, MPI_INT, rxData, 3, MPI_INT, comm->getId());
+   // id now holds unique id, rxData now contains all the previous comm trios of world rank, color, and key
+   if (join) {
+      // Add all ranks to a list that have the same color
+      std::list<SplitData_T> commList;
+      for (int i = 0; i < comm->getSize(); i++) {
+         if (rxData[i].color == color) {
+            commList.push_back(rxData[i]);
+         }
+      }
+      // Sort by key
+      commList.sort(isKeyLessThan);
+      // Create new group
+      size = commList.size();
+      group = new iGroup(IGROUP_CREATE_NEW, size);
+      for (std::list<SplitData_T>::iterator it=commList.begin(); it!=commList.end(); ++it) {
+         group->pushWorldRank(it->worldRank);
+      }
+      group->calculateLocalRanks();
+      localRank = group->getLocalRank();
+      localWorldRank = group->getLocalWorldRank();
+      pt2ptRxBuffer = new iRxBuffer();
+      collectiveRxBuffer = new iRxBuffer();
+      mpiData.comm[id] = this;
+   }
+   delete[] rxData;
+}
+
 // Destroy the reference to the id in the global hash map
 iComm::~iComm() {
-   mpiData.comm.erase(id);
-   delete pt2ptRxBuffer;
-   delete collectiveRxBuffer;
+   if (id != MPI_COMM_NULL) {
+      mpiData.comm.erase(id);
+      delete group;
+      delete pt2ptRxBuffer;
+      delete collectiveRxBuffer;
+   }
+}
+
+// Get a unique identifier for a new comm from a current comm
+MPI_Comm iComm::getNewId(MPI_Comm comm, bool join) {
+   static MPI_Comm nextId = 1;
+   MPI_Comm newId;
+   if (join) {
+      newId = nextId;
+   } else {
+      newId = 0;
+   }
+   MPI_Allreduce (&newId, &newId, 1, MPI_INT, MPI_MAX, comm);
+   if (join) {
+      nextId = newId+1;
+      return newId;
+   } else {
+      return MPI_COMM_NULL;
+   }
+}
+
+// Compare the comm to another comm
+int iComm::compare(iComm *oComm) {
+   if (id == oComm->id) {
+      return MPI_IDENT;
+   }
+   int res = group->compare(oComm->group);
+   if (res == MPI_IDENT) {
+      return MPI_CONGRUENT;
+   }
+   return res;
+}
+
+// Translate the comm rank to the world rank
+int iComm::getWorldRankFromRank(int rank) {
+   return group->getWorldRankFromRank(rank);
+}
+
+// Translate the world rank to the comm rank
+int iComm::getRankFromWorldRank(int worldRank) {
+   return group->getRankFromWorldRank(worldRank);
+}
+
+// Get the group in comm
+iGroup* iComm::getGroup() {
+   return group;
 }

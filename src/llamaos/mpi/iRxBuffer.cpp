@@ -28,8 +28,8 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include "iRxBuffer.h"
-#include "string.h"
+#include <iRxBuffer.h>
+#include <string.h>
 #include <cstdlib>
 
 void iRxBuffer::pushMessage(unsigned char *buf, int size, int source, int tag) {
@@ -45,7 +45,8 @@ void iRxBuffer::pushMessage(unsigned char *buf, int size, int source, int tag) {
 
 bool iRxBuffer::popMessage(int source, int tag, void *buf, int size, MPI_Status *status) {
    for (std::list<MpiRxMessage_T>::iterator it = buffer.begin(); it != buffer.end(); it++) {
-      if ((it->source == source || static_cast<uint32_t>(source) == MPI_ANY_SOURCE) && (it->tag == tag)) {
+      if (((it->source == source) || (source == MPI_ANY_SOURCE)) &&
+               ((it->tag == tag) || (tag == MPI_ANY_TAG))) {
          // Verify length
          if (size < it->size) { // Will not fit in buffer - discard
             free(it->buf);
@@ -57,13 +58,33 @@ bool iRxBuffer::popMessage(int source, int tag, void *buf, int size, MPI_Status 
          memcpy(buf, it->buf, it->size);
 
          // Copy data into status
-         status->MPI_SOURCE = it->source;
-         status->MPI_TAG = it->tag;
-         status->MPI_ERROR = MPI_SUCCESS;
+         if (status != MPI_STATUS_IGNORE) {
+            status->MPI_SOURCE = it->source;
+            status->MPI_TAG = it->tag;
+            status->MPI_ERROR = MPI_SUCCESS;
+            status->size = it->size;
+         }
 
          // Clean up list
          free(it->buf);
          buffer.erase(it);
+         return true;
+      }
+   }
+   return false;
+}
+
+bool iRxBuffer::probeMessage(int source, int tag, MPI_Status *status) {
+   for (std::list<MpiRxMessage_T>::iterator it = buffer.begin(); it != buffer.end(); it++) {
+      if (((it->source == source) || (source == MPI_ANY_SOURCE)) &&
+               ((it->tag == tag) || (tag == MPI_ANY_TAG))) {
+         // Copy data into status
+         if (status != MPI_STATUS_IGNORE) {
+            status->MPI_SOURCE = it->source;
+            status->MPI_TAG = it->tag;
+            status->MPI_ERROR = MPI_SUCCESS;
+            status->size = it->size;
+         }
          return true;
       }
    }

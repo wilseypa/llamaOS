@@ -39,25 +39,73 @@ MAKEFILE_SOURCES += llamaOS.mk
 CPPFLAGS += \
   -I $(INCDIR) \
   -I $(SRCDIR) \
+  -I $(SRCDIR)/llamaos/mpi \
   -include $(SRCDIR)/llamaos/__thread.h \
   -D__XEN_INTERFACE_VERSION__=0x00030205
 
 CPP_SOURCES += \
-  llamaos/mpi/mpi.cpp \
   llamaos/mpi/iGlobals.cpp \
+  llamaos/mpi/iSizeof.cpp \
   llamaos/mpi/iGroup.cpp \
   llamaos/mpi/iRxBuffer.cpp \
   llamaos/mpi/llamaConn.cpp \
   llamaos/mpi/iComm.cpp \
+  llamaos/mpi/iRequest.cpp \
+  llamaos/mpi/iProbe.cpp \
   llamaos/mpi/iReceive.cpp \
   llamaos/mpi/iSend.cpp \
-  llamaos/mpi/MPI_Init.cpp \
+  llamaos/mpi/iProbeNB.cpp \
   llamaos/mpi/tools.cpp \
-  llamaos/mpi/MPI_Recv.cpp \
-  llamaos/mpi/MPI_Send.cpp \
-  llamaos/mpi/MPI_Comm_rank.cpp \
-  llamaos/mpi/MPI_Comm_size.cpp \
-  llamaos/mpi/MPI_Finalize.cpp 
+  llamaos/mpi/op/iPerformOp.cpp \
+  llamaos/mpi/api/pt2pt/MPI_Recv.cpp \
+  llamaos/mpi/api/pt2pt/MPI_Send.cpp \
+  llamaos/mpi/api/pt2pt/MPI_Probe.cpp \
+  llamaos/mpi/api/pt2pt/MPI_Get_count.cpp \
+  llamaos/mpi/api/pt2pt/MPI_Isend.cpp \
+  llamaos/mpi/api/pt2pt/MPI_Irecv.cpp \
+  llamaos/mpi/api/pt2pt/MPI_Request_free.cpp \
+  llamaos/mpi/api/pt2pt/MPI_Wait.cpp \
+  llamaos/mpi/api/pt2pt/MPI_Waitall.cpp \
+  llamaos/mpi/api/group/MPI_Group_rank.cpp \
+  llamaos/mpi/api/group/MPI_Group_size.cpp \
+  llamaos/mpi/api/group/MPI_Group_incl.cpp \
+  llamaos/mpi/api/group/MPI_Group_excl.cpp \
+  llamaos/mpi/api/group/MPI_Group_union.cpp \
+  llamaos/mpi/api/group/MPI_Group_intersection.cpp \
+  llamaos/mpi/api/group/MPI_Group_difference.cpp \
+  llamaos/mpi/api/group/MPI_Group_translate_ranks.cpp \
+  llamaos/mpi/api/group/MPI_Group_compare.cpp \
+  llamaos/mpi/api/group/MPI_Group_free.cpp \
+  llamaos/mpi/api/comm/MPI_Comm_rank.cpp \
+  llamaos/mpi/api/comm/MPI_Comm_size.cpp \
+  llamaos/mpi/api/comm/MPI_Comm_compare.cpp \
+  llamaos/mpi/api/comm/MPI_Comm_group.cpp \
+  llamaos/mpi/api/comm/MPI_Comm_dup.cpp \
+  llamaos/mpi/api/comm/MPI_Comm_create.cpp \
+  llamaos/mpi/api/comm/MPI_Comm_split.cpp \
+  llamaos/mpi/api/comm/MPI_Comm_free.cpp \
+  llamaos/mpi/api/sys/MPI_Init.cpp \
+  llamaos/mpi/api/sys/MPI_Finalize.cpp \
+  llamaos/mpi/api/collective/MPI_Barrier.cpp \
+  llamaos/mpi/api/collective/MPI_Bcast.cpp \
+  llamaos/mpi/api/collective/MPI_Scatter.cpp \
+  llamaos/mpi/api/collective/MPI_Gather.cpp \
+  llamaos/mpi/api/collective/MPI_Allgather.cpp \
+  llamaos/mpi/api/collective/MPI_Alltoall.cpp \
+  llamaos/mpi/api/collective/MPI_Reduce.cpp \
+  llamaos/mpi/api/collective/MPI_Allreduce.cpp \
+  llamaos/mpi/api/time/MPI_Wtime.cpp
+
+# llamaos/mpi/api/time/MPI_Wtick.cpp
+
+ifdef BUILD_NB
+CPP_SOURCES += \
+  llamaos/mpi/iReceiveNB.cpp \
+  llamaos/mpi/api/pt2pt/MPI_Iprobe.cpp \
+  llamaos/mpi/api/pt2pt/MPI_Test.cpp \
+  llamaos/mpi/api/pt2pt/MPI_Waitany.cpp \
+  llamaos/mpi/api/pt2pt/MPI_Waitsome.cpp
+endif
 
 HEADERS = \
   $(INCDIR)/llamaos/mpi/mpi.h

@@ -126,6 +126,27 @@ llamaNET::Protocol_header *llamaNET::recv (uint32_t node)
    }
 }
 
+llamaNET::Protocol_header *llamaNET::recvNB (uint32_t node)
+{
+   llamaNET::Protocol_header *header;
+
+   if (recv_poll())
+   {
+      header = recv ();
+
+      if (   (header->eth_type == 0x0C09)
+          && (header->dest == node))
+      {
+         return header;
+      } else {
+         release_recv_buffer (header);
+         return NULL;
+      }
+   } else {
+      return NULL;
+   }
+}
+
 void llamaNET::release_recv_buffer (Protocol_header *header)
 {
    if (header == rx_buffers [control->app [index].rx_tail]->get_pointer ())

@@ -199,7 +199,7 @@ bool protocols::MPI::recv_buffer (unsigned long length)
    }
    else
    {
-      MPI_Request request;
+/*      MPI_Request request;
 
       if (MPI_SUCCESS == MPI_Irecv (buffer,
                                     length,
@@ -220,7 +220,7 @@ bool protocols::MPI::recv_buffer (unsigned long length)
                return (peer == status.MPI_SOURCE);
             }
          }
-      }
+      }*/
    }
 
    return false;
@@ -244,7 +244,7 @@ bool protocols::MPI::send_buffer (unsigned long length)
    }
    else
    {
-      MPI_Request request;
+      /*MPI_Request request;
 
       if (MPI_SUCCESS == MPI_Isend (buffer,
                                     length,
@@ -266,7 +266,7 @@ bool protocols::MPI::send_buffer (unsigned long length)
                return true;
             }
          }
-      }
+      }*/
    }
 
    return false;
