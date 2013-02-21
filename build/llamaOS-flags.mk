@@ -343,6 +343,9 @@ CPPFLAGS = $(XFLAGS) \
   -fuse-cxa-atexit
 #  -Wold-style-cast -Wzero-as-null-pointer-constant \
 
+F90FLAGS = $(XFLAGS) \
+  -nostdinc
+
 LDFLAGS = -nostdlib
 # -nostartfiles -nodefaultlibs 
 

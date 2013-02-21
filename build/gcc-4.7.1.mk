@@ -37,9 +37,14 @@ MAKEFILE_SOURCES += gcc-$(GCC_VERSION).mk
 
 CFLAGS += \
   -I $(SRCDIR)/gcc-$(GCC_VERSION)/gcc \
+  -I $(SRCDIR)/gcc-$(GCC_VERSION)/gcc/config/spu \
   -I $(SRCDIR)/gcc-$(GCC_VERSION)/gcc/ginclude \
   -I $(SRCDIR)/gcc-$(GCC_VERSION)/gcc/include \
   -I $(SRCDIR)/gcc-$(GCC_VERSION)/gcc/include-fixed \
+  -I $(SRCDIR)/gcc-$(GCC_VERSION)/libcpp/include \
+  -I $(SRCDIR)/gcc-$(GCC_VERSION)/libgcc \
+  -I $(SRCDIR)/gcc-$(GCC_VERSION)/libgfortran \
+  -I $(SRCDIR)/gcc-$(GCC_VERSION)/libquadmath \
   -I $(SRCDIR)/gcc-$(GCC_VERSION)/include \
   -I $(INCDIR) \
   -include $(SRCDIR)/llamaos/__thread.h \
@@ -226,10 +231,107 @@ HEADERS = \
   $(INCDIR)/valarray \
   $(INCDIR)/vector
 
+#  gcc-$(GCC_VERSION)/libgcc/soft-fp/divdf3.c \
+#  gcc-$(GCC_VERSION)/libgcc/soft-fp/divsf3.c \
+#  gcc-$(GCC_VERSION)/libgcc/soft-fp/muldf3.c \
+#  gcc-$(GCC_VERSION)/libgcc/soft-fp/mulsf3.c \
+
+#  gcc-$(GCC_VERSION)/gcc/config/spu/spu.c \
+
 C_SOURCES = \
+  gcc-$(GCC_VERSION)/libgcc/config/spu/divmodti4.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/adddf3.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/addsf3.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/addtf3.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/divtf3.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/eqdf2.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/eqsf2.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/eqtf2.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/extenddftf2.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/extendsfdf2.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/extendsftf2.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/extendxftf2.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/fixdfdi.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/fixdfsi.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/fixdfti.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/fixsfdi.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/fixsfsi.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/fixsfti.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/fixtfdi.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/fixtfsi.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/fixtfti.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/fixunsdfdi.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/fixunsdfsi.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/fixunsdfti.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/fixunssfdi.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/fixunssfsi.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/fixunssfti.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/fixunstfdi.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/fixunstfsi.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/fixunstfti.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/floatdidf.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/floatdisf.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/floatditf.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/floatsidf.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/floatsisf.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/floatsitf.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/floattidf.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/floattisf.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/floattitf.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/floatundidf.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/floatundisf.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/floatunditf.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/floatunsidf.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/floatunsisf.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/floatunsitf.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/floatuntidf.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/floatuntisf.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/floatuntitf.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/gedf2.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/gesf2.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/getf2.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/ledf2.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/lesf2.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/letf2.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/multf3.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/negdf2.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/negsf2.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/negtf2.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/subdf3.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/subsf3.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/subtf3.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/truncdfsf2.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/trunctfdf2.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/trunctfsf2.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/trunctfxf2.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/unorddf2.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/unordsf2.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/unordtf2.c \
   gcc-$(GCC_VERSION)/libgcc/unwind-dw2-fde.c \
   gcc-$(GCC_VERSION)/libgcc/unwind-dw2.c \
-  gcc-$(GCC_VERSION)/libiberty/cp-demangle.c
+  gcc-$(GCC_VERSION)/libiberty/cp-demangle.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/random.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/signal.c \
+  gcc-$(GCC_VERSION)/libgfortran/io/fbuf.c \
+  gcc-$(GCC_VERSION)/libgfortran/io/format.c \
+  gcc-$(GCC_VERSION)/libgfortran/io/list_read.c \
+  gcc-$(GCC_VERSION)/libgfortran/io/lock.c \
+  gcc-$(GCC_VERSION)/libgfortran/io/open.c \
+  gcc-$(GCC_VERSION)/libgfortran/io/read.c \
+  gcc-$(GCC_VERSION)/libgfortran/io/size_from_kind.c \
+  gcc-$(GCC_VERSION)/libgfortran/io/transfer.c \
+  gcc-$(GCC_VERSION)/libgfortran/io/unit.c \
+  gcc-$(GCC_VERSION)/libgfortran/io/unix.c \
+  gcc-$(GCC_VERSION)/libgfortran/io/write.c \
+  gcc-$(GCC_VERSION)/libgfortran/runtime/backtrace.c \
+  gcc-$(GCC_VERSION)/libgfortran/runtime/compile_options.c \
+  gcc-$(GCC_VERSION)/libgfortran/runtime/environ.c \
+  gcc-$(GCC_VERSION)/libgfortran/runtime/error.c \
+  gcc-$(GCC_VERSION)/libgfortran/runtime/fpu.c \
+  gcc-$(GCC_VERSION)/libgfortran/runtime/main.c \
+  gcc-$(GCC_VERSION)/libgfortran/runtime/memory.c \
+  gcc-$(GCC_VERSION)/libgfortran/runtime/string.c \
+  gcc-$(GCC_VERSION)/libgfortran/fmain.c
 
 CC_SOURCES = \
   gcc-$(GCC_VERSION)/libstdc++-v3/libsupc++/array_type_info.cc \

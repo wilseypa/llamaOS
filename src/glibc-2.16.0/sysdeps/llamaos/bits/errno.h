@@ -37,9 +37,9 @@ extern int *__errno_location (void) __THROW __attribute__ ((__const__));
 // # define EILSEQ	XXX	<--- fill in what is actually needed
 // # define ERANGE	XXX	<--- fill in what is actually needed
 
-#define EDOM 0
-#define EILSEQ 0
-#define ERANGE 0
+#define EDOM 1
+#define EILSEQ 2
+#define ERANGE 3
 
 #endif
 
@@ -56,87 +56,87 @@ extern int *__errno_location (void) __THROW __attribute__ ((__const__));
 // # error "must match the numbers of the kernel."
 // # define Exxxx	XXX
 
-#define ENOSYS 0
+#define ENOSYS 4
 
-#define EAFNOSUPPORT 0
-#define EADDRINUSE 0
-#define EADDRNOTAVAIL 0
-#define EISCONN 0
-#define E2BIG 0
-#define EDOM 0
-#define EFAULT 0
-#define EBADF 0
-#define EBADMSG 0
-#define EPIPE 0
-#define ECONNABORTED 0
-#define EALREADY 0
-#define ECONNREFUSED 0
-#define ECONNRESET 0
-#define EXDEV 0
-#define EDESTADDRREQ 0
-#define EBUSY 0
-#define ENOTEMPTY 0
-#define ENOEXEC 0
-#define EEXIST 0
-#define EFBIG 0
-#define ENAMETOOLONG 0
-#define ENOSYS 0
-#define EHOSTUNREACH 0
-#define EIDRM 0
-#define EILSEQ 0
-#define ENOTTY 0
-#define EINTR 0
-#define EINVAL 0
-#define ESPIPE 0
-#define EIO 0
-#define EISDIR 0
-#define EMSGSIZE 0
-#define ENETDOWN 0
-#define ENETRESET 0
-#define ENETUNREACH 0
-#define ENOBUFS 0
-#define ECHILD 0
-#define ENOLINK 0
-#define ENOLCK 0
-#define ENODATA 0
-#define ENOMSG 0
-#define ENOPROTOOPT 0
-#define ENOSPC 0
-#define ENOSR 0
-#define ENXIO 0
-#define ENODEV 0
-#define ENOENT 0
-#define ESRCH 0
-#define ENOTDIR 0
-#define ENOTSOCK 0
-#define ENOSTR 0
-#define ENOTCONN 0
-#define ENOMEM 0
-#define ENOTSUP 0
-#define ECANCELED 0
-#define EINPROGRESS 0
-#define EPERM 0
-#define EOPNOTSUPP 0
-#define EWOULDBLOCK 0
-#define EOWNERDEAD 0
-#define EACCES 0
-#define EPROTO 0
-#define EPROTONOSUPPORT 0
-#define EROFS 0
-#define EDEADLK 0
-#define EAGAIN 0
-#define ERANGE 0
-#define ENOTRECOVERABLE 0
-#define ETIME 0
-#define ETXTBSY 0
-#define ETIMEDOUT 0
-#define ENFILE 0
-#define EMFILE 0
-#define EMLINK 0
-#define ELOOP 0
-#define EOVERFLOW 0
-#define EPROTOTYPE 0
-#define ETIMEDOUT 0
-#define EINVAL 0
+#define EAFNOSUPPORT 5
+#define EADDRINUSE 6
+#define EADDRNOTAVAIL 7
+#define EISCONN 8
+#define E2BIG 9
+// #define EDOM 10
+#define EFAULT 11
+#define EBADF 12
+#define EBADMSG 13
+#define EPIPE 14
+#define ECONNABORTED 15
+#define EALREADY 16
+#define ECONNREFUSED 17
+#define ECONNRESET 18
+#define EXDEV 19
+#define EDESTADDRREQ 20
+#define EBUSY 21
+#define ENOTEMPTY 22
+#define ENOEXEC 23
+#define EEXIST 24
+#define EFBIG 25
+#define ENAMETOOLONG 26
+// #define ENOSYS 27
+#define EHOSTUNREACH 28
+#define EIDRM 29
+// #define EILSEQ 30
+#define ENOTTY 31
+#define EINTR 32
+#define EINVAL 33
+#define ESPIPE 34
+#define EIO 35
+#define EISDIR 36
+#define EMSGSIZE 37
+#define ENETDOWN 38
+#define ENETRESET 39
+#define ENETUNREACH 40
+#define ENOBUFS 41
+#define ECHILD 42
+#define ENOLINK 43
+#define ENOLCK 44
+#define ENODATA 45
+#define ENOMSG 46
+#define ENOPROTOOPT 47
+#define ENOSPC 48
+#define ENOSR 49
+#define ENXIO 50
+#define ENODEV 51
+#define ENOENT 52
+#define ESRCH 53
+#define ENOTDIR 54
+#define ENOTSOCK 55
+#define ENOSTR 56
+#define ENOTCONN 57
+#define ENOMEM 58
+#define ENOTSUP 59
+#define ECANCELED 60
+#define EINPROGRESS 61
+#define EPERM 62
+#define EOPNOTSUPP 63
+#define EWOULDBLOCK 64
+#define EOWNERDEAD 65
+#define EACCES 66
+#define EPROTO 67
+#define EPROTONOSUPPORT 68
+#define EROFS 69
+#define EDEADLK 70
+#define EAGAIN 71
+// #define ERANGE 72
+#define ENOTRECOVERABLE 73
+#define ETIME 74
+#define ETXTBSY 75
+#define ETIMEDOUT 76
+#define ENFILE 77
+#define EMFILE 78
+#define EMLINK 79
+#define ELOOP 80
+#define EOVERFLOW 81
+#define EPROTOTYPE 82
+// #define ETIMEDOUT 83
+// #define EINVAL 84
 
 #endif

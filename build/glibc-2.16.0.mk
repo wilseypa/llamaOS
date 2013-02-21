@@ -123,6 +123,7 @@ HEADERS = \
   $(INCDIR)/asm/unistd_32.h \
   $(INCDIR)/asm/unistd_64.h \
   $(INCDIR)/bits/confname.h \
+  $(INCDIR)/bits/cmathcalls.h \
   $(INCDIR)/bits/byteswap.h \
   $(INCDIR)/bits/byteswap-16.h \
   $(INCDIR)/bits/endian.h \
@@ -192,14 +193,17 @@ HEADERS = \
   $(INCDIR)/sys/syscall.h \
   $(INCDIR)/sys/sysinfo.h \
   $(INCDIR)/sys/time.h \
+  $(INCDIR)/sys/times.h \
   $(INCDIR)/sys/ttydefaults.h \
   $(INCDIR)/sys/types.h \
   $(INCDIR)/sys/ucontext.h \
   $(INCDIR)/sys/uio.h \
   $(INCDIR)/sys/utsname.h \
+  $(INCDIR)/sys/wait.h \
   $(INCDIR)/_G_config.h \
   $(INCDIR)/alloca.h \
   $(INCDIR)/assert.h \
+  $(INCDIR)/complex.h \
   $(INCDIR)/config.h \
   $(INCDIR)/ctype.h \
   $(INCDIR)/errno.h \
@@ -208,6 +212,8 @@ HEADERS = \
   $(INCDIR)/features.h \
   $(INCDIR)/float.h \
   $(INCDIR)/getopt.h \
+  $(INCDIR)/gmp.h \
+  $(INCDIR)/inttypes.h \
   $(INCDIR)/libintl.h \
   $(INCDIR)/libio.h \
   $(INCDIR)/limits.h \
@@ -288,11 +294,16 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/io/access.c \
   glibc-$(GLIBC_VERSION)/io/close.c \
   glibc-$(GLIBC_VERSION)/io/dup.c \
+  glibc-$(GLIBC_VERSION)/io/dup2.c \
   glibc-$(GLIBC_VERSION)/io/fcntl.c \
   glibc-$(GLIBC_VERSION)/io/fxstat.c \
   glibc-$(GLIBC_VERSION)/io/fxstat64.c \
   glibc-$(GLIBC_VERSION)/io/open.c \
   glibc-$(GLIBC_VERSION)/io/open64.c \
+  glibc-$(GLIBC_VERSION)/io/pipe.c \
+  glibc-$(GLIBC_VERSION)/io/readlink.c \
+  glibc-$(GLIBC_VERSION)/io/ttyname_r.c \
+  glibc-$(GLIBC_VERSION)/io/unlink.c \
   glibc-$(GLIBC_VERSION)/io/xstat.c \
   glibc-$(GLIBC_VERSION)/io/xstat64.c \
   glibc-$(GLIBC_VERSION)/libio/fcloseall.c \
@@ -393,10 +404,12 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/malloc/malloc.c \
   glibc-$(GLIBC_VERSION)/malloc/memusage.c \
   glibc-$(GLIBC_VERSION)/malloc/morecore.c \
+  glibc-$(GLIBC_VERSION)/misc/ftruncate.c \
   glibc-$(GLIBC_VERSION)/misc/getclktck.c \
   glibc-$(GLIBC_VERSION)/misc/getdtsz.c \
   glibc-$(GLIBC_VERSION)/misc/init-misc.c \
   glibc-$(GLIBC_VERSION)/misc/lseek.c \
+  glibc-$(GLIBC_VERSION)/misc/mkstemp.c \
   glibc-$(GLIBC_VERSION)/misc/mmap.c \
   glibc-$(GLIBC_VERSION)/misc/mmap64.c \
   glibc-$(GLIBC_VERSION)/misc/mprotect.c \
@@ -405,6 +418,8 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/misc/sbrk.c \
   glibc-$(GLIBC_VERSION)/misc/tsearch.c \
   glibc-$(GLIBC_VERSION)/posix/environ.c \
+  glibc-$(GLIBC_VERSION)/posix/execve.c \
+  glibc-$(GLIBC_VERSION)/posix/fork.c \
   glibc-$(GLIBC_VERSION)/posix/fpathconf.c \
   glibc-$(GLIBC_VERSION)/posix/get_child_max.c \
   glibc-$(GLIBC_VERSION)/posix/getegid.c \
@@ -419,7 +434,9 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/posix/sched_gets.c \
   glibc-$(GLIBC_VERSION)/posix/sched_setp.c \
   glibc-$(GLIBC_VERSION)/posix/sched_sets.c \
+  glibc-$(GLIBC_VERSION)/posix/wait.c \
   glibc-$(GLIBC_VERSION)/signal/sigaction.c \
+  glibc-$(GLIBC_VERSION)/signal/signal.c \
   glibc-$(GLIBC_VERSION)/signal/sigprocmask.c \
   glibc-$(GLIBC_VERSION)/stdio-common/_itoa.c \
   glibc-$(GLIBC_VERSION)/stdio-common/_itowa.c \
@@ -445,6 +462,7 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/stdio-common/snprintf.c \
   glibc-$(GLIBC_VERSION)/stdio-common/sprintf.c \
   glibc-$(GLIBC_VERSION)/stdio-common/sscanf.c \
+  glibc-$(GLIBC_VERSION)/stdio-common/tempname.c \
   glibc-$(GLIBC_VERSION)/stdio-common/vfprintf.c \
   glibc-$(GLIBC_VERSION)/stdio-common/vfscanf.c \
   glibc-$(GLIBC_VERSION)/stdio-common/vfwprintf.c \

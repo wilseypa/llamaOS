@@ -168,6 +168,7 @@ static void register_glibc_exports (void)
    register_llamaos_write (glibc_libc_write);
 }
 
+extern "C"
 int main (int argc, char *argv []);
 
 static vector<string> split (const string &input)

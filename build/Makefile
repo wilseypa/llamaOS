@@ -45,6 +45,8 @@ all:
 	@$(MAKE) -f xen-$(XEN_VERSION).mk
 	@$(MAKE) -f llamaOS.mk xen
 	@$(MAKE) -f llamaMPI.mk
+	@$(MAKE) -f apps/hello-f90.mk
+	@$(MAKE) -f apps/hello-f90-llamaOS.mk xen
 	@$(MAKE) -f apps/hello.mk xen
 	@$(MAKE) -f apps/latency-llamaMPI.mk
 	@$(MAKE) -f apps/testMPI-llamaMPI.mk

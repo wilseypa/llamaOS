@@ -52,6 +52,11 @@ $(OBJDIR)/%.o : %.cpp $(MAKEFILE_SOURCES)
 	@echo compiling: $<
 	@$(CC) -c $(CPPFLAGS) -o $@ $<
 
+$(OBJDIR)/%.o : %.f90 $(MAKEFILE_SOURCES)
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo compiling: $<
+	@$(F90) -c $(F90FLAGS) -o $@ $<
+
 $(OBJDIR)/%.d : %.S
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo creating: $@ from $<
