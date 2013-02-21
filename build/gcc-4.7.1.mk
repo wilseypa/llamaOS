@@ -330,8 +330,8 @@ C_SOURCES = \
   gcc-$(GCC_VERSION)/libgfortran/runtime/fpu.c \
   gcc-$(GCC_VERSION)/libgfortran/runtime/main.c \
   gcc-$(GCC_VERSION)/libgfortran/runtime/memory.c \
-  gcc-$(GCC_VERSION)/libgfortran/runtime/string.c \
-  gcc-$(GCC_VERSION)/libgfortran/fmain.c
+  gcc-$(GCC_VERSION)/libgfortran/runtime/string.c
+#  gcc-$(GCC_VERSION)/libgfortran/fmain.c
 
 CC_SOURCES = \
   gcc-$(GCC_VERSION)/libstdc++-v3/libsupc++/array_type_info.cc \

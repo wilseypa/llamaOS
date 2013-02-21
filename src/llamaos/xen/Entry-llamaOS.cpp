@@ -208,6 +208,10 @@ static vector<string> split (const string &input)
    return tokens;
 }
 
+// void set_args (int argc, char **argv);
+//extern "C" void MAIN__ (void);
+//extern "C" int main (int argc, char **argv);
+
 void entry_llamaOS (start_info_t *start_info)
 {
    register_glibc_exports ();
@@ -255,14 +259,21 @@ void entry_llamaOS (start_info_t *start_info)
       trace ("Before application main()...\n");
 
       // start the application
-      main (args.size () + 1, argv);
+//      fortran_main (args.size () + 1, argv);
+  /* Set up the runtime environment.  */
+//  set_args (args.size () + 1, argv);
+
+  /* Call the Fortran main program.  Internally this is a function
+     called MAIN__ */
+//  MAIN__ ();
+   main (args.size () + 1, argv);
 
       // get rid of all leftover console buffer
       cout.flush ();
       fflush (stdout);
 
       trace ("After application main()...\n");
-      api::sleep(1);
+      api::sleep(10);
    }
    catch (const std::runtime_error &e)
    {
