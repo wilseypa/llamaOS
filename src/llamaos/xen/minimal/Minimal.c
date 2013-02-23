@@ -45,7 +45,7 @@ typedef unsigned long uint64_t;
 #include <llamaos/llamaOS.h>
 
 // runtime stack memory
-char RUNTIME_STACK [2 * LLAMAOS_STACK_SIZE];
+//char RUNTIME_STACK [2 * LLAMAOS_STACK_SIZE];
 
 static int verify_magic (const start_info_t *start_info)
 {
@@ -67,6 +67,21 @@ void minimal_kernel (start_info_t *start_info)
    {
       HYPERVISOR_console_io(CONSOLEIO_write, 32, "\n\nStarting minimal Xen guest...\n\n");
 
+volatile double d1 = 9.4553;
+//printf("NOT CRASHED\n");
+volatile double d2 = (double)(int)d1;
+//printf("NOT CRASHED\n");
+//int ij;
+//for (ij = 0; ij < 6; ij++) {
+//  printf("NOT CRASHED\n");
+//  d1 += d1 + 1;
+//}
+//printf("NOT CRASHED\n");
+//volatile int i1 = d1;
+//printf("NOT CRASHED\n");
+//volatile double d3 = i1;
+//printf("NOT CRASHED\n");
+      
       // loop forever
       for (;;);
    }

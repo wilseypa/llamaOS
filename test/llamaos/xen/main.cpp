@@ -30,27 +30,31 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 #include <iostream>
 
-#include <gtest/gtest.h>
+//#include <gtest/gtest.h>
 
 #include <llamaos/api/sleep.h>
 
 using namespace std;
 
-GTEST_TEST(Default,Test1)
-{
-   int x = 0;
-
-   EXPECT_EQ(0, x);
-}
-
+//GTEST_TEST(Default,Test1)
+//{
+//   int x = 0;
+//
+//   EXPECT_EQ(0, x);
+//}
+extern "C"
 int main (int argc, char *argv [])
 {
-   cout << "running test-xen..." << endl;
-   cout << "  argc: " << argc << ", argv[0]: " << argv [0] << endl;
+//   cout << "running test-xen..." << endl;
+//   cout << "  argc: " << argc << ", argv[0]: " << argv [0] << endl;
 
-   ::testing::InitGoogleTest(&argc, argv);
+//   ::testing::InitGoogleTest(&argc, argv);
 
-   cout << "  RUN_ALL_TESTS: " << RUN_ALL_TESTS() << endl << endl;
+//   cout << "  RUN_ALL_TESTS: " << RUN_ALL_TESTS() << endl << endl;
+
+volatile double d1 = 9.4553;
+//printf("NOT CRASHED\n");
+volatile double d2 = (double)(int)d1;
 
    cout << "waiting 5 sec, then exit..." << endl;
    cout.flush ();
@@ -59,7 +63,7 @@ int main (int argc, char *argv [])
    return 0;
 }
 
-GTEST_TEST(LLAMAOS,TESTTEST)
-{
-   EXPECT_EQ(0, 0);
-}
+//GTEST_TEST(LLAMAOS,TESTTEST)
+//{
+//   EXPECT_EQ(0, 0);
+//}

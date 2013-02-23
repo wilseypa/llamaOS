@@ -41,10 +41,11 @@ CPPFLAGS += \
   -D__XEN_INTERFACE_VERSION__=0x00030205 \
   -include $(SRCDIR)/llamaos/__thread.h
 
+#  ../test/llamaos/Console.cpp \
+#  ../test/llamaos/Gettimeofday.cpp \
+#  ../test/llamaos/Stopwatch.cpp
+
 SOURCES = \
-  ../test/llamaos/Console.cpp \
-  ../test/llamaos/Gettimeofday.cpp \
-  ../test/llamaos/Stopwatch.cpp \
   ../test/llamaos/xen/main.cpp
 
 OBJECTS = $(SOURCES:%.cpp=$(OBJDIR)/%.o)
@@ -54,7 +55,8 @@ DEPENDS = $(OBJECTS:%.o=%.d)
 xen : $(BINDIR)/xen/llamaOS-test
 
 # the entry object must be the first object listed here or the guest will crash!
-$(BINDIR)/xen/llamaOS-test: $(LIBDIR)/xen/Entry.o $(OBJECTS) $(LIBDIR)/gtest.a $(LIBDIR)/xen/llamaOS.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
+# $(BINDIR)/xen/llamaOS-test: $(LIBDIR)/xen/Entry.o $(OBJECTS) $(LIBDIR)/gtest.a $(LIBDIR)/xen/llamaOS.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
+$(BINDIR)/xen/llamaOS-test: $(LIBDIR)/xen/Entry.o $(OBJECTS) $(LIBDIR)/xen/llamaOS.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
 	@$(LD) $(LDFLAGS) -T llamaOS.lds -o $@ $^

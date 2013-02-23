@@ -346,7 +346,7 @@ CPPFLAGS = $(XFLAGS) \
 F90FLAGS = $(XFLAGS) \
   -nostdinc
 
-LDFLAGS = -nostdlib
-# -nostartfiles -nodefaultlibs 
+LDFLAGS = -nostdlib \
+ -nostartfiles -nodefaultlibs 
 
 -include custom-flags.mk

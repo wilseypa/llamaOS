@@ -74,13 +74,16 @@ SUCH DAMAGE.
 
 _start:
    cld                                     /* Clears the direction flag (DF) in the rFLAGS register to zero. */
-   movq stack_start(%rip), %rsp            /* Setup the runtime stack position */
-   andq $(~(LLAMAOS_STACK_SIZE-1)), %rsp   /* Align stack pointer */
+#   movq stack_start(%rip), %rsp            /* Setup the runtime stack position */
+#   andq $(~(LLAMAOS_STACK_SIZE-1)), %rsp   /* Align stack pointer */
+   movq $0x13000, %rbp            /* set up the stack */
+   movq $0x13000, %rsp            /* set up the stack */
+#   subq $0x10, %rsp
    movq %rsi, %rdi                         /* Pass the start_info pointer to start_kernel */
    call minimal_kernel                     /* call the kernel entry function */
 
-stack_start:
-   .quad RUNTIME_STACK+(2*LLAMAOS_STACK_SIZE)
+# stack_start:
+#    .quad RUNTIME_STACK+(2*LLAMAOS_STACK_SIZE)
 
    /* Unpleasant -- the PTE that maps this page is actually overwritten */
    /* to map the real shared-info page! :-)                             */
@@ -91,3 +94,6 @@ shared_info:
 hypercall_page:
 
    .org 0x3000
+stack:
+
+   .org 0x13000                   # reserve 64k stack on a doubleword boundary

@@ -41,7 +41,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <llamaos/Trace.h>
 
 // runtime stack memory
-char RUNTIME_STACK [2 * LLAMAOS_STACK_SIZE];
+// char RUNTIME_STACK [2 * LLAMAOS_STACK_SIZE];
 
 static int verify_magic (const start_info_t *start_info)
 {

@@ -30,6 +30,8 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 #include <cstdint>
 
+#include <iostream>
+
 #include <xen/xen.h>
 
 #include <llamaos/xen/Hypercall.h>
@@ -44,13 +46,13 @@ extern "C"
 void simd_coprocessor_error (void);
 
 extern "C"
-void do_simd_coprocessor_error(struct pt_regs * /* regs */)
+void do_simd_coprocessor_error(struct pt_regs *regs)
 {
-
+   std::cout << "do_simd_coprocessor_error" << std::endl;
 }
 
 static trap_info_t table[] = {
-   {19, 0, 0, pointer_to_address(simd_coprocessor_error)},
+   {19, 0xe033, 3, pointer_to_address(simd_coprocessor_error)},
    {0, 0, 0, 0},
 };
 

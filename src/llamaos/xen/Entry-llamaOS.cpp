@@ -210,7 +210,7 @@ static vector<string> split (const string &input)
 
 // void set_args (int argc, char **argv);
 //extern "C" void MAIN__ (void);
-//extern "C" int main (int argc, char **argv);
+//extern "C" int main (int argc, char *argv[]);
 
 void entry_llamaOS (start_info_t *start_info)
 {
@@ -266,7 +266,7 @@ void entry_llamaOS (start_info_t *start_info)
   /* Call the Fortran main program.  Internally this is a function
      called MAIN__ */
 //  MAIN__ ();
-   main (args.size () + 1, argv);
+   main ((int)(args.size () + 1), argv);
 
       // get rid of all leftover console buffer
       cout.flush ();

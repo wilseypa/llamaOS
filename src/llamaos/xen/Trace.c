@@ -40,6 +40,7 @@ static char buffer [512] = { '\0' };
 
 int trace (const char *format, ...)
 {
+return 0;
    // prep variable arguments
    va_list arg;
    va_start (arg, format);

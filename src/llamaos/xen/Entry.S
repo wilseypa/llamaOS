@@ -76,13 +76,27 @@ SUCH DAMAGE.
 
 _start:
    cld                                     /* Clears the direction flag (DF) in the rFLAGS register to zero. */
-   movq stack_start(%rip), %rsp            /* Setup the runtime stack position */
-   andq $(~(LLAMAOS_STACK_SIZE-1)), %rsp   /* Align stack pointer */
+#   movq stack_start(%rip), %rsp            /* Setup the runtime stack position */
+#   andq $(~(LLAMAOS_STACK_SIZE-1)), %rsp   /* Align stack pointer */
+#   movq $0x13000, %rsp            /* set up the stack */
+   movq $stack_top, %rsp            /* set up the stack */
+   movq %rsp, %rbp
+#   pushq %rbp
+#   movq $0x13000, %rbp            /* set up the stack */
+#   subq $0x8, %rsp
+
+   STMXCSR (%EDI)           #store the MXCSR into memory
+   MOV (%EDI), %EAX           #put into EAX
+   OR $0x1F, %AH             #clear Precision and Divide by Zero masks
+   OR $0x80, %AL              #and the Invalid Operation mask
+   MOV %EAX, (%EDI)           #put back into memory
+   LDMXCSR (%EDI)           #and put that into processor
+
    movq %rsi, %rdi                         /* Pass the start_info pointer to start_kernel */
    call entry_glibc                        /* call the kernel entry function */
 
-stack_start:
-   .quad RUNTIME_STACK+(2*LLAMAOS_STACK_SIZE)
+#stack_start:
+#   .quad RUNTIME_STACK+(2*LLAMAOS_STACK_SIZE)
 
    /* Unpleasant -- the PTE that maps this page is actually overwritten */
    /* to map the real shared-info page! :-)                             */
@@ -93,6 +107,13 @@ shared_info:
 hypercall_page:
 
    .org 0x3000
+blank_page:
+
+   .org 0x4000
+stack_bottom:
+
+   .org 0x14000                   # reserve 64k stack on a doubleword boundary
+stack_top:
 
 /* Offsets into shared_info_t. */
 #define evtchn_upcall_pending           /* 0 */
