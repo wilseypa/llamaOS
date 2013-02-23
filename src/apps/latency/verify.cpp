@@ -39,9 +39,9 @@ void latency::mark_data_alpha (unsigned char *buffer, unsigned long length)
    unsigned long j = 0;
 
    // put alpha data (A B C D ...)
-   for (unsigned long i = 0; i < length; i++)
+   for (unsigned long i = 0; i < length; i++, j++)
    {
-      buffer [i] = ('A' + (++j % 26));
+      buffer [i] = ('A' + (j % 26));
    }
 }
 
@@ -50,9 +50,9 @@ bool latency::verify_data_alpha (const unsigned char *buffer, unsigned long leng
    unsigned long j = 0;
    unsigned char c;
 
-   for (unsigned long i = 0; i < length; i++)
+   for (unsigned long i = 0; i < length; i++, j++)
    {
-      c = 'A' + (++j % 26);
+      c = 'A' + (j % 26);
 
       if (buffer [i] != c)
       {
@@ -69,9 +69,9 @@ void latency::mark_data_numeric (unsigned char *buffer, unsigned long length)
    unsigned long j = 0;
 
    // put num data (0 1 2 3 ...)
-   for (unsigned long i = 0; i < length; i++)
+   for (unsigned long i = 0; i < length; i++, j++)
    {
-      buffer [i] = ('0' + (++j % 10));
+      buffer [i] = ('0' + (j % 10));
    }
 }
 
@@ -80,9 +80,9 @@ bool latency::verify_data_numeric (const unsigned char *buffer, unsigned long le
    unsigned long j = 0;
    unsigned char c;
 
-   for (unsigned long i = 0; i < length; i++)
+   for (unsigned long i = 0; i < length; i++, j++)
    {
-      c = '0' + (++j % 10);
+      c = '0' + (j % 10);
 
       if (buffer [i] != c)
       {

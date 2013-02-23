@@ -388,6 +388,9 @@ bool Hypercall::grant_table_unmap_grant_ref (gnttab_unmap_grant_ref_t &unmap_gra
 
 bool Hypercall::sched_op_yield ()
 {
+   // stop doing this, it may be halting the guest?
+   // return true;
+#if 1
    // __HYPERVISOR_sched_op             29
    int result = HYPERVISOR_sched_op (SCHEDOP_yield, 0);
 
@@ -399,6 +402,7 @@ bool Hypercall::sched_op_yield ()
    }
 
    return true;
+#endif
 }
 
 bool Hypercall::sched_op_block ()

@@ -144,22 +144,37 @@ PCI_impl::PCI_impl ()
    grant_ref_t ref = Hypervisor::get_instance ()->grant_table.grant_access (backend_id, pci_sharedinfo);
    cout << "grant ref: " << ref << endl;
 
+   cout << "calling event_channel_alloc_unbound..." << endl;
    Hypercall::event_channel_alloc_unbound (0, port);
+   cout << "event_channel_alloc_unbound resulted in port " << port << endl;
 
+   cout << "starting transaction to initialise xenbus device..." << endl;
    xenstore.start_transaction (1);
    xenstore.write ("device/pci/0/pci-op-ref", ref);
    xenstore.write ("device/pci/0/event-channel", port);
    xenstore.write ("device/pci/0/magic", XEN_PCI_MAGIC);
    xenstore.write ("device/pci/0/state", XenbusStateInitialised);
    xenstore.end_transaction (1);
+   cout << "ending transaction to initialise xenbus device..." << endl;
 
-   sleep (3);
+   string backend = xenstore.read("device/pci/0/backend");
+
+   for (int i = 0; i < 10; i++)
+   {
+      string backend_state = xenstore.read(backend + "/state");
+
+      cout << "waiting for backend state: " << backend_state << endl;
+
+      if (backend_state == "4")
+      {
+         break;
+      }
+
+      sleep (1);
+   }
 
    xenstore.write ("device/pci/0/state", XenbusStateConnected);
 
-   sleep (3);
-
-   string backend = xenstore.read("device/pci/0/backend");
    cout << "backend: " << backend << endl;
    cout << "backend state: " << xenstore.read(backend+"/state") << endl;
    cout << "frontend state: " << xenstore.read("device/pci/0/state") << endl;

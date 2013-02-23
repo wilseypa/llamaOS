@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012, William Magato
+Copyright (c) 2013, William Magato
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,32 +28,26 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <stdint.h>
-#include <stdarg.h>
-#include <stdio.h>
-#include <string.h>
+#include <iostream>
 
-#include <llamaos/xen/Hypercall-macros.h>
-#include <llamaos/Trace.h>
+#include <llamaos/api/sleep.h>
+#include <llamaos/api/pci/PCI.h>
 
-static char buffer [512] = { '\0' };
+using namespace std;
+using namespace llamaos::api;
+using namespace llamaos::api::pci;
 
-int trace (const char *format, ...)
+int main (int /* argc */, char ** /* argv [] */)
 {
-   // prep variable arguments
-   va_list arg;
-   va_start (arg, format);
+   cout << "running 82574 llamaNET domain...\n" << endl;
+   PCI pci;
+   sleep (1);
+   cout << "PCI config:" << endl;
+   cout << pci << endl << endl;
 
-   // copy formatted output to buffer
-   int count = vsnprintf (buffer, sizeof(buffer)-1, format, arg);
+   cout << "waiting 1 sec, then exit..." << endl;
+   cout.flush ();
+   sleep (1);
 
-   // term variable arguments
-   va_end (arg);
-
-   // write buffer to system output/log
-   // xen::Hypercall::console_io (buffer);
-   HYPERVISOR_console_io(CONSOLEIO_write, count, buffer);
-
-   // return the number characters written
-   return count;
+   return 0;
 }

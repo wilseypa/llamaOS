@@ -54,6 +54,7 @@ all:
 	@$(MAKE) -f apps/latency-llamaNET.mk
 #	@$(MAKE) -f apps/latency-MPI.mk
 	@$(MAKE) -f apps/latency-TCPIP.mk
+	@$(MAKE) -f apps/lspci.mk xen
 	@$(MAKE) -f net/i82574.mk xen
 	@$(MAKE) -f net/i80003es2lan.mk xen
 	@$(MAKE) -f llamaOS-xen-test.mk xen
