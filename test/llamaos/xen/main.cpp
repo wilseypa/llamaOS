@@ -29,12 +29,20 @@ either expressed or implied, of the copyright holder(s) or contributors.
 */
 
 #include <iostream>
+#include <algorithm>    // std::for_each
+#include <map>
+#include <unordered_map>
 
 //#include <gtest/gtest.h>
 
 #include <llamaos/api/sleep.h>
 
 using namespace std;
+
+void print (std::pair<int, string> p)
+{
+   cout << ' ' <<  p.second << endl;
+}
 
 //GTEST_TEST(Default,Test1)
 //{
@@ -51,6 +59,10 @@ int main (int argc, char *argv [])
 //   ::testing::InitGoogleTest(&argc, argv);
 
 //   cout << "  RUN_ALL_TESTS: " << RUN_ALL_TESTS() << endl << endl;
+   struct timeval tv1;
+   struct timeval tv2;
+
+   gettimeofday (&tv1, 0);
 
    cout << "using doubles that cause SIMD error..." << endl;
    cout.flush ();
@@ -61,9 +73,27 @@ int main (int argc, char *argv [])
    cout << "using doubles that cause SIMD error..." << endl;
    cout.flush ();
 
-//   d1 = 9.4553;
-//   d2 = (double)(int)d1;
+   d1 = 9.4553;
+   d2 = (double)(int)d1;
 
+   gettimeofday (&tv2, 0);
+
+   cout << "gettimeofday: " <<  (((tv2.tv_sec - tv1.tv_sec) * 1000000UL) + tv2.tv_usec - tv1.tv_usec) << endl;
+
+   timeval tv;
+   gettimeofday(&tv, NULL);
+   cout << "John's Wtime: " << ((double)tv.tv_sec) + ((double)tv.tv_usec)/(1000000.0) << endl;;
+
+   map<int, string> map;
+   map[0] = "bill";
+   map[1] = "magato";
+   for_each(map.begin(), map.end(), print); 
+
+   unordered_map<int, string> umap;
+   umap[0] = "isa";
+   umap[1] = "braden";
+   for_each(umap.begin(), umap.end(), print); 
+   
    cout << "waiting 5 sec, then exit..." << endl;
    cout.flush ();
    llamaos::api::sleep (5);
