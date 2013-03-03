@@ -52,9 +52,17 @@ int main (int argc, char *argv [])
 
 //   cout << "  RUN_ALL_TESTS: " << RUN_ALL_TESTS() << endl << endl;
 
-volatile double d1 = 9.4553;
-//printf("NOT CRASHED\n");
-volatile double d2 = (double)(int)d1;
+   cout << "using doubles that cause SIMD error..." << endl;
+   cout.flush ();
+
+   volatile double d1 = 9.4553;
+   volatile double d2 = (double)(int)d1;
+
+   cout << "using doubles that cause SIMD error..." << endl;
+   cout.flush ();
+
+//   d1 = 9.4553;
+//   d2 = (double)(int)d1;
 
    cout << "waiting 5 sec, then exit..." << endl;
    cout.flush ();

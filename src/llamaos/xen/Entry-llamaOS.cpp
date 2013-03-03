@@ -216,6 +216,8 @@ void entry_llamaOS (start_info_t *start_info)
 {
    register_glibc_exports ();
 
+//   xen_features [XENFEAT_supervisor_mode_kernel] = 1;
+
    try
    {
       // create the one and only hypervisor object
@@ -266,14 +268,14 @@ void entry_llamaOS (start_info_t *start_info)
   /* Call the Fortran main program.  Internally this is a function
      called MAIN__ */
 //  MAIN__ ();
-   main ((int)(args.size () + 1), argv);
+      main ((int)(args.size () + 1), argv);
 
       // get rid of all leftover console buffer
       cout.flush ();
       fflush (stdout);
 
       trace ("After application main()...\n");
-      api::sleep(10);
+      api::sleep(1);
    }
    catch (const std::runtime_error &e)
    {

@@ -8,7 +8,7 @@
 #define NUM_SAMPLES 884736
 #define STD_DEVIATION 1024
 #define NUM_SOURCES 32
-#define COMPILETIME "23 Feb 2013"
+#define COMPILETIME "02 Mar 2013"
 #define NPBVERSION "3.2"
 #define MPICC "cc"
 #define CFLAGS "-O3"

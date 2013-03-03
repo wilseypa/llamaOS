@@ -324,7 +324,10 @@ MAKEFLAGS = --silent
 XFLAGS = \
   -m64 -g -O1 \
   -Wall \
-  -fno-common
+  -fno-common \
+  -mno-red-zone \
+  -fno-reorder-blocks \
+  -fno-asynchronous-unwind-tables
 # -Wextra
 # -ffreestanding
 

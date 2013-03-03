@@ -303,11 +303,21 @@ static void register_glibc_exports (void)
    register_llamaos_writev (glibc_writev);
 }
 
+#define MXCSR_DEFAULT 0x1f80
+
+static void fpu_init(void)
+{
+   unsigned long val = MXCSR_DEFAULT;
+   asm volatile ( "fninit; ldmxcsr %0" : : "m" (val) );
+}
+
 // void __libc_init_first (int argc, char *arg0, ...);
 
 // entry function called from Entry.S
 void entry_glibc (start_info_t *start_info)
 {
+   fpu_init ();
+
    // check to make sure the initial memory is good
    if (verify_magic (start_info))
    {

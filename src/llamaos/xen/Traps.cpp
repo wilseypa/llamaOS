@@ -29,7 +29,6 @@ either expressed or implied, of the copyright holder(s) or contributors.
 */
 
 #include <cstdint>
-
 #include <iostream>
 
 #include <xen/xen.h>
@@ -45,19 +44,58 @@ using namespace llamaos::memory;
 extern "C"
 void simd_coprocessor_error (void);
 
+struct pt_regs {
+        unsigned long r15;
+        unsigned long r14;
+        unsigned long r13;
+        unsigned long r12;
+        unsigned long rbp;
+        unsigned long rbx;
+/* arguments: non interrupts/non tracing syscalls only save upto here*/
+        unsigned long r11;
+        unsigned long r10;      
+        unsigned long r9;
+        unsigned long r8;
+        unsigned long rax;
+        unsigned long rcx;
+        unsigned long rdx;
+        unsigned long rsi;
+        unsigned long rdi;
+        unsigned long orig_rax;
+/* end of arguments */  
+/* cpu exception frame or undefined */
+        unsigned long rip;
+        unsigned long cs;
+        unsigned long eflags; 
+        unsigned long rsp; 
+        unsigned long ss;
+/* top of stack page */ 
+};
+
+// SIMD, gcc with Intel Core 2 Duo uses SSE2(4)
+#define getmxcsr(x)    asm ("stmxcsr %0" : "=m" (x));
+#define setmxcsr(x)    asm ("ldmxcsr %0" : "=m" (x));
+
 extern "C"
 void do_simd_coprocessor_error(struct pt_regs *regs)
 {
-   std::cout << "do_simd_coprocessor_error" << std::endl;
+
 }
 
-static trap_info_t table[] = {
-   {19, 0xe033, 3, pointer_to_address(simd_coprocessor_error)},
-   {0, 0, 0, 0},
-};
+static trap_info_t table [2];
 
 Traps::Traps ()
 {
+   table [0].vector = 19;
+   table [0].flags = 0;
+   table [0].cs = 0xe033;
+   table [0].address = pointer_to_address(simd_coprocessor_error);
+
+   table [1].vector = 0;
+   table [1].flags = 0;
+   table [1].cs = 0;
+   table [1].address = 0;
+
    Hypercall::set_trap_table (table);
 }
 
