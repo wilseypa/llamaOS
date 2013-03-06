@@ -46,7 +46,7 @@ SOURCES = \
 OBJECTS = $(SOURCES:%.c=$(OBJDIR)/%.o)
 DEPENDS = $(OBJECTS:%.o=%.d)
 
-util/NAS/dt/npbparams.h: apps/NAS/params.def
+util/NAS/dt/npbparams.h: apps/NAS/params.def util/NAS/setparams
 	echo Creating parameter header files
 	util/NAS/setparams `grep DT apps/NAS/params.def`
 	mkdir util/NAS/dt
