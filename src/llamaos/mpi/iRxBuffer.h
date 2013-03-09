@@ -52,6 +52,7 @@ class iRxBuffer {
    private:
       std::list<MpiRxMessage_T> buffer;
       std::list<MpiRxMessage_T>::iterator getMessage(int source, int tag);
+      std::list<MpiRxMessage_T>::iterator getInProgressMessage(int source, int tag);
 };
 
 #endif

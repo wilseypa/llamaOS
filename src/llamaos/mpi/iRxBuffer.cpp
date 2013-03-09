@@ -44,8 +44,18 @@ std::list<MpiRxMessage_T>::iterator iRxBuffer::getMessage(int source, int tag) {
    return buffer.end();
 }
 
+std::list<MpiRxMessage_T>::iterator iRxBuffer::getInProgressMessage(int source, int tag) {
+   for (std::list<MpiRxMessage_T>::iterator it = buffer.begin(); it != buffer.end(); it++) {
+      if (((it->source == source) || (source == MPI_ANY_SOURCE)) &&
+               ((it->tag == tag) || (tag == MPI_ANY_TAG)) && (it->curSize < it->size)) {
+         return it;
+      }
+   }
+   return buffer.end();
+}
+
 void iRxBuffer::pushMessage(unsigned char *buf, int size, int source, int tag, int totSize, int part) {
-   std::list<MpiRxMessage_T>::iterator it = getMessage(source, tag);
+   std::list<MpiRxMessage_T>::iterator it = getInProgressMessage(source, tag);
    unsigned char *dataPt;
    if (it == buffer.end()) { //New message
       dataPt = new unsigned char[totSize];
