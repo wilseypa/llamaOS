@@ -74,7 +74,7 @@ void iProbe(int source, int tag, MPI_Comm comm, MPI_Context context, MPI_Status 
 
    // If not in receive buffer, wait unti message received while buffering all other messages
    net::llamaNET::Protocol_header *header;
-   int rxCommContext, rxTag, rxSource;
+   int rxCommContext, rxTag, rxSource, rxTotSize, rxPart;
    MPI_Comm rxComm;
    MPI_Context rxContext;
    for (;;) {
@@ -85,6 +85,8 @@ void iProbe(int source, int tag, MPI_Comm comm, MPI_Context context, MPI_Status 
       rxComm = rxCommContext & MPI_COMM_MASK;
       rxContext = rxCommContext & MPI_CONTEXT_MASK;
       memcpy(&rxTag, data++, 4);
+      memcpy(&rxTotSize, data++, 4);
+      memcpy(&rxPart, data++, 4);
       rxSource = static_cast<int>(header->src);
 
       // Print header
@@ -109,7 +111,8 @@ void iProbe(int source, int tag, MPI_Comm comm, MPI_Context context, MPI_Status 
          // Add to receive buffer
          int rxCommRank = it->second->getRankFromWorldRank(rxSource);
          if (rxCommRank != MPI_UNDEFINED) { // rank is in comm
-            rxBuff->pushMessage((unsigned char*)data, header->len - 8, rxCommRank, rxTag);
+            rxBuff->pushMessage((unsigned char*)data, header->len - 16, rxCommRank, 
+                  rxTag, rxTotSize, rxPart);
          }
 
          // Check if desired message type - Block until received
@@ -119,7 +122,7 @@ void iProbe(int source, int tag, MPI_Comm comm, MPI_Context context, MPI_Status 
                status->MPI_SOURCE = commPtr->getRankFromWorldRank(rxSource);
                status->MPI_TAG = rxTag;
                status->MPI_ERROR = MPI_SUCCESS;
-               status->size = header->len - 8;
+               status->size = rxTotSize;
             }
             llamaNetInterface->release_recv_buffer(header); // Release llama rx message buffer
             return;

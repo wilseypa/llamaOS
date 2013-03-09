@@ -39,17 +39,19 @@ typedef struct MpiRxMessage_T {
    int size;
    int source; // Comm Rank
    int tag;
+   int curSize;
 } MpiRxMessage_T;
 
 class iRxBuffer {
    public:
       iRxBuffer() {}
       ~iRxBuffer() {}
-      void pushMessage(unsigned char *buf, int size, int source, int tag);
+      void pushMessage(unsigned char *buf, int size, int source, int tag, int totSize, int part);
       bool popMessage(int source, int tag, void *buf, int size, MPI_Status *status);
       bool probeMessage(int source, int tag, MPI_Status *status);
    private:
       std::list<MpiRxMessage_T> buffer;
+      std::list<MpiRxMessage_T>::iterator getMessage(int source, int tag);
 };
 
 #endif

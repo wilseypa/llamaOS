@@ -56,20 +56,34 @@ void iSend(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_C
    if (srcWorldRank == MPI_UNDEFINED) {return;} // Source rank is not in comm
    int commContext = comm | context;
 
-   header = llamaNetInterface->get_send_buffer();
-   header->dest = static_cast<uint32_t>(destWorldRank);
-   header->src = static_cast<uint32_t>(srcWorldRank);
-   header->type = 1;
-   header->seq = seq++; 
-   header->len = sizeInBytes + 8;
-   memcpy(header->eth_dest, mpiData.hostTable[destWorldRank].address, 6);
-   memcpy(header->eth_src, mpiData.address, 6);
+   // Split large messages into multiple sends
+   int numFullMess = sizeInBytes/MAX_MESS_SIZE;
+   int remMessSize = sizeInBytes%MAX_MESS_SIZE;
+   for (int partOn=0; partOn <= numFullMess; partOn++) {
+      int messSize = (partOn==numFullMess) ? remMessSize : MAX_MESS_SIZE;
+      if (messSize == 0) {break;}
+    
+      header = llamaNetInterface->get_send_buffer();
+      header->dest = static_cast<uint32_t>(destWorldRank);
+      header->src = static_cast<uint32_t>(srcWorldRank);
+      header->type = 1;
+      header->seq = seq++; 
+      header->len = messSize + 16;
+      memcpy(header->eth_dest, mpiData.hostTable[destWorldRank].address, 6);
+      memcpy(header->eth_src, mpiData.address, 6);
 
-   // get pointer to data section of buffer
-   int *data = reinterpret_cast<int *>(header + 1);
-   memcpy(data++, &commContext, 4);
-   memcpy(data++, &tag, 4);
-   memcpy(data, buf, sizeInBytes);
+      // get pointer to data section of buffer
+      int *data = reinterpret_cast<int *>(header + 1);
+      memcpy(data++, &commContext, 4);
+      memcpy(data++, &tag, 4);
+	   memcpy(data++, &sizeInBytes, 4);
+      memcpy(data++, &partOn, 4);
+      memcpy(data, buf, messSize);
+
+      // send the message
+      llamaNetInterface->send(header);
+      buf = (void*)((char*)buf + MAX_MESS_SIZE); // Advance the pointer
+   }
 
    // Print header
    #ifdef MPI_COUT_EVERY_MESSAGE
@@ -79,7 +93,4 @@ void iSend(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_C
    iPrintMAC(header->eth_src);
    cout << endl;
    #endif
-
-   // send/recv and verify the data has been changed to numerals (1,2,3,...)
-   llamaNetInterface->send(header);
 }

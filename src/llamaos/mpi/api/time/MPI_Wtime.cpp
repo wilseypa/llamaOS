@@ -33,8 +33,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <string.h>
 
 double MPI_Wtime() {
-   //timeval tv;
-   //gettimeofday(&tv, NULL);
-   //return ((double)tv.tv_sec) + ((double)tv.tv_usec)/(1000000.0);
-   return 0;
+   timeval tv;
+   gettimeofday(&tv, NULL);
+   return ((double)tv.tv_sec) + ((double)tv.tv_usec)/(1000000.0);
 }

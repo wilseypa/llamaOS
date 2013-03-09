@@ -41,23 +41,112 @@ void duoTest();
 void groupTest();
 void commTest();
 void nonBlockTest();
+void largeTest();
 
 int main(int argc, char *argv []) {
    MPI_Init (&argc, &argv);
    cout << "Starting program" << endl;
    double startTime = MPI_Wtime();
 
-   //duoTest();   // for 2
+   largeTest();	// for 2
+   duoTest();   // for 2
    //groupTest(); // for 3 or more
    //commTest();    // for 3 or more
    nonBlockTest(); // for 2 or more
 
    double stopTime = MPI_Wtime();
-   cout << "Tests completed in " << stopTime-startTime << " seconds" << endl;
+   cout << "Tests completed in " << (int)(stopTime-startTime) << " seconds" << endl;
    cout << "Ending program" << endl;
    MPI_Finalize();
 
    return 0;
+}
+
+void largeTest() {
+   int rank, totNodes;
+   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+   MPI_Comm_size(MPI_COMM_WORLD, &totNodes);
+
+   cout << "Starting large test" << endl;
+
+   cout << "Direct Test" << endl;
+	for (int mSize = 1; mSize <= 10000; mSize *= 10) {
+      cout << "Message Size: " << mSize << "...  ";
+		int *buf = new int[mSize];
+      if (rank == 0) {
+         for (int source = 1; source < totNodes; source++) {
+            MPI_Status status;
+            MPI_Recv(buf, mSize, MPI_INT, source, 0, MPI_COMM_WORLD, &status);
+			   bool isValid = true;
+            for (int i=0; i < mSize; i++) {
+				   if (buf[i] != i) {
+                  isValid = false;
+                  break;
+               }
+			   }
+            if (isValid) {
+               cout << "VALID     ";
+            } else {
+               cout << "NOT VALID     ";
+            }
+         }
+         cout << endl;
+      } else {
+			for (int i=0; i < mSize; i++) {
+				buf[i] = i;
+			}
+         MPI_Send(buf, mSize, MPI_INT, 0, 0, MPI_COMM_WORLD);
+         cout << "Sent message to root" << endl;
+      }  
+		delete[] buf;
+      cout << "Barrier" << endl;
+      MPI_Barrier(MPI_COMM_WORLD);
+      llamaos::api::sleep(3);
+   }
+
+   cout << "Buffered Test" << endl;
+	for (int mSize = 1; mSize <= 10000; mSize *= 10) {
+      cout << "Message Size: " << mSize << "...  ";
+		int *buf0 = new int[mSize];
+      int *buf1 = new int[mSize];
+      if (rank == 0) {
+         for (int source = 1; source < totNodes; source++) {
+            MPI_Status status;
+            MPI_Recv(buf1, mSize, MPI_INT, source, 1, MPI_COMM_WORLD, &status);
+            MPI_Recv(buf0, mSize, MPI_INT, source, 0, MPI_COMM_WORLD, &status);
+			   bool isValid = true;
+            for (int i=0; i < mSize; i++) {
+				   if (buf0[i] != i) {
+                  isValid = false;
+                  break;
+               }
+				   if (buf1[i] != mSize+i) {
+                  isValid = false;
+                  break;
+               }
+			   }
+            if (isValid) {
+               cout << "VALID     ";
+            } else {
+               cout << "NOT VALID     ";
+            }
+         }
+         cout << endl;
+      } else {
+			for (int i=0; i < mSize; i++) {
+				buf0[i] = i;
+            buf1[i] = mSize+i;
+			}
+         MPI_Send(buf0, mSize, MPI_INT, 0, 0, MPI_COMM_WORLD);
+         MPI_Send(buf1, mSize, MPI_INT, 0, 1, MPI_COMM_WORLD);
+         cout << "Sent messages to root" << endl;
+      }  
+		delete[] buf0;
+      delete[] buf1;
+      cout << "Barrier" << endl;
+      MPI_Barrier(MPI_COMM_WORLD);
+      llamaos::api::sleep(3);
+   }
 }
 
 void nonBlockTest() {

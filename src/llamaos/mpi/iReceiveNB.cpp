@@ -41,7 +41,7 @@ using namespace llamaos::xen;
 
 void iReceiveNB(void *buf, int count, MPI_Datatype datatype, int source, int tag, 
 			MPI_Comm comm, MPI_Context context, MPI_Status *status, int *flag) {
-   // Determine actual send size in bytes
+/*   // Determine actual send size in bytes
    unsigned int sizeInBytes = count*iSizeof(datatype);
    (*flag) = false;
 
@@ -139,5 +139,5 @@ void iReceiveNB(void *buf, int count, MPI_Datatype datatype, int source, int tag
       }
    }
    llamaNetInterface->release_recv_buffer(header); // Release llama rx message buffer
-   return;
+   return;*/
 }

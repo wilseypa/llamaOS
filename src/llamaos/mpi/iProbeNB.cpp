@@ -40,7 +40,7 @@ using namespace llamaos::net;
 using namespace llamaos::xen;
 
 void iProbeNB(int source, int tag, MPI_Comm comm, MPI_Context context, MPI_Status *status, int *flag) {
-   (*flag) = false;
+   /*(*flag) = false;
    // Get receive buffer
    iRxBuffer *rxBuff;
    MAP_TYPE<MPI_Comm,iComm*>::iterator it = mpiData.comm.find(comm);
@@ -130,5 +130,5 @@ void iProbeNB(int source, int tag, MPI_Comm comm, MPI_Context context, MPI_Statu
       cout << "WARNING: Received comm " << rxComm << " does not exist" << endl;
    }
    llamaNetInterface->release_recv_buffer(header); // Release llama rx message buffer
-   return;
+   return;*/
 }

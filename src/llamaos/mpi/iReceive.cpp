@@ -42,7 +42,7 @@ using namespace llamaos::xen;
 void iReceive(void *buf, int count, MPI_Datatype datatype, int source, int tag, 
 			MPI_Comm comm, MPI_Context context, MPI_Status *status) {
    // Determine actual send size in bytes
-   unsigned int sizeInBytes = count*iSizeof(datatype);
+   int sizeInBytes = count*iSizeof(datatype);
 
    // Get receive buffer
    iRxBuffer *rxBuff;
@@ -78,9 +78,10 @@ void iReceive(void *buf, int count, MPI_Datatype datatype, int source, int tag,
 
    // If not in receive buffer, wait unti message received while buffering all other messages
    net::llamaNET::Protocol_header *header;
-   int rxCommContext, rxTag, rxSource;
+   int rxCommContext, rxTag, rxSource, rxTotSize, rxPart;
    MPI_Comm rxComm;
    MPI_Context rxContext;
+   int curRxSize = 0;
    for (;;) {
       // Receive most recent packet and extract needed information
       header = llamaNetInterface->recv(mpiData.rank);
@@ -89,6 +90,8 @@ void iReceive(void *buf, int count, MPI_Datatype datatype, int source, int tag,
       rxComm = rxCommContext & MPI_COMM_MASK;
       rxContext = rxCommContext & MPI_CONTEXT_MASK;
       memcpy(&rxTag, data++, 4);
+      memcpy(&rxTotSize, data++, 4);
+      memcpy(&rxPart, data++, 4);
       rxSource = static_cast<int>(header->src);
 
       // Print header
@@ -104,19 +107,31 @@ void iReceive(void *buf, int count, MPI_Datatype datatype, int source, int tag,
       if (((rxSource == srcWorldRank) || (srcWorldRank == MPI_ANY_SOURCE)) &&
                (rxComm == comm) && (rxContext == context) && ((rxTag == tag) || (tag == MPI_ANY_TAG))) {
          // Verify length
-         if (sizeInBytes < header->len - 8) { // Will not fit in buffer - discard
+         if (sizeInBytes < rxTotSize) { // Will not fit in buffer - discard
             llamaNetInterface->release_recv_buffer(header);
             return;
          }
-         memcpy(buf, data, header->len - 8);
-         if (status != MPI_STATUS_IGNORE) {
-            status->MPI_SOURCE = commPtr->getRankFromWorldRank(rxSource);
-            status->MPI_TAG = rxTag;
-            status->MPI_ERROR = MPI_SUCCESS;
-            status->size = header->len - 8;
+         // Determine the part of buffer to add to
+         char *bufPart = (char*)buf;
+         bufPart += rxPart*MAX_MESS_SIZE;
+
+         // Copy into buffer
+         memcpy(bufPart, data, header->len - 16);
+         curRxSize += (header->len - 16);
+         // Check if finished
+         bool isFinished = false;
+         if (curRxSize > rxTotSize) {isFinished = true;} //error
+         if (curRxSize == rxTotSize) {
+            if (status != MPI_STATUS_IGNORE) {
+               status->MPI_SOURCE = commPtr->getRankFromWorldRank(rxSource);
+               status->MPI_TAG = rxTag;
+               status->MPI_ERROR = MPI_SUCCESS;
+               status->size = rxTotSize;
+            }
+            isFinished = true;
          }
          llamaNetInterface->release_recv_buffer(header); // Release llama rx message buffer
-         return;
+         if (isFinished) {return;}
       } else { // Store in receive buffer
          it = mpiData.comm.find(rxComm);
          if (it != mpiData.comm.end()) { // Comm is declared
@@ -130,7 +145,8 @@ void iReceive(void *buf, int count, MPI_Datatype datatype, int source, int tag,
             // Add to receive buffer
             int rxCommRank = it->second->getRankFromWorldRank(rxSource);
             if (rxCommRank != MPI_UNDEFINED) { // rank is in comm
-               rxBuff->pushMessage((unsigned char*)data, header->len - 8, rxCommRank, rxTag);
+               rxBuff->pushMessage((unsigned char*)data, header->len-16, rxCommRank, 
+                     rxTag, rxTotSize, rxPart);
             }
          } else {
             cout << "WARNING: Received comm " << rxComm << " does not exist" << endl;
