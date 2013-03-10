@@ -85,6 +85,7 @@ typedef int MPI_Context;
 #define MPI_FUNC_TAG_SCATTER ((int)0xFFFFFFFB)
 #define MPI_FUNC_TAG_ALLTOALL ((int)0xFFFFFFFA)
 #define MPI_FUNC_TAG_REDUCE ((int)0xFFFFFFF9)
+#define MPI_FUNC_TAG_ALLTOALLV ((int)0xFFFFFFF8)
 
 typedef struct MpiHostTable_T {
    uint8_t address[6];

@@ -185,6 +185,9 @@ int MPI_Allgather(void *sendbuf, int sendcount, MPI_Datatype sendtype,
 int MPI_Alltoall(void *sendbuf, int sendcount, MPI_Datatype sendtype, 
                  void *recvbuf, int recvcount, MPI_Datatype recvtype, 
                  MPI_Comm comm);
+int MPI_Alltoallv(void *sendbuf, int *sendcnts, int *sdispls, 
+                  MPI_Datatype sendtype, void *recvbuf, int *recvcnts, 
+                  int *rdispls, MPI_Datatype recvtype, MPI_Comm comm);
 // COLLECTIVE - Computational
 int MPI_Reduce(void *sendbuf, void *recvbuf, int count, MPI_Datatype datatype, 
                MPI_Op op, int root, MPI_Comm comm);

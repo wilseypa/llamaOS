@@ -33,33 +33,34 @@
 # include common variables
 include common.mk
 
-MAKEFILE_SOURCES += apps/NAS/setparams.mk
+MAKEFILE_SOURCES += apps/NAS/NAS-is.mk
 
 CFLAGS += \
   -I $(INCDIR) \
   -I $(SRCDIR) \
-  -I $(SRCDIR)/apps/NPB3.2-MPI/sys
+  -I $(SRCDIR)/llamaos/mpi \
+  -I ../src/apps \
+  -I util/NAS/is \
+  -D__XEN_INTERFACE_VERSION__=0x00030205 \
+  -include $(SRCDIR)/llamaos/__thread.h
 
 SOURCES = \
-  apps/NPB3.2-MPI/sys/setparams.c
+  apps/NPB3.2-MPI/common/c_print_results.c \
+  apps/NPB3.2-MPI/common/c_timers.c \
+  apps/NPB3.2-MPI/IS/is.c
 
 OBJECTS = $(SOURCES:%.c=$(OBJDIR)/%.o)
 DEPENDS = $(OBJECTS:%.o=%.d)
+ 
+.PHONY: xen
+xen : $(BINDIR)/xen/NAS/is
 
-util/NAS/dt/npbparams.h: apps/NAS/params.def util/NAS/setparams
-	echo Creating parameter header files
-	util/NAS/setparams `grep DT apps/NAS/params.def`
-	mkdir -p util/NAS/dt
-	mv util/NAS/npbparams.h util/NAS/dt/npbparams.h
-	util/NAS/setparams `grep IS apps/NAS/params.def`
-	mkdir -p util/NAS/is
-	mv util/NAS/npbparams.h util/NAS/is/npbparams.h
-
-util/NAS/setparams: $(OBJECTS)
-	echo $(OBJECTS)
+# the entry object must be the first object listed here or the guest will crash!
+$(BINDIR)/xen/NAS/is: $(LIBDIR)/xen/Entry.o $(OBJECTS) $(LIBDIR)/xen/llamaMPI.a $(LIBDIR)/xen/llamaOS.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
-	@$(LD) -o $@ $^
+	@$(LD) $(LDFLAGS) -T llamaOS.lds -o $@ $^
+	@gzip -c -f --best $@ >$@.gz
 	@echo successfully built: $@
 	@echo
 
