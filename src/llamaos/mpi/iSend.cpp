@@ -33,6 +33,8 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <iostream>
 #include <string.h>
 
+#include <llamaos/api/sleep.h>
+
 using namespace std;
 
 void iSend(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm, MPI_Context context) {
@@ -62,7 +64,11 @@ void iSend(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_C
    for (int partOn=0; partOn <= numFullMess; partOn++) {
       int messSize = (partOn==numFullMess) ? remMessSize : MAX_MESS_SIZE;
       if (messSize == 0) {break;}
-    
+
+      #ifdef SLOW_SENDS
+      llamaos::api::sleep(1);
+      #endif
+
       header = llamaNetInterface->get_send_buffer();
       header->dest = static_cast<uint32_t>(destWorldRank);
       header->src = static_cast<uint32_t>(srcWorldRank);
@@ -80,17 +86,15 @@ void iSend(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_C
       memcpy(data++, &partOn, 4);
       memcpy(data, buf, messSize);
 
+      // Print header
+      #ifdef MPI_COUT_EVERY_MESSAGE
+      cout << "Sending to dest " << header->dest << " Context: " << commContext;
+      cout << " Tag: " << tag << " TotSize: " << sizeInBytes << " Part: " << partOn;
+      cout << endl;
+      #endif
+
       // send the message
       llamaNetInterface->send(header);
       buf = (void*)((char*)buf + MAX_MESS_SIZE); // Advance the pointer
    }
-
-   // Print header
-   #ifdef MPI_COUT_EVERY_MESSAGE
-   cout << "Sending to dest " << header->dest << " with MAC address ";
-   iPrintMAC(header->eth_dest);
-   cout << "    From src " << header->src << " with MAC address ";
-   iPrintMAC(header->eth_src);
-   cout << endl;
-   #endif
 }

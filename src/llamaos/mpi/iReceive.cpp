@@ -68,11 +68,15 @@ void iReceive(void *buf, int count, MPI_Datatype datatype, int source, int tag,
    #ifdef MPI_COUT_EVERY_MESSAGE
    cout << "Waiting for message from src " << srcWorldRank << " from MAC address ";
    iPrintMAC(mpiData.hostTable[srcWorldRank].address);
+   cout << " Size: " << sizeInBytes << " Tag: " << tag;
    cout << endl;
    #endif
 
    // Check through receive buffer
    if (rxBuff->popMessage(source, tag, buf, sizeInBytes, status)) { // Message has been popped
+      #ifdef MPI_COUT_EVERY_MESSAGE
+      cout << "Receive from src " << srcWorldRank << " COMPLETE" << endl;
+      #endif
       return;
    }
 
@@ -96,10 +100,8 @@ void iReceive(void *buf, int count, MPI_Datatype datatype, int source, int tag,
 
       // Print header
       #ifdef MPI_COUT_EVERY_MESSAGE
-      cout << "Received from src " << header->src << " with MAC address ";
-      iPrintMAC(header->eth_src);
-      cout << "    At dest " << header->dest << " with MAC address ";
-      iPrintMAC(header->eth_dest);
+      cout << "Received from src " << header->src << " Context: " << rxCommContext;
+      cout << " Tag: " << rxTag << " TotSize: " << rxTotSize << " Part: " << rxPart;
       cout << endl;
       #endif
 
@@ -131,7 +133,12 @@ void iReceive(void *buf, int count, MPI_Datatype datatype, int source, int tag,
             isFinished = true;
          }
          llamaNetInterface->release_recv_buffer(header); // Release llama rx message buffer
-         if (isFinished) {return;}
+         if (isFinished) {
+            #ifdef MPI_COUT_EVERY_MESSAGE
+            cout << "Receive from src " << srcWorldRank << " COMPLETE" << endl;
+            #endif
+            return;
+         }
       } else { // Store in receive buffer
          it = mpiData.comm.find(rxComm);
          if (it != mpiData.comm.end()) { // Comm is declared
