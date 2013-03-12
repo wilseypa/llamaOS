@@ -46,11 +46,13 @@ all:
 	@$(MAKE) -f llamaOS.mk xen
 	@$(MAKE) -f llamaOS-xen-test.mk xen
 	@$(MAKE) -f llamaMPI.mk
-#	@$(MAKE) -f apps/hello-f90.mk
-#	@$(MAKE) -f apps/hello-f90-llamaOS.mk xen
+	@$(MAKE) -f llamaMPIF.mk
+	@$(MAKE) -f apps/hello-f90.mk
+	@$(MAKE) -f apps/hello-f90-llamaOS.mk xen
 	@$(MAKE) -f apps/hello.mk xen
 	@$(MAKE) -f apps/latency-llamaMPI.mk
 	@$(MAKE) -f apps/testMPI-llamaMPI.mk
+#	@$(MAKE) -f apps/testMPIF-llamaMPI.mk xen
 	@$(MAKE) -f apps/NAS/NAS.mk
 	@$(MAKE) -f apps/latency-llamaNET.mk
 #	@$(MAKE) -f apps/latency-MPI.mk

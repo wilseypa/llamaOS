@@ -33,23 +33,25 @@
 # include common variables
 include common.mk
 
-MAKEFILE_SOURCES += apps/hello-f90-llamaOS.mk
+MAKEFILE_SOURCES += apps/testMPIF-llamaMPI.mk
 
 F90FLAGS += 
 
 SOURCES = \
-  apps/hello-f90/main.f90
+  llamaos/mpi/mpif_init.f90 \
+  apps/testMPIF/main.f90
 
 OBJECTS = $(SOURCES:%.f90=$(OBJDIR)/%.o)
 DEPENDS = $(OBJECTS:%.o=%.d)
 
 .PHONY: xen
-xen : $(BINDIR)/xen/hello-f90
+xen : $(BINDIR)/xen/testMPIF-llamaMPI
 
 # the entry object must be the first object listed here or the guest will crash!
-$(BINDIR)/xen/hello-f90: $(LIBDIR)/xen/Entry.o $(OBJECTS) $(LIBDIR)/xen/llamaOS.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
+$(BINDIR)/xen/testMPIF-llamaMPI: $(LIBDIR)/xen/Entry.o $(OBJECTS) $(LIBDIR)/xen/llamaMPIF.a $(LIBDIR)/xen/llamaMPI.a $(LIBDIR)/xen/llamaOS.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
+	@echo $(LDFLAGS)
 	@$(LDF) $(LDFLAGS) -T llamaOS.lds -o $@ $^
 	@gzip -c -f --best $@ >$@.gz
 	@echo successfully built: $@

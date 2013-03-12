@@ -33,27 +33,34 @@
 # include common variables
 include common.mk
 
-MAKEFILE_SOURCES += apps/hello-f90-llamaOS.mk
+# make file list
+MAKEFILE_SOURCES += llamaMPIF.mk
 
-F90FLAGS += 
+CPPFLAGS += \
+  -I $(INCDIR) \
+  -I $(SRCDIR) \
+  -I $(SRCDIR)/llamaos/mpi \
+  -include $(SRCDIR)/llamaos/__thread.h \
+  -D__XEN_INTERFACE_VERSION__=0x00030205
 
-SOURCES = \
-  apps/hello-f90/main.f90
-
-OBJECTS = $(SOURCES:%.f90=$(OBJDIR)/%.o)
+CPP_SOURCES += \
+  llamaos/mpi/mpif.cpp
+ 
+# generate object list
+OBJECTS = $(CPP_SOURCES:%.cpp=$(OBJDIR)/%.o)
 DEPENDS = $(OBJECTS:%.o=%.d)
 
-.PHONY: xen
-xen : $(BINDIR)/xen/hello-f90
-
-# the entry object must be the first object listed here or the guest will crash!
-$(BINDIR)/xen/hello-f90: $(LIBDIR)/xen/Entry.o $(OBJECTS) $(LIBDIR)/xen/llamaOS.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
+$(LIBDIR)/xen/llamaMPIF.a: $(OBJECTS)
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
-	@$(LDF) $(LDFLAGS) -T llamaOS.lds -o $@ $^
-	@gzip -c -f --best $@ >$@.gz
+	@$(AR) r $@ $^
 	@echo successfully built: $@
 	@echo
+
+$(INCDIR)/% : $(SRCDIR)/%
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo copying: $@ from $<
+	cp $< $@
 
 include rules.mk
 

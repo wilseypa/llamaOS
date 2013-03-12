@@ -31,18 +31,15 @@
 #
 
 # include common variables
-# include common.mk
+include common.mk
 
 MAKEFILE_SOURCES += apps/hello-f90.mk
-
-# compiler tools
-F90 = /opt/gcc-4.7.2/bin/gfortran
 
 BINDIR = bin
 LIBDIR = lib
 OBJDIR = obj/native
 
-F90FLAGS = 
+F90FLAGS += 
 
 # source paths
 SRCDIR = ../src
@@ -57,7 +54,7 @@ OBJECTS = $(SOURCES:%.f90=$(OBJDIR)/%.o)
 $(BINDIR)/native/hello-f90: $(OBJECTS)
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
-	@gfortran -o $@ $^
+	@$(LDF) -o $@ $^
 	@echo successfully built: $@
 	@echo
 
