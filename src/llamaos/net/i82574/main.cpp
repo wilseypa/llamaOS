@@ -56,11 +56,6 @@ using namespace llamaos::api::pci;
 using namespace llamaos::memory;
 using namespace llamaos::net::i82574;
 
-#define DRIVER 1
-
-#define LATENCY_TRIAL 250000
-#define LATENCY_DATA 8
-
 struct __attribute__ ((__packed__)) rx_desc_t
 {
    uint64_t buffer;
@@ -290,11 +285,11 @@ int main (int /* argc */, char ** /* argv [] */)
    csr.write_TDLEN (PAGE_SIZE); // 256 descriptors
    cout << "TDBA: " << hex << csr.read_TDBA() << ", " << tx_desc_machine_address << endl;
 
-   buffer_entry tx_buffers [8];
+   buffer_entry tx_buffers [TX_BUFFERS];
    queue<buffer_entry> tx_hw;
    queue<buffer_entry> tx_sw;
 
-   for (unsigned int i = 0; i < 8; i++)
+   for (unsigned int i = 0; i < TX_BUFFERS; i++)
    {
       tx_buffers [i].pointer = static_cast<unsigned char *>(memalign (PAGE_SIZE, PAGE_SIZE));
       tx_buffers [i].address = virtual_pointer_to_machine_address(tx_buffers [i].pointer);
@@ -319,10 +314,10 @@ int main (int /* argc */, char ** /* argv [] */)
    csr.write_RDLEN (PAGE_SIZE); // 256 descriptors
    cout << "RDBA: " << hex << csr.read_RDBA() << ", " << rx_desc_machine_address << endl;
 
-   buffer_entry rx_buffers [8];
+   buffer_entry rx_buffers [RX_BUFFERS];
    queue<buffer_entry> rx_hw;
 
-   for (unsigned int i = 0; i < 8; i++)
+   for (unsigned int i = 0; i < RX_BUFFERS; i++)
    {
       rx_buffers [i].pointer = static_cast<unsigned char *>(memalign (PAGE_SIZE, PAGE_SIZE));
       rx_buffers [i].address = virtual_pointer_to_machine_address(rx_buffers [i].pointer);
@@ -334,7 +329,7 @@ int main (int /* argc */, char ** /* argv [] */)
    }
 
    uint16_t rx_head = 0;
-   uint16_t rx_tail = 8;
+   uint16_t rx_tail = RX_BUFFERS;
    csr.write_RDT (rx_tail);
 
    // create memory for the control page
@@ -352,8 +347,8 @@ int main (int /* argc */, char ** /* argv [] */)
    llamaNET_ref = Hypervisor::get_instance ()->grant_table.grant_access (self_id+6, llamaNET_control);
    cout << "llamaNET_ref: " << dec << llamaNET_ref << endl;
 
-   llamaNET_control->rx_buffer_size = 8;
-   llamaNET_control->tx_buffer_size = 8;
+   llamaNET_control->rx_buffer_size = RX_BUFFERS;
+   llamaNET_control->tx_buffer_size = TX_BUFFERS;
 
    // allow tx_buffer guest access
    for (unsigned int i = 0; i < llamaNET_control->rx_buffer_size; i++)
@@ -391,7 +386,7 @@ int main (int /* argc */, char ** /* argv [] */)
       {
          head = llamaNET_control->driver.rx_head;
          head++;
-         head %= 8;
+         head %= RX_BUFFERS;
          llamaNET_control->driver.rx_head = head;
 
          // !bam can't do this until all guest tail is updated
@@ -432,7 +427,7 @@ int main (int /* argc */, char ** /* argv [] */)
 //            {
                head = llamaNET_control->driver.tx_head;
                head++;
-               head %= 8;
+               head %= TX_BUFFERS;
                llamaNET_control->driver.tx_head = head;
 
 //               while (llamaNET_control->driver.tx_head == tx_indexes.front ())

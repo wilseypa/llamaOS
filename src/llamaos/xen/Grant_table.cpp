@@ -45,8 +45,8 @@ using namespace llamaos::xen;
 
 // for now just map a single page for the table
 Grant_table::Grant_table ()
-   :  size(PAGE_SIZE / sizeof(grant_entry_v1_t)),
-      entries(address_to_pointer<grant_entry_v1_t> (get_reserved_virtual_address (1))),
+   :  size(2 * PAGE_SIZE / sizeof(grant_entry_v1_t)),
+      entries(address_to_pointer<grant_entry_v1_t> (get_reserved_virtual_address (2))),
       avail(),
       inuse()
 {
@@ -54,10 +54,10 @@ Grant_table::Grant_table ()
    trace (" size: %x\n", size);
    trace (" entries: %lx\n", entries);
 
-   unsigned long frame_list [1] = { 0 };
+   unsigned long frame_list [2] = { 0 };
 
    trace ("calling grant_table_setup_table...\n");
-   if (!Hypercall::grant_table_setup_table (1, frame_list))
+   if (!Hypercall::grant_table_setup_table (2, frame_list))
    {
       trace ("failed to create grant table\n");
       throw runtime_error ("failed to create grant table");
@@ -65,6 +65,14 @@ Grant_table::Grant_table ()
 
    trace ("calling update_va_mapping...\n");
    if (!Hypercall::update_va_mapping (pointer_to_address(entries), page_to_address (frame_list [0])))
+   {
+      trace("failed to map grant table\n");
+      throw runtime_error ("failed to map grant table");
+   }
+   trace ("calling update_va_mapping returned.\n");
+
+   trace ("calling update_va_mapping...\n");
+   if (!Hypercall::update_va_mapping (pointer_to_address(entries) + PAGE_SIZE, page_to_address (frame_list [1])))
    {
       trace("failed to map grant table\n");
       throw runtime_error ("failed to map grant table");

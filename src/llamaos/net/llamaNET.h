@@ -36,6 +36,11 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 #include <llamaos/xen/Grant_map.h>
 
+// do not exceed 980 or control structure spills out of grant ref
+// also running out of grant id when running all 6 guests
+#define TX_BUFFERS 64
+#define RX_BUFFERS 64
+
 namespace llamaos {
 namespace net {
 
@@ -93,8 +98,8 @@ public:
       volatile unsigned int tx_index;
       volatile unsigned int tx_length;
 
-      volatile grant_ref_t rx_refs [8];
-      volatile grant_ref_t tx_refs [8];
+      volatile grant_ref_t rx_refs [RX_BUFFERS];
+      volatile grant_ref_t tx_refs [TX_BUFFERS];
 
    };
 

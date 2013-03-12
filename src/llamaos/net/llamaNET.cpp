@@ -48,7 +48,8 @@ const unsigned int llamaNET::HEADER_LENGTH = sizeof(llamaNET::Protocol_header);
 llamaNET::llamaNET (int domd_id, int index)
    :  domd_id(domd_id),
       index(index),
-      control(domd_id, 510 - index),    // hardcoded 510 for now, eventually use the xenstore
+//      control(domd_id, 510 - index),    // hardcoded 510 for now, eventually use the xenstore
+      control(domd_id, 1022 - index),    // hardcoded 510 for now, eventually use the xenstore
       rx_buffers(),
       tx_buffers()
 {
