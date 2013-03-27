@@ -65,6 +65,7 @@ CPPFLAGS += \
   -I $(SRCDIR)/gcc-$(GCC_VERSION)/gcc/ginclude \
   -I $(SRCDIR)/gcc-$(GCC_VERSION)/include \
   -I $(INCDIR) \
+  -U_GLIBCXX_ATOMIC_BUILTINS \
   -include $(SRCDIR)/llamaos/__thread.h
 
 HEADERS = \

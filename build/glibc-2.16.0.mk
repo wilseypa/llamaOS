@@ -130,6 +130,7 @@ HEADERS = \
   $(INCDIR)/bits/environments.h \
   $(INCDIR)/bits/errno.h \
   $(INCDIR)/bits/fcntl.h \
+  $(INCDIR)/bits/fcntl2.h \
   $(INCDIR)/bits/huge_val.h \
   $(INCDIR)/bits/huge_valf.h \
   $(INCDIR)/bits/huge_vall.h \
@@ -151,6 +152,7 @@ HEADERS = \
   $(INCDIR)/bits/resource.h \
   $(INCDIR)/bits/sched.h \
   $(INCDIR)/bits/select.h \
+  $(INCDIR)/bits/select2.h \
   $(INCDIR)/bits/sockaddr.h \
   $(INCDIR)/bits/socket.h \
   $(INCDIR)/bits/stdio_lim.h \
@@ -164,18 +166,23 @@ HEADERS = \
   $(INCDIR)/bits/sigthread.h \
   $(INCDIR)/bits/stat.h \
   $(INCDIR)/bits/stdio.h \
+  $(INCDIR)/bits/stdio2.h \
+  $(INCDIR)/bits/stdlib.h \
   $(INCDIR)/bits/string.h \
   $(INCDIR)/bits/string2.h \
+  $(INCDIR)/bits/string3.h \
   $(INCDIR)/bits/sys_errlist.h \
   $(INCDIR)/bits/syscall.h \
   $(INCDIR)/bits/time.h \
   $(INCDIR)/bits/types.h \
   $(INCDIR)/bits/typesizes.h \
   $(INCDIR)/bits/uio.h \
+  $(INCDIR)/bits/unistd.h \
   $(INCDIR)/bits/utsname.h \
   $(INCDIR)/bits/waitflags.h \
   $(INCDIR)/bits/waitstatus.h \
   $(INCDIR)/bits/wchar.h \
+  $(INCDIR)/bits/wchar2.h \
   $(INCDIR)/bits/wordsize.h \
   $(INCDIR)/bits/xopen_lim.h \
   $(INCDIR)/gnu/stubs.h \

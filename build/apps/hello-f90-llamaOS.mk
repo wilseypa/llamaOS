@@ -50,7 +50,7 @@ xen : $(BINDIR)/xen/hello-f90
 $(BINDIR)/xen/hello-f90: $(LIBDIR)/xen/Entry.o $(OBJECTS) $(LIBDIR)/xen/llamaOS.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
-	@$(LDF) $(LDFLAGS) -T llamaOS.lds -o $@ $^
+	@$(F90) $(LDFLAGS) -T llamaOS.lds -o $@ $^
 	@gzip -c -f --best $@ >$@.gz
 	@echo successfully built: $@
 	@echo
