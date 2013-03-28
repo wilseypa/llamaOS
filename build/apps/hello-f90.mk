@@ -54,7 +54,7 @@ OBJECTS = $(SOURCES:%.f90=$(OBJDIR)/%.o)
 $(BINDIR)/native/hello-f90: $(OBJECTS)
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
-	@$(F90) -o $@ $^
+	@$(LD) -o $@ $^ -l gfortran
 	@echo successfully built: $@
 	@echo
 

@@ -47,10 +47,10 @@ DEPENDS = $(OBJECTS:%.o=%.d)
 xen : $(BINDIR)/xen/hello-f90
 
 # the entry object must be the first object listed here or the guest will crash!
-$(BINDIR)/xen/hello-f90: $(LIBDIR)/xen/Entry.o $(OBJECTS) $(LIBDIR)/xen/llamaOS.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
+$(BINDIR)/xen/hello-f90: $(LIBDIR)/xen/Entry.o $(OBJECTS) $(LIBDIR)/xen/llamaOS.a $(LIBDIR)/gfortran.a $(LIBDIR)/stdc++.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
-	@$(F90) $(LDFLAGS) -T llamaOS.lds -o $@ $^
+	@$(LD) $(LDFLAGS) -T llamaOS.lds -o $@ $^
 	@gzip -c -f --best $@ >$@.gz
 	@echo successfully built: $@
 	@echo

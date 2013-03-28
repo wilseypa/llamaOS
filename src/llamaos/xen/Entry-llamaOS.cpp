@@ -222,6 +222,7 @@ void entry_llamaOS (start_info_t *start_info)
    {
       // create the one and only hypervisor object
       trace ("Creating Hypervisor...\n");
+
       Hypervisor hypervisor (start_info);
 
       // read and create args
@@ -269,7 +270,7 @@ void entry_llamaOS (start_info_t *start_info)
      called MAIN__ */
 //  MAIN__ ();
       main ((int)(args.size () + 1), argv);
-
+for (;;);
       // get rid of all leftover console buffer
       cout.flush ();
       fflush (stdout);

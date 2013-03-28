@@ -67,7 +67,7 @@ DEPENDS  = $(OBJECTS:%.o=%.d)
 xen : $(BINDIR)/xen/netpipe-llamaNET
 
 # the entry object must be the first object listed here or the guest will crash!
-$(BINDIR)/xen/netpipe-llamaNET: $(LIBDIR)/xen/Entry.o $(OBJECTS) $(LIBDIR)/xen/llamaOS.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
+$(BINDIR)/xen/netpipe-llamaNET: $(LIBDIR)/xen/Entry.o $(OBJECTS) $(LIBDIR)/xen/llamaOS.a $(LIBDIR)/stdc++.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
 	@$(LD) $(LDFLAGS) -T llamaOS.lds -o $@ $^
