@@ -179,10 +179,10 @@ static void glibc_libc_fatal (const char *message)
    HYPERVISOR_sched_op(SCHEDOP_shutdown, &arg);
 }
 
+#include <stdio.h>
 static int glibc_libc_open (const char *file, int oflag)
 {
    trace("!!! ALERT: glibc calling libc_open() before file system support is enabled.\n");
-
 //   return -1;
    return 1;
 }

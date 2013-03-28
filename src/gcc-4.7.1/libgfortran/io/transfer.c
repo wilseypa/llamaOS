@@ -1956,10 +1956,17 @@ transfer_logical_write (st_parameter_dt *dtp, void *p, int kind)
   transfer_logical (dtp, p, kind);
 }
 
+// !BAM
+#include <stdio.h>
+
 void
 transfer_character (st_parameter_dt *dtp, void *p, int len)
 {
   static char *empty_string[0];
+
+// !BAM
+  int i;
+  char *s = p;
 
   if ((dtp->common.flags & IOPARM_LIBRETURN_MASK) != IOPARM_LIBRETURN_OK)
     return;
@@ -1971,7 +1978,13 @@ transfer_character (st_parameter_dt *dtp, void *p, int len)
     p = empty_string;
 
   /* Set kind here to 1.  */
-  dtp->u.p.transfer (dtp, BT_CHARACTER, p, 1, len, 1);
+// !BAM
+//  dtp->u.p.transfer (dtp, BT_CHARACTER, p, 1, len, 1);
+  for (i = 0; i < len; i++)
+  {
+//    printf("%d: %c\n", i, s [i]);
+    printf("%c", s [i]);
+  }
 }
 
 void

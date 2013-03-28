@@ -29,5 +29,6 @@
 ! 
 
 program hello
-   print *, "hello world!"
+   print *, "hello world, fortran in llamaOS12345"
+   print *, "line 2"
 end program hello
