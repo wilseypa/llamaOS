@@ -33,34 +33,32 @@
 # include common variables
 include common.mk
 
-# make file list
-MAKEFILE_SOURCES += llamaMPIF.mk
+MAKEFILE_SOURCES += apps/NAS/NAS-ft.mk
 
-CPPFLAGS += \
-  -I $(INCDIR) \
-  -I $(SRCDIR) \
-  -I $(SRCDIR)/llamaos/mpi \
-  -include $(SRCDIR)/llamaos/__thread.h \
-  -D__XEN_INTERFACE_VERSION__=0x00030205
+F90FLAGS += 
+  
+# source paths
+SRCDIR = ../src
+VPATH = $(SRCDIR)
 
-CPP_SOURCES += \
-  llamaos/mpi/mpif.cpp
- 
-# generate object list
-OBJECTS = $(CPP_SOURCES:%.cpp=$(OBJDIR)/%.o)
+SOURCES = \
+  llamaos/mpi/ft.f \
+  apps/testMPIF/main.f90
+
+OBJECTS = $(SOURCES:%.c=$(OBJDIR)/%.o)
 DEPENDS = $(OBJECTS:%.o=%.d)
+ 
+.PHONY: xen
+xen : $(BINDIR)/xen/NAS/dt
 
-$(LIBDIR)/xen/llamaMPIF.a: $(OBJECTS) $(LIBDIR)/gfortran.a
+# the entry object must be the first object listed here or the guest will crash!
+$(BINDIR)/xen/NAS/dt: $(LIBDIR)/xen/Entry.o $(OBJECTS) $(LIBDIR)/xen/llamaMPI.a $(LIBDIR)/xen/llamaOS.a $(LIBDIR)/stdc++.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a $(LIBDIR)/gfortran.a
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
-	@$(AR) r $@ $^
+	@$(LD) $(LDFLAGS) -T llamaOS.lds -o $@ $^
+	@gzip -c -f --best $@ >$@.gz
 	@echo successfully built: $@
 	@echo
-
-$(INCDIR)/% : $(SRCDIR)/%
-	@[ -d $(@D) ] || (mkdir -p $(@D))
-	@echo copying: $@ from $<
-	cp $< $@
 
 include rules.mk
 

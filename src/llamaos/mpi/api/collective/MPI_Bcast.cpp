@@ -42,12 +42,14 @@ int MPI_Bcast(void *buffer, int count, MPI_Datatype datatype, int root, MPI_Comm
       int size;
       MPI_Comm_size(comm, &size);
       for (int i = 0; i < size; i++) {
+         if (i == root) {continue;}
          iSend(buffer, count, datatype, i, MPI_FUNC_TAG_BROADCAST, comm, MPI_CONTEXT_COLLECTIVE);
       }
+   } else {
+      // Receive the broadcast message
+      iReceive(buffer, count, datatype, root, MPI_FUNC_TAG_BROADCAST, 
+                       comm, MPI_CONTEXT_COLLECTIVE, 0);
    }
-   // Receive the broadcast message
-   iReceive(buffer, count, datatype, root, MPI_FUNC_TAG_BROADCAST, 
-                    comm, MPI_CONTEXT_COLLECTIVE, 0);
 
    return MPI_SUCCESS;
 }
