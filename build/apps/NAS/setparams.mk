@@ -54,6 +54,9 @@ util/NAS/dt/npbparams.h: apps/NAS/params.def util/NAS/setparams
 	util/NAS/setparams `grep IS apps/NAS/params.def`
 	mkdir -p util/NAS/is
 	mv util/NAS/npbparams.h util/NAS/is/npbparams.h
+	util/NAS/setparams `grep FT apps/NAS/params.def`
+	mkdir -p util/NAS/ft
+	mv util/NAS/npbparams.h util/NAS/ft/npbparams.h
 
 util/NAS/setparams: $(OBJECTS)
 	echo $(OBJECTS)
