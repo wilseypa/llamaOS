@@ -76,8 +76,34 @@ CPPFLAGS += \
 #  gcc-$(GCC_VERSION)/gcc/config/spu/spu.c \
 
 C_SOURCES = \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/abort.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/args.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/bit_intrinsics.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/c99_functions.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/clock.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/cpu_time.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/cshift0.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/ctime.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/date_and_time.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/ierrno.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/ishftc.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/iso_c_binding.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/iso_c_generated_procs.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/malloc.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/move_alloc.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/mvbits.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/pack_generic.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/perror.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/rand.c \
   gcc-$(GCC_VERSION)/libgfortran/intrinsics/random.c \
   gcc-$(GCC_VERSION)/libgfortran/intrinsics/signal.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/sleep.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/string_intrinsics.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/system.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/system_clock.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/time.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/transpose_generic.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/unpack_generic.c \
   gcc-$(GCC_VERSION)/libgfortran/io/fbuf.c \
   gcc-$(GCC_VERSION)/libgfortran/io/format.c \
   gcc-$(GCC_VERSION)/libgfortran/io/list_read.c \

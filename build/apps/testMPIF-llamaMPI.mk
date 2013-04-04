@@ -52,11 +52,11 @@ DEPENDS = $(OBJECTS:%.o=%.d)
 xen : $(BINDIR)/xen/testMPIF-llamaMPI
 
 # the entry object must be the first object listed here or the guest will crash!
-$(BINDIR)/xen/testMPIF-llamaMPI: $(LIBDIR)/xen/Entry.o $(OBJECTS) $(LIBDIR)/xen/llamaMPIF.a $(LIBDIR)/xen/llamaMPI.a $(LIBDIR)/xen/llamaOS.a $(LIBDIR)/stdc++.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a $(LIBDIR)/gfortran.a
+$(BINDIR)/xen/testMPIF-llamaMPI: $(LIBDIR)/xen/Entry.o $(OBJECTS) $(LIBDIR)/xen/llamaMPIF.a $(LIBDIR)/xen/llamaMPI.a $(LIBDIR)/xen/llamaOS.a $(LIBDIR)/stdc++.a $(LIBDIR)/gfortran.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
 	@echo $(LDFLAGS)
-	@$(LDF) $(LDFLAGS) -T llamaOS.lds -o $@ $^
+	@$(LD) $(LDFLAGS) -T llamaOS.lds -o $@ $^
 	@gzip -c -f --best $@ >$@.gz
 	@echo successfully built: $@
 	@echo
