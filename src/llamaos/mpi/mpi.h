@@ -61,6 +61,11 @@ typedef int MPI_Datatype;
 #define MPI_2INT		((MPI_Datatype)18)
 #define MPI_LONG_DOUBLE_INT	((MPI_Datatype)19)
 
+// !BAM added
+#define MPI_DATATYPE_NULL	((MPI_Datatype)20)
+#define MPI_OP_NULL		((MPI_Datatype)21)
+#define MPI_ERRHANDLER_NULL	((MPI_Datatype)22)
+
 typedef int MPI_Op;
 #define MPI_MAX       ((MPI_Op)1)      //maximum
 #define MPI_MIN       ((MPI_Op)2)      //minimum
@@ -110,6 +115,13 @@ typedef struct MPI_Status {
     int size;
 } MPI_Status;
 #define MPI_STATUS_SIZE 4
+
+// !BAM added
+typedef int MPI_Errhandler;
+typedef void *MPI_Aint;
+
+#define MPI_ERR_INTERN 0
+#define MPI_MAX_ERROR_STRING 0
 
 // MPI FUNCTIONS
 // SYSTEM FUNCTIONS
@@ -197,6 +209,12 @@ int MPI_Allreduce ( void *sendbuf, void *recvbuf, int count,
 // TIME 
 double MPI_Wtime();
 double MPI_Wtick();
+
+// !BAM added
+int MPI_Abort(MPI_Comm comm, int errorcode);
+int MPI_Error_string(int errorcode, char *string, int *resultlen);
+int MPI_Get_version(int *version, int *subversion);
+int MPI_Type_size(MPI_Datatype datatype, int *size);
 
 #ifdef __cplusplus
 } //extern "C"

@@ -95,7 +95,11 @@ CPP_SOURCES += \
   llamaos/mpi/api/collective/MPI_Alltoallv.cpp \
   llamaos/mpi/api/collective/MPI_Reduce.cpp \
   llamaos/mpi/api/collective/MPI_Allreduce.cpp \
-  llamaos/mpi/api/time/MPI_Wtime.cpp
+  llamaos/mpi/api/time/MPI_Wtime.cpp \
+  llamaos/mpi/api/error/MPI_Error_string.cpp \
+  llamaos/mpi/api/sys/MPI_Abort.cpp \
+  llamaos/mpi/api/sys/MPI_Get_version.cpp \
+  llamaos/mpi/api/type/MPI_Type_size.cpp
 
 # llamaos/mpi/api/time/MPI_Wtick.cpp
 

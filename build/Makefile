@@ -62,9 +62,8 @@ all:
 	@$(MAKE) -f apps/lspci.mk xen
 	@$(MAKE) -f net/i82574.mk xen
 	@$(MAKE) -f net/i80003es2lan.mk xen
-
-#	@$(MAKE) -f apps/IMB.mk
-#	@$(MAKE) -f apps/IMB-llamaMPI.mk
+	@$(MAKE) -f apps/IMB.mk
+	@$(MAKE) -f apps/IMB-llamaMPI.mk
 #	@$(MAKE) -f apps/latency-Infiniband.mk
 
 #	@$(MAKE) -f gtest-$(GTEST_VERSION).mk
