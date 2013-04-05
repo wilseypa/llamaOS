@@ -62,7 +62,7 @@ util/NAS/setparams: $(OBJECTS)
 	echo $(OBJECTS)
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
-	@$(LD) -o $@ $^
+	@$(CC) -o $@ $^
 	@echo successfully built: $@
 	@echo
 
