@@ -26,78 +26,103 @@
 ! of the authors and should not be interpreted as representing official policies,
 ! either expressed or implied, of the copyright holder(s) or contributors.
 
-integer, parameter :: MPI_SUCCESS = 0
+      integer MPI_SUCCESS
+      parameter (MPI_SUCCESS = 0)
 
-integer, parameter :: MPI_CHAR = 1
-integer, parameter :: MPI_BYTE = 2
-integer, parameter :: MPI_SHORT = 3
-integer, parameter :: MPI_INT = 4
-integer, parameter :: MPI_LONG = 5
-integer, parameter :: MPI_FLOAT = 6
-integer, parameter :: MPI_DOUBLE = 7
-integer, parameter :: MPI_UNSIGNED_CHAR = 8
-integer, parameter :: MPI_UNSIGNED_SHORT = 9
-integer, parameter :: MPI_UNSIGNED = 10
-integer, parameter :: MPI_UNSIGNED_LONG = 11
-integer, parameter :: MPI_LONG_DOUBLE = 12
-integer, parameter :: MPI_LONG_LONG_INT = 13
+      integer MPI_CHAR, MPI_BYTE, MPI_SHORT, MPI_INT, MPI_LONG 
+      integer MPI_FLOAT, MPI_DOUBLE, MPI_UNSIGNED_CHAR
+      integer MPI_UNSIGNED_SHORT, MPI_UNSIGNED, MPI_UNSIGNED_LONG
+      integer MPI_LONG_DOUBLE, MPI_LONG_LONG_INT
+      parameter (MPI_CHAR = 1)
+      parameter (MPI_BYTE = 2)
+      parameter (MPI_SHORT = 3)
+      parameter (MPI_INT = 4)
+      parameter (MPI_LONG = 5)
+      parameter (MPI_FLOAT = 6)
+      parameter (MPI_DOUBLE = 7)
+      parameter (MPI_UNSIGNED_CHAR = 8)
+      parameter (MPI_UNSIGNED_SHORT = 9)
+      parameter (MPI_UNSIGNED = 10)
+      parameter (MPI_UNSIGNED_LONG = 11)
+      parameter (MPI_LONG_DOUBLE = 12)
+      parameter (MPI_LONG_LONG_INT = 13)
 
-integer, parameter :: MPI_FLOAT_INT = 14
-integer, parameter :: MPI_LONG_INT = 15
-integer, parameter :: MPI_DOUBLE_INT = 16
-integer, parameter :: MPI_SHORT_INT = 17
-integer, parameter :: MPI_2INT = 18
-integer, parameter :: MPI_LONG_DOUBLE_INT = 19
+      integer MPI_FLOAT_INT, MPI_LONG_INT, MPI_DOUBLE_INT
+      integer MPI_SHORT_INT, MPI_2INT, MPI_LONG_DOUBLE_INT
+      parameter (MPI_FLOAT_INT = 14)
+      parameter (MPI_LONG_INT = 15)
+      parameter (MPI_DOUBLE_INT = 16)
+      parameter (MPI_SHORT_INT = 17)
+      parameter (MPI_2INT = 18)
+      parameter (MPI_LONG_DOUBLE_INT = 19)
 
-integer, parameter :: MPI_DATATYPE_NULL = 20
-integer, parameter :: MPI_OP_NULL = 21
-integer, parameter :: MPI_ERRHANDLER_NULL = 22
+      integer MPI_DATATYPE_NULL, MPI_OP_NULL, MPI_ERRHANDLER_NULL
+      parameter (MPI_DATATYPE_NULL = 20)
+      parameter (MPI_OP_NULL = 21)
+      parameter (MPI_ERRHANDLER_NULL = 22)
 
-integer, parameter :: MPI_CHARACTER = 23
-integer, parameter :: MPI_INTEGER = 24
-integer, parameter :: MPI_INTEGER1 = 25
-integer, parameter :: MPI_INTEGER2 = 26
-integer, parameter :: MPI_INTEGER4 = 27
-integer, parameter :: MPI_REAL = 28
-integer, parameter :: MPI_DOUBLE_PRECISION = 29
-integer, parameter :: MPI_COMPLEX = 30
-integer, parameter :: MPI_DOUBLE_COMPLEX = 31
-integer, parameter :: MPI_LOGICAL = 32
+      integer MPI_CHARACTER, MPI_INTEGER, MPI_INTEGER1, MPI_INTEGER2
+      integer MPI_INTEGER4, MPI_REAL, MPI_DOUBLE_PRECISION, MPI_COMPLEX
+      integer MPI_DOUBLE_COMPLEX, MPI_LOGICAL
+      parameter (MPI_CHARACTER = 23)
+      parameter (MPI_INTEGER = 24)
+      parameter (MPI_INTEGER1 = 25)
+      parameter (MPI_INTEGER2 = 26)
+      parameter (MPI_INTEGER4 = 27)
+      parameter (MPI_REAL = 28)
+      parameter (MPI_DOUBLE_PRECISION = 29)
+      parameter (MPI_COMPLEX = 30)
+      parameter (MPI_DOUBLE_COMPLEX = 31)
+      parameter (MPI_LOGICAL = 32)
 
-integer, parameter :: MPI_MAX       = 1      !maximum
-integer, parameter :: MPI_MIN       = 2      !minimum
-integer, parameter :: MPI_SUM       = 3      !sum
-integer, parameter :: MPI_PROD      = 4      !product
-integer, parameter :: MPI_LAND      = 5      !logical and
-integer, parameter :: MPI_BAND      = 6      !bit-wise and
-integer, parameter :: MPI_LOR       = 7      !logical or
-integer, parameter :: MPI_BOR       = 8      !bit-wise or
-integer, parameter :: MPI_LXOR      = 9      !logical xor
-integer, parameter :: MPI_BXOR      = 10     !bit-wise xor
-integer, parameter :: MPI_MAXLOC    = 11     !max value and location
-integer, parameter :: MPI_MINLOC    = 12     !min value and location
+      integer MPI_MAX, MPI_MIN, MPI_SUM, MPI_PROD, MPI_LAND, MPI_BAND
+      integer MPI_LOR, MPI_BOR, MPI_LXOR, MPI_BXOR
+      integer MPI_MAXLOC, MPI_MINLOC
+      parameter (MPI_MAX       = 1)      !maximum
+      parameter (MPI_MIN       = 2)      !minimum
+      parameter (MPI_SUM       = 3)      !sum
+      parameter (MPI_PROD      = 4)      !product
+      parameter (MPI_LAND      = 5)      !logical and
+      parameter (MPI_BAND      = 6)      !bit-wise and
+      parameter (MPI_LOR       = 7)      !logical or
+      parameter (MPI_BOR       = 8)      !bit-wise or
+      parameter (MPI_LXOR      = 9)      !logical xor
+      parameter (MPI_BXOR      = 10)     !bit-wise xor
+      parameter (MPI_MAXLOC    = 11)     !max value and location
+      parameter (MPI_MINLOC    = 12)     !min value and location
 
-integer, parameter :: MPI_COMM_NULL  = 0
-integer, parameter :: MPI_COMM_WORLD = 2147483647
-integer, parameter :: MPI_COMM_SELF  = 2147483646
+      integer MPI_COMM_NULL, MPI_COMM_WORLD, MPI_COMM_SELF
+      parameter (MPI_COMM_NULL  = 0)
+      parameter (MPI_COMM_WORLD = 2147483647)
+      parameter (MPI_COMM_SELF  = 2147483646)
 
-integer, parameter :: MPI_GROUP_NULL  = 0
-integer, parameter :: MPI_GROUP_EMPTY = -1
+      integer MPI_GROUP_NULL, MPI_GROUP_EMPTY
+      parameter (MPI_GROUP_NULL  = 0)
+      parameter (MPI_GROUP_EMPTY = -1)
 
-integer, parameter :: MPI_REQUEST_NULL = 0
+      integer MPI_REQUEST_NULL
+      parameter (MPI_REQUEST_NULL = 0)
 
-integer, parameter :: MPI_IDENT = 1     !Identical
-integer, parameter :: MPI_CONGRUENT = 2 !(only for MPI_COMM_COMPARE ) The groups are identical
-integer, parameter :: MPI_SIMILAR = 3   !Same members, but in a different order
-integer, parameter :: MPI_UNEQUAL = 4   !Different
+      integer MPI_IDENT, MPI_CONGRUENT, MPI_SIMILAR, MPI_UNEQUAL
+      parameter (MPI_IDENT = 1)     !Identical
+      parameter (MPI_CONGRUENT = 2) !(only for MPI_COMM_COMPARE ) The groups are identical
+      parameter (MPI_SIMILAR = 3)   !Same members, but in a different order
+      parameter (MPI_UNEQUAL = 4)   !Different
 
-integer, parameter :: MPI_STATUS_IGNORE = 0
-integer, parameter :: MPI_TAG_UB = 2147483647
-integer, parameter :: MPI_UNDEFINED = -1
-integer, parameter :: MPI_ANY_SOURCE = -1
-integer, parameter :: MPI_ANY_TAG = -1
+      integer MPI_STATUS_IGNORE, MPI_TAG_UB, MPI_UNDEFINED
+      integer MPI_ANY_SOURCE, MPI_ANY_TAG
+      parameter (MPI_STATUS_IGNORE = 0)
+      parameter (MPI_TAG_UB = 2147483647)
+      parameter (MPI_UNDEFINED = -1)
+      parameter (MPI_ANY_SOURCE = -1)
+      parameter (MPI_ANY_TAG = -1)
 
-integer, parameter :: MPI_STATUS_SIZE = 4
+      integer MPI_STATUS_SIZE
+      parameter (MPI_STATUS_SIZE = 4)
 
-integer, parameter :: MPI_ERR_INTERN = 0
-integer, parameter :: MPI_MAX_ERROR_STRING = 0
+      integer MPI_ERR_INTERN, MPI_MAX_ERROR_STRING
+      parameter (MPI_ERR_INTERN = 0)
+      parameter (MPI_MAX_ERROR_STRING = 0)
+      
+      double precision mpi_wtime, mpi_wtick
+      external mpi_wtime, mpi_wtick

@@ -57,6 +57,11 @@ $(OBJDIR)/%.o : %.f90 $(MAKEFILE_SOURCES)
 	@echo compiling: $<
 	@$(F90) -c $(F90FLAGS) -o $@ $<
 
+$(OBJDIR)/%.o : %.f $(MAKEFILE_SOURCES)
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo compiling: $<
+	@$(F90) -c $(F90FLAGS) -o $@ $<
+
 $(OBJDIR)/%.d : %.S
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo creating: $@ from $<

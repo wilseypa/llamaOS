@@ -35,27 +35,27 @@ include common.mk
 
 MAKEFILE_SOURCES += apps/NAS/NAS-ft.mk
 
-F90FLAGS += 
-  
-# source paths
-SRCDIR = ../src
-VPATH = $(SRCDIR)
+F90FLAGS += -I $(SRCDIR)/llamaos/mpi \
+  -I util/NAS/ft
 
 SOURCES = \
-  llamaos/mpi/ft.f \
-  apps/testMPIF/main.f90
+  apps/NPB3.2-MPI/FT/ft.f \
+  apps/NPB3.2-MPI/common/timers.f \
+  apps/NPB3.2-MPI/common/randi8.f \
+  apps/NPB3.2-MPI/common/print_results.f
 
-OBJECTS = $(SOURCES:%.c=$(OBJDIR)/%.o)
+OBJECTS = $(SOURCES:%.f=$(OBJDIR)/%.o)
 DEPENDS = $(OBJECTS:%.o=%.d)
  
 .PHONY: xen
 xen : $(BINDIR)/xen/NAS/dt
 
 # the entry object must be the first object listed here or the guest will crash!
-$(BINDIR)/xen/NAS/dt: $(LIBDIR)/xen/Entry.o $(OBJECTS) $(LIBDIR)/xen/llamaMPI.a $(LIBDIR)/xen/llamaOS.a $(LIBDIR)/stdc++.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a $(LIBDIR)/gfortran.a
+$(BINDIR)/xen/NAS/dt: $(LIBDIR)/xen/Entry.o $(OBJECTS) $(LIBDIR)/xen/llamaMPIF.a $(LIBDIR)/xen/llamaMPI.a $(LIBDIR)/xen/llamaOS.a $(LIBDIR)/stdc++.a $(LIBDIR)/gfortran.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
-	@$(LD) $(LDFLAGS) -T llamaOS.lds -o $@ $^
+	@echo $(LDFLAGS)
+	@$(LD) $(LDFLAGS) -T llamaOS.lds -o $@ $^ -lm
 	@gzip -c -f --best $@ >$@.gz
 	@echo successfully built: $@
 	@echo
