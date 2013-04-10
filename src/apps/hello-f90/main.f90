@@ -29,6 +29,7 @@
 ! 
 
 program hello
-   print *, "hello world, fortran in llamaOS12345"
-   print *, "line 2"
+   print *, 'hello world, fortran in llamaOS12345'
+   print *, 'line i10           ', 2
+   print *, 'line 3'
 end program hello

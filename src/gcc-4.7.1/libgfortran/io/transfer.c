@@ -1907,6 +1907,8 @@ formatted_transfer (st_parameter_dt *dtp, bt type, void *p, int kind,
     }
 }
 
+// !BAM
+#include <stdio.h>
 
 /* Data transfer entry points.  The type of the data entity is
    implicit in the subroutine call.  This prevents us from having to
@@ -1917,7 +1919,9 @@ transfer_integer (st_parameter_dt *dtp, void *p, int kind)
 {
   if ((dtp->common.flags & IOPARM_LIBRETURN_MASK) != IOPARM_LIBRETURN_OK)
     return;
-  dtp->u.p.transfer (dtp, BT_INTEGER, p, kind, kind, 1);
+// !BAM
+//  dtp->u.p.transfer (dtp, BT_INTEGER, p, kind, kind, 1);
+   printf("%d", *(int *)p);
 }
 
 void
@@ -1933,7 +1937,10 @@ transfer_real (st_parameter_dt *dtp, void *p, int kind)
   if ((dtp->common.flags & IOPARM_LIBRETURN_MASK) != IOPARM_LIBRETURN_OK)
     return;
   size = size_from_real_kind (kind);
-  dtp->u.p.transfer (dtp, BT_REAL, p, kind, size, 1);
+
+// !BAM
+//  dtp->u.p.transfer (dtp, BT_REAL, p, kind, size, 1);
+   printf("%f", *(float *)p);
 }
 
 void
@@ -1956,8 +1963,6 @@ transfer_logical_write (st_parameter_dt *dtp, void *p, int kind)
   transfer_logical (dtp, p, kind);
 }
 
-// !BAM
-#include <stdio.h>
 
 void
 transfer_character (st_parameter_dt *dtp, void *p, int len)

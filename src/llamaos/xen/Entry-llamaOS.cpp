@@ -251,12 +251,15 @@ void entry_llamaOS (start_info_t *start_info)
          trace ("argv [%d] = %s\n", i, args [i].c_str ());
       }
 
-      char *argv [16] = { '\0' };
-      argv [0] = const_cast<char *>(hypervisor.name.c_str ());
+      hypervisor.argc = static_cast<int>(args.size () + 1);
+//      char *argv [16] = { '\0' };
+//      argv [0] = const_cast<char *>(hypervisor.name.c_str ());
+      hypervisor.argv [0] = const_cast<char *>(hypervisor.name.c_str ());
 
       for (unsigned int i = 0; i < args.size (); i++)
       {
-         argv [i+1] = const_cast<char *>(args [i].c_str ());
+//         argv [i+1] = const_cast<char *>(args [i].c_str ());
+         hypervisor.argv [i+1] = const_cast<char *>(args [i].c_str ());
       }
 
       trace ("Before application main()...\n");
@@ -269,7 +272,8 @@ void entry_llamaOS (start_info_t *start_info)
   /* Call the Fortran main program.  Internally this is a function
      called MAIN__ */
 //  MAIN__ ();
-      main ((int)(args.size () + 1), argv);
+//      main ((int)(args.size () + 1), argv);
+      main (hypervisor.argc, hypervisor.argv);
 
       // get rid of all leftover console buffer
       cout.flush ();

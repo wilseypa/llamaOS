@@ -105,7 +105,8 @@ Hypervisor::Hypervisor (const start_info_t *start_info)
       grant_table(),
       xenstore(machine_page_to_virtual_pointer<xenstore_domain_interface>(start_info->store_mfn), start_info->store_evtchn),
       name(""),
-      domid(0)
+      domid(0),
+      argc(0)
 {
    instance = this;
    trace ("Hypervisor created.\n");
@@ -122,7 +123,10 @@ Hypervisor::Hypervisor (const start_info_t *start_info)
 
    events.bind (console.port, console.event_handler, &console);
 
-   
+   for (int i = 0; i < 64; i++)
+   {
+      argv [i] = '\0';
+   }
 }
 
 Hypervisor::~Hypervisor ()

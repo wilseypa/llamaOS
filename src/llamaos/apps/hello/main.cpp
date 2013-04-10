@@ -38,5 +38,13 @@ int main (int argc, char *argv [])
    cout << endl << "hello llamaOS" << endl;
    cout.flush ();
 
+   cout << endl;
+   cout << "argc: " << argc << endl;
+
+   for (int i = 0; i < argc; i++)
+   {
+      cout << "argv[" << i << "]: " << argv [i] << endl;
+   }
+
    return 0;
 }

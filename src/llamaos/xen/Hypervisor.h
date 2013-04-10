@@ -95,6 +95,9 @@ public:
    std::string name;
    int domid;
 
+   int argc;
+   char *argv [64];
+
 private:
    Hypervisor ();
    Hypervisor (const Hypervisor &);
