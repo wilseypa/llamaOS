@@ -71,6 +71,17 @@ struct MPI_SHORT_INT_T {MPI_SHORT_T value; MPI_INT_T index;};
 struct MPI_2INT_T {MPI_INT_T value; MPI_INT_T index;};
 struct MPI_LONG_DOUBLE_INT_T {MPI_LONG_DOUBLE_T value; MPI_INT_T index;};
 
+typedef char MPI_CHARACTER_T;
+typedef int MPI_INTEGER_T;
+typedef signed char MPI_INTEGER1_T;
+typedef short MPI_INTEGER2_T;
+typedef int MPI_INTEGER4_T;
+typedef float MPI_REAL_T;
+typedef double MPI_DOUBLE_PRECISION_T;
+typedef float _Complex MPI_COMPLEX_T;
+typedef double _Complex MPI_DOUBLE_COMPLEX_T;
+typedef bool MPI_LOGICAL_T;
+
 typedef int MPI_Context;
 #define MPI_COMM_MASK ((int)0x7FFFFFFF)
 #define MPI_CONTEXT_MASK ((int)0x80000000)

@@ -52,6 +52,17 @@ int iSizeof(MPI_Datatype type) {
       case MPI_SHORT_INT:	return sizeof(MPI_SHORT_INT_T);
       case MPI_2INT:		return sizeof(MPI_2INT_T);
       case MPI_LONG_DOUBLE_INT:	return sizeof(MPI_LONG_DOUBLE_INT_T);
+      
+      case MPI_CHARACTER:	return sizeof(MPI_CHARACTER_T);
+      case MPI_INTEGER:	return sizeof(MPI_INTEGER_T);
+      case MPI_INTEGER1:	return sizeof(MPI_INTEGER1_T);
+      case MPI_INTEGER2:	return sizeof(MPI_INTEGER2_T);
+      case MPI_INTEGER4:	return sizeof(MPI_INTEGER4_T);
+      case MPI_REAL:	return sizeof(MPI_REAL_T);
+      case MPI_DOUBLE_PRECISION:	return sizeof(MPI_DOUBLE_PRECISION_T);
+      case MPI_COMPLEX:	return sizeof(MPI_COMPLEX_T);
+      case MPI_DOUBLE_COMPLEX:	return sizeof(MPI_DOUBLE_COMPLEX_T);
+      case MPI_LOGICAL:	return sizeof(MPI_LOGICAL_T);
 	
       default:			return 0;
    }
