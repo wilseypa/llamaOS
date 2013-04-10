@@ -32,5 +32,6 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <sys/time.h>
 
 double MPI_Wtick() {
-   return 1.0/(double)CLOCKS_PER_SEC;
+   return 1.0;
+   //return 1.0/(double)CLOCKS_PER_SEC;
 }

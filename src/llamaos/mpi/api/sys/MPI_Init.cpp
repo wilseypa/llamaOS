@@ -45,7 +45,7 @@ static const int ARG_TAG_DNE = -1;
 static const int ARG_TAG_NO_VAL = 0;
 
 static int iGetArgIndex(int argc, char *argv[], const std::string &arg) {
-   for (int i = 1; i < argc; i++)
+   for (int i = 0; i < argc; i++)
    {
       if (arg == argv [i])
       {

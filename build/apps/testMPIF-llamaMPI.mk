@@ -39,10 +39,9 @@ BINDIR = bin
 LIBDIR = lib
 OBJDIR = obj/native
 
-F90FLAGS += 
+F90FLAGS += -I $(SRCDIR)/llamaos/mpi
 
 SOURCES = \
-  llamaos/mpi/mpif_init.f90 \
   apps/testMPIF/main.f90
 
 OBJECTS = $(SOURCES:%.f90=$(OBJDIR)/%.o)

@@ -66,6 +66,17 @@ typedef int MPI_Datatype;
 #define MPI_OP_NULL		((MPI_Datatype)21)
 #define MPI_ERRHANDLER_NULL	((MPI_Datatype)22)
 
+#define MPI_CHARACTER  ((MPI_Datatype)23)
+#define MPI_INTEGER  ((MPI_Datatype)24)
+#define MPI_INTEGER1  ((MPI_Datatype)25)
+#define MPI_INTEGER2  ((MPI_Datatype)26)
+#define MPI_INTEGER4  ((MPI_Datatype)27)
+#define MPI_REAL  ((MPI_Datatype)28)
+#define MPI_DOUBLE_PRECISION  ((MPI_Datatype)29)
+#define MPI_COMPLEX  ((MPI_Datatype)30)
+#define MPI_DOUBLE_COMPLEX  ((MPI_Datatype)31)
+#define MPI_LOGICAL  ((MPI_Datatype)32)
+
 typedef int MPI_Op;
 #define MPI_MAX       ((MPI_Op)1)      //maximum
 #define MPI_MIN       ((MPI_Op)2)      //minimum
