@@ -48,10 +48,10 @@ OBJECTS = $(SOURCES:%.f=$(OBJDIR)/%.o)
 DEPENDS = $(OBJECTS:%.o=%.d)
  
 .PHONY: xen
-xen : $(BINDIR)/xen/NAS/dt
+xen : $(BINDIR)/xen/NAS/ft
 
 # the entry object must be the first object listed here or the guest will crash!
-$(BINDIR)/xen/NAS/dt: $(LIBDIR)/xen/Entry.o $(OBJECTS) $(LIBDIR)/xen/llamaMPIF.a $(LIBDIR)/xen/llamaMPI.a $(LIBDIR)/xen/llamaOS.a $(LIBDIR)/stdc++.a $(LIBDIR)/gfortran.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
+$(BINDIR)/xen/NAS/ft: $(LIBDIR)/xen/Entry.o $(OBJECTS) $(LIBDIR)/xen/llamaMPIF.a $(LIBDIR)/xen/llamaMPI.a $(LIBDIR)/xen/llamaOS.a $(LIBDIR)/stdc++.a $(LIBDIR)/gfortran.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
 	@echo $(LDFLAGS)
