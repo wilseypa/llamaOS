@@ -53,7 +53,8 @@ CFLAGS += \
   -D HAVE_STRING_H \
   -D HAVE_ALLOCA_H \
   -DFIRST_PSEUDO_REGISTER=53 \
-  -DIN_GLIBCPP_V3
+  -DIN_GLIBCPP_V3 \
+  -DMIN_UNITS_PER_WORD=4
 
 CPPFLAGS += \
   -I $(SRCDIR)/gcc-$(GCC_VERSION)/libstdc++-v3/include/backward \
@@ -308,6 +309,7 @@ C_SOURCES = \
   gcc-$(GCC_VERSION)/libgcc/soft-fp/unorddf2.c \
   gcc-$(GCC_VERSION)/libgcc/soft-fp/unordsf2.c \
   gcc-$(GCC_VERSION)/libgcc/soft-fp/unordtf2.c \
+  gcc-$(GCC_VERSION)/libgcc/libgcc2.c \
   gcc-$(GCC_VERSION)/libgcc/unwind-dw2-fde.c \
   gcc-$(GCC_VERSION)/libgcc/unwind-dw2.c \
   gcc-$(GCC_VERSION)/libiberty/cp-demangle.c

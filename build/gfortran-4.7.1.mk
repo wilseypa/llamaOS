@@ -76,6 +76,11 @@ CPPFLAGS += \
 #  gcc-$(GCC_VERSION)/gcc/config/spu/spu.c \
 
 C_SOURCES = \
+  gcc-$(GCC_VERSION)/libgfortran/generated/exponent_r10.c \
+  gcc-$(GCC_VERSION)/libgfortran/generated/exponent_r16.c \
+  gcc-$(GCC_VERSION)/libgfortran/generated/exponent_r4.c \
+  gcc-$(GCC_VERSION)/libgfortran/generated/exponent_r8.c \
+  gcc-$(GCC_VERSION)/libgfortran/generated/pow_i4_i4.c \
   gcc-$(GCC_VERSION)/libgfortran/intrinsics/abort.c \
   gcc-$(GCC_VERSION)/libgfortran/intrinsics/args.c \
   gcc-$(GCC_VERSION)/libgfortran/intrinsics/bit_intrinsics.c \
@@ -104,16 +109,22 @@ C_SOURCES = \
   gcc-$(GCC_VERSION)/libgfortran/intrinsics/time.c \
   gcc-$(GCC_VERSION)/libgfortran/intrinsics/transpose_generic.c \
   gcc-$(GCC_VERSION)/libgfortran/intrinsics/unpack_generic.c \
+  gcc-$(GCC_VERSION)/libgfortran/io/close.c \
   gcc-$(GCC_VERSION)/libgfortran/io/fbuf.c \
+  gcc-$(GCC_VERSION)/libgfortran/io/file_pos.c \
   gcc-$(GCC_VERSION)/libgfortran/io/format.c \
+  gcc-$(GCC_VERSION)/libgfortran/io/inquire.c \
+  gcc-$(GCC_VERSION)/libgfortran/io/intrinsics.c \
   gcc-$(GCC_VERSION)/libgfortran/io/list_read.c \
   gcc-$(GCC_VERSION)/libgfortran/io/lock.c \
   gcc-$(GCC_VERSION)/libgfortran/io/open.c \
   gcc-$(GCC_VERSION)/libgfortran/io/read.c \
   gcc-$(GCC_VERSION)/libgfortran/io/size_from_kind.c \
   gcc-$(GCC_VERSION)/libgfortran/io/transfer.c \
+  gcc-$(GCC_VERSION)/libgfortran/io/transfer128.c \
   gcc-$(GCC_VERSION)/libgfortran/io/unit.c \
   gcc-$(GCC_VERSION)/libgfortran/io/unix.c \
+  gcc-$(GCC_VERSION)/libgfortran/io/write.c \
   gcc-$(GCC_VERSION)/libgfortran/io/write.c \
   gcc-$(GCC_VERSION)/libgfortran/runtime/backtrace.c \
   gcc-$(GCC_VERSION)/libgfortran/runtime/compile_options.c \
@@ -122,6 +133,7 @@ C_SOURCES = \
   gcc-$(GCC_VERSION)/libgfortran/runtime/fpu.c \
   gcc-$(GCC_VERSION)/libgfortran/runtime/main.c \
   gcc-$(GCC_VERSION)/libgfortran/runtime/memory.c \
+  gcc-$(GCC_VERSION)/libgfortran/runtime/stop.c \
   gcc-$(GCC_VERSION)/libgfortran/runtime/string.c \
   gcc-$(GCC_VERSION)/libgfortran/fmain.c
 

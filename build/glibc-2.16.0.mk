@@ -405,6 +405,11 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/locale/SYS_libc.c \
   glibc-$(GLIBC_VERSION)/locale/uselocale.c \
   glibc-$(GLIBC_VERSION)/locale/xlocale.c \
+  glibc-$(GLIBC_VERSION)/math/e_exp10.c \
+  glibc-$(GLIBC_VERSION)/math/e_exp10f.c \
+  glibc-$(GLIBC_VERSION)/math/e_exp10l.c \
+  glibc-$(GLIBC_VERSION)/math/e_exp2l.c \
+  glibc-$(GLIBC_VERSION)/math/e_expl.c \
   glibc-$(GLIBC_VERSION)/nptl/sysdeps/pthread/flockfile.c \
   glibc-$(GLIBC_VERSION)/nptl/sysdeps/pthread/funlockfile.c \
   glibc-$(GLIBC_VERSION)/nptl/sysdeps/pthread/pthread.c \
