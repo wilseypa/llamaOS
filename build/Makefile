@@ -79,7 +79,7 @@ install:
 	@[ -d $(INSTALL_FOLDER) ] || (mkdir -p $(INSTALL_FOLDER))
 	@cp -r bin $(INSTALL_FOLDER)/bin
 	@cp -r include $(INSTALL_FOLDER)/include
-	@cp -r include-fixed $(INSTALL_FOLDER)/include-fixed
+#	@cp -r include-fixed $(INSTALL_FOLDER)/include-fixed
 	@cp -r lib $(INSTALL_FOLDER)/lib
 	@cp -r ../script $(INSTALL_FOLDER)/script
 	@cp llamaOS-flags.mk $(INSTALL_FOLDER)/llamaOS-flags.mk
