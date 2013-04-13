@@ -46,5 +46,8 @@ int main (int argc, char *argv [])
       cout << "argv[" << i << "]: " << argv [i] << endl;
    }
 
+   double third = (1.0 / 3.0);
+   cout << "print floats again: " << third << endl;
+   
    return 0;
 }
