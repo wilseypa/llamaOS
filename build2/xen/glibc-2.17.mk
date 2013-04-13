@@ -842,6 +842,7 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/string/memfrob.c \
   glibc-$(GLIBC_VERSION)/string/memmem.c \
   glibc-$(GLIBC_VERSION)/string/stpncpy.c \
+  glibc-$(GLIBC_VERSION)/string/strcasecmp.c \
   glibc-$(GLIBC_VERSION)/string/strcasecmp_l.c \
   glibc-$(GLIBC_VERSION)/string/strcasestr.c \
   glibc-$(GLIBC_VERSION)/string/strcoll.c \
@@ -851,6 +852,7 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/string/strerror_l.c \
   glibc-$(GLIBC_VERSION)/string/strfry.c \
   glibc-$(GLIBC_VERSION)/string/string-inlines.c \
+  glibc-$(GLIBC_VERSION)/string/strncase.c \
   glibc-$(GLIBC_VERSION)/string/strncase_l.c \
   glibc-$(GLIBC_VERSION)/string/strncat.c \
   glibc-$(GLIBC_VERSION)/string/strncpy.c \
