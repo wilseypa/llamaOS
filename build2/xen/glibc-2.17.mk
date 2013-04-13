@@ -87,7 +87,9 @@ ASMFLAGS += \
   -DASSEMBLER \
   -Wa,--noexecstack \
   $(INCLUDES_DIRS) \
-  -include  $(SRCDIR)/glibc-$(GLIBC_VERSION)/include/libc-symbols.h
+  -include  $(SRCDIR)/glibc-$(GLIBC_VERSION)/include/libc-symbols.h \
+  -include $(SRCDIR)/llamaos/__thread.h
+
 
 #  -Wbad-function-cast \
 #  -Wcast-qual \
@@ -120,8 +122,10 @@ CFLAGS += \
   -DMORECORE_CLEARS=2 \
   -DPER_THREAD \
   -DEXEC_PAGESIZE=4096 \
+  -D HAVE_MREMAP=0 \
   $(INCLUDES_DIRS) \
-  -include  $(SRCDIR)/glibc-$(GLIBC_VERSION)/include/libc-symbols.h
+  -include  $(SRCDIR)/glibc-$(GLIBC_VERSION)/include/libc-symbols.h \
+  -include $(SRCDIR)/llamaos/__thread.h
 
 VPATH = $(SRCDIR)
 
@@ -191,7 +195,6 @@ ASM_SOURCES = \
   glibc-$(GLIBC_VERSION)/sysdeps/x86_64/setjmp.S \
   glibc-$(GLIBC_VERSION)/sysdeps/x86_64/stpcpy.S \
   glibc-$(GLIBC_VERSION)/sysdeps/x86_64/strcasecmp.S \
-  glibc-$(GLIBC_VERSION)/sysdeps/x86_64/strcasecmp_l.S \
   glibc-$(GLIBC_VERSION)/sysdeps/x86_64/strcat.S \
   glibc-$(GLIBC_VERSION)/sysdeps/x86_64/strchr.S \
   glibc-$(GLIBC_VERSION)/sysdeps/x86_64/strchrnul.S \
@@ -200,7 +203,6 @@ ASM_SOURCES = \
   glibc-$(GLIBC_VERSION)/sysdeps/x86_64/strcspn.S \
   glibc-$(GLIBC_VERSION)/sysdeps/x86_64/strlen.S \
   glibc-$(GLIBC_VERSION)/sysdeps/x86_64/strncase.S \
-  glibc-$(GLIBC_VERSION)/sysdeps/x86_64/strncase_l.S \
   glibc-$(GLIBC_VERSION)/sysdeps/x86_64/strncmp.S \
   glibc-$(GLIBC_VERSION)/sysdeps/x86_64/strnlen.S \
   glibc-$(GLIBC_VERSION)/sysdeps/x86_64/strpbrk.S \
@@ -214,6 +216,10 @@ ASM_SOURCES = \
   glibc-$(GLIBC_VERSION)/sysdeps/x86_64/wcscmp.S \
   glibc-$(GLIBC_VERSION)/sysdeps/x86_64/wcslen.S \
   glibc-$(GLIBC_VERSION)/sysdeps/x86_64/wcsrchr.S
+
+# these have TLS conflicts
+#  glibc-$(GLIBC_VERSION)/sysdeps/x86_64/strcasecmp_l.S \
+#  glibc-$(GLIBC_VERSION)/sysdeps/x86_64/strncase_l.S \
 
 C_SOURCES = \
   glibc-$(GLIBC_VERSION)/assert/__assert.c \
@@ -836,6 +842,7 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/string/memfrob.c \
   glibc-$(GLIBC_VERSION)/string/memmem.c \
   glibc-$(GLIBC_VERSION)/string/stpncpy.c \
+  glibc-$(GLIBC_VERSION)/string/strcasecmp_l.c \
   glibc-$(GLIBC_VERSION)/string/strcasestr.c \
   glibc-$(GLIBC_VERSION)/string/strcoll.c \
   glibc-$(GLIBC_VERSION)/string/strcoll_l.c \
@@ -844,6 +851,7 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/string/strerror_l.c \
   glibc-$(GLIBC_VERSION)/string/strfry.c \
   glibc-$(GLIBC_VERSION)/string/string-inlines.c \
+  glibc-$(GLIBC_VERSION)/string/strncase_l.c \
   glibc-$(GLIBC_VERSION)/string/strncat.c \
   glibc-$(GLIBC_VERSION)/string/strncpy.c \
   glibc-$(GLIBC_VERSION)/string/strndup.c \

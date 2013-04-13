@@ -312,10 +312,12 @@ static void fpu_init(void)
 }
 
 // void __libc_init_first (int argc, char *arg0, ...);
+void __pthread_initialize_minimal (void);
 
 // entry function called from Entry.S
 void entry_glibc (start_info_t *start_info)
 {
+   __pthread_initialize_minimal ();
    fpu_init ();
 
    // check to make sure the initial memory is good
