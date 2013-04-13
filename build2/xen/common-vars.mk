@@ -57,3 +57,5 @@ GTEST_VERSION = 1.6.0
 
 # auto dependency generation
 DEPENDS = 
+
+-include ../../build/custom-flags.mk
