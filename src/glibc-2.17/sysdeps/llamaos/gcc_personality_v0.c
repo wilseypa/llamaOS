@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012, William Magato
+Copyright (c) 2013, William Magato
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,38 +28,18 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <errno.h>
-#include <stdio.h>
+#include <stdlib.h>
+#include <unwind.h>
 
-// define function pointer
-typedef void (*llamaos_libc_fatal_t) (const char *);
-
-// function pointer variable
-static llamaos_libc_fatal_t llamaos_libc_fatal = 0;
-
-// function called by llamaOS to register pointer
-void register_llamaos_libc_fatal (llamaos_libc_fatal_t libc_fatal)
+_Unwind_Reason_Code
+__gcc_personality_v0 (int version __attribute__ ((unused)),
+		      _Unwind_Action actions __attribute__ ((unused)),
+		      _Unwind_Exception_Class exception_class
+		      __attribute__ ((unused)),
+		      struct _Unwind_Exception *ue_header
+		      __attribute__ ((unused)),
+		      struct _Unwind_Context *context __attribute__ ((unused)))
 {
-   llamaos_libc_fatal = __libc_fatal;
+  abort ();
 }
-
-/* Abort with an error message.  */
-void
-__libc_message (int do_abort, const char *fmt, ...)
-{
-}
-
-/* Abort with an error message.  */
-void __libc_fatal (const char *message)
-{
-   /* This function should write MESSAGE out in the most reliable way.
-      It is called in situations like internal stdio lossage.  */
-   if (0 != llamaos_libc_fatal)
-   {
-      llamaos_libc_fatal (message);
-   }
-
-   __set_errno (ENOSYS);
-   abort ();
-}
-libc_hidden_def (__libc_fatal)
+ 

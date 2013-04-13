@@ -28,6 +28,9 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
+#error who included this?
+#if 0
+
 #include <stdio.h>
 
 /* Abort with an error message.  */
@@ -46,3 +49,4 @@ __libc_fatal (message)
 }
 libc_hidden_def (__libc_fatal)
 
+#endif

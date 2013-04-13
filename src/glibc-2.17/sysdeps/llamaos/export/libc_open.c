@@ -52,3 +52,9 @@ int __libc_open (const char *file, int oflag, ...)
    __set_errno (ENOSYS);
    return 0;
 }
+libc_hidden_def (__libc_open)
+weak_alias (__libc_open, __open)
+libc_hidden_weak (__open)
+weak_alias (__libc_open, open)
+
+stub_warning (open)
