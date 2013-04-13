@@ -1076,6 +1076,7 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/dlerror.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/gcc_personality_v0.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/mremap.c \
+  glibc-$(GLIBC_VERSION)/sysdeps/llamaos/powidf2.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/register-atfork.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/sigaddset.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/sysconf.c \
@@ -1317,6 +1318,7 @@ HEADERS = \
   $(INCDIR)/bits/types.h \
   $(INCDIR)/bits/typesizes.h \
   $(INCDIR)/bits/uio.h \
+  $(INCDIR)/bits/utsname.h \
   $(INCDIR)/bits/waitflags.h \
   $(INCDIR)/bits/waitstatus.h \
   $(INCDIR)/bits/wchar.h \
@@ -1336,6 +1338,7 @@ HEADERS = \
   $(INCDIR)/sys/types.h \
   $(INCDIR)/sys/ucontext.h \
   $(INCDIR)/sys/uio.h \
+  $(INCDIR)/sys/utsname.h \
   $(INCDIR)/sys/wait.h \
   $(INCDIR)/_G_config.h \
   $(INCDIR)/alloca.h \
