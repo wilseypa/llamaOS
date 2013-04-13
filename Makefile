@@ -1,6 +1,7 @@
 
 .PHONY: all
 all:
+	@$(MAKE) -C build2 $@
 	@$(MAKE) -C build $@
 
 .PHONY: install
@@ -9,5 +10,6 @@ install:
 
 .PHONY: clean
 clean:
+	@$(MAKE) -C build2 $@
 	@$(MAKE) -C build $@
 

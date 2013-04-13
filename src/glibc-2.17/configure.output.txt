@@ -1,0 +1,121 @@
+checking build system type... x86_64-unknown-linux-gnu
+checking host system type... x86_64-unknown-linux-gnu
+checking for gcc... gcc
+checking for suffix of object files... o
+checking whether we are using the GNU C compiler... yes
+checking whether gcc accepts -g... yes
+checking for gcc option to accept ISO C89... none needed
+checking how to run the C preprocessor... gcc -E
+checking for g++... g++
+checking whether we are using the GNU C++ compiler... yes
+checking whether g++ accepts -g... yes
+checking for readelf... readelf
+checking for sysdeps preconfigure fragments... x86_64 checking whether gcc compiles in -mx32 mode by default... no
+
+configure: running configure fragment for add-on nptl
+checking for assembler and linker STT_GNU_IFUNC support... yes
+checking whether .text pseudo-op must be used... yes
+checking sysdep dirs... sysdeps/unix/sysv/linux/x86_64/64/nptl sysdeps/unix/sysv/linux/x86_64/64 nptl/sysdeps/unix/sysv/linux/x86_64 nptl/sysdeps/unix/sysv/linux/x86 sysdeps/unix/sysv/linux/x86 sysdeps/unix/sysv/linux/x86_64 sysdeps/unix/sysv/linux/wordsize-64 nptl/sysdeps/unix/sysv/linux nptl/sysdeps/pthread sysdeps/pthread sysdeps/unix/sysv/linux sysdeps/gnu sysdeps/unix/inet nptl/sysdeps/unix/sysv sysdeps/unix/sysv sysdeps/unix/x86_64 nptl/sysdeps/unix sysdeps/unix sysdeps/posix nptl/sysdeps/x86_64/64 sysdeps/x86_64/64 sysdeps/x86_64/fpu sysdeps/x86/fpu nptl/sysdeps/x86_64 sysdeps/x86_64 sysdeps/x86 sysdeps/ieee754/ldbl-96 sysdeps/ieee754/dbl-64/wordsize-64 sysdeps/ieee754/dbl-64 sysdeps/ieee754/flt-32 sysdeps/wordsize-64 sysdeps/ieee754 sysdeps/generic
+checking for a BSD-compatible install... /usr/bin/install -c
+checking whether ln -s works... yes
+checking whether /usr/lib/gcc/x86_64-pc-linux-gnu/4.6.3/../../../../x86_64-pc-linux-gnu/bin/as is GNU as... yes
+checking whether /usr/lib/gcc/x86_64-pc-linux-gnu/4.6.3/../../../../x86_64-pc-linux-gnu/bin/ld is GNU ld... yes
+checking for /usr/lib/gcc/x86_64-pc-linux-gnu/4.6.3/../../../../x86_64-pc-linux-gnu/bin/as... /usr/lib/gcc/x86_64-pc-linux-gnu/4.6.3/../../../../x86_64-pc-linux-gnu/bin/as
+checking version of /usr/lib/gcc/x86_64-pc-linux-gnu/4.6.3/../../../../x86_64-pc-linux-gnu/bin/as... 2.22, ok
+checking for /usr/lib/gcc/x86_64-pc-linux-gnu/4.6.3/../../../../x86_64-pc-linux-gnu/bin/ld... /usr/lib/gcc/x86_64-pc-linux-gnu/4.6.3/../../../../x86_64-pc-linux-gnu/bin/ld
+checking version of /usr/lib/gcc/x86_64-pc-linux-gnu/4.6.3/../../../../x86_64-pc-linux-gnu/bin/ld... 2.22, ok
+checking for gcc... gcc
+checking version of gcc... 4.6.3, ok
+checking for gnumake... no
+checking for gmake... gmake
+checking version of gmake... 3.82, ok
+checking for gnumsgfmt... no
+checking for gmsgfmt... gmsgfmt
+checking version of gmsgfmt... 0.18.2, ok
+checking for makeinfo... makeinfo
+checking version of makeinfo... 4.13, ok
+checking for sed... sed
+checking version of sed... 4.2.1, ok
+checking for gawk... gawk
+checking version of gawk... 4.0.1, ok
+checking for nm... nm
+checking for autoconf... autoconf
+checking whether autoconf works... no
+checking LD_LIBRARY_PATH variable... ok
+checking whether GCC supports -static-libgcc... -static-libgcc
+checking for bash... /bin/bash
+checking for perl... /usr/bin/perl
+checking for install-info... /usr/bin/install-info
+checking for bison... /usr/bin/bison
+checking for libc-friendly stddef.h... yes
+checking whether we need to use -P to assemble .S files... no
+checking for .set assembler directive... yes
+checking for assembler gnu_unique_object symbol type... yes
+checking for .symver assembler directive... yes
+checking for ld --version-script... yes
+checking for .previous assembler directive... yes
+checking for .protected and .hidden assembler directive... yes
+checking whether __attribute__((visibility())) is supported... yes
+checking for broken __attribute__((visibility()))... no
+checking for broken __attribute__((alias()))... no
+checking whether to put _rtld_local into .sdata section... no
+checking for .preinit_array/.init_array/.fini_array support... yes
+checking whether to use .ctors/.dtors header and trailer... no
+checking for libunwind-support in compiler... no
+checking for linker that supports -z nodelete... yes
+checking for linker that supports -z nodlopen... yes
+checking for linker that supports -z initfirst... yes
+checking for -z relro option... yes
+checking for -Bgroup option... yes
+checking whether --noexecstack is desirable for .S files... yes
+checking for -z combreloc... yes
+checking for linker that supports -z execstack... yes
+checking for -fpie... yes
+checking for --hash-style option... yes
+checking for sufficient default -shared layout... no
+checking linker output format... elf64-x86-64
+checking for -fno-toplevel-reorder -fno-section-anchors... yes
+checking for -fstack-protector... yes
+checking for -fgnu89-inline... yes
+checking whether cc puts quotes around section names... no
+checking for assembler .weak directive... yes
+checking whether CFI directives are supported... yes
+checking for ld --no-whole-archive... yes
+checking for gcc -fexceptions... yes
+checking for __builtin_memset... yes
+checking for redirection of built-in functions... yes
+checking for __thread... yes
+checking for tls_model attribute... yes
+checking for compiler option to disable generation of FMA instructions... -ffp-contract=off
+checking for libgd... yes
+checking for is_selinux_enabled in -lselinux... no
+checking size of long double... 16
+checking for _FORTIFY_SOURCE predefine... yes
+checking whether gcc implicitly enables -fstack-protector... no
+running configure fragment for nptl/sysdeps/pthread
+checking for forced unwind support... yes
+checking for C cleanup handling... yes
+running configure fragment for sysdeps/unix/sysv/linux
+checking for grep that handles long lines and -e... /bin/grep
+checking for egrep... /bin/grep -E
+checking installed Linux kernel header files... 2.6.19 or later
+checking for kernel header at least 2.6.16... ok
+checking for symlinks in /opt/glibc-2.17/include... ok
+running configure fragment for sysdeps/gnu
+running configure fragment for nptl/sysdeps/x86_64
+checking for .cfi_personality and .cfi_lsda pseudo-ops... yes
+running configure fragment for sysdeps/x86_64
+checking for cpuid.h... yes
+checking for SSE4 support... yes
+checking for AVX support... yes
+checking for AVX encoding of SSE instructions... yes
+checking for FMA4 support... yes
+checking for -mno-vzeroupper support... yes
+checking for old glibc 2.0.x headers... no
+checking whether -fPIC is default... no
+configure: creating ./config.status
+config.status: creating config.make
+config.status: creating Makefile
+config.status: creating config.h
+config.status: config.h is unchanged
+config.status: executing default commands

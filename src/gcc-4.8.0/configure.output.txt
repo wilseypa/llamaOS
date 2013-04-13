@@ -1,0 +1,111 @@
+checking build system type... x86_64-unknown-linux-gnu
+checking host system type... x86_64-unknown-linux-gnu
+checking target system type... x86_64-unknown-linux-gnu
+checking for a BSD-compatible install... /usr/bin/install -c
+checking whether ln works... yes
+checking whether ln -s works... yes
+checking for a sed that does not truncate output... /bin/sed
+checking for gawk... gawk
+checking for libatomic support... yes
+checking for libitm support... yes
+checking for libsanitizer support... yes
+checking for gcc... gcc
+checking for C compiler default output file name... a.out
+checking whether the C compiler works... yes
+checking whether we are cross compiling... no
+checking for suffix of executables... 
+checking for suffix of object files... o
+checking whether we are using the GNU C compiler... yes
+checking whether gcc accepts -g... yes
+checking for gcc option to accept ISO C89... none needed
+checking for g++... g++
+checking whether we are using the GNU C++ compiler... yes
+checking whether g++ accepts -g... yes
+checking whether g++ accepts -static-libstdc++ -static-libgcc... yes
+checking for gnatbind... no
+checking for gnatmake... no
+checking whether compiler driver understands Ada... no
+checking how to compare bootstrapped objects... cmp --ignore-initial=16 $$f1 $$f2
+checking for objdir... .libs
+checking for the correct version of gmp.h... yes
+checking for the correct version of mpfr.h... yes
+checking for the correct version of mpc.h... yes
+checking for the correct version of the gmp/mpfr/mpc libraries... yes
+checking for version 0.10 of ISL... no
+checking for version 0.11 of ISL... no
+checking for default BUILD_CONFIG... bootstrap-debug
+checking for bison... bison -y
+checking for bison... bison
+checking for gm4... no
+checking for gnum4... no
+checking for m4... m4
+checking for flex... flex
+checking for flex... flex
+checking for makeinfo... makeinfo
+checking for expect... no
+checking for runtest... no
+checking for ar... ar
+checking for as... as
+checking for dlltool... no
+checking for ld... (cached) /usr/lib/gcc/x86_64-pc-linux-gnu/4.6.3/../../../../x86_64-pc-linux-gnu/bin/ld
+checking for lipo... no
+checking for nm... nm
+checking for ranlib... ranlib
+checking for strip... strip
+checking for windres... no
+checking for windmc... no
+checking for objcopy... objcopy
+checking for objdump... objdump
+checking for readelf... readelf
+checking for cc... cc
+checking for c++... c++
+checking for gcc... gcc
+checking for gcj... no
+checking for gfortran... gfortran
+checking for gccgo... no
+checking for ar... no
+checking for ar... ar
+checking for as... no
+checking for as... as
+checking for dlltool... no
+checking for dlltool... no
+checking for ld... no
+checking for ld... ld
+checking for lipo... no
+checking for lipo... no
+checking for nm... no
+checking for nm... nm
+checking for objdump... no
+checking for objdump... objdump
+checking for ranlib... no
+checking for ranlib... ranlib
+checking for readelf... no
+checking for readelf... readelf
+checking for strip... no
+checking for strip... strip
+checking for windres... no
+checking for windres... no
+checking for windmc... no
+checking for windmc... no
+checking where to find the target ar... host tool
+checking where to find the target as... host tool
+checking where to find the target cc... just compiled
+checking where to find the target c++... just compiled
+checking where to find the target c++ for libstdc++... just compiled
+checking where to find the target dlltool... host tool
+checking where to find the target gcc... just compiled
+checking where to find the target gcj... host tool
+checking where to find the target gfortran... just compiled
+checking where to find the target gccgo... host tool
+checking where to find the target ld... host tool
+checking where to find the target lipo... host tool
+checking where to find the target nm... host tool
+checking where to find the target objdump... host tool
+checking where to find the target ranlib... host tool
+checking where to find the target readelf... host tool
+checking where to find the target strip... host tool
+checking where to find the target windres... host tool
+checking where to find the target windmc... host tool
+checking whether to enable maintainer-specific portions of Makefiles... no
+configure: creating ./config.status
+config.status: creating Makefile

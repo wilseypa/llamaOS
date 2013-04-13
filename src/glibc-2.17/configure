@@ -1,0 +1,17 @@
+/usr/src/glibc-2.17/configure \
+  --prefix=/opt/glibc-2.17 \
+  --enable-stackguard-randomization \
+  --enable-add-ons=nptl \
+  --enable-all-warnings \
+  --disable-sanity-checks \
+  --disable-shared \
+  --disable-profile \
+  --disable-versioning \
+  --disable-static-nss \
+  --disable-multi-arch \
+  --disable-nss-crypt \
+  --disable-obsolete-rpc \
+  --disable-systemtap \
+  --disable-build-nscd \
+  --disable-nscd \
+  --with-fp
