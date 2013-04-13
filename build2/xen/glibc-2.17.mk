@@ -659,7 +659,10 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/misc/munmap.c \
   glibc-$(GLIBC_VERSION)/misc/sbrk.c \
   glibc-$(GLIBC_VERSION)/misc/tsearch.c \
+  glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaos/flockfile.c \
+  glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaos/funlockfile.c \
   glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaos/jmp-unwind.c \
+  glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaos/pthread.c \
   glibc-$(GLIBC_VERSION)/nptl/sysdeps/pthread/flockfile.c \
   glibc-$(GLIBC_VERSION)/nptl/sysdeps/pthread/ftrylockfile.c \
   glibc-$(GLIBC_VERSION)/nptl/sysdeps/pthread/funlockfile.c \

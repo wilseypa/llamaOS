@@ -28,37 +28,39 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <sys/types.h>
-#include <sys/mman.h>
-#include <errno.h>
+// bypassing pthread logic until llamaOS supports threads
 
-// define function pointer
-typedef int (*llamaos_madvise_t) (__ptr_t, size_t, int);
+#include <pthread.h>
 
-// function pointer variable
-static llamaos_madvise_t llamaos_madvise = 0;
-
-// function called by llamaOS to register pointer
-void register_llamaos_madvise (llamaos_madvise_t madvise)
+int __pthread_mutex_lock (pthread_mutex_t *mutex)
 {
-   llamaos_madvise = madvise;
+   return 0;
 }
+#ifndef __pthread_mutex_lock
+strong_alias (__pthread_mutex_lock, pthread_mutex_lock)
+hidden_def (__pthread_mutex_lock)
+#endif
 
-/* Advise the system about particular usage patterns the program follows
-   for the region starting at ADDR and extending LEN bytes.  */
+int __pthread_mutex_unlock (pthread_mutex_t *__mutex);
 
 int
-__madvise (void *addr, size_t len, int advice)
+__pthread_mutex_unlock (mutex)
+     pthread_mutex_t *mutex;
 {
-   if (0 != llamaos_madvise)
-   {
-      return llamaos_madvise (addr, len, advice);
-   }
-
-   __set_errno (ENOSYS);
-   return -1;
+  return 0; // __pthread_mutex_unlock_usercnt (mutex, 1);
 }
-libc_hidden_def (__madvise)
-weak_alias (__madvise, madvise)
+strong_alias (__pthread_mutex_unlock, pthread_mutex_unlock)
+hidden_def (__pthread_mutex_unlock)
 
-stub_warning (madvise)
+extern int __pthread_once (pthread_once_t *once_control,
+			   void (*init_routine) (void));
+
+int
+__pthread_once (once_control, init_routine)
+     pthread_once_t *once_control;
+     void (*init_routine) (void);
+{
+  return 0;
+}
+strong_alias (__pthread_once, pthread_once)
+hidden_def (__pthread_once)
