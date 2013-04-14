@@ -1570,7 +1570,6 @@ $(INCDIR)/glimits.h : $(SRCDIR)/gcc-$(GCC_VERSION)/gcc/glimits.h
 	@echo copying: $@ from $<
 	cp $< $@
 
-
 include rules.mk
 
 # include auto-generated dependencies

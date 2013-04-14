@@ -36,6 +36,7 @@ include common-vars.mk
 .PHONY: all
 all:
 	@$(MAKE) -f glibc-$(GLIBC_VERSION).mk
+	@$(MAKE) -f stdc++-$(GCC_VERSION).mk
 #	@$(MAKE) -f xen-$(XEN_VERSION).mk
 #	@$(MAKE) -f empty.mk
 #	@$(MAKE) -f empty-glibc.mk
