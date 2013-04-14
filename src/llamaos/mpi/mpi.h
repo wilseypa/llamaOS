@@ -38,6 +38,7 @@ extern "C" {
 // MPI TYPEDEF AND DEFINES
 /* MPI's error classes */
 #define MPI_SUCCESS          0      /* Successful return code */
+#define MPI_ERR_OTHER        1
 
 typedef int MPI_Datatype;
 #define MPI_CHAR		((MPI_Datatype)1)
