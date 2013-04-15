@@ -1,6 +1,6 @@
-// Optimizations for random number extensions, generic version -*- C++ -*-
+// Support for <functional> -*- C++ -*-
 
-// Copyright (C) 2012-2013 Free Software Foundation, Inc.
+// Copyright (C) 2011-2013 Free Software Foundation, Inc.
 //
 // This file is part of the GNU ISO C++ Library.  This library is free
 // software; you can redistribute it and/or modify it under the
@@ -22,17 +22,17 @@
 // see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
 // <http://www.gnu.org/licenses/>.
 
-/** @file ext/opt_random.h
- *  This is an internal header file, included by other library headers.
- *  Do not attempt to use it directly. @headername{ext/random}
- */
+#include <functional>
 
-#ifndef _EXT_OPT_RANDOM_H
-#define _EXT_OPT_RANDOM_H 1
+namespace std _GLIBCXX_VISIBILITY(default)
+{
+_GLIBCXX_BEGIN_NAMESPACE_VERSION
 
-#pragma GCC system_header
+  bad_function_call::~bad_function_call() noexcept = default;
 
+  const char*
+  bad_function_call::what() const noexcept
+  { return "bad_function_call"; }
 
-
-
-#endif // _EXT_OPT_RANDOM_H
+_GLIBCXX_END_NAMESPACE_VERSION
+} // namespace

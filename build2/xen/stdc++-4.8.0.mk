@@ -54,8 +54,10 @@ CPPFLAGS += \
   -Wwrite-strings \
   -Wcast-qual \
   -Wabi \
+  -Wno-deprecated \
   -D_GNU_SOURCE \
   -I $(SRCDIR)/gcc-$(GCC_VERSION)/libgcc \
+  -I $(SRCDIR)/gcc-$(GCC_VERSION)/libstdc++-v3/include/backward \
   -I $(SRCDIR)/gcc-$(GCC_VERSION)/libstdc++-v3/include \
   -I $(SRCDIR)/gcc-$(GCC_VERSION)/libstdc++-v3/libsupc++ \
   -I $(SRCDIR)/gcc-$(GCC_VERSION)/gcc/include \
@@ -63,11 +65,9 @@ CPPFLAGS += \
 
 VPATH = $(SRCDIR)
 
-#  gcc-$(GCC_VERSION)/gcc/config/i386/i386.c \
 C_SOURCES = \
   gcc-$(GCC_VERSION)/libiberty/cp-demangle.c
 
-#  gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/ext-inst.cc \
 CC_SOURCES = \
   gcc-$(GCC_VERSION)/libstdc++-v3/libsupc++/array_type_info.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/libsupc++/atexit_arm.cc \
@@ -118,6 +118,28 @@ CC_SOURCES = \
   gcc-$(GCC_VERSION)/libstdc++-v3/libsupc++/vec.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/libsupc++/vmi_class_type_info.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/libsupc++/vterminate.cc \
+  gcc-$(GCC_VERSION)/libstdc++-v3/src/c++11/chrono.cc \
+  gcc-$(GCC_VERSION)/libstdc++-v3/src/c++11/compatibility-atomic-c++0x.cc \
+  gcc-$(GCC_VERSION)/libstdc++-v3/src/c++11/compatibility-c++0x.cc \
+  gcc-$(GCC_VERSION)/libstdc++-v3/src/c++11/compatibility-thread-c++0x.cc \
+  gcc-$(GCC_VERSION)/libstdc++-v3/src/c++11/condition_variable.cc \
+  gcc-$(GCC_VERSION)/libstdc++-v3/src/c++11/debug.cc \
+  gcc-$(GCC_VERSION)/libstdc++-v3/src/c++11/fstream-inst.cc \
+  gcc-$(GCC_VERSION)/libstdc++-v3/src/c++11/functexcept.cc \
+  gcc-$(GCC_VERSION)/libstdc++-v3/src/c++11/functional.cc \
+  gcc-$(GCC_VERSION)/libstdc++-v3/src/c++11/future.cc \
+  gcc-$(GCC_VERSION)/libstdc++-v3/src/c++11/hash_c++0x.cc \
+  gcc-$(GCC_VERSION)/libstdc++-v3/src/c++11/hashtable_c++0x.cc \
+  gcc-$(GCC_VERSION)/libstdc++-v3/src/c++11/limits.cc \
+  gcc-$(GCC_VERSION)/libstdc++-v3/src/c++11/mutex.cc \
+  gcc-$(GCC_VERSION)/libstdc++-v3/src/c++11/placeholders.cc \
+  gcc-$(GCC_VERSION)/libstdc++-v3/src/c++11/random.cc \
+  gcc-$(GCC_VERSION)/libstdc++-v3/src/c++11/regex.cc \
+  gcc-$(GCC_VERSION)/libstdc++-v3/src/c++11/shared_ptr.cc \
+  gcc-$(GCC_VERSION)/libstdc++-v3/src/c++11/string-inst.cc \
+  gcc-$(GCC_VERSION)/libstdc++-v3/src/c++11/system_error.cc \
+  gcc-$(GCC_VERSION)/libstdc++-v3/src/c++11/thread.cc \
+  gcc-$(GCC_VERSION)/libstdc++-v3/src/c++11/wstring-inst.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/allocator-inst.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/atomicity.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/basic_file.cc \
@@ -126,11 +148,15 @@ CC_SOURCES = \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/codecvt.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/codecvt_members.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/collate_members.cc \
+  gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/compatibility-debug_list-2.cc \
+  gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/compatibility-debug_list.cc \
+  gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/compatibility.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/complex_io.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/concept-inst.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/ctype.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/ctype_configure_char.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/ctype_members.cc \
+  gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/ext-inst.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/globals_io.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/hash_tr1.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/hashtable_tr1.cc \

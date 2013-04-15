@@ -1,6 +1,6 @@
-// Optimizations for random number extensions, generic version -*- C++ -*-
+// wide string support -*- C++ -*-
 
-// Copyright (C) 2012-2013 Free Software Foundation, Inc.
+// Copyright (C) 1999-2013 Free Software Foundation, Inc.
 //
 // This file is part of the GNU ISO C++ Library.  This library is free
 // software; you can redistribute it and/or modify it under the
@@ -22,17 +22,13 @@
 // see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
 // <http://www.gnu.org/licenses/>.
 
-/** @file ext/opt_random.h
- *  This is an internal header file, included by other library headers.
- *  Do not attempt to use it directly. @headername{ext/random}
- */
+//
+// ISO C++ 14882: 21  Strings library
+//
 
-#ifndef _EXT_OPT_RANDOM_H
-#define _EXT_OPT_RANDOM_H 1
+#include <bits/c++config.h>
 
-#pragma GCC system_header
-
-
-
-
-#endif // _EXT_OPT_RANDOM_H
+#ifdef _GLIBCXX_USE_WCHAR_T
+#define C wchar_t
+#include "string-inst.cc"
+#endif

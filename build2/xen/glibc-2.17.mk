@@ -1378,6 +1378,7 @@ HEADERS = \
   $(INCDIR)/sched.h \
   $(INCDIR)/signal.h \
   $(INCDIR)/stdarg.h \
+  $(INCDIR)/stdbool.h \
   $(INCDIR)/stdc-predef.h \
   $(INCDIR)/stddef.h \
   $(INCDIR)/stdint.h \
@@ -1566,6 +1567,12 @@ $(INCDIR)/stdc-predef.h : $(SRCDIR)/glibc-$(GLIBC_VERSION)/include/stdc-predef.h
 
 # some files come from the gcc source
 $(INCDIR)/stdarg.h : $(SRCDIR)/gcc-$(GCC_VERSION)/gcc/ginclude/stdarg.h
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo copying: $@ from $<
+	cp $< $@
+
+# some files come from the gcc source
+$(INCDIR)/stdbool.h : $(SRCDIR)/gcc-$(GCC_VERSION)/gcc/ginclude/stdbool.h
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo copying: $@ from $<
 	cp $< $@

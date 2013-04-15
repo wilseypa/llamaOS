@@ -1,6 +1,6 @@
-// Optimizations for random number extensions, generic version -*- C++ -*-
+// Support for pointer abstractions -*- C++ -*-
 
-// Copyright (C) 2012-2013 Free Software Foundation, Inc.
+// Copyright (C) 2011-2013 Free Software Foundation, Inc.
 //
 // This file is part of the GNU ISO C++ Library.  This library is free
 // software; you can redistribute it and/or modify it under the
@@ -22,17 +22,17 @@
 // see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
 // <http://www.gnu.org/licenses/>.
 
-/** @file ext/opt_random.h
- *  This is an internal header file, included by other library headers.
- *  Do not attempt to use it directly. @headername{ext/random}
- */
+#include <memory>
 
-#ifndef _EXT_OPT_RANDOM_H
-#define _EXT_OPT_RANDOM_H 1
+namespace std _GLIBCXX_VISIBILITY(default)
+{
+_GLIBCXX_BEGIN_NAMESPACE_VERSION
 
-#pragma GCC system_header
+  bad_weak_ptr::~bad_weak_ptr() noexcept = default;
 
+  char const*
+  bad_weak_ptr::what() const noexcept
+  { return "bad_weak_ptr"; }
 
-
-
-#endif // _EXT_OPT_RANDOM_H
+_GLIBCXX_END_NAMESPACE_VERSION
+} // namespace
