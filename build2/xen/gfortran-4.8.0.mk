@@ -433,6 +433,22 @@ SOURCES = \
   gcc-$(GCC_VERSION)/libgfortran/generated/unpack_r16.c \
   gcc-$(GCC_VERSION)/libgfortran/generated/unpack_r4.c \
   gcc-$(GCC_VERSION)/libgfortran/generated/unpack_r8.c \
+  gcc-$(GCC_VERSION)/libgfortran/io/close.c \
+  gcc-$(GCC_VERSION)/libgfortran/io/fbuf.c \
+  gcc-$(GCC_VERSION)/libgfortran/io/file_pos.c \
+  gcc-$(GCC_VERSION)/libgfortran/io/format.c \
+  gcc-$(GCC_VERSION)/libgfortran/io/inquire.c \
+  gcc-$(GCC_VERSION)/libgfortran/io/intrinsics.c \
+  gcc-$(GCC_VERSION)/libgfortran/io/list_read.c \
+  gcc-$(GCC_VERSION)/libgfortran/io/lock.c \
+  gcc-$(GCC_VERSION)/libgfortran/io/open.c \
+  gcc-$(GCC_VERSION)/libgfortran/io/read.c \
+  gcc-$(GCC_VERSION)/libgfortran/io/size_from_kind.c \
+  gcc-$(GCC_VERSION)/libgfortran/io/transfer.c \
+  gcc-$(GCC_VERSION)/libgfortran/io/transfer128.c \
+  gcc-$(GCC_VERSION)/libgfortran/io/unit.c \
+  gcc-$(GCC_VERSION)/libgfortran/io/unix.c \
+  gcc-$(GCC_VERSION)/libgfortran/io/write.c \
   gcc-$(GCC_VERSION)/libgfortran/runtime/backtrace.c \
   gcc-$(GCC_VERSION)/libgfortran/runtime/bounds.c \
   gcc-$(GCC_VERSION)/libgfortran/runtime/compile_options.c \
