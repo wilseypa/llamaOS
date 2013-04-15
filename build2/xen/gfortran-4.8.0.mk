@@ -55,6 +55,12 @@ CFLAGS += \
 
 VPATH = $(SRCDIR)
 
+# needs __S_ISVTX defined
+#  gcc-$(GCC_VERSION)/libgfortran/intrinsics/chmod.c
+
+# this is all jacked up
+#  gcc-$(GCC_VERSION)/libgfortran/intrinsics/stat.c \
+
 SOURCES = \
   gcc-$(GCC_VERSION)/libgfortran/generated/all_l1.c \
   gcc-$(GCC_VERSION)/libgfortran/generated/all_l16.c \
@@ -433,6 +439,63 @@ SOURCES = \
   gcc-$(GCC_VERSION)/libgfortran/generated/unpack_r16.c \
   gcc-$(GCC_VERSION)/libgfortran/generated/unpack_r4.c \
   gcc-$(GCC_VERSION)/libgfortran/generated/unpack_r8.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/abort.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/access.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/args.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/associated.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/bit_intrinsics.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/c99_functions.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/chdir.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/clock.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/cpu_time.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/cshift0.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/ctime.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/date_and_time.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/dtime.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/env.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/eoshift0.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/eoshift2.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/erfc_scaled.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/etime.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/execute_command_line.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/exit.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/extends_type_of.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/fnum.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/gerror.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/getXid.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/getcwd.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/getlog.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/hostnm.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/ierrno.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/ishftc.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/iso_c_binding.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/iso_c_generated_procs.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/kill.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/link.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/malloc.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/move_alloc.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/mvbits.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/pack_generic.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/perror.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/rand.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/random.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/rename.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/reshape_generic.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/reshape_packed.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/selected_char_kind.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/signal.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/size.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/sleep.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/spread_generic.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/string_intrinsics.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/symlnk.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/system.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/system_clock.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/time.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/transpose_generic.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/umask.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/unlink.c \
+  gcc-$(GCC_VERSION)/libgfortran/intrinsics/unpack_generic.c \
   gcc-$(GCC_VERSION)/libgfortran/io/close.c \
   gcc-$(GCC_VERSION)/libgfortran/io/fbuf.c \
   gcc-$(GCC_VERSION)/libgfortran/io/file_pos.c \
@@ -456,6 +519,8 @@ SOURCES = \
   gcc-$(GCC_VERSION)/libgfortran/runtime/environ.c \
   gcc-$(GCC_VERSION)/libgfortran/runtime/error.c \
   gcc-$(GCC_VERSION)/libgfortran/runtime/fpu.c \
+  gcc-$(GCC_VERSION)/libgfortran/runtime/in_pack_generic.c \
+  gcc-$(GCC_VERSION)/libgfortran/runtime/in_unpack_generic.c \
   gcc-$(GCC_VERSION)/libgfortran/runtime/main.c \
   gcc-$(GCC_VERSION)/libgfortran/runtime/memory.c \
   gcc-$(GCC_VERSION)/libgfortran/runtime/pause.c \

@@ -1377,6 +1377,7 @@ HEADERS = \
   $(INCDIR)/nl_types.h \
   $(INCDIR)/poll.h \
   $(INCDIR)/pthread.h \
+  $(INCDIR)/pwd.h \
   $(INCDIR)/sched.h \
   $(INCDIR)/signal.h \
   $(INCDIR)/stdalign.h \
@@ -1513,6 +1514,11 @@ $(INCDIR)/% : $(SRCDIR)/glibc-$(GLIBC_VERSION)/misc/%
 	cp $< $@
 
 $(INCDIR)/% : $(SRCDIR)/glibc-$(GLIBC_VERSION)/posix/%
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo copying: $@ from $<
+	cp $< $@
+
+$(INCDIR)/% : $(SRCDIR)/glibc-$(GLIBC_VERSION)/pwd/%
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo copying: $@ from $<
 	cp $< $@
