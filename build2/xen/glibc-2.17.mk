@@ -1361,10 +1361,12 @@ HEADERS = \
   $(INCDIR)/errno.h \
   $(INCDIR)/fcntl.h \
   $(INCDIR)/features.h \
+  $(INCDIR)/float.h \
   $(INCDIR)/getopt.h \
   $(INCDIR)/glimits.h \
   $(INCDIR)/gmp.h \
   $(INCDIR)/inttypes.h \
+  $(INCDIR)/iso646.h \
   $(INCDIR)/langinfo.h \
   $(INCDIR)/libintl.h \
   $(INCDIR)/libio.h \
@@ -1377,17 +1379,23 @@ HEADERS = \
   $(INCDIR)/pthread.h \
   $(INCDIR)/sched.h \
   $(INCDIR)/signal.h \
+  $(INCDIR)/stdalign.h \
   $(INCDIR)/stdarg.h \
   $(INCDIR)/stdbool.h \
   $(INCDIR)/stdc-predef.h \
   $(INCDIR)/stddef.h \
+  $(INCDIR)/stdfix.h \
+  $(INCDIR)/stdint-gcc.h \
+  $(INCDIR)/stdint-wrap.h \
   $(INCDIR)/stdint.h \
   $(INCDIR)/stdio.h \
   $(INCDIR)/stdlib.h \
+  $(INCDIR)/stdnoreturn.h \
   $(INCDIR)/string.h \
   $(INCDIR)/syscall.h \
   $(INCDIR)/time.h \
   $(INCDIR)/unistd.h \
+  $(INCDIR)/varargs.h \
   $(INCDIR)/wchar.h \
   $(INCDIR)/wctype.h \
   $(INCDIR)/xlocale.h
@@ -1566,18 +1574,57 @@ $(INCDIR)/stdc-predef.h : $(SRCDIR)/glibc-$(GLIBC_VERSION)/include/stdc-predef.h
 	cp $< $@
 
 # some files come from the gcc source
+$(INCDIR)/float.h : $(SRCDIR)/gcc-$(GCC_VERSION)/gcc/ginclude/float.h
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo copying: $@ from $<
+	cp $< $@
+
+$(INCDIR)/iso646.h : $(SRCDIR)/gcc-$(GCC_VERSION)/gcc/ginclude/iso646.h
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo copying: $@ from $<
+	cp $< $@
+
+$(INCDIR)/stdalign.h : $(SRCDIR)/gcc-$(GCC_VERSION)/gcc/ginclude/stdalign.h
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo copying: $@ from $<
+	cp $< $@
+
 $(INCDIR)/stdarg.h : $(SRCDIR)/gcc-$(GCC_VERSION)/gcc/ginclude/stdarg.h
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo copying: $@ from $<
 	cp $< $@
 
-# some files come from the gcc source
 $(INCDIR)/stdbool.h : $(SRCDIR)/gcc-$(GCC_VERSION)/gcc/ginclude/stdbool.h
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo copying: $@ from $<
 	cp $< $@
 
 $(INCDIR)/stddef.h : $(SRCDIR)/gcc-$(GCC_VERSION)/gcc/ginclude/stddef.h
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo copying: $@ from $<
+	cp $< $@
+
+$(INCDIR)/stdfix.h : $(SRCDIR)/gcc-$(GCC_VERSION)/gcc/ginclude/stdfix.h
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo copying: $@ from $<
+	cp $< $@
+
+$(INCDIR)/stdint-gcc.h : $(SRCDIR)/gcc-$(GCC_VERSION)/gcc/ginclude/stdint-gcc.h
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo copying: $@ from $<
+	cp $< $@
+
+$(INCDIR)/stdint-wrap.h : $(SRCDIR)/gcc-$(GCC_VERSION)/gcc/ginclude/stdint-wrap.h
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo copying: $@ from $<
+	cp $< $@
+
+$(INCDIR)/stdnoreturn.h : $(SRCDIR)/gcc-$(GCC_VERSION)/gcc/ginclude/stdnoreturn.h
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo copying: $@ from $<
+	cp $< $@
+
+$(INCDIR)/varargs.h : $(SRCDIR)/gcc-$(GCC_VERSION)/gcc/ginclude/varargs.h
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo copying: $@ from $<
 	cp $< $@

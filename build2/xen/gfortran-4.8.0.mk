@@ -32,42 +32,50 @@
 
 # include common variables
 include common-vars.mk
+include common-flags.mk
+
+MAKEFILE_SOURCES += gfortran-$(GCC_VERSION).mk
+
+# -iquote/usr/src/gcc-4.8.0/libgfortran/io
+CFLAGS += \
+  -DHAVE_CONFIG_H \
+  -Wall \
+  -Wstrict-prototypes \
+  -Wmissing-prototypes \
+  -Wold-style-definition \
+  -Wextra \
+  -Wwrite-strings \
+  -fcx-fortran-rules \
+  -I $(SRCDIR)/gcc-$(GCC_VERSION)/libgfortran \
+  -I $(SRCDIR)/gcc-$(GCC_VERSION)/gcc \
+  -I $(SRCDIR)/gcc-$(GCC_VERSION)/gcc/config \
+  -I $(SRCDIR)/gcc-$(GCC_VERSION)/libquadmath \
+  -I $(SRCDIR)/gcc-$(GCC_VERSION)/libgcc \
+  -I $(INCDIR)
+
+VPATH = $(SRCDIR)
+
+SOURCES = \
+  gcc-$(GCC_VERSION)/libgfortran/runtime/backtrace.c
+
+OBJECTS  = $(SOURCES:%.c=$(OBJDIR)/%.o)
+DEPENDS += $(OBJECTS:%.o=%.d)
 
 .PHONY: all
-all:
-	@$(MAKE) -f glibc-$(GLIBC_VERSION).mk
-	@$(MAKE) -f stdc++-$(GCC_VERSION).mk
-	@$(MAKE) -f gfortran-$(GCC_VERSION).mk
-#	@$(MAKE) -f xen-$(XEN_VERSION).mk
-#	@$(MAKE) -f empty.mk
-#	@$(MAKE) -f empty-glibc.mk
-#	@$(MAKE) -f empty-gcc.mk
-#	@$(MAKE) -f gcc-$(GCC_VERSION).mk
-#	@$(MAKE) -f llamaOS.mk
+all : $(LIBDIR)/gfortran.a
 
-.PHONY: install
-install:
-	@echo installing llamaOS into $(INSTALL_FOLDER) folder...
-	@[ -d $(INSTALL_FOLDER) ] || (mkdir -p $(INSTALL_FOLDER))
-	@cp -r bin $(INSTALL_FOLDER)/bin
-	@cp -r lib $(INSTALL_FOLDER)/lib
-	@cp -r include $(INSTALL_FOLDER)/include
-	@cp -r ../script $(INSTALL_FOLDER)/script
-#	@cp llamaOS-flags.mk $(INSTALL_FOLDER)/llamaOS-flags.mk
-#	@cp llamaOS.lds $(INSTALL_FOLDER)/llamaOS.lds
-	@echo adjusting file attributes...
-	@chmod -R o+r $(INSTALL_FOLDER)
-	@echo install complete.
-	@echo 
+$(LIBDIR)/gfortran.a: $(OBJECTS)
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo linking: $@
+	@$(AR) r $@ $(OBJECTS)
+	@echo successfully built: $@
+	@echo
 
-.PHONY: clean
-clean:
-	@echo cleaning build folder...
-	@echo removing: $(OBJDIR)
-	@rm -rf $(OBJDIR)
-	@echo removing: $(BINDIR)
-	@rm -rf $(BINDIR)
-	@echo removing: $(LIBDIR)
-	@rm -rf $(LIBDIR)
-	@echo removing: $(INCDIR)
-	@rm -rf $(INCDIR)
+include rules.mk
+
+# include auto-generated dependencies
+-include $(DEPENDS)
+
+
+
+
