@@ -1,4 +1,4 @@
-// std::ctype implementation details, GNU version -*- C++ -*-
+// std::ctype implementation details, generic version -*- C++ -*-
 
 // Copyright (C) 2001-2013 Free Software Foundation, Inc.
 //
@@ -29,8 +29,9 @@
 // Written by Benjamin Kosnik <bkoz@redhat.com>
 
 #include <locale>
+#include <cstdlib>
+#include <cstring>
 #include <cstdio>
-#include <bits/c++locale_internal.h>
 
 namespace std _GLIBCXX_VISIBILITY(default)
 {
@@ -40,14 +41,11 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
   // various /config/os/* files.
   ctype_byname<char>::ctype_byname(const char* __s, size_t __refs)
   : ctype<char>(0, false, __refs) 
-  { 		
+  { 	
     if (std::strcmp(__s, "C") != 0 && std::strcmp(__s, "POSIX") != 0)
       {
 	this->_S_destroy_c_locale(this->_M_c_locale_ctype);
 	this->_S_create_c_locale(this->_M_c_locale_ctype, __s); 
-	this->_M_toupper = this->_M_c_locale_ctype->__ctype_toupper;
-	this->_M_tolower = this->_M_c_locale_ctype->__ctype_tolower;
-	this->_M_table = this->_M_c_locale_ctype->__ctype_b;
       }
   }
 
@@ -62,54 +60,54 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
     switch (__m)
       {
       case space:
-	__ret = __wctype_l("space", _M_c_locale_ctype);
+	__ret = wctype("space");
 	break;
       case print:
-	__ret = __wctype_l("print", _M_c_locale_ctype);
+	__ret = wctype("print");
 	break;
       case cntrl:
-	__ret = __wctype_l("cntrl", _M_c_locale_ctype);
+	__ret = wctype("cntrl");
 	break;
       case upper:
-	__ret = __wctype_l("upper", _M_c_locale_ctype);
+	__ret = wctype("upper");
 	break;
       case lower:
-	__ret = __wctype_l("lower", _M_c_locale_ctype);
+	__ret = wctype("lower");
 	break;
       case alpha:
-	__ret = __wctype_l("alpha", _M_c_locale_ctype);
+	__ret = wctype("alpha");
 	break;
       case digit:
-	__ret = __wctype_l("digit", _M_c_locale_ctype);
+	__ret = wctype("digit");
 	break;
       case punct:
-	__ret = __wctype_l("punct", _M_c_locale_ctype);
+	__ret = wctype("punct");
 	break;
       case xdigit:
-	__ret = __wctype_l("xdigit", _M_c_locale_ctype);
+	__ret = wctype("xdigit");
 	break;
       case alnum:
-	__ret = __wctype_l("alnum", _M_c_locale_ctype);
+	__ret = wctype("alnum");
 	break;
       case graph:
-	__ret = __wctype_l("graph", _M_c_locale_ctype);
+	__ret = wctype("graph");
 	break;
       default:
 	__ret = __wmask_type();
       }
     return __ret;
-  }
+  };
   
   wchar_t
   ctype<wchar_t>::do_toupper(wchar_t __c) const
-  { return __towupper_l(__c, _M_c_locale_ctype); }
+  { return towupper(__c); }
 
   const wchar_t*
   ctype<wchar_t>::do_toupper(wchar_t* __lo, const wchar_t* __hi) const
   {
     while (__lo < __hi)
       {
-        *__lo = __towupper_l(*__lo, _M_c_locale_ctype);
+        *__lo = towupper(*__lo);
         ++__lo;
       }
     return __hi;
@@ -117,14 +115,14 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
   
   wchar_t
   ctype<wchar_t>::do_tolower(wchar_t __c) const
-  { return __towlower_l(__c, _M_c_locale_ctype); }
+  { return towlower(__c); }
   
   const wchar_t*
   ctype<wchar_t>::do_tolower(wchar_t* __lo, const wchar_t* __hi) const
   {
     while (__lo < __hi)
       {
-        *__lo = __towlower_l(*__lo, _M_c_locale_ctype);
+        *__lo = towlower(*__lo);
         ++__lo;
       }
     return __hi;
@@ -132,48 +130,34 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
 
   bool
   ctype<wchar_t>::
-  do_is(mask __m, wchar_t __c) const
+  do_is(mask __m, char_type __c) const
   { 
-    // The case of __m == ctype_base::space is particularly important,
-    // due to its use in many istream functions.  Therefore we deal with
-    // it first, exploiting the knowledge that on GNU systems _M_bit[5]
-    // is the mask corresponding to ctype_base::space.  NB: an encoding
-    // change would not affect correctness!
     bool __ret = false;
-    if (__m == _M_bit[5])
-      __ret = __iswctype_l(__c, _M_wmask[5], _M_c_locale_ctype);
-    else
-      {
-	// Highest bitmask in ctype_base == 10, but extra in "C"
-	// library for blank.
-	const size_t __bitmasksize = 11;
-	for (size_t __bitcur = 0; __bitcur <= __bitmasksize; ++__bitcur)
-	  if (__m & _M_bit[__bitcur])
-	    {
-	      if (__iswctype_l(__c, _M_wmask[__bitcur], _M_c_locale_ctype))
-		{
-		  __ret = true;
-		  break;
-		}
-	      else if (__m == _M_bit[__bitcur])
-		break;
-	    }
-      }
+    // Generically, 15 (instead of 10) since we don't know the numerical
+    // encoding of the various categories in /usr/include/ctype.h.
+    const size_t __bitmasksize = 15; 
+    for (size_t __bitcur = 0; __bitcur <= __bitmasksize; ++__bitcur)
+      if (__m & _M_bit[__bitcur]
+	  && iswctype(__c, _M_wmask[__bitcur]))
+	{
+	  __ret = true;
+	  break;
+	}
     return __ret;    
   }
-
+  
   const wchar_t* 
   ctype<wchar_t>::
   do_is(const wchar_t* __lo, const wchar_t* __hi, mask* __vec) const
   {
-    for (; __lo < __hi; ++__vec, ++__lo)
+    for (;__lo < __hi; ++__vec, ++__lo)
       {
-	// Highest bitmask in ctype_base == 10, but extra in "C"
-	// library for blank.
-	const size_t __bitmasksize = 11; 
+	// Generically, 15 (instead of 10) since we don't know the numerical
+	// encoding of the various categories in /usr/include/ctype.h.
+	const size_t __bitmasksize = 15; 
 	mask __m = 0;
 	for (size_t __bitcur = 0; __bitcur <= __bitmasksize; ++__bitcur)
-	  if (__iswctype_l(*__lo, _M_wmask[__bitcur], _M_c_locale_ctype))
+	  if (iswctype(*__lo, _M_wmask[__bitcur]))
 	    __m |= _M_bit[__bitcur];
 	*__vec = __m;
       }
@@ -202,7 +186,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
   ctype<wchar_t>::
   do_widen(char __c) const
   { return _M_widen[static_cast<unsigned char>(__c)]; }
-
+  
   const char* 
   ctype<wchar_t>::
   do_widen(const char* __lo, const char* __hi, wchar_t* __dest) const
@@ -219,16 +203,10 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
   char
   ctype<wchar_t>::
   do_narrow(wchar_t __wc, char __dfault) const
-  {
+  { 
     if (__wc >= 0 && __wc < 128 && _M_narrow_ok)
       return _M_narrow[__wc];
-#if __GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ > 2)
-    __c_locale __old = __uselocale(_M_c_locale_ctype);
-#endif
     const int __c = wctob(__wc);
-#if __GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ > 2)
-    __uselocale(__old);
-#endif
     return (__c == EOF ? __dfault : static_cast<char>(__c)); 
   }
 
@@ -237,9 +215,6 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
   do_narrow(const wchar_t* __lo, const wchar_t* __hi, char __dfault, 
 	    char* __dest) const
   {
-#if __GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ > 2)
-    __c_locale __old = __uselocale(_M_c_locale_ctype);
-#endif
     if (_M_narrow_ok)
       while (__lo < __hi)
 	{
@@ -261,18 +236,12 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
 	  ++__lo;
 	  ++__dest;
 	}
-#if __GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ > 2)
-    __uselocale(__old);
-#endif
     return __hi;
   }
 
   void
   ctype<wchar_t>::_M_initialize_ctype() throw()
   {
-#if __GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ > 2)
-    __c_locale __old = __uselocale(_M_c_locale_ctype);
-#endif
     wint_t __i;
     for (__i = 0; __i < 128; ++__i)
       {
@@ -286,18 +255,15 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
       _M_narrow_ok = true;
     else
       _M_narrow_ok = false;
-    for (size_t __j = 0;
-	 __j < sizeof(_M_widen) / sizeof(wint_t); ++__j)
-      _M_widen[__j] = btowc(__j);
+    for (size_t __i = 0;
+	 __i < sizeof(_M_widen) / sizeof(wint_t); ++__i)
+      _M_widen[__i] = btowc(__i);
 
-    for (size_t __k = 0; __k <= 11; ++__k)
+    for (size_t __i = 0; __i <= 15; ++__i)
       { 
-	_M_bit[__k] = static_cast<mask>(_ISbit(__k));
-	_M_wmask[__k] = _M_convert_to_wmask(_M_bit[__k]);
-      }
-#if __GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ > 2)
-    __uselocale(__old);
-#endif
+	_M_bit[__i] = static_cast<mask>(1 << __i);
+	_M_wmask[__i] = _M_convert_to_wmask(_M_bit[__i]);
+      }  
   }
 #endif //  _GLIBCXX_USE_WCHAR_T
 

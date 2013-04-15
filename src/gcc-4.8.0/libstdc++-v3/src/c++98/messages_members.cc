@@ -1,4 +1,4 @@
-// std::messages implementation details, GNU version -*- C++ -*-
+// std::messages implementation details, generic version -*- C++ -*-
 
 // Copyright (C) 2001-2013 Free Software Foundation, Inc.
 //
@@ -29,57 +29,22 @@
 // Written by Benjamin Kosnik <bkoz@redhat.com>
 
 #include <locale>
-#include <bits/c++locale_internal.h>
 
 namespace std _GLIBCXX_VISIBILITY(default)
 {
 _GLIBCXX_BEGIN_NAMESPACE_VERSION
 
-  // Specializations.
+  // Specializations
   template<>
     string
     messages<char>::do_get(catalog, int, int, const string& __dfault) const
-    {
-#if __GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ > 2)
-      __c_locale __old = __uselocale(_M_c_locale_messages);
-      const char* __msg = const_cast<const char*>(gettext(__dfault.c_str()));
-      __uselocale(__old);
-      return string(__msg);
-#else
-      char* __old = setlocale(LC_ALL, 0);
-      const size_t __len = strlen(__old) + 1;
-      char* __sav = new char[__len];
-      memcpy(__sav, __old, __len);
-      setlocale(LC_ALL, _M_name_messages);
-      const char* __msg = gettext(__dfault.c_str());
-      setlocale(LC_ALL, __sav);
-      delete [] __sav;
-      return string(__msg);
-#endif
-    }
+    { return __dfault; }
 
 #ifdef _GLIBCXX_USE_WCHAR_T
   template<>
     wstring
     messages<wchar_t>::do_get(catalog, int, int, const wstring& __dfault) const
-    {
-# if __GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ > 2)
-      __c_locale __old = __uselocale(_M_c_locale_messages);
-      char* __msg = gettext(_M_convert_to_char(__dfault));
-      __uselocale(__old);
-      return _M_convert_from_char(__msg);
-# else
-      char* __old = setlocale(LC_ALL, 0);
-      const size_t __len = strlen(__old) + 1;
-      char* __sav = new char[__len];
-      memcpy(__sav, __old, __len);
-      setlocale(LC_ALL, _M_name_messages);
-      char* __msg = gettext(_M_convert_to_char(__dfault));
-      setlocale(LC_ALL, __sav);
-      delete [] __sav;
-      return _M_convert_from_char(__msg);
-# endif
-    }
+    { return __dfault; }
 #endif
 
 _GLIBCXX_END_NAMESPACE_VERSION

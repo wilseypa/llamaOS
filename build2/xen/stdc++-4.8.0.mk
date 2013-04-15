@@ -44,6 +44,8 @@ CFLAGS += \
   -I $(SRCDIR)/gcc-$(GCC_VERSION)/libiberty \
   -I $(SRCDIR)/gcc-$(GCC_VERSION)/include \
   -I $(SRCDIR)/gcc-$(GCC_VERSION)/libstdc++-v3/include \
+  -I $(SRCDIR)/gcc-$(GCC_VERSION)/libcpp/include \
+  -I $(SRCDIR)/gcc-$(GCC_VERSION)/gcc \
   -I $(INCDIR)
 
 CPPFLAGS += \
@@ -56,13 +58,16 @@ CPPFLAGS += \
   -I $(SRCDIR)/gcc-$(GCC_VERSION)/libgcc \
   -I $(SRCDIR)/gcc-$(GCC_VERSION)/libstdc++-v3/include \
   -I $(SRCDIR)/gcc-$(GCC_VERSION)/libstdc++-v3/libsupc++ \
+  -I $(SRCDIR)/gcc-$(GCC_VERSION)/gcc/include \
   -I $(INCDIR)
 
 VPATH = $(SRCDIR)
 
+#  gcc-$(GCC_VERSION)/gcc/config/i386/i386.c \
 C_SOURCES = \
   gcc-$(GCC_VERSION)/libiberty/cp-demangle.c
 
+#  gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/ext-inst.cc \
 CC_SOURCES = \
   gcc-$(GCC_VERSION)/libstdc++-v3/libsupc++/array_type_info.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/libsupc++/atexit_arm.cc \
@@ -117,7 +122,7 @@ CC_SOURCES = \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/atomicity.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/basic_file.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/bitmap_allocator.cc \
-  gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/c_locale.cc \
+  gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/c++locale.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/codecvt.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/codecvt_members.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/collate_members.cc \
@@ -126,7 +131,6 @@ CC_SOURCES = \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/ctype.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/ctype_configure_char.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/ctype_members.cc \
-  gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/ext-inst.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/globals_io.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/hash_tr1.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/hashtable_tr1.cc \

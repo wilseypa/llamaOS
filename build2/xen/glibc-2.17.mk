@@ -1303,6 +1303,7 @@ HEADERS = \
   $(INCDIR)/bits/mathdef.h \
   $(INCDIR)/bits/mathinline.h \
   $(INCDIR)/bits/nan.h \
+  $(INCDIR)/bits/param.h \
   $(INCDIR)/bits/poll.h \
   $(INCDIR)/bits/posix_opt.h \
   $(INCDIR)/bits/pthreadtypes.h \
@@ -1336,6 +1337,7 @@ HEADERS = \
   $(INCDIR)/gnu/stubs.h \
   $(INCDIR)/sys/cdefs.h \
   $(INCDIR)/sys/ioctl.h \
+  $(INCDIR)/sys/param.h \
   $(INCDIR)/sys/poll.h \
   $(INCDIR)/sys/resource.h \
   $(INCDIR)/sys/select.h \
@@ -1361,13 +1363,16 @@ HEADERS = \
   $(INCDIR)/features.h \
   $(INCDIR)/getopt.h \
   $(INCDIR)/glimits.h \
+  $(INCDIR)/gmp.h \
   $(INCDIR)/inttypes.h \
+  $(INCDIR)/langinfo.h \
   $(INCDIR)/libintl.h \
   $(INCDIR)/libio.h \
   $(INCDIR)/limits.h \
   $(INCDIR)/locale.h \
   $(INCDIR)/malloc.h \
   $(INCDIR)/math.h \
+  $(INCDIR)/nl_types.h \
   $(INCDIR)/poll.h \
   $(INCDIR)/pthread.h \
   $(INCDIR)/sched.h \
@@ -1449,6 +1454,11 @@ $(INCDIR)/% : $(SRCDIR)/glibc-$(GLIBC_VERSION)/sysdeps/generic/%
 	cp $< $@
 
 $(INCDIR)/% : $(SRCDIR)/glibc-$(GLIBC_VERSION)/assert/%
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo copying: $@ from $<
+	cp $< $@
+
+$(INCDIR)/% : $(SRCDIR)/glibc-$(GLIBC_VERSION)/catgets/%
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo copying: $@ from $<
 	cp $< $@
