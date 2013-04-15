@@ -56,7 +56,19 @@ CFLAGS += \
 VPATH = $(SRCDIR)
 
 SOURCES = \
-  gcc-$(GCC_VERSION)/libgfortran/runtime/backtrace.c
+  gcc-$(GCC_VERSION)/libgfortran/runtime/backtrace.c \
+  gcc-$(GCC_VERSION)/libgfortran/runtime/bounds.c \
+  gcc-$(GCC_VERSION)/libgfortran/runtime/compile_options.c \
+  gcc-$(GCC_VERSION)/libgfortran/runtime/convert_char.c \
+  gcc-$(GCC_VERSION)/libgfortran/runtime/environ.c \
+  gcc-$(GCC_VERSION)/libgfortran/runtime/error.c \
+  gcc-$(GCC_VERSION)/libgfortran/runtime/fpu.c \
+  gcc-$(GCC_VERSION)/libgfortran/runtime/main.c \
+  gcc-$(GCC_VERSION)/libgfortran/runtime/memory.c \
+  gcc-$(GCC_VERSION)/libgfortran/runtime/pause.c \
+  gcc-$(GCC_VERSION)/libgfortran/runtime/select.c \
+  gcc-$(GCC_VERSION)/libgfortran/runtime/stop.c \
+  gcc-$(GCC_VERSION)/libgfortran/runtime/string.c
 
 OBJECTS  = $(SOURCES:%.c=$(OBJDIR)/%.o)
 DEPENDS += $(OBJECTS:%.o=%.d)
