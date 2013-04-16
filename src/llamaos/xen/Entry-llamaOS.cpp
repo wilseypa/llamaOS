@@ -28,6 +28,7 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
+#define __STDC_LIMIT_MACROS
 #include <cstdint>
 #include <cstring>
 

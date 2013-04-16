@@ -36,26 +36,50 @@ include common-flags.mk
 
 MAKEFILE_SOURCES += xen-$(XEN_VERSION).mk
 
-#  $(INCDIR)/xen/arch-x86/xen-mca.h \
-#  $(INCDIR)/xen/arch-x86/xen.h \
-#  $(INCDIR)/xen/io/console.h \
-#  $(INCDIR)/xen/io/pciif.h \
-#  $(INCDIR)/xen/io/xenbus.h \
-#  $(INCDIR)/xen/io/xs_wire.h \
-#  $(INCDIR)/xen/event_channel.h \
-#  $(INCDIR)/xen/features.h \
-#  $(INCDIR)/xen/grant_table.h \
-#  $(INCDIR)/xen/physdev.h \
-#  $(INCDIR)/xen/platform.h \
-#  $(INCDIR)/xen/sched.h \
-#  $(INCDIR)/xen/tmem.h \
-#  $(INCDIR)/xen/version.h \
-
 HEADERS = \
+  $(INCDIR)/xen/arch-x86/cpuid.h \
+  $(INCDIR)/xen/arch-x86/xen-mca.h \
   $(INCDIR)/xen/arch-x86/xen-x86_64.h \
   $(INCDIR)/xen/arch-x86/xen.h \
+  $(INCDIR)/xen/io/blkif.h \
+  $(INCDIR)/xen/io/console.h \
+  $(INCDIR)/xen/io/fbif.h \
+  $(INCDIR)/xen/io/fsif.h \
+  $(INCDIR)/xen/io/kbdif.h \
+  $(INCDIR)/xen/io/libxenvchan.h \
+  $(INCDIR)/xen/io/netif.h \
+  $(INCDIR)/xen/io/pciif.h \
+  $(INCDIR)/xen/io/protocols.h \
+  $(INCDIR)/xen/io/ring.h \
+  $(INCDIR)/xen/io/tpmif.h \
+  $(INCDIR)/xen/io/usbif.h \
+  $(INCDIR)/xen/io/vscsiif.h \
+  $(INCDIR)/xen/io/xenbus.h \
+  $(INCDIR)/xen/io/xs_wire.h \
+  $(INCDIR)/xen/arch-x86_64.h \
+  $(INCDIR)/xen/callback.h \
+  $(INCDIR)/xen/dom0_ops.h \
+  $(INCDIR)/xen/domctl.h \
+  $(INCDIR)/xen/elfnote.h \
+  $(INCDIR)/xen/event_channel.h \
+  $(INCDIR)/xen/features.h \
+  $(INCDIR)/xen/grant_table.h \
+  $(INCDIR)/xen/kexec.h \
+  $(INCDIR)/xen/mem_event.h \
+  $(INCDIR)/xen/memory.h \
+  $(INCDIR)/xen/nmi.h \
+  $(INCDIR)/xen/physdev.h \
+  $(INCDIR)/xen/platform.h \
+  $(INCDIR)/xen/sched.h \
+  $(INCDIR)/xen/sysctl.h \
+  $(INCDIR)/xen/tmem.h \
+  $(INCDIR)/xen/trace.h \
+  $(INCDIR)/xen/vcpu.h \
+  $(INCDIR)/xen/version.h \
   $(INCDIR)/xen/xen-compat.h \
-  $(INCDIR)/xen/xen.h
+  $(INCDIR)/xen/xen.h \
+  $(INCDIR)/xen/xencomm.h \
+  $(INCDIR)/xen/xenoprof.h
 
 .PHONY: all
 all : $(HEADERS)

@@ -38,7 +38,8 @@ all:
 	@$(MAKE) -f glibc-$(GLIBC_VERSION).mk
 	@$(MAKE) -f stdc++-$(GCC_VERSION).mk
 	@$(MAKE) -f gfortran-$(GCC_VERSION).mk
-#	@$(MAKE) -f xen-$(XEN_VERSION).mk
+	@$(MAKE) -f gcc-$(GCC_VERSION).mk
+	@$(MAKE) -f xen-$(XEN_VERSION).mk
 #	@$(MAKE) -f empty.mk
 #	@$(MAKE) -f empty-glibc.mk
 #	@$(MAKE) -f empty-gcc.mk
