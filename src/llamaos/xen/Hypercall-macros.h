@@ -36,7 +36,6 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 #include <xen/xen.h>
 #include <xen/physdev.h>
-#include <xen/platform.h>
 #include <xen/sched.h>
 #include <xen/tmem.h>
 #include <xen/arch-x86/xen-mca.h>

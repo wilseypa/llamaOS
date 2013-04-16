@@ -31,31 +31,85 @@
 #
 
 # include common variables
-include common.mk
+include common-vars.mk
+include common-flags.mk
 
 MAKEFILE_SOURCES += llamaOS.mk
 
-ASMFLAGS += 
+ASMFLAGS += \
+  -I $(INCDIR) \
+  -I $(SRCDIR) \
+  -include $(SRCDIR)/llamaos/__thread.h \
+  -D__XEN_INTERFACE_VERSION__=0x00030205
 
 CFLAGS += \
-  -I $(INCDIR)
+  -I $(INCDIR) \
+  -I $(SRCDIR) \
+  -include $(SRCDIR)/llamaos/__thread.h \
+  -D__XEN_INTERFACE_VERSION__=0x00030205
+
+CPPFLAGS += \
+  -I $(INCDIR) \
+  -I $(SRCDIR) \
+  -include $(SRCDIR)/llamaos/__thread.h \
+  -D__XEN_INTERFACE_VERSION__=0x00030205
 
 VPATH = $(SRCDIR)
 
 ASM_SOURCES = \
-  llamaos/xen/entry.S
+  llamaos/xen/Entry.S
 
 C_SOURCES = \
-  llamaos/xen/start.c
+  llamaos/xen/Entry-glibc.c \
+  llamaos/xen/Trace.c
+
+CPP_SOURCES = \
+  llamaos/api/pci/BAR.cpp \
+  llamaos/api/pci/Command.cpp \
+  llamaos/api/pci/PCI.cpp \
+  llamaos/api/pci/Status.cpp \
+  llamaos/memory/Entry.cpp \
+  llamaos/memory/Memory.cpp \
+  llamaos/net/llamaNET.cpp \
+  llamaos/xen/Console.cpp \
+  llamaos/xen/Entry-gcc.cpp \
+  llamaos/xen/Entry-llamaOS.cpp \
+  llamaos/xen/Events.cpp \
+  llamaos/xen/Grant_map.cpp \
+  llamaos/xen/Grant_table.cpp \
+  llamaos/xen/Hypercall.cpp \
+  llamaos/xen/Hypervisor.cpp \
+  llamaos/xen/Memory.cpp \
+  llamaos/xen/PCI.cpp \
+  llamaos/xen/Traps.cpp \
+  llamaos/xen/Xenstore.cpp
+
+HEADERS = \
+  $(INCDIR)/llamaos/api/io.h \
+  $(INCDIR)/llamaos/api/sleep.h \
+  $(INCDIR)/llamaos/memory/Memory.h \
+  $(INCDIR)/llamaos/net/llamaNET.h \
+  $(INCDIR)/llamaos/xen/Console.h \
+  $(INCDIR)/llamaos/xen/Events.h \
+  $(INCDIR)/llamaos/xen/Grant_map.h \
+  $(INCDIR)/llamaos/xen/Grant_table.h \
+  $(INCDIR)/llamaos/xen/Hypercall.h \
+  $(INCDIR)/llamaos/xen/Hypervisor.h \
+  $(INCDIR)/llamaos/xen/Traps.h \
+  $(INCDIR)/llamaos/xen/Xenstore.h \
+  $(INCDIR)/llamaos/__thread.h \
+  $(INCDIR)/llamaos/Trace.h
 
 OBJECTS  = $(ASM_SOURCES:%.S=$(OBJDIR)/%.o)
 OBJECTS += $(C_SOURCES:%.c=$(OBJDIR)/%.o)
+OBJECTS += $(CPP_SOURCES:%.cpp=$(OBJDIR)/%.o)
 DEPENDS += $(OBJECTS:%.o=%.d)
 
-.PHONY: xen
-xen : $(OBJDIR)/llamaos/xen/Entry.o $(LIBDIR)/xen/llamaOS.a $(HEADERS)
+.PHONY: all
+all : $(OBJDIR)/llamaos/xen/Entry.o $(LIBDIR)/xen/llamaOS.a $(HEADERS)
 
-# $(LIBDIR)/xen/Entry.o: llamaos/xen/Entry.S
+.PHONY: headers
+headers : $(HEADERS)
 
 $(LIBDIR)/xen/llamaOS.a: $(OBJECTS)
 	@[ -d $(@D) ] || (mkdir -p $(@D))

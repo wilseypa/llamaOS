@@ -43,11 +43,11 @@ AS = as
 LD = ld
 
 # shared common paths
-BINDIR = ../../build/bin
-LIBDIR = ../../build/lib
+BINDIR = bin
+LIBDIR = lib
 OBJDIR = obj
 
-INCDIR = ../../build/include
+INCDIR = include
 SRCDIR = ../../src
 
 GLIBC_VERSION = 2.17
@@ -58,4 +58,4 @@ GTEST_VERSION = 1.6.0
 # auto dependency generation
 DEPENDS = 
 
--include ../../build/custom-flags.mk
+-include custom-vars.mk

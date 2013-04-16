@@ -36,34 +36,78 @@ ENTRY(_start)
 
 SECTIONS
 {
-    . = 0x0;
+  . = 0x0;
 
-    /* needs to be at zero so hypercall page is located */
-    .absolute :
-    {
-        *(.absolute)
-    }
+  /* needs to be at zero so hypercall page is located */
+  .absolute :
+  {
+    *(.absolute)
+  }
 
-    .text ALIGN (0x1000) :
-    {
-        *(.text)
-    }
+  .text ALIGN (0x1000) :
+  {
+    _text = .;
+    *(.text)
+    *(.gnu.linkonce.t*)
+  }
 
-    .rodata ALIGN (0x1000) :
-    {
-        *(.rodata*)
-    }
+   .ctors :
+   {
+      __CTOR_LIST__ = .;
+      QUAD((__CTOR_END__ - __CTOR_LIST__) / 8 - 2)
+      *(.ctors)
+      QUAD(0)
+      __CTOR_END__ = .;
+   }
 
-    .data ALIGN (0x1000) :
-    {
-        *(.data)
-    }
+   .dtors :
+   {
+      __DTOR_LIST__ = .;
+      QUAD((__DTOR_END__ - __DTOR_LIST__) / 8 - 2)
+      *(.dtors)
+      QUAD(0)
+      __DTOR_END__ = .;
+   }
 
-    .bss :
-    {
-        sbss = .;
-        *(COMMON)
-        *(.bss)
-        ebss = .;
-    }
+/*
+   .rodata ALIGN (0x1000) :
+  {
+    __CTOR_LIST__ = .;
+    start_ctors = .;
+    *(SORT(.ctors*))
+    end_ctors = .;
+
+    __DTOR_LIST__ = .;
+    start_dtors = .;
+    *(SORT(.dtors*))
+    end_dtors = .;
+
+    *(.rodata*)
+    *(.gnu.linkonce.r*)
+  }
+*/
+
+  .data ALIGN (0x1000) :
+  {
+    *(.data)
+    *(.gnu.linkonce.d*)
+  }
+
+  .bss :
+  {
+    sbss = .;
+    *(COMMON)
+    *(.bss)
+    *(.gnu.linkonce.b*)
+    ebss = .;
+  }
+
+  /* Thread Local Storage sections  */
+  .tdata	  : { *(.tdata .tdata.* .gnu.linkonce.td.*) }
+  .tbss		  : { *(.tbss .tbss.* .gnu.linkonce.tb.*) *(.tcommon) }
+
+  /DISCARD/ :
+  {
+    *(.comment)
+  }
 }

@@ -59,13 +59,23 @@ $(OBJDIR)/%.o : %.cpp $(MAKEFILE_SOURCES)
 	@echo compiling: $<
 	@$(CXX) -c $(CPPFLAGS) -o $@ $<
 
+$(OBJDIR)/%.o : %.f90 $(MAKEFILE_SOURCES)
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo compiling: $<
+	@$(F90) -c $(F90FLAGS) -o $@ $<
+
+$(OBJDIR)/%.o : %.f $(MAKEFILE_SOURCES)
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo compiling: $<
+	@$(F90) -c $(F90FLAGS) -o $@ $<
+
 # The $(MAKEFILE_SOURCES) dependency is not needed here since it would take a 
 # source file change to cause the auto-generated lists to change.
 
-#$(OBJDIR)/%.d : %.S
-#	@[ -d $(@D) ] || (mkdir -p $(@D))
-#	@echo creating: $@ from $<
-#	@$(CC) $(ASMFLAGS) -MM -MP -MT '$(OBJDIR)/$*.o $(OBJDIR)/$*.d' -MF $@ $<
+$(OBJDIR)/%.d : %.S
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo creating: $@ from $<
+	@$(CC) $(ASMFLAGS) -MM -MP -MT '$(OBJDIR)/$*.o $(OBJDIR)/$*.d' -MF $@ $<
 
 $(OBJDIR)/%.d : %.c
 	@[ -d $(@D) ] || (mkdir -p $(@D))

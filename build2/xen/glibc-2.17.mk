@@ -312,6 +312,7 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/intl/textdomain.c \
   glibc-$(GLIBC_VERSION)/io/access.c \
   glibc-$(GLIBC_VERSION)/io/close.c \
+  glibc-$(GLIBC_VERSION)/io/dup.c \
   glibc-$(GLIBC_VERSION)/io/dup2.c \
   glibc-$(GLIBC_VERSION)/io/fcntl.c \
   glibc-$(GLIBC_VERSION)/io/fxstat.c \
@@ -325,6 +326,7 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/io/pipe.c \
   glibc-$(GLIBC_VERSION)/io/readlink.c \
   glibc-$(GLIBC_VERSION)/io/ttyname_r.c \
+  glibc-$(GLIBC_VERSION)/io/umask.c \
   glibc-$(GLIBC_VERSION)/io/unlink.c \
   glibc-$(GLIBC_VERSION)/io/xstat.c \
   glibc-$(GLIBC_VERSION)/io/xstat64.c \
