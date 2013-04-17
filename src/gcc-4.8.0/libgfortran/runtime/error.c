@@ -543,6 +543,8 @@ generate_error (st_parameter_common *cmp, int family, const char *message)
   estr_write ("Fortran runtime error: ");
   estr_write (message);
   estr_write ("\n");
+// !BAM
+// for (;;);  
   exit (2);
 }
 iexport(generate_error);

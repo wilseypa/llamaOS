@@ -693,6 +693,8 @@ read_block_direct (st_parameter_dt *dtp, void *buf, size_t nbytes)
   return;
 }
 
+// !BAM
+// #include <stdio.h>
 
 /* Function for writing a block of bytes to the current file at the
    current position, advancing the file pointer. We are given a length
@@ -706,6 +708,7 @@ write_block (st_parameter_dt *dtp, int length)
 
   if (!is_stream_io (dtp))
     {
+//       printf ("dtp->u.p.current_unit->bytes_left: %d < (gfc_offset) length: %d\n", dtp->u.p.current_unit->bytes_left, (gfc_offset) length); 
       if (dtp->u.p.current_unit->bytes_left < (gfc_offset) length)
 	{
 	  /* For preconnected units with default record length, set bytes left
@@ -718,8 +721,13 @@ write_block (st_parameter_dt *dtp, int length)
 	    dtp->u.p.current_unit->bytes_left = dtp->u.p.current_unit->recl;
 	  else
 	    {
-	      generate_error (&dtp->common, LIBERROR_EOR, NULL);
-	      return NULL;
+// !BAM
+//  for (;;);
+//               printf ("correcting console error?\n");
+  
+            dtp->u.p.current_unit->bytes_left = dtp->u.p.current_unit->recl;
+//	      generate_error (&dtp->common, LIBERROR_EOR, NULL);
+//	      return NULL;
 	    }
 	}
 

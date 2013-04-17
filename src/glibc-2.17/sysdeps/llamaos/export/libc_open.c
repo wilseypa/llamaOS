@@ -57,4 +57,4 @@ weak_alias (__libc_open, __open)
 libc_hidden_weak (__open)
 weak_alias (__libc_open, open)
 
-stub_warning (open)
+// stub_warning (open)

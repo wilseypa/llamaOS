@@ -152,13 +152,14 @@ mb();
 
 static ssize_t glibc_libc_write (int fd, const void *buf, size_t nbytes)
 {
-   if (stdout->_fileno == fd)
+   if (   (stdout->_fileno != fd)
+       && (stderr->_fileno != fd))
    {
-      Hypervisor::get_instance ()->console.write (static_cast<const char *>(buf), nbytes);
-      return nbytes;
+      cout << "Alert: writing to fileno " << fd << endl;
    }
 
-   return -1;
+   Hypervisor::get_instance ()->console.write (static_cast<const char *>(buf), nbytes);
+   return nbytes;
 }
 
 static void register_glibc_exports (void)
@@ -208,10 +209,6 @@ static vector<string> split (const string &input)
 
    return tokens;
 }
-
-// void set_args (int argc, char **argv);
-//extern "C" void MAIN__ (void);
-//extern "C" int main (int argc, char *argv[]);
 
 void entry_llamaOS (start_info_t *start_info)
 {
@@ -265,15 +262,6 @@ void entry_llamaOS (start_info_t *start_info)
 
       trace ("Before application main()...\n");
 
-      // start the application
-//      fortran_main (args.size () + 1, argv);
-  /* Set up the runtime environment.  */
-//  set_args (args.size () + 1, argv);
-
-  /* Call the Fortran main program.  Internally this is a function
-     called MAIN__ */
-//  MAIN__ ();
-//      main ((int)(args.size () + 1), argv);
       main (hypervisor.argc, hypervisor.argv);
 
       // get rid of all leftover console buffer

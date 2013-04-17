@@ -70,14 +70,12 @@ SECTIONS
    }
 
 /*
-   .rodata ALIGN (0x1000) :
+  .rodata ALIGN (0x1000) :
   {
-    __CTOR_LIST__ = .;
     start_ctors = .;
     *(SORT(.ctors*))
     end_ctors = .;
 
-    __DTOR_LIST__ = .;
     start_dtors = .;
     *(SORT(.dtors*))
     end_dtors = .;

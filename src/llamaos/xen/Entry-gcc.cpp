@@ -72,29 +72,37 @@ static void register_gcc_exports ()
 
 typedef void (*func_ptr) (void);
 extern func_ptr __CTOR_LIST__[];
+//extern func_ptr start_ctors[];
 extern func_ptr __DTOR_LIST__[];
+//extern func_ptr start_dtors[];
 
 static void execute_ctors ()
 {
    uint64_t ctor_size = reinterpret_cast<uint64_t>(__CTOR_LIST__[0]);
+//   uint64_t ctor_size = reinterpret_cast<uint64_t>(start_ctors[0]);
 
    trace ("__CTOR_LIST__[0]: %lx\n", ctor_size);
+//   trace ("start_ctors[0]: %lx\n", ctor_size);
 
    for (uint64_t i = ctor_size; i >= 1; i--)
    {
       __CTOR_LIST__[i] ();
+//      start_ctors[i] ();
    }
 }
 
 static void execute_dtors ()
 {
    uint64_t dtor_size = reinterpret_cast<uint64_t>(__DTOR_LIST__[0]);
+//   uint64_t dtor_size = reinterpret_cast<uint64_t>(start_dtors[0]);
 
    trace ("__DTOR_LIST__[0]: %lx\n", dtor_size);
+//   trace ("start_dtors[0]: %lx\n", dtor_size);
 
    for (uint64_t i = dtor_size; i >= 1; i--)
    {
       __DTOR_LIST__[i] ();
+//      start_dtors[i] ();
    }
 }
 
