@@ -46,11 +46,11 @@ AS = as
 LD = ld
 
 # shared common paths
-BINDIR = bin
-LIBDIR = lib
+BINDIR = ../../build/bin
+LIBDIR = ../../build/lib
 OBJDIR = obj
 
-INCDIR = include
+INCDIR = ../../build/include
 SRCDIR = ../../src
 
 GLIBC_VERSION = 2.17
