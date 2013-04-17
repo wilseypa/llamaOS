@@ -22,7 +22,10 @@
 
 #ifndef  _SPU_INTRINSICS_H
 #define _SPU_INTRINSICS_H 
- 
+
+// !BAM
+#define __vector
+
 #define vec_uchar16             __vector unsigned char
 #define vec_char16              __vector   signed char
 #define vec_ushort8             __vector unsigned short

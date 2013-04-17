@@ -58,4 +58,4 @@ GTEST_VERSION = 1.6.0
 # auto dependency generation
 DEPENDS = 
 
--include custom-vars.mk
+# -include custom-vars.mk

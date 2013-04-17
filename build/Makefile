@@ -41,11 +41,11 @@ INSTALL_FOLDER = $(INSTALL_DIR)/llamaOS-1.0
 .PHONY: all
 all:
 #	@$(MAKE) -f glibc-$(GLIBC_VERSION).mk
-#	@$(MAKE) -f gcc-$(GCC_VERSION).mk
-#	@$(MAKE) -f gfortran-$(GCC_VERSION).mk
-#	@$(MAKE) -f stdc++-$(GCC_VERSION).mk
-#	@$(MAKE) -f xen-$(XEN_VERSION).mk
-#	@$(MAKE) -f llamaOS.mk xen
+	@$(MAKE) -f gcc-$(GCC_VERSION).mk
+	@$(MAKE) -f gfortran-$(GCC_VERSION).mk
+	@$(MAKE) -f stdc++-$(GCC_VERSION).mk
+	@$(MAKE) -f xen-$(XEN_VERSION).mk
+	@$(MAKE) -f llamaOS.mk xen
 	@$(MAKE) -f llamaOS-xen-test.mk xen
 	@$(MAKE) -f llamaMPI.mk
 	@$(MAKE) -f llamaMPIF.mk

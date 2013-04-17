@@ -36,36 +36,39 @@ include common-flags.mk
 
 MAKEFILE_SOURCES += gcc-$(GCC_VERSION).mk
 
-# /home/wmagato/Builds/gcc-4.8.0/./gcc/xgcc -B/home/wmagato/Builds/gcc-4.8.0/./gcc/ -B/opt/gcc-4.8.0/x86_64-unknown-linux-gnu/bin/ -B/opt/gcc-4.8.0/x86_64-unknown-linux-gnu/lib/ -isystem /opt/gcc-4.8.0/x86_64-unknown-linux-gnu/include -isystem /opt/gcc-4.8.0/x86_64-unknown-linux-gnu/sys-include    -g -O2 -m32 -O2  -g -O2 -DIN_GCC   -W -Wall -Wwrite-strings -Wcast-qual -Wstrict-prototypes -Wmissing-prototypes -Wold-style-definition  -isystem ./include   -fpic -mlong-double-80 -g -DIN_LIBGCC2 -fbuilding-libgcc -fno-stack-protector   -fpic -mlong-double-80 -I. -I. -I../../.././gcc -I/usr/src/gcc-4.8.0/libgcc -I/usr/src/gcc-4.8.0/libgcc/. -I/usr/src/gcc-4.8.0/libgcc/../gcc -I/usr/src/gcc-4.8.0/libgcc/../include -I/usr/src/gcc-4.8.0/libgcc/config/libbid -DENABLE_DECIMAL_BID_FORMAT -DHAVE_CC_TLS  -DUSE_TLS -o unwind-dw2.o -MT unwind-dw2.o -MD -MP -MF unwind-dw2.dep -fexceptions -c /usr/src/gcc-4.8.0/libgcc/unwind-dw2.c -fvisibility=hidden -DHIDE_EXPORTS
-
-# -fpic -mlong-double-80
-# -DHAVE_CC_TLS
-# -DUSE_TLS
-
 CFLAGS += \
-  -Wno-narrowing \
-  -Wwrite-strings \
-  -Wcast-qual \
-  -Wstrict-prototypes \
-  -Wmissing-prototypes \
-  -Wold-style-definition \
   -DIN_GCC \
   -DIN_LIBGCC2 \
-  -DENABLE_DECIMAL_BID_FORMAT \
-  -DHIDE_EXPORTS \
+  -mlong-double-80 \
   -fbuilding-libgcc \
   -fno-stack-protector \
   -fexceptions \
   -fvisibility=hidden \
   -I $(SRCDIR)/gcc-$(GCC_VERSION)/gcc \
-  -I $(SRCDIR)/gcc-$(GCC_VERSION)/libcpp \
+  -I $(SRCDIR)/gcc-$(GCC_VERSION)/libgcc \
   -I $(SRCDIR)/gcc-$(GCC_VERSION)/include \
   -I $(SRCDIR)/gcc-$(GCC_VERSION)/libgcc/config/libbid \
-  -I $(INCDIR)
+  -I $(SRCDIR)/gcc-$(GCC_VERSION)/gcc/config/spu \
+  -I $(SRCDIR)/gcc-$(GCC_VERSION)/libcpp/include \
+  -I $(INCDIR) \
+  -include $(SRCDIR)/llamaos/__thread.h
 
 VPATH = $(SRCDIR)
 
 SOURCES = \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/addtf3.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/divtf3.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/eqtf2.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/floatunditf.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/getf2.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/letf2.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/multf3.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/subtf3.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/trunctfdf2.c \
+  gcc-$(GCC_VERSION)/libgcc/soft-fp/unordtf2.c \
+  gcc-$(GCC_VERSION)/libgcc/config/i386/sfp-exceptions.c \
+  gcc-$(GCC_VERSION)/libgcc/config/spu/divmodti4.c \
+  gcc-$(GCC_VERSION)/libgcc/udivmodsi4.c \
   gcc-$(GCC_VERSION)/libgcc/unwind-dw2-fde.c \
   gcc-$(GCC_VERSION)/libgcc/unwind-dw2.c
 

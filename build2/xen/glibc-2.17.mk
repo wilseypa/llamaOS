@@ -1304,6 +1304,7 @@ HEADERS = \
   $(INCDIR)/bits/mathcalls.h \
   $(INCDIR)/bits/mathdef.h \
   $(INCDIR)/bits/mathinline.h \
+  $(INCDIR)/bits/mman.h \
   $(INCDIR)/bits/nan.h \
   $(INCDIR)/bits/param.h \
   $(INCDIR)/bits/poll.h \
@@ -1339,6 +1340,7 @@ HEADERS = \
   $(INCDIR)/gnu/stubs.h \
   $(INCDIR)/sys/cdefs.h \
   $(INCDIR)/sys/ioctl.h \
+  $(INCDIR)/sys/mman.h \
   $(INCDIR)/sys/param.h \
   $(INCDIR)/sys/poll.h \
   $(INCDIR)/sys/resource.h \
@@ -1348,6 +1350,7 @@ HEADERS = \
   $(INCDIR)/sys/sysinfo.h \
   $(INCDIR)/sys/sysmacros.h \
   $(INCDIR)/sys/time.h \
+  $(INCDIR)/sys/times.h \
   $(INCDIR)/sys/ttydefaults.h \
   $(INCDIR)/sys/types.h \
   $(INCDIR)/sys/ucontext.h \
@@ -1395,6 +1398,7 @@ HEADERS = \
   $(INCDIR)/stdlib.h \
   $(INCDIR)/stdnoreturn.h \
   $(INCDIR)/string.h \
+  $(INCDIR)/strings.h \
   $(INCDIR)/syscall.h \
   $(INCDIR)/time.h \
   $(INCDIR)/unistd.h \

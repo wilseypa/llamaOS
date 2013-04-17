@@ -38,9 +38,7 @@ ASMFLAGS = \
   -g \
   -Wa,--gen-debug \
   -Wa,--warn \
-  -Wa,--fatal-warnings \
-
-#  -Wall \
+  -Wa,--fatal-warnings
 
 CFLAGS = \
   -m64 \
@@ -61,8 +59,13 @@ CPPFLAGS = \
   -nostdinc \
   -nostdinc++
 
+F90FLAGS = \
+  -m64 \
+  -O2 \
+  -g \
+  -nostdinc
+
 LDFLAGS = \
  -nostdlib \
  -nostartfiles \
  -nodefaultlibs 
-

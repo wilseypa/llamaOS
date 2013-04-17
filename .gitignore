@@ -7,6 +7,11 @@ build/include-fixed/
 build/lib/
 build/obj/
 build/test/
+build2/xen/bin/
+build2/xen/include/
+build2/xen/lib/
+build2/xen/obj/
+build2/xen/test/
 bin/
 lib/
 obj/
