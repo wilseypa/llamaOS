@@ -26,8 +26,9 @@
 ! of the authors and should not be interpreted as representing official policies,
 ! either expressed or implied, of the copyright holder(s) or contributors.
 
-      integer MPI_SUCCESS
+      integer MPI_SUCCESS, MPI_ERR_OTHER
       parameter (MPI_SUCCESS = 0)
+      parameter (MPI_ERR_OTHER = 1)
 
       integer MPI_CHAR, MPI_BYTE, MPI_SHORT, MPI_INT, MPI_LONG 
       integer MPI_FLOAT, MPI_DOUBLE, MPI_UNSIGNED_CHAR
