@@ -36,9 +36,12 @@ MAKEFLAGS = --silent
 MAKEFILE_SOURCES = common-vars.mk
 
 # compiler tools
-CC = /opt/gcc-4.8.0/bin/gcc
-CXX = /opt/gcc-4.8.0/bin/g++
-F90 = /opt/gcc-4.8.0/bin/gfortran
+CC = /opt/gcc-4.7.1/bin/gcc
+CXX = /opt/gcc-4.7.1/bin/g++
+F90 = /opt/gcc-4.7.1/bin/gfortran
+# CC = /opt/gcc-4.8.0/bin/gcc
+# CXX = /opt/gcc-4.8.0/bin/g++
+# F90 = /opt/gcc-4.8.0/bin/gfortran
 AS = as
 LD = ld
 

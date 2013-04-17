@@ -902,6 +902,11 @@ reverse_memcpy (void *dest, const void *src, size_t n)
       *(d++) = *(s--);
 }
 
+// !BAM
+static inline unsigned short __builtin_bswap16(unsigned short a)
+{
+  return (a<<8)|(a>>8);
+}
 
 /* Utility function for byteswapping an array, using the bswap
    builtins if possible. dest and src can overlap completely, or then

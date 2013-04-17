@@ -36,10 +36,11 @@ include common-flags.mk
 
 MAKEFILE_SOURCES += gcc-$(GCC_VERSION).mk
 
+# gcc-4.7.1 doesn't know this one
+#  -mlong-double-80
 CFLAGS += \
   -DIN_GCC \
   -DIN_LIBGCC2 \
-  -mlong-double-80 \
   -fbuilding-libgcc \
   -fno-stack-protector \
   -fexceptions \
