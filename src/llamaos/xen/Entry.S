@@ -15,7 +15,7 @@
 .text
 
 #define ENTRY(X) .globl X ; X :
-.globl _start, shared_info, hypercall_page
+.globl _start, shared_info, hypercall_page, stack_bottom
 
 
 _start:

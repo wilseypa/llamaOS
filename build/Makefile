@@ -44,7 +44,7 @@ all:
 #	@$(MAKE) -f gcc-$(GCC_VERSION).mk
 #	@$(MAKE) -f gfortran-$(GCC_VERSION).mk
 #	@$(MAKE) -f stdc++-$(GCC_VERSION).mk
-#	@$(MAKE) -f xen-$(XEN_VERSION).mk
+	@$(MAKE) -f xen-$(XEN_VERSION).mk
 	@$(MAKE) -f llamaOS.mk xen
 	@$(MAKE) -f llamaOS-xen-test.mk xen
 	@$(MAKE) -f llamaMPI.mk
@@ -57,7 +57,7 @@ all:
 	@$(MAKE) -f apps/testMPIF-llamaMPI.mk xen
 	@$(MAKE) -f apps/NAS/NAS.mk
 	@$(MAKE) -f apps/latency-llamaNET.mk
-#	@$(MAKE) -f apps/latency-MPI.mk
+# 	@$(MAKE) -f apps/latency-MPI.mk
 	@$(MAKE) -f apps/latency-TCPIP.mk
 	@$(MAKE) -f apps/lspci.mk xen
 	@$(MAKE) -f net/i82574.mk xen

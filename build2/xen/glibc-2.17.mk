@@ -105,6 +105,8 @@ ASMFLAGS += \
 #  -Wtrigraphs \
 #  -Wwrite-strings \
 
+#  -DPER_THREAD
+
 CFLAGS += \
   -fmerge-all-constants \
   -frounding-math \
@@ -120,7 +122,6 @@ CFLAGS += \
   -D_IO_MTSAFE_IO \
   -fexceptions \
   -DMORECORE_CLEARS=2 \
-  -DPER_THREAD \
   -DEXEC_PAGESIZE=4096 \
   -D HAVE_MREMAP=0 \
   $(INCLUDES_DIRS) \

@@ -84,6 +84,8 @@ typedef struct { int lock; int cnt; void *owner; } _IO_lock_t;
 #define _IO_cleanup_region_end(_doit) \
   __libc_cleanup_region_end (_doit)
 
+// !BAM
+#if 0
 #if defined _LIBC && !defined NOT_IN_libc
 
 # ifdef __EXCEPTIONS
@@ -106,5 +108,12 @@ typedef struct { int lock; int cnt; void *owner; } _IO_lock_t;
 # define _IO_release_lock(_fp) ; } while (0)
 
 #endif
+#endif
+#if defined _LIBC && !defined NOT_IN_libc
+# define _IO_acquire_lock(_fp) do { } while (0)
+# define _IO_acquire_lock_clear_flags2(_fp) do { } while (0)
+# define _IO_release_lock(_fp) do { } while (0)
+#endif
+
 
 #endif /* bits/stdio-lock.h */

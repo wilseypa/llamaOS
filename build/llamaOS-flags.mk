@@ -327,7 +327,9 @@ XFLAGS = \
   -fno-common \
   -mno-red-zone \
   -fno-reorder-blocks \
-  -fno-asynchronous-unwind-tables
+  -fno-asynchronous-unwind-tables \
+  -include $(SRCDIR)/llamaos/__thread.h
+
 # -Wextra
 # -ffreestanding
 

@@ -18,7 +18,7 @@ c
         logical  convertdouble
         parameter (convertdouble = .false.)
         character*11 compiletime
-        parameter (compiletime='17 Apr 2013')
+        parameter (compiletime='18 Apr 2013')
         character*3 npbversion
         parameter (npbversion='3.2')
         character*3 cs1

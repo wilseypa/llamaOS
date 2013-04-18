@@ -177,6 +177,8 @@ LIBC_START_MAIN (int (*main) (int, char **, char ** MAIN_AUXVEC_DECL),
      we need to setup errno.  */
   __pthread_initialize_minimal ();
 
+// !BAM
+#if 0
   /* Set up the stack checker's canary.  */
   uintptr_t stack_chk_guard = _dl_setup_stack_chk_guard (_dl_random);
 # ifdef THREAD_SET_STACK_GUARD
@@ -184,6 +186,7 @@ LIBC_START_MAIN (int (*main) (int, char **, char ** MAIN_AUXVEC_DECL),
 # else
   __stack_chk_guard = stack_chk_guard;
 # endif
+#endif
 #endif
 
   /* Register the destructor of the dynamic linker if there is any.  */
@@ -204,8 +207,9 @@ LIBC_START_MAIN (int (*main) (int, char **, char ** MAIN_AUXVEC_DECL),
      the standard file descriptors are not opened.  We have to do this
      only for statically linked applications since otherwise the dynamic
      loader did the work already.  */
-  if (__builtin_expect (__libc_enable_secure, 0))
-    __libc_check_standard_fds ();
+// !BAM
+//  if (__builtin_expect (__libc_enable_secure, 0))
+//    __libc_check_standard_fds ();
 #endif
 
   /* Call the initializer of the program, if any.  */
@@ -242,6 +246,7 @@ LIBC_START_MAIN (int (*main) (int, char **, char ** MAIN_AUXVEC_DECL),
   struct pthread_unwind_buf unwind_buf;
 
   int not_first_call;
+
   not_first_call = setjmp ((struct __jmp_buf_tag *) unwind_buf.cancel_jmp_buf);
   if (__builtin_expect (! not_first_call, 1))
     {
@@ -280,14 +285,16 @@ LIBC_START_MAIN (int (*main) (int, char **, char ** MAIN_AUXVEC_DECL),
       unsigned int *const ptr = &__nptl_nthreads;
 # endif
 
-      if (! atomic_decrement_and_test (ptr))
-	/* Not much left to do but to exit the thread, not the process.  */
-	__exit_thread (0);
+// !BAM
+//      if (! atomic_decrement_and_test (ptr))
+//	/* Not much left to do but to exit the thread, not the process.  */
+//	__exit_thread (0);
     }
 #else
   /* Nothing fancy, just call the function.  */
   result = main (argc, argv, __environ MAIN_AUXVEC_PARAM);
 #endif
 
-  exit (result);
+// !BAM
+//  exit (result);
 }

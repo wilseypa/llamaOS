@@ -55,7 +55,8 @@ SRCDIR = ../../src
 
 GLIBC_VERSION = 2.17
 GCC_VERSION = 4.8.0
-XEN_VERSION = 4.2.1
+XEN_VERSION = 4.2.0
+# XEN_VERSION = 4.2.1
 GTEST_VERSION = 1.6.0
 
 # auto dependency generation
