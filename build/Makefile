@@ -49,7 +49,6 @@ all:
 	@$(MAKE) -f llamaOS-xen-test.mk xen
 	@$(MAKE) -f llamaMPI.mk
 	@$(MAKE) -f llamaMPIF.mk
-	@$(MAKE) -f apps/hello-f90.mk
 	@$(MAKE) -f apps/hello-f90-llamaOS.mk xen
 	@$(MAKE) -f apps/hello.mk xen
 	@$(MAKE) -f apps/latency-llamaMPI.mk
@@ -57,14 +56,10 @@ all:
 	@$(MAKE) -f apps/testMPIF-llamaMPI.mk xen
 	@$(MAKE) -f apps/NAS/NAS.mk
 	@$(MAKE) -f apps/latency-llamaNET.mk
-# 	@$(MAKE) -f apps/latency-MPI.mk
-	@$(MAKE) -f apps/latency-TCPIP.mk
 	@$(MAKE) -f apps/lspci.mk xen
 	@$(MAKE) -f net/i82574.mk xen
 	@$(MAKE) -f net/i80003es2lan.mk xen
-#	@$(MAKE) -f apps/IMB.mk
 	@$(MAKE) -f apps/IMB-llamaMPI.mk
-#	@$(MAKE) -f apps/latency-Infiniband.mk
 
 #	@$(MAKE) -f gtest-$(GTEST_VERSION).mk
 #	@$(MAKE) -f apps/netpipe-llamaNET.mk
@@ -73,13 +68,20 @@ all:
 #	@$(MAKE) -f minimal/minimal-gcc.mk xen
 #	@$(MAKE) -f net/i82574.mk xen
 
+.PHONY: natives
+natives:
+	@$(MAKE) -f apps/hello-f90.mk
+	@$(MAKE) -f apps/latency-TCPIP.mk
+	@$(MAKE) -f apps/latency-MPI.mk
+#	@$(MAKE) -f apps/IMB.mk
+#	@$(MAKE) -f apps/latency-Infiniband.mk
+
 .PHONY: install
 install:
 	@echo installing llamaOS into $(INSTALL_FOLDER) folder...
 	@[ -d $(INSTALL_FOLDER) ] || (mkdir -p $(INSTALL_FOLDER))
 	@cp -r bin $(INSTALL_FOLDER)/bin
 	@cp -r include $(INSTALL_FOLDER)/include
-#	@cp -r include-fixed $(INSTALL_FOLDER)/include-fixed
 	@cp -r lib $(INSTALL_FOLDER)/lib
 	@cp -r ../script $(INSTALL_FOLDER)/script
 	@cp llamaOS-flags.mk $(INSTALL_FOLDER)/llamaOS-flags.mk
@@ -88,7 +90,6 @@ install:
 	@chmod -R o+r $(INSTALL_FOLDER)
 	@echo install complete.
 	@echo 
-
 
 .PHONY: clean
 clean:

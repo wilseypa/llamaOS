@@ -166,13 +166,17 @@ PCI_impl::PCI_impl ()
    xenstore.end_transaction (1);
    cout << "ending transaction to initialise xenbus device..." << endl;
 
+   cout << "reading backend from device/pci/0/backend..." << endl;
    string backend = xenstore.read("device/pci/0/backend");
+   cout << "backend returned = " << backend << endl;
+   cout.flush();
 
    for (int i = 0; i < 10; i++)
    {
+      cout << "reading " << backend << "/state..." << endl;
       string backend_state = xenstore.read(backend + "/state");
-
-      cout << "waiting for backend state: " << backend_state << endl;
+      cout << "backend state returned = " << backend_state << endl;
+      cout.flush();
 
       if (backend_state == "4")
       {
@@ -182,14 +186,16 @@ PCI_impl::PCI_impl ()
       sleep (1);
    }
 
+   cout << "state is connected, writing XenbusStateConnected..." << endl;
    xenstore.write ("device/pci/0/state", XenbusStateConnected);
+   cout << "done writing XenbusStateConnected" << endl;
+   cout.flush();
 
    cout << "backend: " << backend << endl;
    cout << "backend state: " << xenstore.read(backend+"/state") << endl;
    cout << "frontend state: " << xenstore.read("device/pci/0/state") << endl;
 
    cout << "num-devs: " << xenstore.read(backend+"/num_devs") << endl;
-
    string bus_address = xenstore.read(backend+"/vdev-0");
    cout << "bus_address: " << bus_address << endl;
 
