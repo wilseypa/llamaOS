@@ -53,12 +53,12 @@ llamaNET::llamaNET (int domd_id, int index)
       rx_buffers(),
       tx_buffers()
 {
-   for (unsigned int i = 0; i < control->tx_buffer_size; i++)
+   for (unsigned int i = 0; i < TX_BUFFERS; i++)
    {
       tx_buffers.push_back (new Grant_map<Protocol_header>(domd_id, control->app [index].tx_refs [i]));
    }
 
-   for (unsigned int i = 0; i < control->rx_buffer_size; i++)
+   for (unsigned int i = 0; i < RX_BUFFERS; i++)
    {
       rx_buffers.push_back (new Grant_map<Protocol_header>(domd_id, control->app [index].rx_refs [i], true));
    }
@@ -154,14 +154,14 @@ void llamaNET::release_recv_buffer (Protocol_header *header)
    {
       unsigned int tail = control->app [index].rx_tail;
       tail++;
-      tail %= control->rx_buffer_size;
+      tail %= RX_BUFFERS;
       control->app [index].rx_tail = tail;
    }
    else if (header == tx_buffers [control->app [index].tx_tail]->get_pointer ())
    {
       unsigned int tail = control->app [index].tx_tail;
       tail++;
-      tail %= control->tx_buffer_size;
+      tail %= TX_BUFFERS;
       control->app [index].tx_tail = tail;
    }
 }

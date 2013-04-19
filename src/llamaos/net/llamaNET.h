@@ -36,10 +36,10 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 #include <llamaos/xen/Grant_map.h>
 
-// do not exceed 980 or control structure spills out of grant ref
+// do not exceed 942 or control structure spills out of grant ref
 // also running out of grant id when running all 6 guests
-#define TX_BUFFERS 64
-#define RX_BUFFERS 64
+#define TX_BUFFERS 48
+#define RX_BUFFERS 96
 
 namespace llamaos {
 namespace net {
@@ -72,12 +72,7 @@ public:
       volatile bool online;
 
       volatile unsigned int rx_head;
-//      volatile unsigned int rx_tail;
-
       volatile unsigned int tx_head;
-//      volatile unsigned int tx_tail;
-//      volatile unsigned int tx_length [64];
-
       volatile unsigned int next_tx_index;
 
    };
@@ -87,12 +82,8 @@ public:
    public:
       volatile bool online;
 
-//      volatile unsigned int rx_head;
       volatile unsigned int rx_tail;
-
-//      volatile unsigned int tx_head;
       volatile unsigned int tx_tail;
-//      volatile unsigned int tx_length [64];
 
       volatile bool tx_request;
       volatile unsigned int tx_index;
@@ -108,9 +99,6 @@ public:
    public:
       Driver_state driver;
       App_state app [6];
-
-      volatile unsigned int rx_buffer_size;
-      volatile unsigned int tx_buffer_size;
 
       volatile unsigned int close_driver;
 

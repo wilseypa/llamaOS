@@ -347,11 +347,8 @@ int main (int /* argc */, char ** /* argv [] */)
    llamaNET_ref = Hypervisor::get_instance ()->grant_table.grant_access (self_id+6, llamaNET_control);
    cout << "llamaNET_ref: " << dec << llamaNET_ref << endl;
 
-   llamaNET_control->rx_buffer_size = RX_BUFFERS;
-   llamaNET_control->tx_buffer_size = TX_BUFFERS;
-
    // allow tx_buffer guest access
-   for (unsigned int i = 0; i < llamaNET_control->rx_buffer_size; i++)
+   for (unsigned int i = 0; i < TX_BUFFERS; i++)
    {
       llamaNET_control->app [0].tx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+1, tx_buffers [i].pointer);
       llamaNET_control->app [1].tx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+2, tx_buffers [i].pointer);
@@ -362,7 +359,7 @@ int main (int /* argc */, char ** /* argv [] */)
    }
 
    // allow rx_buffer guest access
-   for (unsigned int i = 0; i < llamaNET_control->rx_buffer_size; i++)
+   for (unsigned int i = 0; i < RX_BUFFERS; i++)
    {
       llamaNET_control->app [0].rx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+1, rx_buffers [i].pointer);
       llamaNET_control->app [1].rx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+2, rx_buffers [i].pointer);
