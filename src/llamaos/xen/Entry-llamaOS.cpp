@@ -207,7 +207,7 @@ static vector<string> split (const string &input)
    return tokens;
 }
 
-#if 0
+extern "C"
 int __libc_start_main (int (*main) (int, char **, char **),
                        int argc,
                        char ** ubp_av,
@@ -215,34 +215,17 @@ int __libc_start_main (int (*main) (int, char **, char **),
                        void (*fini) (void),
                        void (*rtld_fini) (void),
                        void *stack_end) __attribute__ ((noreturn));
-#endif
 
-# define STATIC extern "C"
-# define LIBC_START_MAIN __libc_start_main
-
-STATIC int LIBC_START_MAIN (int (*main) (int, char **, char **
-                                         MAIN_AUXVEC_DECL),
-                            int argc,
-                            char *__unbounded *__unbounded ubp_av,
-#ifdef LIBC_START_MAIN_AUXVEC_ARG
-                            ElfW(auxv_t) *__unbounded auxvec,
-#endif
-                            __typeof (main) init,
-                            void (*fini) (void),
-                            void (*rtld_fini) (void),
-                            void *__unbounded stack_end);
-//     __attribute__ ((noreturn));
-
-
-STATIC int
-__libc_csu_init (int argc, char **argv, char **envp);
+extern "C"
+int __libc_csu_init (int argc, char **argv, char **envp);
 
 extern void *stack_bottom;
 
 extern "C"
 int main (int argc, char *argv []);
 
-static int xmain (int argc, char *argv [], char *env[])
+extern "C"
+int __main (int argc, char *argv [], char *env[])
 {
    return main (argc, argv);
 }
@@ -300,8 +283,7 @@ void entry_llamaOS (start_info_t *start_info)
       trace ("Before application main()...\n");
 
       main (hypervisor.argc, hypervisor.argv);
-
-//      __libc_start_main(xmain, hypervisor.argc, hypervisor.argv, 0, 0, 0, stack_bottom);
+//      __libc_start_main(__main, hypervisor.argc, hypervisor.argv, 0, 0, 0, stack_bottom);
 //      __libc_start_main(xmain, hypervisor.argc, hypervisor.argv, __libc_csu_init, 0, 0, stack_bottom);
 
       // get rid of all leftover console buffer

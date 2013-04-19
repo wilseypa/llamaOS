@@ -89,7 +89,7 @@ int main (int /* argc */, char ** /* argv [] */)
    PCI pci;
    sleep (1);
    cout << "PCI config:" << endl;
-//   cout << pci << endl;
+   cout << pci << endl;
 
    cout << "checking PCI config for valid 82574..." << endl;
    uint16_t vendor_id = pci.read_config_word (0);
@@ -97,15 +97,33 @@ int main (int /* argc */, char ** /* argv [] */)
    uint32_t class_code = (pci.read_config_byte (11) << 16) | (pci.read_config_byte (10) << 8) | pci.read_config_byte(9);
    uint16_t subvendor_id = pci.read_config_word (44);
 
-   if (   (vendor_id != 0x8086)
-       || (device_id != 0x10D3)
-       || (class_code != 0x020000)
-       || (subvendor_id != 0x8086))
+   if (   (vendor_id == 0x8086)
+       && (device_id == 0x10D3)
+       && (class_code == 0x020000)
+       && (subvendor_id == 0x8086))
    {
-      cout << "PCI hardware detected is NOT 82574" << endl;
+      cout << "PCI hardware detected is 82574" << endl;
+   }
+   else if (   (vendor_id == 0x8086)
+            && (device_id == 0x1096)
+            && (class_code == 0x020000))
+   {
+      cout << "PCI hardware detected is 80003es2lan" << endl;
+   }
+   else
+   {
+      cout << "PCI hardware detected is NOT supported by this driver." << endl;
+      cout << hex << "   vendor: " << vendor_id << endl;
+      cout << hex << "   devide: " << device_id << endl;
+      cout << hex << "    class: " << class_code << endl;
+      cout << hex << "subvendor: " << subvendor_id << endl << endl;
+
+      cout << "waiting 3 sec, then exit..." << endl;
+      cout.flush ();
+      sleep (3);
       return -1;
    }
-   cout << "PCI hardware detected is 82574" << endl;
+
    cout << "enabling PCI access and creating CSR register class..." << endl;
    cout.flush ();
 

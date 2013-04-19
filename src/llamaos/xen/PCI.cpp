@@ -76,6 +76,11 @@ private:
    struct xen_pci_sharedinfo *const pci_sharedinfo;
    evtchn_port_t port;
 
+   uint32_t domain;
+   uint32_t bus;
+   uint32_t device;
+   uint32_t function;
+
 };
 
 } } }
@@ -130,7 +135,11 @@ void PCI::write_config_dword (uint64_t offset, uint32_t value) const
 
 PCI_impl::PCI_impl ()
    :  pci_sharedinfo(static_cast<xen_pci_sharedinfo *>(memalign (PAGE_SIZE, sizeof(xen_pci_sharedinfo)))),
-      port()
+      port(0),
+      domain(0),
+      bus(0),
+      device(0),
+      function(0)
 {
    cout << "setup pci device xenbus..." << endl;
    Xenstore &xenstore = Hypervisor::get_instance ()->xenstore;
@@ -181,8 +190,17 @@ PCI_impl::PCI_impl ()
 
    cout << "num-devs: " << xenstore.read(backend+"/num_devs") << endl;
 
-   string bus_address = xenstore.read(backend+"/dev-0");
+   string bus_address = xenstore.read(backend+"/vdev-0");
    cout << "bus_address: " << bus_address << endl;
+
+   // the device will probably alway be mapped to domain == bus == device == 0
+   // but the function may not be zero, cluster at UC has function = 1
+   sscanf (bus_address.c_str (), "%d:%d:%d.%d", &domain, &bus, &device, &function);
+   cout << "parse device id:" << endl;
+   cout << "         domain: " << domain << endl;
+   cout << "            bus: " << bus << endl;
+   cout << "         device: " << device << endl;
+   cout << "       function: " << function << endl;
 }
 
 PCI_impl::~PCI_impl ()
@@ -226,9 +244,9 @@ uint32_t PCI_impl::read_config (uint32_t offset, uint32_t size) const
    memset(&op, 0, sizeof(op));
 
    op.cmd = XEN_PCI_OP_conf_read;
-   op.domain = 0;
-   op.bus = 0;
-   op.devfn = 0;
+   op.domain = domain;
+   op.bus = bus;
+   op.devfn = function; // !BAM need the way to combine dev and fn if dev != 0
    op.offset = offset;
    op.size = size;
    op.value = 0;
@@ -270,9 +288,9 @@ void PCI_impl::write_config (uint32_t offset, uint32_t value, uint32_t size) con
    memset(&op, 0, sizeof(op));
 
    op.cmd = XEN_PCI_OP_conf_write;
-   op.domain = 0;
-   op.bus = 0;
-   op.devfn = 0;
+   op.domain = domain;
+   op.bus = bus;
+   op.devfn = function; // !BAM need the way to combine dev and fn if dev != 0
    op.offset = offset;
    op.size = size;
    op.value = value;
