@@ -36,6 +36,8 @@ typedef struct { int lock; int cnt; void *owner; } _IO_lock_t;
 #define _IO_lock_fini(_name) \
   ((void) 0)
 
+// !BAM
+#if 0
 #define _IO_lock_lock(_name) \
   do {									      \
     void *__self = THREAD_SELF;						      \
@@ -74,8 +76,10 @@ typedef struct { int lock; int cnt; void *owner; } _IO_lock_t;
 	lll_unlock ((_name).lock, LLL_PRIVATE);				      \
       }									      \
   } while (0)
-
-
+#endif
+#define _IO_lock_lock(_name) do { } while (0)
+#define _IO_lock_trylock(_name) 0
+#define _IO_lock_unlock(_name) do { } while (0)
 
 #define _IO_cleanup_region_start(_fct, _fp) \
   __libc_cleanup_region_start (((_fp)->_flags & _IO_USER_LOCK) == 0, _fct, _fp)
