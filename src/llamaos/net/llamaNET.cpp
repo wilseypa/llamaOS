@@ -41,7 +41,7 @@ using namespace llamaos::memory;
 using namespace llamaos::net;
 using namespace llamaos::xen;
 
-//#define HARD_CODED_MACS
+#define HARD_CODED_MACS
 
 const unsigned int llamaNET::HEADER_LENGTH = sizeof(llamaNET::Protocol_header);
 
@@ -172,7 +172,7 @@ llamaNET::Protocol_header *llamaNET::get_send_buffer ()
    while (control->app [index].tx_request);
 
    // get next index
-   control->app [index].tx_index = __sync_fetch_and_add (&control->driver.next_tx_index, 1) & 7;
+   control->app [index].tx_index = __sync_fetch_and_add (&control->driver.next_tx_index, 1) % TX_BUFFERS;
 
    // need atomic increment before this works with multiple llamaNET instances
    return tx_buffers [control->app [index].tx_index]->get_pointer ();
@@ -186,7 +186,7 @@ void llamaNET::send (Protocol_header *header)
    // dalai node 0 mac 00-1b-21-d5-66-ef
    // redpj node 1 mac 68-05-ca-01-f7-db
 #ifdef HARD_CODED_MACS
-#if 0
+#if 1
    if (   (header->dest >= 0)
        && (header->dest < 6))
    {
