@@ -173,12 +173,9 @@ bool llamaNET::run_trial (unsigned long msg_size, unsigned long trial_number)
    net::llamaNET::Protocol_header *header;
    unsigned char *data;
 
-#define COUNT 16
-
    // dalai initiates the trial
    if (client)
    {
-      for (int i = 0; i < COUNT; i++) {
       header = interface.get_send_buffer ();
       header->dest = (node % 2) ? (node - 1) : (node + 1);
       header->src = node;
@@ -187,38 +184,27 @@ bool llamaNET::run_trial (unsigned long msg_size, unsigned long trial_number)
       header->len = msg_size;
 
       interface.send (header);
-      }
 
-      for (int i = 0; i < COUNT; i++) {
       header = interface.recv (node);
 
       // get pointer to data section of buffer
       data = reinterpret_cast<unsigned char *>(header + 1);
 
-      if (*(reinterpret_cast<unsigned long *>(data)) == trial_number)
-      {
-         interface.release_recv_buffer (header);
-         trial_number++;
-         // return true;
-      }
-      else
+      if (*(reinterpret_cast<unsigned long *>(data)) != trial_number)
       {
          cout << "data error: " << *(reinterpret_cast<unsigned long *>(data))  << " == " << trial_number << endl;
          interface.release_recv_buffer (header);
          return false;
       }
-      }
 
+      interface.release_recv_buffer (header);
       return true;
    }
    else
    {
-      for (int i = 0; i < COUNT; i++) {
       header = interface.recv (node);
       interface.release_recv_buffer (header);
-      }
 
-      for (int i = 0; i < COUNT; i++) {
       header = interface.get_send_buffer ();
       header->dest = (node % 2) ? (node - 1) : (node + 1);
       header->src = node;
@@ -233,7 +219,6 @@ bool llamaNET::run_trial (unsigned long msg_size, unsigned long trial_number)
       *(reinterpret_cast<unsigned long *>(data)) = trial_number++;
 
       interface.send (header);
-      }
       return true;
    }
 
