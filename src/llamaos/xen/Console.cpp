@@ -71,13 +71,16 @@ void Console::write (char data) const
    mb();
 
    // check for space in the ring
-   while ((interface->out_prod - interface->out_cons) >= sizeof(interface->out))
+//   while ((interface->out_prod - interface->out_cons) >= sizeof(interface->out))
+   // !BAM
+   // just stay well within the buffer?
+   while ((interface->out_prod - interface->out_cons) >= 1000)
    {
       // tell dom0 to consume some data
       Hypercall::event_channel_send (port);
 
       // yield cpu to dom0
-      llamaos::xen::Hypercall::sched_op_yield ();
+      // llamaos::xen::Hypercall::sched_op_yield ();
       mb();
    }
 

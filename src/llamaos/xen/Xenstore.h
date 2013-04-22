@@ -34,6 +34,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <cstdint>
 
 #include <stdexcept>
+#include <iostream>
 #include <sstream>
 #include <string>
 
@@ -87,7 +88,10 @@ public:
 
       if ((sstream >> t).fail ())
       {
-         throw std::runtime_error ("failed to convert xenstore string to type");
+         // !BAM
+         // don't throw for now 
+         // throw std::runtime_error ("failed to convert xenstore string to type");
+         std::cout << "failed to convert xenstore string to type: " << sstream.str () << std::endl;
       }
 
       return t;
@@ -109,7 +113,10 @@ public:
 
       if ((sstream << value).fail ())
       {
-         throw std::runtime_error ("failed to convert xenstore type to string");
+         // !BAM
+         // don't throw for now 
+         // throw std::runtime_error ("failed to convert xenstore type to string");
+         std::cout << "failed to convert xenstore string to type: " << sstream.str () << std::endl;
       }
 
       write (key, sstream.str ());
