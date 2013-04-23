@@ -42,6 +42,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <llamaos/net/i82574/RCTL.h>
 #include <llamaos/net/i82574/RXDCTL.h>
 #include <llamaos/net/i82574/STATUS.h>
+#include <llamaos/net/i82574/SWSM.h>
 #include <llamaos/net/i82574/TCTL.h>
 #include <llamaos/net/i82574/TXDCTL.h>
 
@@ -91,6 +92,9 @@ public:
 
    uint16_t read_RDT () const;
    void write_RDT (uint16_t tail) const;
+
+   SWSM read_SWSM () const;
+   void write_SWSM (const SWSM &);
 
    TCTL read_TCTL () const;
    void write_TCTL (const TCTL &);

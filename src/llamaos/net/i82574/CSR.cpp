@@ -172,6 +172,16 @@ void CSR::write_RDT (uint16_t tail) const
    writel (tail & 0xFFFF, pointer + 0x02818);
 }
 
+SWSM CSR::read_SWSM () const
+{
+   return SWSM (readl (pointer + 0x05B50));
+}
+
+void CSR::write_SWSM (const SWSM &reg)
+{
+   writel (reg, pointer + 0x05B50);
+}
+
 TCTL CSR::read_TCTL () const
 {
    return TCTL (readl (pointer + 0x00400));

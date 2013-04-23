@@ -54,6 +54,7 @@ SOURCES = \
   llamaos/net/i82574/RCTL.cpp \
   llamaos/net/i82574/RXDCTL.cpp \
   llamaos/net/i82574/STATUS.cpp \
+  llamaos/net/i82574/SWSM.cpp \
   llamaos/net/i82574/TCTL.cpp \
   llamaos/net/i82574/TXDCTL.cpp
 

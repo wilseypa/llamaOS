@@ -31,6 +31,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <llamaos/api/bit.h>
 #include <llamaos/net/i82574/RCTL.h>
 
+using namespace std;
 using namespace llamaos::api;
 using namespace llamaos::net::i82574;
 
@@ -215,4 +216,12 @@ bool RCTL::BSEX () const
 void RCTL::BSEX (bool flag)
 {
    edit_bit (value, 25, flag);
+}
+
+ostream &llamaos::net::i82574::operator<< (ostream &out, const RCTL &rctl)
+{
+   out << "Receive Control Register - RCTL" << endl;
+   out << hex << "   value: 0x" << static_cast<uint32_t>(rctl) << endl;
+
+   return out;
 }

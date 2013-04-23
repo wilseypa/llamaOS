@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012, William Magato
+Copyright (c) 2013, William Magato
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,8 +28,8 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#ifndef llamaos_net_i82574_rctl_h_
-#define llamaos_net_i82574_rctl_h_
+#ifndef llamaos_net_i82574_swsm_h_
+#define llamaos_net_i82574_swsm_h_
 
 #include <cstdint>
 
@@ -39,55 +39,25 @@ namespace llamaos {
 namespace net {
 namespace i82574 {
 
-class RCTL
+class SWSM
 {
 public:
-   RCTL (uint32_t value);
+   SWSM (uint32_t value);
 
    operator uint32_t () const;
 
-   bool EN () const;
-   void EN (bool flag);
+   bool SMBI () const;
+   void SMBI (bool flag);
 
-   bool SBP () const;
-   void SBP (bool flag);
-
-   bool UPE () const;
-   void UPE (bool flag);
-
-   bool MPE () const;
-   void MPE (bool flag);
-
-   bool LPE () const;
-   void LPE (bool flag);
-
-   enum DESC_THRESHOLD { HALF, QUARTER, EIGHTH };
-
-   DESC_THRESHOLD RDMTS () const;
-   void RDMTS (DESC_THRESHOLD rdt);
-
-   enum DESC_TYPE { LEGACY, SPLIT };
-
-   DESC_TYPE DTYP () const;
-   void DTYP (DESC_TYPE type);
-
-   bool BAM () const;
-   void BAM (bool flag);
-
-   enum BUFFER_SIZE { BYTES_2048, BYTES_1024, BYTES_512, BYTES_256 };
-
-   BUFFER_SIZE BSIZE () const;
-   void BSIZE (BUFFER_SIZE size);
-
-   bool BSEX () const;
-   void BSEX (bool flag);
+   bool SWESMBI () const;
+   void SWESMBI (bool flag);
 
 private:
    uint32_t value;
 };
 
-std::ostream &operator<< (std::ostream &, const RCTL &);
+std::ostream &operator<< (std::ostream &, const SWSM &);
 
 } } }
 
-#endif  // llamaos_net_i82574_rctl_h_
+#endif  // llamaos_net_i82574_swsm_h_

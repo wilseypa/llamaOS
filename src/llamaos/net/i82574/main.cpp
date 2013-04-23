@@ -85,6 +85,8 @@ struct buffer_entry
 
 int main (int /* argc */, char ** /* argv [] */)
 {
+   bool hw_is_82574 = false;
+
    cout << "running 82574 llamaNET domain...\n" << endl;
    PCI pci;
    sleep (1);
@@ -103,6 +105,7 @@ int main (int /* argc */, char ** /* argv [] */)
        && (subvendor_id == 0x8086))
    {
       cout << "PCI hardware detected is 82574" << endl;
+      hw_is_82574 = true;
    }
    else if (   (vendor_id == 0x8086)
             && (device_id == 0x1096)
@@ -187,25 +190,48 @@ int main (int /* argc */, char ** /* argv [] */)
    csr.write_IMC(IMC::ALL);
    cout << csr.read_IMS () << endl;
 
-   EXTCNF_CTRL extcnf_ctrl = csr.read_EXTCNF_CTRL ();
-   cout << "getting hw semaphore..." << extcnf_ctrl << endl;
-   extcnf_ctrl =- EXTCNF_CTRL(0);
-   extcnf_ctrl.SW_OWN (true);
-   csr.write_EXTCNF_CTRL (extcnf_ctrl);
-
-   extcnf_ctrl = csr.read_EXTCNF_CTRL ();
-   cout << "getting hw semaphore..." << extcnf_ctrl << endl;
-
-   while (!(extcnf_ctrl.SW_OWN ()))
+   if (hw_is_82574)
    {
+      EXTCNF_CTRL extcnf_ctrl = csr.read_EXTCNF_CTRL ();
+      cout << "getting hw semaphore..." << extcnf_ctrl << endl;
+   // !BAM
+   // is the "=-" a typo
+   //   extcnf_ctrl =- EXTCNF_CTRL(0);
+      extcnf_ctrl = EXTCNF_CTRL(0);
       extcnf_ctrl.SW_OWN (true);
-
-      sleep (1);
-
       csr.write_EXTCNF_CTRL (extcnf_ctrl);
+
       extcnf_ctrl = csr.read_EXTCNF_CTRL ();
       cout << "getting hw semaphore..." << extcnf_ctrl << endl;
-      break;
+
+      while (!(extcnf_ctrl.SW_OWN ()))
+      {
+         extcnf_ctrl.SW_OWN (true);
+
+         sleep (1);
+
+         csr.write_EXTCNF_CTRL (extcnf_ctrl);
+         extcnf_ctrl = csr.read_EXTCNF_CTRL ();
+         cout << "getting hw semaphore..." << extcnf_ctrl << endl;
+         break;
+      }
+   }
+   else
+   {
+      SWSM swsm = csr.read_SWSM ();
+      cout << "getting hw semaphore..." << swsm << endl;
+
+      while (!(swsm.SWESMBI()))
+      {
+         swsm.SWESMBI(true);
+         csr.write_SWSM(swsm);
+
+         sleep (1);
+
+         swsm = csr.read_SWSM ();
+         cout << "getting hw semaphore..." << swsm << endl;
+         break;
+      }
    }
 
    cout << "reseting..." << endl;
@@ -280,6 +306,8 @@ int main (int /* argc */, char ** /* argv [] */)
    csr.write_RXDCTL (rxdctl);
 
    cout << "enabling receiver..." << endl;
+   cout << csr.read_RCTL() << endl;
+
    RCTL rctl (0);
    rctl.MPE(true);
    rctl.UPE(true);
@@ -289,6 +317,8 @@ int main (int /* argc */, char ** /* argv [] */)
    rctl.BSIZE(RCTL::BYTES_256);
    rctl.BSEX(true);
    csr.write_RCTL (rctl);
+
+   cout << csr.read_RCTL() << endl;
 
    cout << "create transmit descriptors..." << endl;
 

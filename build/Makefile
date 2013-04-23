@@ -58,7 +58,7 @@ all:
 #	@$(MAKE) -f apps/NAS/NAS.mk
 #	@$(MAKE) -f apps/latency-llamaNET.mk
 #	@$(MAKE) -f apps/lspci.mk xen
-#	@$(MAKE) -f net/i82574.mk xen
+	@$(MAKE) -f net/i82574.mk xen
 #	@$(MAKE) -f net/i80003es2lan.mk xen
 #	@$(MAKE) -f apps/IMB-llamaMPI.mk
 
