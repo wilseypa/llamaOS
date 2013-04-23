@@ -150,6 +150,12 @@ mb();
    return 0;
 }
 
+static unsigned int glibc_libc_sleep (unsigned int seconds)
+{
+   api::sleep (seconds);
+   return 0;
+}
+
 static ssize_t glibc_libc_write (int fd, const void *buf, size_t nbytes)
 {
    if (   (stdout->_fileno != fd)
@@ -167,6 +173,7 @@ static void register_glibc_exports (void)
    register_llamaos_brk (glibc_brk);
    register_llamaos_getpid (glibc_getpid);
    register_llamaos_gettimeofday (glibc_gettimeofday);
+   register_llamaos_sleep (glibc_libc_sleep);
    register_llamaos_write (glibc_libc_write);
 }
 
@@ -214,10 +221,7 @@ int __libc_start_main (int (*main) (int, char **, char **),
                        __typeof (main) init,
                        void (*fini) (void),
                        void (*rtld_fini) (void),
-                       void *stack_end) __attribute__ ((noreturn));
-
-extern "C"
-int __libc_csu_init (int argc, char **argv, char **envp);
+                       void *stack_end);// __attribute__ ((noreturn));
 
 extern void *stack_bottom;
 
@@ -282,9 +286,8 @@ void entry_llamaOS (start_info_t *start_info)
 
       trace ("Before application main()...\n");
 
-      main (hypervisor.argc, hypervisor.argv);
-//      __libc_start_main(__main, hypervisor.argc, hypervisor.argv, 0, 0, 0, stack_bottom);
-//      __libc_start_main(xmain, hypervisor.argc, hypervisor.argv, __libc_csu_init, 0, 0, stack_bottom);
+//      main (hypervisor.argc, hypervisor.argv);
+      __libc_start_main(__main, hypervisor.argc, hypervisor.argv, 0, 0, 0, stack_bottom);
 
       // get rid of all leftover console buffer
       cout.flush ();

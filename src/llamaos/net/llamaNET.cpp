@@ -42,6 +42,7 @@ using namespace llamaos::net;
 using namespace llamaos::xen;
 
 #define HARD_CODED_MACS
+#define BEOWULF1
 
 const unsigned int llamaNET::HEADER_LENGTH = sizeof(llamaNET::Protocol_header);
 
@@ -186,7 +187,8 @@ void llamaNET::send (Protocol_header *header)
    // dalai node 0 mac 00-1b-21-d5-66-ef
    // redpj node 1 mac 68-05-ca-01-f7-db
 #ifdef HARD_CODED_MACS
-#if 1
+
+#ifdef DALAI_REDPJ
    if (   (header->dest >= 0)
        && (header->dest < 6))
    {
@@ -240,7 +242,10 @@ void llamaNET::send (Protocol_header *header)
    {
       // throw exception?
    }
-#else
+
+#endif
+
+#ifdef THOR_WILEY
    // !BAM get these in a config soon
    // dalai node 0 (even) mac 00-1b-21-d5-66-ef
    // redpj node 1 (odd)  mac 68-05-ca-01-f7-db
@@ -286,8 +291,54 @@ void llamaNET::send (Protocol_header *header)
       header->eth_src [4] = 0xf7;
       header->eth_src [5] = 0x72;
    }
-
 #endif
+
+#ifdef BEOWULF1
+   // n021 = even = 00:1e:8c:7e:d4:1b
+   // n022 = odd  = 00:1e:8c:91:a4:45
+   if ((header->dest % 2) == 0)
+   {
+      // sending to n021
+      header->eth_dest [0] = 0x00;
+      header->eth_dest [1] = 0x1e;
+      header->eth_dest [2] = 0x8c;
+      header->eth_dest [3] = 0x7e;
+      header->eth_dest [4] = 0xd4;
+      header->eth_dest [5] = 0x1b;
+   }
+   else
+   {
+      // sending to n022
+      header->eth_dest [0] = 0x00;
+      header->eth_dest [1] = 0x1e;
+      header->eth_dest [2] = 0x8c;
+      header->eth_dest [3] = 0x91;
+      header->eth_dest [4] = 0xa4;
+      header->eth_dest [5] = 0x45;
+   }
+
+   if ((header->src % 2) == 0)
+   {
+      // sending from n021
+      header->eth_src [0] = 0x00;
+      header->eth_src [1] = 0x1e;
+      header->eth_src [2] = 0x8c;
+      header->eth_src [3] = 0x7e;
+      header->eth_src [4] = 0xd4;
+      header->eth_src [5] = 0x1b;
+   }
+   else
+   {
+      // sending from n022
+      header->eth_src [0] = 0x00;
+      header->eth_src [1] = 0x1e;
+      header->eth_src [2] = 0x8c;
+      header->eth_src [3] = 0x91;
+      header->eth_src [4] = 0xa4;
+      header->eth_src [5] = 0x45;
+   }
+#endif
+
 #endif
    header->eth_type = 0x0C09;
 

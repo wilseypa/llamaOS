@@ -149,6 +149,10 @@ EXTERN void register_llamaos_sigsuspend (llamaos_sigsuspend_t sigsuspend);
 typedef int (*llamaos_sigsuspend_nocancel_t) (const sigset_t *);
 EXTERN void register_llamaos_sigsuspend_nocancel (llamaos_sigsuspend_nocancel_t sigsuspend_nocancel);
 
+// unsigned int sleep (unsigned int seconds)
+typedef unsigned int (*llamaos_sleep_t) (unsigned int);
+EXTERN void register_llamaos_sleep (llamaos_sleep_t sleep);
+
 // long int syscall (long int callno)
 typedef long int (*llamaos_syscall_t) (long int);
 EXTERN void register_llamaos_syscall (llamaos_syscall_t syscall);

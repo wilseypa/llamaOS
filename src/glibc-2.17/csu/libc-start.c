@@ -110,7 +110,8 @@ STATIC int LIBC_START_MAIN (int (*main) (int, char **, char **
 			    void (*fini) (void),
 			    void (*rtld_fini) (void),
 			    void *__unbounded stack_end)
-     __attribute__ ((noreturn));
+// !BAM
+;//     __attribute__ ((noreturn));
 
 
 /* Note: the fini parameter is ignored here for shared library.  It
@@ -241,7 +242,9 @@ LIBC_START_MAIN (int (*main) (int, char **, char ** MAIN_AUXVEC_DECL),
     GLRO(dl_debug_printf) ("\ntransferring control: %s\n\n", argv[0]);
 #endif
 
-#ifdef HAVE_CLEANUP_JMP_BUF
+// !BAM
+#if 0
+// #ifdef HAVE_CLEANUP_JMP_BUF
   /* Memory for the cancellation buffer.  */
   struct pthread_unwind_buf unwind_buf;
 
@@ -261,7 +264,7 @@ LIBC_START_MAIN (int (*main) (int, char **, char ** MAIN_AUXVEC_DECL),
 
       /* Run the program.  */
       result = main (argc, argv, __environ MAIN_AUXVEC_PARAM);
-    }
+   }
   else
     {
       /* Remove the thread-local data.  */
@@ -297,4 +300,5 @@ LIBC_START_MAIN (int (*main) (int, char **, char ** MAIN_AUXVEC_DECL),
 
 // !BAM
 //  exit (result);
+  return result;
 }

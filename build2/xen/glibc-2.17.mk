@@ -1080,6 +1080,7 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/sched_primin.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/sigsuspend.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/sigsuspend_nocancel.c \
+  glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/sleep.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/syscall.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/gettimeofday.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/time.c \
@@ -1280,6 +1281,7 @@ C_SOURCES = \
 #  glibc-$(GLIBC_VERSION)/misc/writev.c \
 #  glibc-$(GLIBC_VERSION)/posix/_exit.c \
 #  glibc-$(GLIBC_VERSION)/posix/getpid.c \
+#  glibc-$(GLIBC_VERSION)/posix/sleep.c \
 #  glibc-$(GLIBC_VERSION)/posix/pathconf.c \
 #  glibc-$(GLIBC_VERSION)/signal/raise.c \
 #  glibc-$(GLIBC_VERSION)/stdlib/abort.c \

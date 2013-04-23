@@ -17,7 +17,6 @@
 #define ENTRY(X) .globl X ; X :
 .globl _start, shared_info, hypercall_page, stack_bottom
 
-
 _start:
         cld
 #        movq stack_start(%rip),%rsp
@@ -37,6 +36,16 @@ _start:
 #        call start_kernel
         call entry_glibc
 
+        /* call the shutdown hypercall */
+        movq $2, %rdi
+        movq $0, sched_shutdown
+        movq $sched_shutdown, %rsi
+        callq hypercall_page+(__HYPERVISOR_sched_op*32)
+
+   /* loop forever if not shutdown */
+loop:
+   jmp loop
+
 #stack_start:
 #        .quad stack+(2*__STACK_SIZE)
 
@@ -55,6 +64,10 @@ stack_bottom:
 
    .org 0x14000                   # reserve 64k stack on a doubleword boundary
 stack_top:
+
+.section .data
+.set __HYPERVISOR_sched_op, 29
+.comm sched_shutdown, 8
 
 
 /* Offsets into shared_info_t. */                

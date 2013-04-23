@@ -253,6 +253,12 @@ static int glibc_sigsuspend_nocancel (const sigset_t *set)
    return -1;
 }
 
+static long int glibc_sleep (long int callno)
+{
+   trace("!!! ALERT: glibc calling sleep() before sleep support is enabled.\n");
+   return -1;
+}
+
 static long int glibc_syscall (long int callno)
 {
    trace("!!! ALERT: glibc calling syscall() before syscall support is enabled.\n");
@@ -298,6 +304,7 @@ static void register_glibc_exports (void)
    register_llamaos_sched_get_priority_min (glibc_sched_get_priority_min);
    register_llamaos_sigsuspend (glibc_sigsuspend);
    register_llamaos_sigsuspend_nocancel (glibc_sigsuspend_nocancel);
+   register_llamaos_sleep (glibc_sleep);
    register_llamaos_syscall (glibc_syscall);
    register_llamaos_write (glibc_libc_write);
    register_llamaos_writev (glibc_writev);
@@ -312,12 +319,12 @@ static void fpu_init(void)
 }
 
 // void __libc_init_first (int argc, char *arg0, ...);
-void __pthread_initialize_minimal (void);
+//void __pthread_initialize_minimal (void);
 
 // entry function called from Entry.S
 void entry_glibc (start_info_t *start_info)
 {
-   __pthread_initialize_minimal ();
+//   __pthread_initialize_minimal ();
    fpu_init ();
 
    // check to make sure the initial memory is good
