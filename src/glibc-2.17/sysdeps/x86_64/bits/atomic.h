@@ -16,6 +16,12 @@
    License along with the GNU C Library; if not, see
    <http://www.gnu.org/licenses/>.  */
 
+// !BAM
+// this is getting included multiple time on the uc cluster but no where else?
+// added the include guard
+#ifndef _bam_sysdeps_x86_64_bits_atomic_h_
+#define _bam_sysdeps_x86_64_bits_atomic_h_ 1
+
 #include <stdint.h>
 #include <tls.h>	/* For tcbhead_t.  */
 #include <libc-internal.h>
@@ -470,3 +476,6 @@ typedef uintmax_t uatomic_max_t;
 #define catomic_or(mem, mask) __arch_or_body (__arch_cprefix, mem, mask)
 
 #endif
+
+// !BAM
+#endif	// _bam_sysdeps_x86_64_bits_atomic_h_
