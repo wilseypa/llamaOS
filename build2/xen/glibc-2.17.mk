@@ -1339,6 +1339,7 @@ HEADERS = \
   $(INCDIR)/bits/types.h \
   $(INCDIR)/bits/typesizes.h \
   $(INCDIR)/bits/uio.h \
+  $(INCDIR)/bits/unistd.h \
   $(INCDIR)/bits/utsname.h \
   $(INCDIR)/bits/waitflags.h \
   $(INCDIR)/bits/waitstatus.h \
