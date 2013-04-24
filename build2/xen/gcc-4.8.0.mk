@@ -39,6 +39,8 @@ MAKEFILE_SOURCES += gcc-$(GCC_VERSION).mk
 # gcc-4.7.1 doesn't know this one
 #  -mlong-double-80
 CFLAGS += \
+  -U_FORTIFY_SOURCE \
+  -D__USE_FORTIFY_LEVEL=0 \
   -DIN_GCC \
   -DIN_LIBGCC2 \
   -fbuilding-libgcc \

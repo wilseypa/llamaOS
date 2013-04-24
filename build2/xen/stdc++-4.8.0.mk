@@ -38,6 +38,8 @@ MAKEFILE_SOURCES += stdc++-$(GCC_VERSION).mk
 
 CFLAGS += \
   -Wno-error \
+  -U_FORTIFY_SOURCE \
+  -D__USE_FORTIFY_LEVEL=0 \
   -DIN_GLIBCPP_V3 \
   -DHAVE_CONFIG_H \
   -I $(SRCDIR)/gcc-$(GCC_VERSION)/libstdc++-v3 \
@@ -55,6 +57,8 @@ CPPFLAGS += \
   -Wcast-qual \
   -Wabi \
   -Wno-deprecated \
+  -U_FORTIFY_SOURCE \
+  -D__USE_FORTIFY_LEVEL=0 \
   -D_GNU_SOURCE \
   -I $(SRCDIR)/gcc-$(GCC_VERSION)/libgcc \
   -I $(SRCDIR)/gcc-$(GCC_VERSION)/libstdc++-v3/include/backward \
