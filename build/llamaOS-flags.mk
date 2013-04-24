@@ -324,6 +324,8 @@ MAKEFLAGS = --silent
 XFLAGS = \
   -m64 -g -O1 \
   -Wall \
+  -D__USE_FORTIFY_LEVEL=0 \
+  -D_LIBC_REENTRANT \
   -fno-common \
   -mno-red-zone \
   -fno-reorder-blocks \
