@@ -1344,6 +1344,7 @@ HEADERS = \
   $(INCDIR)/bits/waitflags.h \
   $(INCDIR)/bits/waitstatus.h \
   $(INCDIR)/bits/wchar.h \
+  $(INCDIR)/bits/wchar2.h \
   $(INCDIR)/bits/wordsize.h \
   $(INCDIR)/gnu/stubs.h \
   $(INCDIR)/sys/cdefs.h \
