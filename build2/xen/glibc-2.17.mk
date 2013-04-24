@@ -1330,6 +1330,7 @@ HEADERS = \
   $(INCDIR)/bits/stdio2.h \
   $(INCDIR)/bits/stdio_lim.h \
   $(INCDIR)/bits/stdlib-float.h \
+  $(INCDIR)/bits/stdlib.h \
   $(INCDIR)/bits/string.h \
   $(INCDIR)/bits/string2.h \
   $(INCDIR)/bits/sys_errlist.h \
