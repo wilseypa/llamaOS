@@ -245,6 +245,7 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/ctype/ctype.c \
   glibc-$(GLIBC_VERSION)/ctype/ctype_l.c \
   glibc-$(GLIBC_VERSION)/ctype/isctype.c \
+  glibc-$(GLIBC_VERSION)/debug/chk_fail.c \
   glibc-$(GLIBC_VERSION)/debug/fortify_fail.c \
   glibc-$(GLIBC_VERSION)/debug/readonly-area.c \
   glibc-$(GLIBC_VERSION)/debug/stack_chk_fail.c \
