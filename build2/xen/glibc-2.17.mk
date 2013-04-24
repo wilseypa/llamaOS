@@ -1297,6 +1297,7 @@ HEADERS = \
   $(INCDIR)/bits/environments.h \
   $(INCDIR)/bits/errno.h \
   $(INCDIR)/bits/fcntl.h \
+  $(INCDIR)/bits/fcntl2.h \
   $(INCDIR)/bits/huge_val.h \
   $(INCDIR)/bits/huge_valf.h \
   $(INCDIR)/bits/huge_vall.h \
@@ -1311,6 +1312,7 @@ HEADERS = \
   $(INCDIR)/bits/nan.h \
   $(INCDIR)/bits/param.h \
   $(INCDIR)/bits/poll.h \
+  $(INCDIR)/bits/poll2.h \
   $(INCDIR)/bits/posix_opt.h \
   $(INCDIR)/bits/pthreadtypes.h \
   $(INCDIR)/bits/resource.h \
