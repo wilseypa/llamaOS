@@ -1333,6 +1333,7 @@ HEADERS = \
   $(INCDIR)/bits/stdlib.h \
   $(INCDIR)/bits/string.h \
   $(INCDIR)/bits/string2.h \
+  $(INCDIR)/bits/string3.h \
   $(INCDIR)/bits/sys_errlist.h \
   $(INCDIR)/bits/time.h \
   $(INCDIR)/bits/types.h \
