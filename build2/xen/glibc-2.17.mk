@@ -248,6 +248,8 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/debug/chk_fail.c \
   glibc-$(GLIBC_VERSION)/debug/fortify_fail.c \
   glibc-$(GLIBC_VERSION)/debug/readonly-area.c \
+  glibc-$(GLIBC_VERSION)/debug/snprintf_chk.c \
+  glibc-$(GLIBC_VERSION)/debug/sprintf_chk.c \
   glibc-$(GLIBC_VERSION)/debug/stack_chk_fail.c \
   glibc-$(GLIBC_VERSION)/debug/stack_chk_fail_local.c \
   glibc-$(GLIBC_VERSION)/debug/vsnprintf_chk.c \
