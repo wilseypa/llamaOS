@@ -37,16 +37,20 @@ int MPI_Alltoall(void *sendbuf, int sendcount, MPI_Datatype sendtype,
                  MPI_Comm comm) {
    int size;
    MPI_Comm_size(comm, &size);
+   int rank; 
+   MPI_Comm_rank(comm, &rank);
 
    // Transpose the send buffers amoung the nodes' recv buffers
    char *bufPartPtr = reinterpret_cast<char*>(sendbuf); 
    for (int i = 0; i < size; i++) {
+      if (i == rank) {continue;}
       iSend(bufPartPtr, sendcount, sendtype, i, 
             MPI_FUNC_TAG_ALLTOALL, comm, MPI_CONTEXT_COLLECTIVE); 
       bufPartPtr += sendcount*iSizeof(sendtype);
    }
    bufPartPtr = reinterpret_cast<char*>(recvbuf);
    for (int i = 0; i < size; i++) {
+      if (i == rank) {continue;}
       iReceive(bufPartPtr, recvcount, recvtype, i, 
             MPI_FUNC_TAG_ALLTOALL, comm, MPI_CONTEXT_COLLECTIVE, 0);
       bufPartPtr += recvcount*iSizeof(recvtype);

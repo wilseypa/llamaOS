@@ -364,7 +364,8 @@ c---------------------------------------------------------------------
 
       if (me .eq. 0) then
          write(*, 1000)
-         open (unit=2,file='inputft.data',status='old', iostat=fstatus)
+         fstatus = 1
+c         open (unit=2,file='inputft.data',status='old', iostat=fstatus)
 
          if (fstatus .eq. 0) then
             write(*,233) 

@@ -82,6 +82,7 @@ int MPI_Init (int *argc, char ***argv) {
       cout << "Host table not present: running alone" << endl;
       mpiData.rank = 0;
       mpiData.totNodes = 1;
+      (*argc) = rankIndex-1;
       return MPI_SUCCESS; //No sync necessary
    }
 
@@ -94,6 +95,7 @@ int MPI_Init (int *argc, char ***argv) {
       cout << "Partial host table: running alone" << endl;
       mpiData.rank = 0;
       mpiData.totNodes = 1;
+      (*argc) = rankIndex-1;
       return MPI_SUCCESS; //No sync necessary
    }
 
@@ -158,5 +160,6 @@ int MPI_Init (int *argc, char ***argv) {
 
    //The process waits for the sync to start
    MPI_Barrier(MPI_COMM_WORLD);
+   (*argc) = rankIndex-1;
    return MPI_SUCCESS;
 }

@@ -673,10 +673,9 @@ int main(int argc,char **argv ){
   double bytes_sent=2.0,tot_time=0.0;
 
     MPI_Init( &argc, &argv );
-printf("Starting NAS part\n");
     MPI_Comm_rank( MPI_COMM_WORLD, &my_rank );
     MPI_Comm_size( MPI_COMM_WORLD, &comm_size );
-    /* if(argc!=2||
+    if(argc!=2||
                 (  strncmp(argv[1],"BH",2)!=0
                  &&strncmp(argv[1],"WH",2)!=0
                  &&strncmp(argv[1],"SH",2)!=0
@@ -692,7 +691,7 @@ printf("Starting NAS part\n");
       }
       MPI_Finalize();
       exit(0);
-    } */
+    }
     if(strncmp(argv[1],"BH",2)==0){
       dg=buildBH(CLASS);
     }else if(strncmp(argv[1],"WH",2)==0){
@@ -706,7 +705,7 @@ printf("Starting NAS part\n");
       if(my_rank==0)
         fprintf(stderr,"Not enough timers. Node timeing is off. \n");
     }
-printf("Num nodes: %d   Comm size: %d\n", dg->numNodes, comm_size);
+
     if(dg->numNodes>comm_size){
       if(my_rank==0){
         fprintf(stderr,"**  The number of MPI processes should not be less than \n");
@@ -714,7 +713,6 @@ printf("Num nodes: %d   Comm size: %d\n", dg->numNodes, comm_size);
         fprintf(stderr,"**  Number of MPI processes = %d\n",comm_size);
         fprintf(stderr,"**  Number nodes in the graph = %d\n",dg->numNodes);
       }
-printf("ERROR\n");
 
       MPI_Finalize();
       exit(0);
