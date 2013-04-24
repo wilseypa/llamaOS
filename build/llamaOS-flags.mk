@@ -353,4 +353,11 @@ F90FLAGS = $(XFLAGS) \
 LDFLAGS = -nostdlib \
  -nostartfiles -nodefaultlibs 
 
+ # compiler tools
+CC = gcc
+CXX = g++
+F90 = gfortran
+LD = ld
+AR = ar
+
 -include custom-flags.mk
