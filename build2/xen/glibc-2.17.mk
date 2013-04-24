@@ -1326,6 +1326,7 @@ HEADERS = \
   $(INCDIR)/bits/sigthread.h \
   $(INCDIR)/bits/stat.h \
   $(INCDIR)/bits/stdio.h \
+  $(INCDIR)/bits/stdio2.h \
   $(INCDIR)/bits/stdio_lim.h \
   $(INCDIR)/bits/stdlib-float.h \
   $(INCDIR)/bits/string.h \
