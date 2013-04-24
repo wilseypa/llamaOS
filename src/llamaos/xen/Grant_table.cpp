@@ -29,6 +29,8 @@ either expressed or implied, of the copyright holder(s) or contributors.
 */
 
 #include <malloc.h>
+
+#include <iostream>
 #include <stdexcept>
 
 #include <llamaos/memory/Memory.h>
@@ -43,10 +45,12 @@ using namespace llamaos;
 using namespace llamaos::memory;
 using namespace llamaos::xen;
 
+#define FRAME_LIST_SIZE 32
+
 // for now just map a single page for the table
 Grant_table::Grant_table ()
-   :  size(2 * PAGE_SIZE / sizeof(grant_entry_v1_t)),
-      entries(address_to_pointer<grant_entry_v1_t> (get_reserved_virtual_address (2))),
+   :  size((FRAME_LIST_SIZE * PAGE_SIZE) / sizeof(grant_entry_v1_t)),
+      entries(address_to_pointer<grant_entry_v1_t> (get_reserved_virtual_address (FRAME_LIST_SIZE))),
       avail(),
       inuse()
 {
@@ -54,15 +58,16 @@ Grant_table::Grant_table ()
    trace (" size: %x\n", size);
    trace (" entries: %lx\n", entries);
 
-   unsigned long frame_list [2] = { 0 };
+   unsigned long frame_list [FRAME_LIST_SIZE] = { 0 };
 
    trace ("calling grant_table_setup_table...\n");
-   if (!Hypercall::grant_table_setup_table (2, frame_list))
+   if (!Hypercall::grant_table_setup_table (FRAME_LIST_SIZE, frame_list))
    {
       trace ("failed to create grant table\n");
       throw runtime_error ("failed to create grant table");
    }
 
+#if 0
    trace ("calling update_va_mapping...\n");
    if (!Hypercall::update_va_mapping (pointer_to_address(entries), page_to_address (frame_list [0])))
    {
@@ -78,6 +83,18 @@ Grant_table::Grant_table ()
       throw runtime_error ("failed to map grant table");
    }
    trace ("calling update_va_mapping returned.\n");
+#endif
+
+   for (int i = 0; i < FRAME_LIST_SIZE; i++)
+   {
+      trace ("calling update_va_mapping...\n");
+      if (!Hypercall::update_va_mapping (pointer_to_address(entries) + (i * PAGE_SIZE), page_to_address (frame_list [i])))
+      {
+         trace("failed to map grant table\n");
+         throw runtime_error ("failed to map grant table");
+      }
+      trace ("calling update_va_mapping returned.\n");
+   }
 
    for (grant_ref_t i = 0; i < size; i++)
    {
@@ -97,7 +114,7 @@ grant_ref_t Grant_table::grant_access (domid_t domid, void *address)
    grant_ref_t ref = avail.back ();
    avail.pop_back ();
    inuse.push_back (ref);
-
+//cout << "grant_access (" << domid << ", " << address << ") to " << ref << endl;
    entries [ref].domid = domid;
    entries [ref].frame = virtual_pointer_to_machine_page(address);
 

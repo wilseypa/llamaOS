@@ -364,6 +364,7 @@ int main (int /* argc */, char ** /* argv [] */)
 
    buffer_entry rx_buffers [RX_BUFFERS];
    queue<buffer_entry> rx_hw;
+   queue<buffer_entry> rx_sw;
 
    for (unsigned int i = 0; i < RX_BUFFERS; i++)
    {
@@ -371,13 +372,20 @@ int main (int /* argc */, char ** /* argv [] */)
       rx_buffers [i].address = virtual_pointer_to_machine_address(rx_buffers [i].pointer);
       Hypercall::update_va_mapping_nocache (pointer_to_address (rx_buffers [i].pointer), rx_buffers [i].address);
 
-      rx_desc [i].buffer = rx_buffers [i].address;
-      rx_desc [i].status = 0;
-      rx_hw.push(rx_buffers [i]);
+      if (i < 255)
+      {
+         rx_desc [i].buffer = rx_buffers [i].address;
+         rx_desc [i].status = 0;
+         rx_hw.push(rx_buffers [i]);
+      }
+      else
+      {
+         rx_sw.push(rx_buffers [i]);
+      }
    }
 
    uint16_t rx_head = 0;
-   uint16_t rx_tail = RX_BUFFERS;
+   uint16_t rx_tail = 255; // RX_BUFFERS;
    csr.write_RDT (rx_tail);
 
    // create memory for the control page
@@ -393,29 +401,66 @@ int main (int /* argc */, char ** /* argv [] */)
    llamaNET_ref = Hypervisor::get_instance ()->grant_table.grant_access (self_id+4, llamaNET_control);
    llamaNET_ref = Hypervisor::get_instance ()->grant_table.grant_access (self_id+5, llamaNET_control);
    llamaNET_ref = Hypervisor::get_instance ()->grant_table.grant_access (self_id+6, llamaNET_control);
-   cout << "llamaNET_ref: " << dec << llamaNET_ref << endl;
+   cout << "llamaNET_ref after mapping Control[]: " << dec << llamaNET_ref << endl;
+
+   grant_ref_t *tx_refs [6];
+   grant_ref_t *rx_refs [6];
+
+   for (int i = 0; i < 6; i++)
+   {
+      tx_refs [i] = static_cast<grant_ref_t *>(memalign (PAGE_SIZE, PAGE_SIZE));
+      memset(static_cast<void *>(tx_refs [i]), 0, PAGE_SIZE);
+
+      llamaNET_ref = Hypervisor::get_instance ()->grant_table.grant_access (self_id + 1 + i, tx_refs [i]);
+   }
+   cout << "llamaNET_ref after mapping tx_refs[]: " << dec << llamaNET_ref << endl;
+
+   for (int i = 0; i < 6; i++)
+   {
+      rx_refs [i] = static_cast<grant_ref_t *>(memalign (PAGE_SIZE, PAGE_SIZE));
+      memset(static_cast<void *>(rx_refs [i]), 0, PAGE_SIZE);
+
+      llamaNET_ref = Hypervisor::get_instance ()->grant_table.grant_access (self_id + 1 + i, rx_refs [i]);
+   }
+   cout << "llamaNET_ref after mapping rx_refs[]: " << dec << llamaNET_ref << endl;
 
    // allow tx_buffer guest access
    for (unsigned int i = 0; i < TX_BUFFERS; i++)
    {
-      llamaNET_control->app [0].tx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+1, tx_buffers [i].pointer);
-      llamaNET_control->app [1].tx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+2, tx_buffers [i].pointer);
-      llamaNET_control->app [2].tx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+3, tx_buffers [i].pointer);
-      llamaNET_control->app [3].tx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+4, tx_buffers [i].pointer);
-      llamaNET_control->app [4].tx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+5, tx_buffers [i].pointer);
-      llamaNET_control->app [5].tx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+6, tx_buffers [i].pointer);
+//      llamaNET_control->app [0].tx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+1, tx_buffers [i].pointer);
+//      llamaNET_control->app [1].tx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+2, tx_buffers [i].pointer);
+//      llamaNET_control->app [2].tx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+3, tx_buffers [i].pointer);
+//      llamaNET_control->app [3].tx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+4, tx_buffers [i].pointer);
+//      llamaNET_control->app [4].tx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+5, tx_buffers [i].pointer);
+//      llamaNET_control->app [5].tx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+6, tx_buffers [i].pointer);
+
+      for (int j = 0; j < 6; j++)
+      {
+         grant_ref_t *tx_ref = tx_refs [j];
+         llamaNET_ref = Hypervisor::get_instance ()->grant_table.grant_access (self_id + 1 + j, tx_buffers [i].pointer);
+         tx_ref [i] = llamaNET_ref;
+      }
    }
+   cout << "llamaNET_ref after mapping tx_buffers: " << dec << llamaNET_ref << endl;
 
    // allow rx_buffer guest access
    for (unsigned int i = 0; i < RX_BUFFERS; i++)
    {
-      llamaNET_control->app [0].rx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+1, rx_buffers [i].pointer);
-      llamaNET_control->app [1].rx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+2, rx_buffers [i].pointer);
-      llamaNET_control->app [2].rx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+3, rx_buffers [i].pointer);
-      llamaNET_control->app [3].rx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+4, rx_buffers [i].pointer);
-      llamaNET_control->app [4].rx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+5, rx_buffers [i].pointer);
-      llamaNET_control->app [5].rx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+6, rx_buffers [i].pointer);
+//      llamaNET_control->app [0].rx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+1, rx_buffers [i].pointer);
+//      llamaNET_control->app [1].rx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+2, rx_buffers [i].pointer);
+//      llamaNET_control->app [2].rx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+3, rx_buffers [i].pointer);
+//      llamaNET_control->app [3].rx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+4, rx_buffers [i].pointer);
+//      llamaNET_control->app [4].rx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+5, rx_buffers [i].pointer);
+//      llamaNET_control->app [5].rx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+6, rx_buffers [i].pointer);
+
+      for (int j = 0; j < 6; j++)
+      {
+         grant_ref_t *rx_ref = rx_refs [j];
+         llamaNET_ref = Hypervisor::get_instance ()->grant_table.grant_access (self_id + 1 + j, rx_buffers [i].pointer);
+         rx_ref [i] = llamaNET_ref;
+      }
    }
+   cout << "llamaNET_ref after mapping rx_buffers: " << dec << llamaNET_ref << endl;
 
    llamaNET_control->driver.online = true;
    cout << "starting forever loop..." << endl;
@@ -429,13 +474,21 @@ int main (int /* argc */, char ** /* argv [] */)
    {
       if (rx_desc [rx_head].status != 0)
       {
+         buffer_entry entry;
+         entry.address = rx_desc [rx_head].buffer;
+         rx_sw.push (entry);
+
          head = llamaNET_control->driver.rx_head;
          head++;
          head %= RX_BUFFERS;
          llamaNET_control->driver.rx_head = head;
 
          // !bam can't do this until all guest tail is updated
-         rx_desc [rx_tail].buffer = rx_desc [rx_head].buffer;
+         entry = rx_sw.front ();
+         rx_sw.pop ();
+
+//         rx_desc [rx_tail].buffer = rx_desc [rx_head].buffer;
+         rx_desc [rx_tail].buffer = entry.address;
          rx_desc [rx_tail].checksum = 0;
          rx_desc [rx_tail].error = 0;
          rx_desc [rx_tail].length = 0;

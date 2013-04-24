@@ -63,7 +63,10 @@ static void initialize_mmu (start_info_t *start_info)
    memory::pseudo_table = memory::address_to_pointer<uint64_t> (start_info->mfn_list);
    memory::pseudo_table_size = start_info->nr_pages;
 
-   memory::initialize (start_info->pt_base, start_info->nr_pages, 1024);
+// !BAM
+// need way more reserved pages for enormous grant tables for llamaNET
+//   memory::initialize (start_info->pt_base, start_info->nr_pages, 1024);
+   memory::initialize (start_info->pt_base, start_info->nr_pages, 4096);
 }
 
 static void register_gcc_exports ()

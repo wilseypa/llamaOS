@@ -38,8 +38,15 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 // do not exceed 942 or control structure spills out of grant ref
 // also running out of grant id when running all 6 guests
-#define TX_BUFFERS 48
-#define RX_BUFFERS 96
+// #define TX_BUFFERS 48
+// #define RX_BUFFERS 96
+
+// !BAM
+// buffer grant reference numbers are now in their own pages
+// so we can allocate huge sizes provided the grant framelist
+// and reserved memory space is big enough
+#define TX_BUFFERS 1024
+#define RX_BUFFERS 1024
 
 namespace llamaos {
 namespace net {
@@ -89,8 +96,8 @@ public:
       volatile unsigned int tx_index;
       volatile unsigned int tx_length;
 
-      volatile grant_ref_t rx_refs [RX_BUFFERS];
-      volatile grant_ref_t tx_refs [TX_BUFFERS];
+//      volatile grant_ref_t rx_refs [RX_BUFFERS];
+//      volatile grant_ref_t tx_refs [TX_BUFFERS];
 
    };
 

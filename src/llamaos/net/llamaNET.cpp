@@ -28,6 +28,7 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
+#include <unistd.h>
 #include <iostream>
 
 #include <llamaos/api/sleep.h>
@@ -42,7 +43,8 @@ using namespace llamaos::net;
 using namespace llamaos::xen;
 
 #define HARD_CODED_MACS
-#define BEOWULF1
+#define DALAI_REDPJ
+// #define BEOWULF1
 
 const unsigned int llamaNET::HEADER_LENGTH = sizeof(llamaNET::Protocol_header);
 
@@ -50,18 +52,32 @@ llamaNET::llamaNET (int domd_id, int index)
    :  domd_id(domd_id),
       index(index),
 //      control(domd_id, 510 - index),    // hardcoded 510 for now, eventually use the xenstore
-      control(domd_id, 1022 - index),    // hardcoded 510 for now, eventually use the xenstore
+//      control(domd_id, 1022 - index),    // hardcoded 1022 for now, eventually use the xenstore
+//      control(domd_id, 3070 - index),    // hardcoded 3070 for now, eventually use the xenstore
+      control(domd_id, 16382 - index),    // hardcoded 16382 for now, eventually use the xenstore
       rx_buffers(),
       tx_buffers()
 {
+   cout << "creating llamaNET interface..." << endl;
+   xen::Grant_map<grant_ref_t> tx_refs (domd_id, 16376 - index);
+   xen::Grant_map<grant_ref_t> rx_refs (domd_id, 16370 - index);
+
    for (unsigned int i = 0; i < TX_BUFFERS; i++)
    {
-      tx_buffers.push_back (new Grant_map<Protocol_header>(domd_id, control->app [index].tx_refs [i]));
+//      cout << "  tx_buffer [" << i << "]..." << endl;
+//      tx_buffers.push_back (new Grant_map<Protocol_header>(domd_id, control->app [index].tx_refs [i]));
+//      cout << "mapping tx_refs [" << i << "] = " << tx_refs [i] << endl;
+      tx_buffers.push_back (new Grant_map<Protocol_header>(domd_id, tx_refs.get_pointer () [i]));
    }
+//      sleep (3);
 
    for (unsigned int i = 0; i < RX_BUFFERS; i++)
    {
-      rx_buffers.push_back (new Grant_map<Protocol_header>(domd_id, control->app [index].rx_refs [i], true));
+//      cout << "  rx_buffer [" << i << "]..." << endl;
+//      rx_buffers.push_back (new Grant_map<Protocol_header>(domd_id, control->app [index].rx_refs [i], true));
+//      cout << "mapping rx_refs [" << i << "] = " << rx_refs [i] << endl;
+      rx_buffers.push_back (new Grant_map<Protocol_header>(domd_id, rx_refs.get_pointer () [i], true));
+//      sleep (1);
    }
 }
 
@@ -189,19 +205,7 @@ void llamaNET::send (Protocol_header *header)
 #ifdef HARD_CODED_MACS
 
 #ifdef DALAI_REDPJ
-   if (   (header->dest >= 0)
-       && (header->dest < 6))
-   {
-      // sending to redpj
-      header->eth_dest [0] = 0x68;
-      header->eth_dest [1] = 0x05;
-      header->eth_dest [2] = 0xca;
-      header->eth_dest [3] = 0x01;
-      header->eth_dest [4] = 0xf7;
-      header->eth_dest [5] = 0xdb;
-   }
-   else if (   (header->dest >= 6)
-            && (header->dest < 12))
+   if ((header->dest % 2) == 0)
    {
       // sending to dalai
       header->eth_dest [0] = 0x00;
@@ -213,11 +217,16 @@ void llamaNET::send (Protocol_header *header)
    }
    else
    {
-      // throw exception?
+      // sending to redpj
+      header->eth_dest [0] = 0x68;
+      header->eth_dest [1] = 0x05;
+      header->eth_dest [2] = 0xca;
+      header->eth_dest [3] = 0x01;
+      header->eth_dest [4] = 0xf7;
+      header->eth_dest [5] = 0xdb;
    }
 
-   if (   (header->src >= 0)
-       && (header->src < 6))
+   if ((header->src % 2) == 0)
    {
       // sending from dalai
       header->eth_src [0] = 0x00;
@@ -227,8 +236,7 @@ void llamaNET::send (Protocol_header *header)
       header->eth_src [4] = 0x66;
       header->eth_src [5] = 0xef;
    }
-   else if (   (header->src >= 6)
-            && (header->src < 12))
+   else
    {
       // sending from redpj
       header->eth_src [0] = 0x68;
@@ -238,11 +246,6 @@ void llamaNET::send (Protocol_header *header)
       header->eth_src [4] = 0xf7;
       header->eth_src [5] = 0xdb;
    }
-   else
-   {
-      // throw exception?
-   }
-
 #endif
 
 #ifdef THOR_WILEY
