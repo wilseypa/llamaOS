@@ -28,6 +28,8 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
+#include <unistd.h>
+
 #include <iostream>
 #include <stdexcept>
 
@@ -110,10 +112,21 @@ Hypervisor::Hypervisor (const start_info_t *start_info)
 {
    instance = this;
    trace ("Hypervisor created.\n");
+}
 
-   name = xenstore.read ("name").c_str ();
+Hypervisor::~Hypervisor ()
+{
+
+}
+
+void Hypervisor::initialize ()
+{
+   sleep (1);
+
+   name = xenstore.read_string ("name"); // .c_str ();
+   trace ("Xenstore name: %s\n", name.c_str ()); 
    domid = xenstore.read<domid_t>("domid");
-   trace ("Xenstore name: %s, %d\n", name.c_str (), domid); 
+   trace ("Xenstore domid: %d\n", domid); 
 
 //   trace ("float math: %f, %f, %f\n", 1.0f / 2638.0f, 25 / 43219.0f, 1 / 3.0f);
    trace ("double math: %lf, %lf, %lf\n", 1.0 / 2638.0, 25 / 43219.0, 1 / 3.0);
@@ -127,9 +140,4 @@ Hypervisor::Hypervisor (const start_info_t *start_info)
    {
       argv [i] = '\0';
    }
-}
-
-Hypervisor::~Hypervisor ()
-{
-
 }

@@ -75,11 +75,13 @@ _init (int argc, char **argv, char **envp)
   __environ = envp;
 
 #ifndef SHARED
-  __libc_init_secure ();
+// !BAM
+//  __libc_init_secure ();
 
   /* First the initialization which normally would be done by the
      dynamic linker.  */
-  _dl_non_dynamic_init ();
+// !BAM
+//  _dl_non_dynamic_init ();
 #endif
 
 #ifdef VDSO_SETUP

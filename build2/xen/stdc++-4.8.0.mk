@@ -50,13 +50,14 @@ CFLAGS += \
   -I $(SRCDIR)/gcc-$(GCC_VERSION)/gcc \
   -I $(INCDIR)
 
+#  -Wno-deprecated
+
 CPPFLAGS += \
   -Wall \
   -Wextra \
   -Wwrite-strings \
   -Wcast-qual \
   -Wabi \
-  -Wno-deprecated \
   -U_FORTIFY_SOURCE \
   -D__USE_FORTIFY_LEVEL=0 \
   -D_GNU_SOURCE \
@@ -71,6 +72,8 @@ VPATH = $(SRCDIR)
 
 C_SOURCES = \
   gcc-$(GCC_VERSION)/libiberty/cp-demangle.c
+
+#  gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/strstream.cc
 
 CC_SOURCES = \
   gcc-$(GCC_VERSION)/libstdc++-v3/libsupc++/array_type_info.cc \
@@ -196,7 +199,6 @@ CC_SOURCES = \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/stdexcept.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/streambuf-inst.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/streambuf.cc \
-  gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/strstream.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/time_members.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/tree.cc \
   gcc-$(GCC_VERSION)/libstdc++-v3/src/c++98/valarray.cc \

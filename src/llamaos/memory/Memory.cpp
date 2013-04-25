@@ -238,12 +238,12 @@ bool initialize (uint64_t CR3_virtual_address, uint64_t total_pages, uint64_t re
 
    program_break = address_to_pointer<void>(start_virtual_address);
 
-   trace ("memory initialized\n");
-   trace ("      start_pseudo_page: %lx\n", start_pseudo_page);
-   trace ("        end_pseudo_page: %lx\n", end_pseudo_page);
-   trace ("  start_virtual_address: %lx\n", start_virtual_address);
-   trace ("    end_virtual_address: %lx\n", end_virtual_address);
-   trace ("\n");
+//   trace ("memory initialized\n");
+//   trace ("      start_pseudo_page: %lx\n", start_pseudo_page);
+//   trace ("        end_pseudo_page: %lx\n", end_pseudo_page);
+//   trace ("  start_virtual_address: %lx\n", start_virtual_address);
+//   trace ("    end_virtual_address: %lx\n", end_virtual_address);
+//   trace ("\n");
 
    return true;
 }

@@ -52,14 +52,7 @@ using namespace std;
 using namespace llamaos;
 using namespace llamaos::xen;
 
-uint8_t xen_features [XENFEAT_NR_SUBMAPS * 32];
-
-static void *glibc_brk (void *addr)
-{
-   trace ("glibc calling brk (%lx)\n", addr);
-
-   return memory::set_program_break (addr);
-}
+//uint8_t xen_features [XENFEAT_NR_SUBMAPS * 32];
 
 static inline uint64_t rdtsc ()
 {
@@ -170,7 +163,6 @@ static ssize_t glibc_libc_write (int fd, const void *buf, size_t nbytes)
 
 static void register_glibc_exports (void)
 {
-   register_llamaos_brk (glibc_brk);
    register_llamaos_getpid (glibc_getpid);
    register_llamaos_gettimeofday (glibc_gettimeofday);
    register_llamaos_sleep (glibc_libc_sleep);
@@ -214,16 +206,6 @@ static vector<string> split (const string &input)
    return tokens;
 }
 
-extern "C"
-int __libc_start_main (int (*main) (int, char **, char **),
-                       int argc,
-                       char ** ubp_av,
-                       __typeof (main) init,
-                       void (*fini) (void),
-                       void (*rtld_fini) (void),
-                       void *stack_end);// __attribute__ ((noreturn));
-
-extern void *stack_bottom;
 
 extern "C"
 int main (int argc, char *argv []);
@@ -236,8 +218,6 @@ int __main (int argc, char *argv [], char *env[])
 
 void entry_llamaOS (start_info_t *start_info)
 {
-   register_glibc_exports ();
-
 //   xen_features [XENFEAT_supervisor_mode_kernel] = 1;
 
    try
@@ -246,6 +226,8 @@ void entry_llamaOS (start_info_t *start_info)
       trace ("Creating Hypervisor...\n");
 
       Hypervisor hypervisor (start_info);
+      register_glibc_exports ();
+      hypervisor.initialize ();
 
       // read and create args
       trace ("reading command-line args from extra string\n");
@@ -286,8 +268,8 @@ void entry_llamaOS (start_info_t *start_info)
 
       trace ("Before application main()...\n");
 
-//      main (hypervisor.argc, hypervisor.argv);
-      __libc_start_main(__main, hypervisor.argc, hypervisor.argv, 0, 0, 0, stack_bottom);
+      main (hypervisor.argc, hypervisor.argv);
+//      __libc_start_main(__main, hypervisor.argc, hypervisor.argv, 0, 0, 0, stack_bottom);
 
       // get rid of all leftover console buffer
       cout.flush ();

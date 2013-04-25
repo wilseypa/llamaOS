@@ -36,7 +36,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <llamaos/xen/Hypercall-macros.h>
 #include <llamaos/Trace.h>
 
-#if 1
+#if 0
 static char buffer [512] = { '\0' };
 
 int trace (const char *format, ...)
@@ -51,12 +51,18 @@ int trace (const char *format, ...)
    // term variable arguments
    va_end (arg);
 
-   // write buffer to system output/log
-   // xen::Hypercall::console_io (buffer);
-   HYPERVISOR_console_io(CONSOLEIO_write, count, buffer);
+   if ((count > 0) && (count < sizeof(buffer)))
+   {
+      // write buffer to system output/log
+      // xen::Hypercall::console_io (buffer);
+      HYPERVISOR_console_io(CONSOLEIO_write, count, buffer);
 
-   // return the number characters written
-   return count;
+      // return the number characters written
+      return count;
+   }
+
+   HYPERVISOR_console_io(CONSOLEIO_write, 16, "vsnprintf error\n");
+   return 0;
 }
 #else
 int trace (const char *format, ...)

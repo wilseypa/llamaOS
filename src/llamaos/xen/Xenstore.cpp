@@ -35,11 +35,13 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <iostream>
 #include <sstream>
 
+#include <llamaos/memory/Memory.h>
 #include <llamaos/xen/Hypercall.h>
 #include <llamaos/xen/Xenstore.h>
 #include <llamaos/Trace.h>
 
 using namespace std;
+using namespace llamaos::memory;
 using namespace llamaos::xen;
 
 #define mb()  __asm__ __volatile__ ( "mfence" : : : "memory")
@@ -97,7 +99,7 @@ void Xenstore::end_transaction (uint32_t id)
    read_response ();
 }
 
-string Xenstore::read (const string &key) const
+string Xenstore::read_string (const string &key) const
 {
    // write request to Xenstore
    write_read_request (key);
@@ -126,10 +128,12 @@ void Xenstore::write_request (const char *data, unsigned int length) const
    if (length > XENSTORE_RING_SIZE)
    {
       cout << "Xenstore write: message too long" << endl;
+      cout.flush();
       // throw runtime_error ("Xenstore write: message too long");
       return;
    }
 
+#if 0
    for (unsigned int i = 0; i < length; i++)
    {
       // check for space in the ring
@@ -153,8 +157,7 @@ void Xenstore::write_request (const char *data, unsigned int length) const
       // increment index
       interface->req_prod++;
    }
-
-#if 0
+#else
    // check for space in the ring
    if ((interface->req_prod - interface->req_cons) < length)
    {
@@ -162,7 +165,7 @@ void Xenstore::write_request (const char *data, unsigned int length) const
       Hypercall::event_channel_send (port);
 
       // yield cpu to dom0
-      // llamaos::xen::Hypercall::sched_op_yield ();
+      llamaos::xen::Hypercall::sched_op_yield ();
       mb();
    }
 
@@ -215,55 +218,65 @@ void Xenstore::read_response (char *data, unsigned int length) const
    if (length > XENSTORE_RING_SIZE)
    {
       cout << "Xenstore write: message too long" << endl;
+      cout.flush();
       // throw runtime_error ("Xenstore write: message too long");
       return;
    }
 
-//   XENSTORE_RING_IDX rsp_cons = interface->rsp_cons;
+   XENSTORE_RING_IDX rsp_cons = interface->rsp_cons;
 
    for (unsigned int i = 0; i < length; i++)
    {
-//      while (0 == (interface->rsp_prod - rsp_cons))
-      while (0 == (interface->rsp_prod - interface->rsp_cons))
+      while (0 == (interface->rsp_prod - rsp_cons))
+//      while (0 == (interface->rsp_prod - interface->rsp_cons))
       {
          // yield cpu to dom0
-         // llamaos::xen::Hypercall::sched_op_yield ();
+         llamaos::xen::Hypercall::sched_op_yield ();
          mb ();
       }
 
       // get current index into ring and read data
-//      XENSTORE_RING_IDX index = MASK_XENSTORE_IDX(rsp_cons++);
-      XENSTORE_RING_IDX index = MASK_XENSTORE_IDX(interface->rsp_cons);
+      XENSTORE_RING_IDX index = MASK_XENSTORE_IDX(rsp_cons++);
+//      XENSTORE_RING_IDX index = MASK_XENSTORE_IDX(interface->rsp_cons);
       data [i] = interface->rsp [index];
-      interface->rsp_cons++;
+
+      mb ();
+
+//      interface->rsp_cons++;
    }
 
-//   interface->rsp_cons += length;
+   interface->rsp_cons += length;
 }
 
 string Xenstore::read_response (unsigned int length) const
 {
+   xenstore_domain_interface *_interface = interface;
+   XENSTORE_RING_IDX rsp_cons = _interface->rsp_cons;
+   mb();
+
    stringstream sstream;
-//   XENSTORE_RING_IDX rsp_cons = interface->rsp_cons;
 
    for (unsigned int i = 0; i < length; i++)
    {
-//      while (0 == (interface->rsp_prod - rsp_cons))
-      while (0 == (interface->rsp_prod - interface->rsp_cons))
+      while (0 == (_interface->rsp_prod - rsp_cons))
+//      while (0 == (interface->rsp_prod - interface->rsp_cons))
       {
          // yield cpu to dom0
-         // llamaos::xen::Hypercall::sched_op_yield ();
+         llamaos::xen::Hypercall::sched_op_yield ();
          mb ();
       }
 
       // get current index into ring and read data
-      // XENSTORE_RING_IDX index = MASK_XENSTORE_IDX(rsp_cons++);
-      XENSTORE_RING_IDX index = MASK_XENSTORE_IDX(interface->rsp_cons);
-      sstream << interface->rsp [index];
+      XENSTORE_RING_IDX index = MASK_XENSTORE_IDX(rsp_cons++);
+//      XENSTORE_RING_IDX index = MASK_XENSTORE_IDX(interface->rsp_cons);
+      sstream << _interface->rsp [index];
+
+      wmb ();
       interface->rsp_cons++;
+      mb ();
    }
 
-//   interface->rsp_cons += length;
+   _interface->rsp_cons = rsp_cons;
 
    return sstream.str ();
 }
@@ -278,6 +291,8 @@ string Xenstore::read_response () const
       // !BAM lets not do this now since throw is unreliable
       // throw runtime_error ("Xenstore read: returned invalid request id");
       std::cout << "wrong xenstore msg id detected: " << msg.req_id << " != " << (xenstore_req_id - 1) << std::endl;
+      cout.flush();
+      for (;;);
    }
 
    return read_response (msg.len);

@@ -78,13 +78,13 @@ public:
     * @return value
     *
     */
-   std::string read (const std::string &key) const;
+   std::string read_string (const std::string &key) const;
 
    template <typename T>
    T read (const std::string &key) const
    {
       T t;
-      std::stringstream sstream (read (key));
+      std::stringstream sstream (read_string (key));
 
       if ((sstream >> t).fail ())
       {
@@ -92,6 +92,8 @@ public:
          // don't throw for now 
          // throw std::runtime_error ("failed to convert xenstore string to type");
          std::cout << "failed to convert xenstore string to type: " << sstream.str () << std::endl;
+         std::cout.flush();
+         for (;;);
       }
 
       return t;
@@ -117,6 +119,8 @@ public:
          // don't throw for now 
          // throw std::runtime_error ("failed to convert xenstore type to string");
          std::cout << "failed to convert xenstore string to type: " << sstream.str () << std::endl;
+         std::cout.flush();
+         for (;;);
       }
 
       write (key, sstream.str ());

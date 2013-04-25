@@ -80,7 +80,7 @@ void Console::write (char data) const
       Hypercall::event_channel_send (port);
 
       // yield cpu to dom0
-      // llamaos::xen::Hypercall::sched_op_yield ();
+      llamaos::xen::Hypercall::sched_op_yield ();
       mb();
    }
 
@@ -110,4 +110,14 @@ void Console::write (const char *data, unsigned int length) const
    }
 
    Hypercall::event_channel_send (port);
+
+   // empty in too
+   while ((interface->in_prod - interface->in_cons) > 0)
+   {
+      // increment index
+      interface->in_cons++;
+
+      // ensure write is processed
+      wmb();
+   }
 }

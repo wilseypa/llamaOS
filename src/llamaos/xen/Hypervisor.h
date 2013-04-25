@@ -69,6 +69,8 @@ public:
     */
    virtual ~Hypervisor ();
 
+   void initialize ();
+   
    /**
     * @brief Xen start_info structure.
     *

@@ -31,6 +31,8 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <stdint.h>
 #include <string.h>
 
+#include <xen/features.h>
+#include <xen/version.h>
 #include <xen/xen.h>
 
 #include <llamaos/xen/Entry-gcc.h>
@@ -318,34 +320,94 @@ static void fpu_init(void)
    asm volatile ( "fninit; ldmxcsr %0" : : "m" (val) );
 }
 
-// void __libc_init_first (int argc, char *arg0, ...);
-//void __pthread_initialize_minimal (void);
+static char cmd_line [MAX_GUEST_CMDLINE];
+static int argc;
+static char *argv [64];
+static char *name = "llamaOS";
+
+int __libc_start_main (int (*main) (int, char **, char **),
+                       int argc,
+                       char ** ubp_av,
+                       __typeof (main) init,
+                       void (*fini) (void),
+                       void (*rtld_fini) (void),
+                       void *stack_end);// __attribute__ ((noreturn));
+
+extern void *stack_bottom;
+
+uint8_t xen_features[XENFEAT_NR_SUBMAPS * 32];
+
+void setup_xen_features(void)
+{
+    xen_feature_info_t fi;
+    int i, j;
+
+    for (i = 0; i < XENFEAT_NR_SUBMAPS; i++) 
+    {
+        fi.submap_idx = i;
+        if (HYPERVISOR_xen_version(XENVER_get_features, &fi) < 0)
+            break;
+        
+        for (j=0; j<32; j++)
+            xen_features[i*32+j] = !!(fi.submap & 1<<j);
+    }
+}
 
 // entry function called from Entry.S
 void entry_glibc (start_info_t *start_info)
 {
-//   __pthread_initialize_minimal ();
-   fpu_init ();
-
-   // check to make sure the initial memory is good
-   if (verify_magic (start_info))
+   // check to make sure the start_info_t is valid
+   // at check for the magic string
+   if (   (0 != start_info)
+       && ('x' == start_info->magic [0])
+       && ('e' == start_info->magic [1])
+       && ('n' == start_info->magic [2])
+       && ('-' == start_info->magic [3]))
    {
-      // print the info given from Xen
-      trace_startup (start_info);
+      // put this is assembly *.S
+      fpu_init ();
+
+      setup_xen_features ();
 
       // register our export functions with glibc
-      trace ("registering llamaOS glibc exports...\n");
       register_glibc_exports ();
 
-      // initialize glibc
-      // __libc_init_first (1, "");
+      // Before calling anything from glibc, call the startup
+      // to initialize the library. We need the command line args
+      // for this, which are stored as a string in the start_info
+      argv [argc++] = name;
+      int space = 0;
+
+      for (int i = 0; i < MAX_GUEST_CMDLINE; i++)
+      {
+         cmd_line [i] = start_info->cmd_line [i];
+
+         if (cmd_line [i] == '\0')
+         {
+            break;
+         }
+         else if (   (cmd_line [i] != ' ')
+                  && (space))
+         {
+            argv [argc++] = &cmd_line [i];
+            space = 0;
+         }
+         else
+         {
+            space = 1;
+         }
+      }
+
+      // initialize the c-runtime library
+      __libc_start_main(0, argc, argv, 0, 0, 0, stack_bottom);
+
+      // print the info given from Xen
+      trace_startup (start_info);
 
       // call the C++ entry function
       entry_gcc (start_info);
 
       // cleanup glibc
-
-      // shutdown the hypervisor
    }
    // else
    // !!! ERROR finding Xen memory, so just quietly leave !!!

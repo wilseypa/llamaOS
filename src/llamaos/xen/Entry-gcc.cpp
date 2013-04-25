@@ -37,6 +37,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 #include <llamaos/memory/Memory.h>
 #include <llamaos/xen/Entry-llamaOS.h>
+#include <llamaos/xen/Export-glibc.h>
 #include <llamaos/llamaOS.h>
 #include <llamaos/Trace.h>
 
@@ -67,6 +68,13 @@ static void initialize_mmu (start_info_t *start_info)
 // need way more reserved pages for enormous grant tables for llamaNET
 //   memory::initialize (start_info->pt_base, start_info->nr_pages, 1024);
    memory::initialize (start_info->pt_base, start_info->nr_pages, 4096);
+}
+
+static void *glibc_brk (void *addr)
+{
+   trace ("glibc calling brk (%lx)\n", addr);
+
+   return memory::set_program_break (addr);
 }
 
 static void register_gcc_exports ()
@@ -117,11 +125,12 @@ void entry_gcc (start_info_t *start_info)
 
    // initialize memory management
    initialize_mmu (start_info);
-
-   execute_ctors ();
+   register_llamaos_brk (glibc_brk);
 
    // initialize libstdc++
    ios_base::Init ios_base_init;
+
+   execute_ctors ();
 
    entry_llamaOS (start_info);
 
