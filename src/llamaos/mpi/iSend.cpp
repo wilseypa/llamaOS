@@ -88,8 +88,10 @@ void iSend(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_C
 
       // Print header
       #ifdef MPI_COUT_EVERY_MESSAGE
+      int totParts = sizeInBytes / MAX_MESS_SIZE;
+      if (sizeInBytes % MAX_MESS_SIZE != 0) {totParts++;}
       cout << "Sending to dest " << header->dest << " Context: " << commContext;
-      cout << " Tag: " << tag << " TotSize: " << sizeInBytes << " Part: " << partOn;
+      cout << " Tag: " << tag << " TotSize: " << sizeInBytes << " Part: " << partOn+1 << "/" << totParts;
       cout << endl;
       #endif
 

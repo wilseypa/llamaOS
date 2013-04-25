@@ -75,20 +75,15 @@ void iRxBuffer::pushMessage(unsigned char *buf, int size, int source, int tag, i
    memcpy(dataPt, buf, size);
 }
 
-bool iRxBuffer::popMessage(int source, int tag, void *buf, int size, MPI_Status *status) {
+int iRxBuffer::popMessage(int source, int tag, void *buf, int size, MPI_Status *status) {
    std::list<MpiRxMessage_T>::iterator it = getMessage(source, tag);
-   if (it == buffer.end()) {return false;}
-
-   // Determine if finished building
-   if (it->size != it->curSize) {
-      return false;
-   }
+   if (it == buffer.end()) {return 0;}
 
    // Verify length
    if (size < it->size) { // Will not fit in buffer - discard
       free(it->buf);
       buffer.erase(it);
-      return false;
+      return 0;
    }
 
    // Copy data into buffer
@@ -105,7 +100,7 @@ bool iRxBuffer::popMessage(int source, int tag, void *buf, int size, MPI_Status 
    // Clean up list
    delete[] it->buf;
    buffer.erase(it);
-   return true;
+   return it->curSize;
 }
 
 bool iRxBuffer::probeMessage(int source, int tag, MPI_Status *status) {
