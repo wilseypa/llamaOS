@@ -47,7 +47,7 @@ class iRxBuffer {
       iRxBuffer() {}
       ~iRxBuffer() {}
       void pushMessage(unsigned char *buf, int size, int source, int tag, int totSize, int part);
-      bool popMessage(int source, int tag, void *buf, int size, MPI_Status *status);
+      int popMessage(int source, int tag, void *buf, int size, MPI_Status *status);
       bool probeMessage(int source, int tag, MPI_Status *status);
    private:
       std::list<MpiRxMessage_T> buffer;

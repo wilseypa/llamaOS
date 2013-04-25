@@ -73,7 +73,8 @@ void iReceive(void *buf, int count, MPI_Datatype datatype, int source, int tag,
    #endif
 
    // Check through receive buffer
-   if (rxBuff->popMessage(source, tag, buf, sizeInBytes, status)) { // Message has been popped
+   int curRxSize = rxBuff->popMessage(source, tag, buf, sizeInBytes, status);
+   if (curRxSize == sizeInBytes) { // Message has been popped
       #ifdef MPI_COUT_EVERY_MESSAGE
       cout << "Receive from src " << srcWorldRank << " COMPLETE" << endl;
       #endif
@@ -85,7 +86,6 @@ void iReceive(void *buf, int count, MPI_Datatype datatype, int source, int tag,
    int rxCommContext, rxTag, rxSource, rxTotSize, rxPart;
    MPI_Comm rxComm;
    MPI_Context rxContext;
-   int curRxSize = 0;
    for (;;) {
       // Receive most recent packet and extract needed information
       header = llamaNetInterface->recv(mpiData.rank);
@@ -100,8 +100,10 @@ void iReceive(void *buf, int count, MPI_Datatype datatype, int source, int tag,
 
       // Print header
       #ifdef MPI_COUT_EVERY_MESSAGE
+      int totParts = rxTotSize / MAX_MESS_SIZE;
+      if (rxTotSize % MAX_MESS_SIZE != 0) {totParts++;}
       cout << "Received from src " << header->src << " Context: " << rxCommContext;
-      cout << " Tag: " << rxTag << " TotSize: " << rxTotSize << " Part: " << rxPart;
+      cout << " Tag: " << rxTag << " TotSize: " << rxTotSize << " Part: " << rxPart+1 << "/" << totParts;
       cout << endl;
       #endif
 
