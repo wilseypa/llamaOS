@@ -43,17 +43,13 @@ int MPI_Alltoallv(void *sendbuf, int *sendcnts, int *sdispls,
    // Transpose the send buffers amoung the nodes' recv buffers
    for (int i = 0; i < size; i++) {
       char *bufPartPtr = reinterpret_cast<char*>(sendbuf) + sdispls[i]*iSizeof(sendtype);
-      if (i != rank) {
-         iSend(bufPartPtr, sendcnts[i], sendtype, i, 
-               MPI_FUNC_TAG_ALLTOALLV, comm, MPI_CONTEXT_COLLECTIVE);
-      }
+      iSend(bufPartPtr, sendcnts[i], sendtype, i, 
+            MPI_FUNC_TAG_ALLTOALLV, comm, MPI_CONTEXT_COLLECTIVE);
    }
    for (int i = 0; i < size; i++) {
       char *bufPartPtr = reinterpret_cast<char*>(recvbuf) + rdispls[i]*iSizeof(recvtype);
-      if (i != rank) {
-         iReceive(bufPartPtr, recvcnts[i], recvtype, i, 
-               MPI_FUNC_TAG_ALLTOALLV, comm, MPI_CONTEXT_COLLECTIVE, 0);
-      }
+      iReceive(bufPartPtr, recvcnts[i], recvtype, i, 
+            MPI_FUNC_TAG_ALLTOALLV, comm, MPI_CONTEXT_COLLECTIVE, 0);
    }
 
    return MPI_SUCCESS;
