@@ -468,12 +468,7 @@ int main (int /* argc */, char ** /* argv [] */)
    int cleanup_delay = 0;
    unsigned int head = 0;
 
-   unsigned int next_tx_index = 0;
    queue<unsigned int> tx_indexes;
-
-   unsigned int last_tx_index1 = 255;
-   unsigned int last_tx_index2 = 255;
-   unsigned int last_tx_index3 = 255;
 
    for (;;)
    {
@@ -512,23 +507,6 @@ int main (int /* argc */, char ** /* argv [] */)
          if (llamaNET_control->app [i].tx_request)
          {
             unsigned int index = llamaNET_control->app [i].tx_index;
-
-            if (index == last_tx_index1)
-            {
-               cout << "send index is tx_index1: " << index << endl; 
-            }
-            else if (index == last_tx_index2)
-            {
-               cout << "send index is tx_index2: " << index << endl; 
-            }
-            else if (index == last_tx_index3)
-            {
-               cout << "send index is tx_index3: " << index << endl; 
-            }
-
-            last_tx_index3 = last_tx_index2;
-            last_tx_index2 = last_tx_index1;
-            last_tx_index1 = index;
 
             tx_desc [tx_tail].buffer = tx_buffers [index].address;
             tx_desc [tx_tail].length = llamaNET_control->app [i].tx_length;
