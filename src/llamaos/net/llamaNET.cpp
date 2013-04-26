@@ -42,7 +42,7 @@ using namespace llamaos::memory;
 using namespace llamaos::net;
 using namespace llamaos::xen;
 
-#define HARD_CODED_MACS
+// #define HARD_CODED_MACS
 #define DALAI_REDPJ
 // #define BEOWULF1
 
@@ -59,6 +59,9 @@ llamaNET::llamaNET (int domd_id, int index)
       tx_buffers()
 {
    cout << "creating llamaNET interface..." << endl;
+
+//   Hypercall::update_va_mapping_nocache (pointer_to_address (control.get_pointer ()), virtual_pointer_to_machine_address(control.get_pointer ()));
+
    xen::Grant_map<grant_ref_t> tx_refs (domd_id, 16376 - index);
    xen::Grant_map<grant_ref_t> rx_refs (domd_id, 16370 - index);
 
@@ -121,9 +124,6 @@ llamaNET::Protocol_header *llamaNET::recv ()
          return tx_buffers [control->app [index].tx_tail]->get_pointer ();
       }
    }
-//      while (!recv_poll ());
-
-//   return rx_buffers [control->app [index].rx_tail]->get_pointer ();
 }
 
 llamaNET::Protocol_header *llamaNET::recv (uint32_t node)
@@ -190,8 +190,14 @@ llamaNET::Protocol_header *llamaNET::get_send_buffer ()
 
    // get next index
    control->app [index].tx_index = __sync_fetch_and_add (&control->driver.next_tx_index, 1) % TX_BUFFERS;
-
+   // cout << "get_send_buffer " << control->app [index].tx_index << endl;
    // need atomic increment before this works with multiple llamaNET instances
+   // control->app [index].tx_index_request = true;
+
+   // wait for driver to deliver index
+   // while (control->app [index].tx_index_request);
+   // mb ();
+
    return tx_buffers [control->app [index].tx_index]->get_pointer ();
 }
 

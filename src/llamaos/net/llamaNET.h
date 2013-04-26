@@ -80,6 +80,7 @@ public:
 
       volatile unsigned int rx_head;
       volatile unsigned int tx_head;
+
       volatile unsigned int next_tx_index;
 
    };
@@ -95,9 +96,6 @@ public:
       volatile bool tx_request;
       volatile unsigned int tx_index;
       volatile unsigned int tx_length;
-
-//      volatile grant_ref_t rx_refs [RX_BUFFERS];
-//      volatile grant_ref_t tx_refs [TX_BUFFERS];
 
    };
 
@@ -135,6 +133,8 @@ private:
    std::vector<xen::Grant_map<Protocol_header> *> rx_buffers;
    std::vector<xen::Grant_map<Protocol_header> *> tx_buffers;
 
+//   protected:
+//   int& __sync_fetch_and_add(volatile unsigned int* next_tx_index, int arg2);
 };
 
 } }

@@ -59,7 +59,8 @@ static domid_t get_domd_id (int node)
 
 llamaNET::llamaNET (int argc, char *argv [])
    :  node(parse<uint32_t>(argc, argv, "--node", 0U)),
-      client((node % 2) == 0),
+//      client((node % 2) != 0),
+      client(node == 2),
       interface(get_domd_id (node), (node / 2))
 {
    cout << "latency-llamaNET" << endl
@@ -103,8 +104,10 @@ bool llamaNET::run_verify (unsigned long msg_size)
    // dalai initiates the trial
    if (client)
    {
+//      cout << "waiting for send..." << endl;
       header = interface.get_send_buffer ();
-      header->dest = (node % 2) ? (node - 1) : (node + 1);
+//      header->dest = (node % 2) ? (node - 1) : (node + 1);
+      header->dest = (node == 2) ? 0 : 2;
       header->src = node;
       header->type = 1;
       header->seq = seq++;
@@ -116,9 +119,13 @@ bool llamaNET::run_verify (unsigned long msg_size)
       // marks all bytes with alpha chars (a,b,c,...)
       mark_data_alpha (data, msg_size);
 
+//      cout << "sending..." << endl;
       // send/recv and verify the data has been changed to numerals (1,2,3,...)
       interface.send (header);
+
+//      cout << "waiting for recv..." << endl;
       header = interface.recv (node);
+//      cout << "recved..." << endl;
 
       // get pointer to data section of buffer
       data = reinterpret_cast<unsigned char *>(header + 1);
@@ -127,22 +134,28 @@ bool llamaNET::run_verify (unsigned long msg_size)
       {
          interface.release_recv_buffer (header);
 
+//         cout << "verified" << endl;
          return true;
       }
    }
    else
    {
+//      cout << "waiting for recv..." << endl;
       header = interface.recv (node);
+//      cout << "recved..." << endl;
 
       // get pointer to data section of buffer
       data = reinterpret_cast<unsigned char *>(header + 1);
 
       if (verify_data_alpha (data, msg_size))
       {
+//         cout << "verified" << endl;
          interface.release_recv_buffer (header);
 
+//      cout << "waiting for send..." << endl;
          header = interface.get_send_buffer ();
-         header->dest = (node % 2) ? (node - 1) : (node + 1);
+//         header->dest = (node % 2) ? (node - 1) : (node + 1);
+         header->dest = (node == 2) ? 0 : 2;
          header->src = node;
          header->type = 1;
          header->seq = seq++;
@@ -154,6 +167,7 @@ bool llamaNET::run_verify (unsigned long msg_size)
          // marks all bytes with numerals and send
          mark_data_numeric (data, msg_size);
 
+//      cout << "sending..." << endl;
          interface.send (header);
          return true;
       }
@@ -176,16 +190,21 @@ bool llamaNET::run_trial (unsigned long msg_size, unsigned long trial_number)
    // dalai initiates the trial
    if (client)
    {
+//      cout << "waiting for send..." << endl;
       header = interface.get_send_buffer ();
-      header->dest = (node % 2) ? (node - 1) : (node + 1);
+//      header->dest = (node % 2) ? (node - 1) : (node + 1);
+      header->dest = (node == 2) ? 0 : 2;
       header->src = node;
       header->type = 1;
       header->seq = seq++;
       header->len = msg_size;
 
+//      cout << "sending..." << endl;
       interface.send (header);
 
+//      cout << "waiting for recv..." << endl;
       header = interface.recv (node);
+//      cout << "recved..." << endl;
 
       // get pointer to data section of buffer
       data = reinterpret_cast<unsigned char *>(header + 1);
@@ -197,16 +216,21 @@ bool llamaNET::run_trial (unsigned long msg_size, unsigned long trial_number)
          return false;
       }
 
+//         cout << "verified" << endl;
       interface.release_recv_buffer (header);
       return true;
    }
    else
    {
+//      cout << "waiting for recv..." << endl;
       header = interface.recv (node);
+//      cout << "recved..." << endl;
       interface.release_recv_buffer (header);
 
+//      cout << "waiting for send..." << endl;
       header = interface.get_send_buffer ();
-      header->dest = (node % 2) ? (node - 1) : (node + 1);
+//      header->dest = (node % 2) ? (node - 1) : (node + 1);
+      header->dest = (node == 2) ? 0 : 2;
       header->src = node;
       header->type = 1;
       header->seq = seq++;
@@ -218,6 +242,7 @@ bool llamaNET::run_trial (unsigned long msg_size, unsigned long trial_number)
       // place trial number in first "int" for master to verify
       *(reinterpret_cast<unsigned long *>(data)) = trial_number++;
 
+//      cout << "sending..." << endl;
       interface.send (header);
       return true;
    }

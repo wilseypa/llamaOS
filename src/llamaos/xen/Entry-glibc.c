@@ -353,6 +353,8 @@ void setup_xen_features(void)
     }
 }
 
+static start_info_t local_start_info;
+
 // entry function called from Entry.S
 void entry_glibc (start_info_t *start_info)
 {
@@ -401,11 +403,12 @@ void entry_glibc (start_info_t *start_info)
       // initialize the c-runtime library
       __libc_start_main(0, argc, argv, 0, 0, 0, stack_bottom);
 
+      memcpy(&local_start_info, start_info, sizeof(start_info_t));
       // print the info given from Xen
-      trace_startup (start_info);
+      trace_startup (&local_start_info);
 
       // call the C++ entry function
-      entry_gcc (start_info);
+      entry_gcc (&local_start_info);
 
       // cleanup glibc
    }
