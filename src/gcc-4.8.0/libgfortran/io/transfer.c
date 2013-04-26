@@ -718,10 +718,8 @@ write_block (st_parameter_dt *dtp, int length)
 	    dtp->u.p.current_unit->bytes_left = dtp->u.p.current_unit->recl;
 	  else
 	    {
-// !BAM
-          dtp->u.p.current_unit->bytes_left = dtp->u.p.current_unit->recl;
-//	      generate_error (&dtp->common, LIBERROR_EOR, NULL);
-//	      return NULL;
+	      generate_error (&dtp->common, LIBERROR_EOR, NULL);
+	      return NULL;
 	    }
 	}
 

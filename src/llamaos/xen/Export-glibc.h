@@ -38,6 +38,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <sys/time.h>
 #include <sys/types.h>
 #include <sys/uio.h>
+#include <sys/stat.h>
 
 #ifdef __cplusplus
 #define EXTERN extern "C"
@@ -53,13 +54,33 @@ typedef int64_t off64_t;
 typedef void (*llamaos_abort_t) (void);
 EXTERN void register_llamaos_abort (llamaos_abort_t abort);
 
+// int __access (const char *file, int type)
+typedef int (*llamaos_access_t) (const char *, int);
+EXTERN void register_llamaos_access (llamaos_access_t access);
+
 // int brk (void *addr)
 typedef void *(*llamaos_brk_t) (void *);
 EXTERN void register_llamaos_brk (llamaos_brk_t brk);
 
+// int __close (int fd)
+typedef int (*llamaos_close_t) (int);
+EXTERN void register_llamaos_close (llamaos_close_t close);
+
+// int __dup (int fd)
+typedef int (*llamaos_dup_t) (int);
+EXTERN void register_llamaos_dup (llamaos_dup_t dup);
+
+// int __dup2 (int fd, int fd2)
+typedef int (*llamaos_dup2_t) (int, int);
+EXTERN void register_llamaos_dup2 (llamaos_dup2_t dup2);
+
 // void _exit (int status)
 typedef void (*llamaos_exit_t) (int);
 EXTERN void register_llamaos_exit (llamaos_exit_t exit);
+
+// int __ftruncate (int fd, off_t length)
+typedef int (*llamaos_ftruncate_t) (int, off_t);
+EXTERN void register_llamaos_ftruncate (llamaos_ftruncate_t ftruncate);
 
 // long int get_avphys_pages (void)
 typedef long int (*llamaos_get_avphys_pages_t) (void);
@@ -105,9 +126,17 @@ EXTERN void register_llamaos_libc_fatal (llamaos_libc_fatal_t libc_fatal);
 typedef int (*llamaos_libc_open_t) (const char *, int);
 EXTERN void register_llamaos_libc_open (llamaos_libc_open_t libc_open);
 
+// off_t __lseek (int fd, off_t offset, int whence)
+typedef off_t (*llamaos_lseek_t) (int, off_t, int);
+EXTERN void register_llamaos_lseek (llamaos_lseek_t func);
+
 // off64_t __libc_lseek64 (int fd, off64_t offset, int whence)
 typedef off64_t (*llamaos_lseek64_t) (int, off64_t, int);
 EXTERN void register_llamaos_lseek64 (llamaos_lseek64_t func);
+
+// int __lxstat64 (int vers, const char *file, struct stat64 *buf)
+typedef int (*llamaos_lxstat64_t) (int, const char *, struct stat64 *);
+EXTERN void register_llamaos_lxstat64 (llamaos_lxstat64_t func);
 
 // int madvise (__ptr_t addr, size_t len, int advice)
 typedef int (*llamaos_madvise_t) (__ptr_t, size_t, int);
@@ -157,6 +186,10 @@ EXTERN void register_llamaos_sleep (llamaos_sleep_t sleep);
 typedef long int (*llamaos_syscall_t) (long int);
 EXTERN void register_llamaos_syscall (llamaos_syscall_t syscall);
 
+// int unlink (const char *name)
+typedef int (*llamaos_unlink_t) (const char *);
+EXTERN void register_llamaos_unlink (llamaos_unlink_t unlink);
+
 // ssize_t libc_write (int fd, const void *buf, size_t nbytes)
 typedef ssize_t (*llamaos_write_t) (int, const void *, size_t);
 EXTERN void register_llamaos_write (llamaos_write_t write);
@@ -164,5 +197,13 @@ EXTERN void register_llamaos_write (llamaos_write_t write);
 // ssize_t __libc_writev (int fd, const struct iovec *vector, int count)
 typedef ssize_t (*llamaos_writev_t) (int, const struct iovec *, int);
 EXTERN void register_llamaos_writev (llamaos_writev_t func);
+
+// int __xstat (int vers, const char *file, struct stat *buf)
+typedef int (*llamaos_xstat_t) (int, const char *, struct stat *);
+EXTERN void register_llamaos_xstat (llamaos_xstat_t func);
+
+// int __xstat64 (int vers, const char *file, struct stat64 *buf)
+typedef int (*llamaos_xstat64_t) (int, const char *, struct stat64 *);
+EXTERN void register_llamaos_xstat64 (llamaos_xstat64_t func);
 
 #endif	//  llamaos_xen_export_glibc_h_

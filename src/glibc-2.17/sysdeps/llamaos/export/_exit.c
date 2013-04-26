@@ -52,9 +52,11 @@ void _exit (int status)
    {
       llamaos_exit (status & 0xff);
    }
-
-   __set_errno (ENOSYS);
-   abort ();
+   else
+   {
+      __set_errno (ENOSYS);
+      abort ();
+   }
 }
 libc_hidden_def (_exit)
 weak_alias (_exit, _Exit)

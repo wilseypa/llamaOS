@@ -151,9 +151,17 @@ maybe_find_addr2line (void)
 extern void set_options (int , int []);
 export_proto(set_options);
 
+// !BAM
+// init from main.c
+void init (void);
+
 void
 set_options (int num, int options[])
 {
+   // !BAM
+   // call this here since it's not getting called by linker script
+   init ();
+
   if (num >= 1)
     compile_options.warn_std = options[0];
   if (num >= 2)

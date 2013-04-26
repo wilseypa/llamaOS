@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012, William Magato
+Copyright (c) 2013, William Magato
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -31,33 +31,33 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <errno.h>
 
 // define function pointer
-typedef unsigned int (*llamaos_sleep_t) (unsigned int);
+typedef int (*llamaos_unlink_t) (const char *);
 
 // function pointer variable
-static llamaos_sleep_t llamaos_sleep = 0;
+static llamaos_unlink_t llamaos_unlink = 0;
 
 // function called by llamaOS to register pointer
-void register_llamaos_sleep (llamaos_sleep_t func)
+void register_llamaos_unlink (llamaos_unlink_t func)
 {
-   llamaos_sleep = func;
+   llamaos_unlink = func;
 }
 
-/* Make the process sleep for SECONDS seconds, or until a signal arrives
-   and is not ignored.  The function returns the number of seconds less
-   than SECONDS which it actually slept (zero if it slept the full time).
-   If a signal handler does a `longjmp' or modifies the handling of the
-   SIGALRM signal while inside `sleep' call, the handling of the SIGALRM
-   signal afterwards is undefined.  There is no return value to indicate
-   error, but if `sleep' returns SECONDS, it probably didn't work.  */
-unsigned int
-__sleep (unsigned int seconds)
+/* Remove the link named NAME.  */
+int __unlink (const char *name)
 {
-   if (0 != llamaos_sleep)
+   if (name == NULL)
    {
-      return llamaos_sleep (seconds);
+      __set_errno (EINVAL);
+      return -1;
+   }
+
+   if (0 != llamaos_unlink)
+   {
+      return llamaos_unlink (name);
    }
 
    __set_errno (ENOSYS);
-   return seconds;
+   return -1;
 }
-weak_alias (__sleep, sleep)
+
+weak_alias (__unlink, unlink)

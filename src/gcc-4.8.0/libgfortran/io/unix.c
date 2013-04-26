@@ -1360,11 +1360,9 @@ open_external (st_parameter_open *opp, unit_flags *flags)
       fd = regular_file (opp, flags);
     }
 
-// !BAM
-//  if (fd < 0)
-//    return NULL;
-//  fd = fix_fd (fd);
-  fd = 1;
+  if (fd < 0)
+    return NULL;
+  fd = fix_fd (fd);
 
   return fd_to_stream (fd);
 }

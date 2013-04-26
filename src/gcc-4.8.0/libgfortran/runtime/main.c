@@ -212,8 +212,10 @@ get_args (int *argc, char ***argv)
 
 
 /* Initialize the runtime library.  */
-
-static void __attribute__((constructor))
+// !BAM
+// static void __attribute__((constructor))
+void init (void);
+void
 init (void)
 {
   /* Figure out the machine endianness.  */

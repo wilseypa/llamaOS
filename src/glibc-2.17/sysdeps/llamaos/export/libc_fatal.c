@@ -58,8 +58,10 @@ void __libc_fatal (const char *message)
    {
       llamaos_libc_fatal (message);
    }
-
-   __set_errno (ENOSYS);
-   abort ();
+   else
+   {
+      __set_errno (ENOSYS);
+      abort ();
+   }
 }
 libc_hidden_def (__libc_fatal)

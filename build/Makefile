@@ -46,21 +46,21 @@ all:
 #	@$(MAKE) -f stdc++-$(GCC_VERSION).mk
 	@$(MAKE) -f xen-$(XEN_VERSION).mk
 	@$(MAKE) -f llamaOS.mk xen
-#	@$(MAKE) -f llamaOS-xen-test.mk xen
-	@$(MAKE) -f llamaMPI.mk
-	@$(MAKE) -f llamaMPIF.mk
-	@$(MAKE) -f apps/hello-f77-llamaOS.mk xen
+##	@$(MAKE) -f llamaOS-xen-test.mk xen
+#	@$(MAKE) -f llamaMPI.mk
+#	@$(MAKE) -f llamaMPIF.mk
+#	@$(MAKE) -f apps/hello-f77-llamaOS.mk xen
 	@$(MAKE) -f apps/hello-f90-llamaOS.mk xen
 	@$(MAKE) -f apps/hello.mk xen
-	@$(MAKE) -f apps/latency-llamaMPI.mk
-	@$(MAKE) -f apps/testMPI-llamaMPI.mk
-	@$(MAKE) -f apps/testMPIF-llamaMPI.mk xen
-	@$(MAKE) -f apps/NAS/NAS.mk
-	@$(MAKE) -f apps/latency-llamaNET.mk
-#	@$(MAKE) -f apps/lspci.mk xen
-	@$(MAKE) -f net/i82574.mk xen
-#	@$(MAKE) -f net/i80003es2lan.mk xen
-#	@$(MAKE) -f apps/IMB-llamaMPI.mk
+#	@$(MAKE) -f apps/latency-llamaMPI.mk
+#	@$(MAKE) -f apps/testMPI-llamaMPI.mk
+#	@$(MAKE) -f apps/testMPIF-llamaMPI.mk xen
+#	@$(MAKE) -f apps/NAS/NAS.mk
+#	@$(MAKE) -f apps/latency-llamaNET.mk
+##	@$(MAKE) -f apps/lspci.mk xen
+#	@$(MAKE) -f net/i82574.mk xen
+##	@$(MAKE) -f net/i80003es2lan.mk xen
+##	@$(MAKE) -f apps/IMB-llamaMPI.mk
 
 #	@$(MAKE) -f gtest-$(GTEST_VERSION).mk
 #	@$(MAKE) -f apps/netpipe-llamaNET.mk

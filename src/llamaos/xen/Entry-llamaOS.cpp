@@ -152,7 +152,8 @@ static unsigned int glibc_libc_sleep (unsigned int seconds)
 static ssize_t glibc_libc_write (int fd, const void *buf, size_t nbytes)
 {
    if (   (stdout->_fileno != fd)
-       && (stderr->_fileno != fd))
+       && (stderr->_fileno != fd)
+       && (6 != fd))                    // fortran uses 6 for alt std output
    {
       cout << "Alert: writing to fileno " << fd << endl;
    }

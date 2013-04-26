@@ -36,7 +36,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <llamaos/xen/Hypercall-macros.h>
 #include <llamaos/Trace.h>
 
-#if 0
+#if 1
 static char buffer [512] = { '\0' };
 
 int trace (const char *format, ...)

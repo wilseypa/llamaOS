@@ -53,8 +53,10 @@ void abort (void)
    {
       llamaos_abort ();
    }
-
-   __set_errno (ENOSYS);
-   for (;;);
+   else
+   {
+      __set_errno (ENOSYS);
+      for (;;);
+   }
 }
 libc_hidden_def (abort)

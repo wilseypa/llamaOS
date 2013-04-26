@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012, William Magato
+Copyright (c) 2013, William Magato
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -31,33 +31,39 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <errno.h>
 
 // define function pointer
-typedef unsigned int (*llamaos_sleep_t) (unsigned int);
+typedef int (*llamaos_dup2_t) (int, int);
 
 // function pointer variable
-static llamaos_sleep_t llamaos_sleep = 0;
+static llamaos_dup2_t llamaos_dup2 = 0;
 
 // function called by llamaOS to register pointer
-void register_llamaos_sleep (llamaos_sleep_t func)
+void register_llamaos_dup2 (llamaos_dup2_t func)
 {
-   llamaos_sleep = func;
+   llamaos_dup2 = func;
 }
 
-/* Make the process sleep for SECONDS seconds, or until a signal arrives
-   and is not ignored.  The function returns the number of seconds less
-   than SECONDS which it actually slept (zero if it slept the full time).
-   If a signal handler does a `longjmp' or modifies the handling of the
-   SIGALRM signal while inside `sleep' call, the handling of the SIGALRM
-   signal afterwards is undefined.  There is no return value to indicate
-   error, but if `sleep' returns SECONDS, it probably didn't work.  */
-unsigned int
-__sleep (unsigned int seconds)
+/* Duplicate FD to FD2, closing the old FD2 and making FD2 be
+   open the same file as FD is.  Return FD2 or -1.  */
+int __dup2 (int fd, int fd2)
 {
-   if (0 != llamaos_sleep)
+   if (fd < 0 || fd2 < 0)
    {
-      return llamaos_sleep (seconds);
+      __set_errno (EBADF);
+      return -1;
+   }
+
+   if (fd == fd2)
+      /* No way to check that they are valid.  */
+      return fd2;
+
+   if (0 != llamaos_dup2)
+   {
+      return llamaos_dup2 (fd, fd2);
    }
 
    __set_errno (ENOSYS);
-   return seconds;
+   return -1;
 }
-weak_alias (__sleep, sleep)
+libc_hidden_def (__dup2)
+
+weak_alias (__dup2, dup2)

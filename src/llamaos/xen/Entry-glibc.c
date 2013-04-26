@@ -45,16 +45,16 @@ either expressed or implied, of the copyright holder(s) or contributors.
 // runtime stack memory
 // char RUNTIME_STACK [2 * LLAMAOS_STACK_SIZE];
 
-static int verify_magic (const start_info_t *start_info)
-{
-   if (   (0 != start_info)
-       && (0 == strncmp (start_info->magic, "xen-", 4)))
-   {
-      return 1;
-   }
-
-   return 0;
-}
+// static int verify_magic (const start_info_t *start_info)
+// {
+//   if (   (0 != start_info)
+//       && (0 == strncmp (start_info->magic, "xen-", 4)))
+//   {
+//      return 1;
+//   }
+//
+//   return 0;
+//}
 
 static void trace_startup (const start_info_t *start_info)
 {
@@ -93,10 +93,46 @@ static void glibc_abort (void)
    HYPERVISOR_sched_op(SCHEDOP_shutdown, &arg);
 }
 
+int glibc_access (const char *file, int type)
+{
+   if (strcmp (file, "fort.6") == 0)
+   {
+      return 0;
+   }
+
+   trace("!!! ALERT: glibc calling access() before file system support is enabled.\n");
+   trace (" file %s, %x\n", file, type);
+
+   errno = ENOENT;
+   return -1;
+}
+
 static void *glibc_brk (void *addr)
 {
    trace("!!! ALERT: glibc calling brk() before memory management is enabled.\n");
    return 0;
+}
+
+static int glibc_close (int fd)
+{
+   trace("!!! ALERT: glibc calling close() on %d.\n", fd);
+   return 0;
+}
+
+static int glibc_dup (int fd)
+{
+   trace("!!! ALERT: glibc calling dup() on %d.\n", fd);
+
+   errno = EBADF;
+   return -1;
+}
+
+static int glibc_dup2 (int fd, int fd2)
+{
+   trace("!!! ALERT: glibc calling dup2() on %d and %d.\n", fd, fd2);
+
+   errno = EBADF;
+   return -1;
 }
 
 static void glibc_exit (int status)
@@ -106,6 +142,17 @@ static void glibc_exit (int status)
    sched_shutdown_t arg;
    arg.reason = SHUTDOWN_poweroff;
    HYPERVISOR_sched_op(SCHEDOP_shutdown, &arg);
+}
+
+static int glibc_ftruncate (int fd, off_t length)
+{
+   if (fd == 6)
+   {
+      return 0;
+   }
+
+   trace("!!! ALERT: glibc calling glibc_ftruncate() %d, %d.\n", fd, length);
+   return 0;
 }
 
 static long int glibc_get_avphys_pages (void)
@@ -139,8 +186,6 @@ static long int glibc_get_phys_pages (void)
 
 static char *glibc_getcwd (char *buf, size_t size)
 {
-   trace("!!! ALERT: glibc calling getcwd() before file system support is enabled.\n");
-
    if (   (buf != 0)
        && (size >= 2))
    {
@@ -150,6 +195,7 @@ static char *glibc_getcwd (char *buf, size_t size)
       return buf;
    }
 
+   trace("!!! ALERT: glibc calling getcwd() before file system support is enabled.\n");
    return 0;
 }
 
@@ -181,17 +227,42 @@ static void glibc_libc_fatal (const char *message)
    HYPERVISOR_sched_op(SCHEDOP_shutdown, &arg);
 }
 
-#include <stdio.h>
 static int glibc_libc_open (const char *file, int oflag)
 {
+   if (strcmp (file, "fort.6") == 0)
+   {
+      return 6;
+   }
+
    trace("!!! ALERT: glibc calling libc_open() before file system support is enabled.\n");
-//   return -1;
-   return 1;
+   trace (" opening file %s, %x\n", file, oflag);
+
+   errno = ENOENT;
+   return -1;
+}
+
+static off_t glibc_lseek (int fd, off_t offset, int whence)
+{
+   if (fd == 6)
+   {
+      return offset;
+   }
+
+   trace("!!! ALERT: glibc calling lseek() before file system support is enabled.\n");
+   trace ("   fd: %d, offset: %d, whence: %d\n", fd, offset, whence);
+   return -1;
 }
 
 static off64_t glibc_lseek64 (int fd, off64_t offset, int whence)
 {
    trace("!!! ALERT: glibc calling lseek64() before file system support is enabled.\n");
+   return -1;
+}
+
+static int glibc_lxstat64 (int vers, const char *file, struct stat64 *buf)
+{
+   trace("!!! ALERT: glibc calling lxstat64() before file system support is enabled.\n");
+   trace ("  vers: %d, file: %s\n", vers, file);
    return -1;
 }
 
@@ -255,7 +326,7 @@ static int glibc_sigsuspend_nocancel (const sigset_t *set)
    return -1;
 }
 
-static long int glibc_sleep (long int callno)
+static unsigned int glibc_sleep (unsigned int seconds)
 {
    trace("!!! ALERT: glibc calling sleep() before sleep support is enabled.\n");
    return -1;
@@ -264,6 +335,15 @@ static long int glibc_sleep (long int callno)
 static long int glibc_syscall (long int callno)
 {
    trace("!!! ALERT: glibc calling syscall() before syscall support is enabled.\n");
+   return -1;
+}
+
+static int glibc_unlink (const char *name)
+{
+   trace("!!! ALERT: glibc calling unlink() before file system support is enabled.\n");
+   trace (" unlinking file %s\n", name);
+
+   errno = ENOENT;
    return -1;
 }
 
@@ -279,11 +359,30 @@ static ssize_t glibc_writev (int fd, const struct iovec *vector, int count)
    return -1;
 }
 
+static int glibc_xstat (int vers, const char *file, struct stat *buf)
+{
+   trace("!!! ALERT: glibc calling xstat() before file system support is enabled.\n");
+   trace ("  vers: %d, file: %s\n", vers, file);
+   return -1;
+}
+
+static int glibc_xstat64 (int vers, const char *file, struct stat64 *buf)
+{
+   trace("!!! ALERT: glibc calling xstat64() before file system support is enabled.\n");
+   trace ("  vers: %d, file: %s\n", vers, file);
+   return -1;
+}
+
 static void register_glibc_exports (void)
 {
    register_llamaos_abort (glibc_abort);
+   register_llamaos_access (glibc_access);
    register_llamaos_brk (glibc_brk);
+   register_llamaos_close (glibc_close);
+   register_llamaos_dup (glibc_dup);
+   register_llamaos_dup2 (glibc_dup2);
    register_llamaos_exit (glibc_exit);
+   register_llamaos_ftruncate (glibc_ftruncate);
    register_llamaos_get_avphys_pages (glibc_get_avphys_pages);
    register_llamaos_get_nprocs (glibc_get_nprocs);
    register_llamaos_get_nprocs_conf (glibc_get_nprocs_conf);
@@ -295,7 +394,9 @@ static void register_glibc_exports (void)
    register_llamaos_isatty (glibc_isatty);
    register_llamaos_libc_fatal (glibc_libc_fatal);
    register_llamaos_libc_open (glibc_libc_open);
+   register_llamaos_lseek (glibc_lseek);
    register_llamaos_lseek64 (glibc_lseek64);
+   register_llamaos_lxstat64 (glibc_lxstat64);
    register_llamaos_madvise (glibc_madvise);
    register_llamaos_mkdir (glibc_mkdir);
    register_llamaos_pathconf (glibc_pathconf);
@@ -308,8 +409,11 @@ static void register_glibc_exports (void)
    register_llamaos_sigsuspend_nocancel (glibc_sigsuspend_nocancel);
    register_llamaos_sleep (glibc_sleep);
    register_llamaos_syscall (glibc_syscall);
+   register_llamaos_unlink (glibc_unlink);
    register_llamaos_write (glibc_libc_write);
    register_llamaos_writev (glibc_writev);
+   register_llamaos_xstat (glibc_xstat);
+   register_llamaos_xstat64 (glibc_xstat64);
 }
 
 #define MXCSR_DEFAULT 0x1f80

@@ -322,26 +322,17 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/intl/plural-exp.c \
   glibc-$(GLIBC_VERSION)/intl/plural.c \
   glibc-$(GLIBC_VERSION)/intl/textdomain.c \
-  glibc-$(GLIBC_VERSION)/io/access.c \
-  glibc-$(GLIBC_VERSION)/io/close.c \
-  glibc-$(GLIBC_VERSION)/io/dup.c \
-  glibc-$(GLIBC_VERSION)/io/dup2.c \
   glibc-$(GLIBC_VERSION)/io/fcntl.c \
   glibc-$(GLIBC_VERSION)/io/fxstat.c \
   glibc-$(GLIBC_VERSION)/io/fxstat64.c \
   glibc-$(GLIBC_VERSION)/io/fxstatat.c \
   glibc-$(GLIBC_VERSION)/io/fxstatat64.c \
   glibc-$(GLIBC_VERSION)/io/have_o_cloexec.c \
-  glibc-$(GLIBC_VERSION)/io/lseek.c \
-  glibc-$(GLIBC_VERSION)/io/lxstat64.c \
   glibc-$(GLIBC_VERSION)/io/open64.c \
   glibc-$(GLIBC_VERSION)/io/pipe.c \
   glibc-$(GLIBC_VERSION)/io/readlink.c \
   glibc-$(GLIBC_VERSION)/io/ttyname_r.c \
   glibc-$(GLIBC_VERSION)/io/umask.c \
-  glibc-$(GLIBC_VERSION)/io/unlink.c \
-  glibc-$(GLIBC_VERSION)/io/xstat.c \
-  glibc-$(GLIBC_VERSION)/io/xstat64.c \
   glibc-$(GLIBC_VERSION)/libio/__fbufsize.c \
   glibc-$(GLIBC_VERSION)/libio/__flbf.c \
   glibc-$(GLIBC_VERSION)/libio/__fpending.c \
@@ -675,7 +666,6 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/math/w_tgamma.c \
   glibc-$(GLIBC_VERSION)/math/w_tgammaf.c \
   glibc-$(GLIBC_VERSION)/math/w_tgammal.c \
-  glibc-$(GLIBC_VERSION)/misc/ftruncate.c \
   glibc-$(GLIBC_VERSION)/misc/init-misc.c \
   glibc-$(GLIBC_VERSION)/misc/mkstemp.c \
   glibc-$(GLIBC_VERSION)/misc/mmap.c \
@@ -1069,7 +1059,12 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/sysdeps/ieee754/s_signgam.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/_exit.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/abort.c \
+  glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/access.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/brk.c \
+  glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/close.c \
+  glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/dup.c \
+  glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/dup2.c \
+  glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/ftruncate.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/get_avphys_pages.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/get_nprocs.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/get_nprocs_conf.c \
@@ -1079,8 +1074,10 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/getpid.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/isatty.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/libc_fatal.c \
+  glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/lseek.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/lseek64.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/libc_open.c \
+  glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/lxstat64.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/madvise.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/mkdir.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/pathconf.c \
@@ -1096,8 +1093,11 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/gettimeofday.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/time.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/uname.c \
+  glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/unlink.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/write.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/writev.c \
+  glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/xstat.c \
+  glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/xstat64.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/dlerror.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/gcc_personality_v0.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/mremap.c \
@@ -1278,26 +1278,36 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/wctype/wctype_l.c
 
 # replaced with llamaOS export
-#  glibc-$(GLIBC_VERSION)/elf/static-stubs.c \
-#  glibc-$(GLIBC_VERSION)/io/getcwd.c \
-#  glibc-$(GLIBC_VERSION)/io/isatty.c \
-#  glibc-$(GLIBC_VERSION)/io/lseek64.c \
-#  glibc-$(GLIBC_VERSION)/io/open.c \
-#  glibc-$(GLIBC_VERSION)/io/read.c \
-#  glibc-$(GLIBC_VERSION)/io/write.c \
-#  glibc-$(GLIBC_VERSION)/misc/brk.c \
-#  glibc-$(GLIBC_VERSION)/misc/getpagesize.c \
-#  glibc-$(GLIBC_VERSION)/misc/getsysstats.c \
-#  glibc-$(GLIBC_VERSION)/misc/madvise.c \
-#  glibc-$(GLIBC_VERSION)/misc/writev.c \
-#  glibc-$(GLIBC_VERSION)/posix/_exit.c \
-#  glibc-$(GLIBC_VERSION)/posix/getpid.c \
-#  glibc-$(GLIBC_VERSION)/posix/sleep.c \
-#  glibc-$(GLIBC_VERSION)/posix/pathconf.c \
-#  glibc-$(GLIBC_VERSION)/signal/raise.c \
-#  glibc-$(GLIBC_VERSION)/stdlib/abort.c \
-#  glibc-$(GLIBC_VERSION)/time/gettimeofday.c \
-#  glibc-$(GLIBC_VERSION)/time/time.c \
+#  glibc-$(GLIBC_VERSION)/elf/static-stubs.c
+#  glibc-$(GLIBC_VERSION)/io/access.c
+#  glibc-$(GLIBC_VERSION)/io/close.c
+#  glibc-$(GLIBC_VERSION)/io/dup.c
+#  glibc-$(GLIBC_VERSION)/io/dup2.c
+#  glibc-$(GLIBC_VERSION)/io/getcwd.c
+#  glibc-$(GLIBC_VERSION)/io/isatty.c
+#  glibc-$(GLIBC_VERSION)/io/lseek.c
+#  glibc-$(GLIBC_VERSION)/io/lseek64.c
+#  glibc-$(GLIBC_VERSION)/io/lxstat64.c
+#  glibc-$(GLIBC_VERSION)/io/open.c
+#  glibc-$(GLIBC_VERSION)/io/read.c
+#  glibc-$(GLIBC_VERSION)/io/unlink.c
+#  glibc-$(GLIBC_VERSION)/io/write.c
+#  glibc-$(GLIBC_VERSION)/io/xstat.c
+#  glibc-$(GLIBC_VERSION)/io/xstat64.c
+#  glibc-$(GLIBC_VERSION)/misc/brk.c
+#  glibc-$(GLIBC_VERSION)/misc/ftruncate.c
+#  glibc-$(GLIBC_VERSION)/misc/getpagesize.c
+#  glibc-$(GLIBC_VERSION)/misc/getsysstats.c
+#  glibc-$(GLIBC_VERSION)/misc/madvise.c
+#  glibc-$(GLIBC_VERSION)/misc/writev.c
+#  glibc-$(GLIBC_VERSION)/posix/_exit.c
+#  glibc-$(GLIBC_VERSION)/posix/getpid.c
+#  glibc-$(GLIBC_VERSION)/posix/sleep.c
+#  glibc-$(GLIBC_VERSION)/posix/pathconf.c
+#  glibc-$(GLIBC_VERSION)/signal/raise.c
+#  glibc-$(GLIBC_VERSION)/stdlib/abort.c
+#  glibc-$(GLIBC_VERSION)/time/gettimeofday.c
+#  glibc-$(GLIBC_VERSION)/time/time.c
 
 HEADERS = \
   $(INCDIR)/bits/byteswap.h \

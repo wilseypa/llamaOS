@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012, William Magato
+Copyright (c) 2013, William Magato
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -29,35 +29,34 @@ either expressed or implied, of the copyright holder(s) or contributors.
 */
 
 #include <errno.h>
+#include <stddef.h>
+#include <unistd.h>
 
 // define function pointer
-typedef unsigned int (*llamaos_sleep_t) (unsigned int);
+typedef int (*llamaos_access_t) (const char *, int);
 
 // function pointer variable
-static llamaos_sleep_t llamaos_sleep = 0;
+static llamaos_access_t llamaos_access = 0;
 
 // function called by llamaOS to register pointer
-void register_llamaos_sleep (llamaos_sleep_t func)
+void register_llamaos_access (llamaos_access_t func)
 {
-   llamaos_sleep = func;
+   llamaos_access = func;
 }
 
-/* Make the process sleep for SECONDS seconds, or until a signal arrives
-   and is not ignored.  The function returns the number of seconds less
-   than SECONDS which it actually slept (zero if it slept the full time).
-   If a signal handler does a `longjmp' or modifies the handling of the
-   SIGALRM signal while inside `sleep' call, the handling of the SIGALRM
-   signal afterwards is undefined.  There is no return value to indicate
-   error, but if `sleep' returns SECONDS, it probably didn't work.  */
-unsigned int
-__sleep (unsigned int seconds)
+/* Test for access to FILE.  */
+int __access (const char *file, int type)
 {
-   if (0 != llamaos_sleep)
+   if (file == NULL || (type & ~(R_OK|W_OK|X_OK|F_OK)) != 0)
    {
-      return llamaos_sleep (seconds);
+      __set_errno (EINVAL);
+      return -1;
+   }
+   else if (0 != llamaos_access)
+   {
+      return llamaos_access (file, type);
    }
 
-   __set_errno (ENOSYS);
-   return seconds;
+   return -1;
 }
-weak_alias (__sleep, sleep)
+weak_alias (__access, access)
