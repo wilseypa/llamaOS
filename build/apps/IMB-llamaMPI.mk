@@ -62,6 +62,8 @@ SOURCES = \
   apps/imb-3.2.3/src/IMB_strgs.c \
   apps/imb-3.2.3/src/IMB_warm_up.c
 
+#  apps/imb-3.2.3/src/IMB_sendrecv.c
+
 OBJECTS = $(SOURCES:%.c=$(OBJDIR)/%.o)
 DEPENDS = $(OBJECTS:%.o=%.d)
 
