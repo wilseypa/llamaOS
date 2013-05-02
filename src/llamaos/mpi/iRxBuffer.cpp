@@ -31,6 +31,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <iRxBuffer.h>
 #include <string.h>
 #include <cstdlib>
+#include <iostream>
 
 using namespace std;
 
@@ -66,9 +67,15 @@ void iRxBuffer::pushMessage(unsigned char *buf, int size, int source, int tag, i
       newRxMessage.tag = tag;
       newRxMessage.curSize = size;
       buffer.push_back(newRxMessage);
+      #ifdef MPI_COUT_EVERY_MESSAGE
+      cout << " CurSize: " << size << endl;
+      #endif
    } else { //In progress message
       it->curSize += size;
       dataPt = it->buf;
+      #ifdef MPI_COUT_EVERY_MESSAGE
+      cout << " CurSize: " << it->curSize << endl;
+      #endif
    }
    // Copy over data
    dataPt += part*MAX_MESS_SIZE;
@@ -77,17 +84,23 @@ void iRxBuffer::pushMessage(unsigned char *buf, int size, int source, int tag, i
 
 int iRxBuffer::popMessage(int source, int tag, void *buf, int size, MPI_Status *status) {
    std::list<MpiRxMessage_T>::iterator it = getMessage(source, tag);
-   if (it == buffer.end()) {return 0;}
+   if (it == buffer.end()) {
+      return 0;
+   }
+   int retSize = it->curSize;
+   int cpySize = retSize;
 
    // Verify length
    if (size < it->size) { // Will not fit in buffer - discard
-      free(it->buf);
+      cout << "ERROR: Message Size: " << it->size;
+      cout << " Buffer Size: " << size << " Will not fit" << endl;
+      delete[] it->buf;
       buffer.erase(it);
       return 0;
    }
 
    // Copy data into buffer
-   memcpy(buf, it->buf, it->size);
+   memcpy(buf, it->buf, cpySize);
 
    // Copy data into status
    if (status != MPI_STATUS_IGNORE) {
@@ -100,7 +113,7 @@ int iRxBuffer::popMessage(int source, int tag, void *buf, int size, MPI_Status *
    // Clean up list
    delete[] it->buf;
    buffer.erase(it);
-   return it->curSize;
+   return retSize;
 }
 
 bool iRxBuffer::probeMessage(int source, int tag, MPI_Status *status) {

@@ -74,6 +74,12 @@ void mpi_send_ (void *buf, int *count, MPI_Datatype *datatype, int *dest, int *t
 void mpi_recv_ (void *buf, int *count, MPI_Datatype *datatype, int *source, int *tag, MPI_Comm *comm, MPI_Status *status, int *ierr) {
    (*ierr) = MPI_Recv(buf, *count, *datatype, *source, *tag, *comm, status);
 }
+int mpi_sendrecv_ (void *sendbuf, int *sendcount, MPI_Datatype *sendtype, int *dest, int *sendtag,
+                void *recvbuf, int *recvcount, MPI_Datatype *recvtype, int *source, int *recvtag,
+                MPI_Comm *comm, MPI_Status *status, int *ierr) {
+   (*ierr) = MPI_Sendrecv(sendbuf, *sendcount, *sendtype, *dest, *sendtag,
+                recvbuf, *recvcount, *recvtype, *source, *recvtag, *comm, status);
+}
 void mpi_probe_ (int *source, int *tag, MPI_Comm *comm, MPI_Status *status, int *ierr) {
    (*ierr) = MPI_Probe(*source, *tag, *comm, status);
 }

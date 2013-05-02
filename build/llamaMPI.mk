@@ -60,6 +60,7 @@ CPP_SOURCES += \
   llamaos/mpi/op/iPerformOp.cpp \
   llamaos/mpi/api/pt2pt/MPI_Recv.cpp \
   llamaos/mpi/api/pt2pt/MPI_Send.cpp \
+  llamaos/mpi/api/pt2pt/MPI_Sendrecv.cpp \
   llamaos/mpi/api/pt2pt/MPI_Probe.cpp \
   llamaos/mpi/api/pt2pt/MPI_Iprobe.cpp \
   llamaos/mpi/api/pt2pt/MPI_Get_count.cpp \

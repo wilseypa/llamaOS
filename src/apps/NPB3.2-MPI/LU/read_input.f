@@ -30,9 +30,8 @@ c---------------------------------------------------------------------
       if (id .eq. ROOT) then
 
          write(*, 1000)
-         fstatus = 1
-c         open (unit=3,file='inputlu.data',status='old',
-c     >         access='sequential',form='formatted', iostat=fstatus)
+         open (unit=3,file='inputlu.data',status='old',
+     >         access='sequential',form='formatted', iostat=fstatus)
          if (fstatus .eq. 0) then
 
             write(*, *) ' Reading from input file inputlu.data'

@@ -66,9 +66,10 @@ void iReceive(void *buf, int count, MPI_Datatype datatype, int source, int tag,
 
    // Print receive request
    #ifdef MPI_COUT_EVERY_MESSAGE
-   cout << "Waiting for message from src " << srcWorldRank << " from MAC address ";
-   iPrintMAC(mpiData.hostTable[srcWorldRank].address);
-   cout << " Size: " << sizeInBytes << " Tag: " << tag;
+   int commContext = comm | context;
+   cout << "Waiting for message from src " << srcWorldRank;
+   cout << " Context: " << commContext << " Tag: " << tag;
+   cout << " TotSize: " << sizeInBytes;
    cout << endl;
    #endif
 
@@ -80,6 +81,13 @@ void iReceive(void *buf, int count, MPI_Datatype datatype, int source, int tag,
       #endif
       return;
    }
+   #ifdef MPI_COUT_EVERY_MESSAGE
+   if (curRxSize > 0) {
+      cout << "Pulled message from src " << srcWorldRank << " with curSize " << curRxSize << endl;
+   } else {
+      cout << "Nothing found in rxBuffer" << endl;
+   }
+   #endif
 
    // If not in receive buffer, wait unti message received while buffering all other messages
    net::llamaNET::Protocol_header *header;
@@ -104,7 +112,6 @@ void iReceive(void *buf, int count, MPI_Datatype datatype, int source, int tag,
       if (rxTotSize % MAX_MESS_SIZE != 0) {totParts++;}
       cout << "Received from src " << header->src << " Context: " << rxCommContext;
       cout << " Tag: " << rxTag << " TotSize: " << rxTotSize << " Part: " << rxPart+1 << "/" << totParts;
-      cout << endl;
       #endif
 
       // Check if desired message type
@@ -112,16 +119,24 @@ void iReceive(void *buf, int count, MPI_Datatype datatype, int source, int tag,
                (rxComm == comm) && (rxContext == context) && ((rxTag == tag) || (tag == MPI_ANY_TAG))) {
          // Verify length
          if (sizeInBytes < rxTotSize) { // Will not fit in buffer - discard
+            cout << endl;
+            cout << "ERROR: Message Size: " << rxTotSize;
+            cout << " Buffer Size: " << sizeInBytes << " Will not fit" << endl;
             llamaNetInterface->release_recv_buffer(header);
             return;
          }
          // Determine the part of buffer to add to
          char *bufPart = (char*)buf;
          bufPart += rxPart*MAX_MESS_SIZE;
-
+         
          // Copy into buffer
          memcpy(bufPart, data, header->len - 16);
          curRxSize += (header->len - 16);
+         
+         #ifdef MPI_COUT_EVERY_MESSAGE
+         cout << " CurSize: " << curRxSize << endl;
+         #endif
+
          // Check if finished
          bool isFinished = false;
          if (curRxSize > rxTotSize) {isFinished = true;} //error

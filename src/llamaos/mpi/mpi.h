@@ -143,6 +143,9 @@ int MPI_Finalize (void);
 // POINT TO POINT - Blocking
 int MPI_Send(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm);
 int MPI_Recv(void *buf, int count, MPI_Datatype datatype, int source, int tag, MPI_Comm comm, MPI_Status *status);
+int MPI_Sendrecv(void *sendbuf, int sendcount, MPI_Datatype sendtype, int dest, int sendtag,
+                void *recvbuf, int recvcount, MPI_Datatype recvtype, int source, int recvtag,
+                MPI_Comm comm, MPI_Status *status);
 int MPI_Probe(int source, int tag, MPI_Comm comm, MPI_Status *status);
 // POINT TO POINT - Non-Blocking
 int MPI_Isend(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm, MPI_Request *request);
