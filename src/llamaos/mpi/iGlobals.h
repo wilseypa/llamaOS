@@ -35,6 +35,8 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <vector>
 #define MAP_TYPE std::map
 #include <map>
+//#define MAP_TYPE std::unordered_map
+//#include <unordered_map>
 #include <limits>
 
 #include <mpi.h>
@@ -47,6 +49,7 @@ class iComm;
 class iRequest;
 
 #define MPI_COUT_EVERY_MESSAGE
+#define MPI_COUT_INITIALIZATION
 //#define SLOW_SENDS
 #define MAX_MESS_SIZE 3950
 
