@@ -32,13 +32,23 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 int MPI_Testany(int count, MPI_Request array_of_requests[], int *index, 
                int *flag, MPI_Status *status) {
+   int nullCount = 0;
    for (int i = 0; i < count; i++) {
-      MPI_Test(&array_of_requests[i], flag, status);
-      if (*flag) {
-         (*index) = i;
-         return MPI_SUCCESS;
+      if (array_of_requests[i] == MPI_REQUEST_NULL) {
+         nullCount++;
+      } else {
+         MPI_Test(&array_of_requests[i], flag, status);
+         if (*flag) {
+            (*index) = i;
+            return MPI_SUCCESS;
+         }
       }
    }
-   (*flag) = false;
+   (*index) = MPI_UNDEFINED;
+   if (nullCount == count) { // If all null then flag is true
+      (*flag) = true;
+   } else {
+      (*flag) = false;
+   }
    return MPI_SUCCESS;
 }

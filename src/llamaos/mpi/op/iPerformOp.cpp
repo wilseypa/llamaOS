@@ -42,6 +42,9 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <op/iPerformOpMaxloc.h>
 #include <op/iPerformOpMinloc.h>
 
+#include <iostream>
+using namespace std;
+
 int iPerformOp(void *runningTotal, void *newValue, int count, MPI_Datatype type, MPI_Op op) {
    switch (type) {
       case MPI_CHAR:
@@ -245,7 +248,10 @@ int iPerformOp(void *runningTotal, void *newValue, int count, MPI_Datatype type,
             case MPI_MINLOC:	return iPerformOpMinloc<MPI_LONG_DOUBLE_INT_T>(runningTotal, newValue, count);
             default: return -1;
          }
-
-      default: return -1;
+      default: {
+         cout << "ERROR: Unsupported operation type: " << type << endl;
+         while(1) {}
+         return -1;
+      }
    }
 }

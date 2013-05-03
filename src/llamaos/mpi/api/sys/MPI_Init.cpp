@@ -62,6 +62,12 @@ static int iGetArgIndex(int argc, char *argv[], const std::string &arg) {
 int MPI_Init (int *argc, char ***argv) {
    cout << "Starting llamaMPI..." << endl;
    cout.flush();
+   
+   //Initialize data structures
+   mpiData.hostTable.clear();
+   mpiData.comm.clear();
+   mpiData.group.clear();
+   mpiData.request.clear();
 
    //Check if rank is missing - running alone
    int rankIndex = iGetArgIndex(*argc, *argv, "--rank");

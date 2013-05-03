@@ -118,7 +118,14 @@ int iRxBuffer::popMessage(int source, int tag, void *buf, int size, MPI_Status *
 
 bool iRxBuffer::probeMessage(int source, int tag, MPI_Status *status) {
    std::list<MpiRxMessage_T>::iterator it = getMessage(source, tag);
-   if (it == buffer.end()) {return false;}
+   if (it == buffer.end()) {
+      return false;
+   }
+   
+   // Multi-part message incomplete
+   if (it->curSize < it->size) {
+      return false;
+   }
 
    // Copy data into status
    if (status != MPI_STATUS_IGNORE) {

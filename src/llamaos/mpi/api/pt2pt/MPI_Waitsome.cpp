@@ -30,12 +30,6 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 #include <iGlobals.h>
 
-
-
-#include <llamaos/api/sleep.h>
-
-
-
 int MPI_Waitsome(int incount, MPI_Request array_of_requests[], 
                 int *outcount, int array_of_indices[],
                 MPI_Status array_of_statuses[]) {
@@ -55,7 +49,6 @@ int MPI_Waitsome(int incount, MPI_Request array_of_requests[],
    (*outcount) = 0;
    int *flag = new int[incount];
    do {
-llamaos::api::sleep(1);
       for (int i = 0; i < incount; i++) {
          if (array_of_requests[i] != MPI_REQUEST_NULL) {
             MPI_Test(&array_of_requests[i], &flag[i], &array_of_statuses[i]);
