@@ -85,6 +85,10 @@ typedef float _Complex MPI_COMPLEX_T;
 typedef double _Complex MPI_DOUBLE_COMPLEX_T;
 typedef bool MPI_LOGICAL_T;
 
+struct MPI_2REAL_T {MPI_REAL_T value; MPI_REAL_T index;};
+struct MPI_2DOUBLE_PRECISION_T {MPI_DOUBLE_PRECISION_T value; MPI_DOUBLE_PRECISION_T index;};
+struct MPI_2INTEGER_T {MPI_INTEGER_T value; MPI_INTEGER_T index;};
+
 typedef int MPI_Context;
 #define MPI_COMM_MASK ((int)0x7FFFFFFF)
 #define MPI_CONTEXT_MASK ((int)0x80000000)
