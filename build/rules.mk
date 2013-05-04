@@ -81,3 +81,13 @@ $(OBJDIR)/%.d : %.cpp
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo creating: $@ from $<
 	@$(CC) $(CPPFLAGS) -MM -MP -MT '$(OBJDIR)/$*.o $(OBJDIR)/$*.d' -MF $@ $<
+	
+$(OBJDIR)/%.d : %.f90
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo creating: $@ from $<
+	@$(F90) $(F90FLAGS) -cpp -MM -MP -MT '$(OBJDIR)/$*.o $(OBJDIR)/$*.d' -MF $@ $<
+
+$(OBJDIR)/%.d : %.f
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo creating: $@ from $<
+	@$(F90) $(F90FLAGS) -cpp -MM -MP -MT '$(OBJDIR)/$*.o $(OBJDIR)/$*.d' -MF $@ $<
