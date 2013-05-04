@@ -48,9 +48,6 @@ DEPENDS = $(OBJECTS:%.o=%.d)
 
 util/NAS/*/npbparams.h: apps/NAS/params.def util/NAS/setparams
 	echo Creating benchmark headers
-	util/NAS/setparams `grep BT apps/NAS/params.def`
-	mkdir -p util/NAS/bt
-	mv util/NAS/npbparams.h util/NAS/bt/npbparams.h
 	util/NAS/setparams `grep CG apps/NAS/params.def`
 	mkdir -p util/NAS/cg
 	mv util/NAS/npbparams.h util/NAS/cg/npbparams.h
