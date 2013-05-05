@@ -33,7 +33,9 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <iostream>
 #include <string.h>
 
+#ifdef SLOW_SENDS
 #include <llamaos/api/sleep.h>
+#endif
 
 using namespace std;
 

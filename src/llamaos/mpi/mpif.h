@@ -75,6 +75,11 @@
       parameter (MPI_COMPLEX = 30)
       parameter (MPI_DOUBLE_COMPLEX = 31)
       parameter (MPI_LOGICAL = 32)
+      
+      integer MPI_2REAL, MPI_2DOUBLE_PRECISION, MPI_2INTEGER
+      parameter (MPI_2REAL = 33)
+      parameter (MPI_2DOUBLE_PRECISION = 34)
+      parameter (MPI_2INTEGER = 35)
 
       integer MPI_MAX, MPI_MIN, MPI_SUM, MPI_PROD, MPI_LAND, MPI_BAND
       integer MPI_LOR, MPI_BOR, MPI_LXOR, MPI_BXOR

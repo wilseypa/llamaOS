@@ -35,6 +35,8 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <vector>
 #define MAP_TYPE std::map
 #include <map>
+//#define MAP_TYPE std::unordered_map
+//#include <unordered_map>
 #include <limits>
 
 #include <mpi.h>
@@ -47,6 +49,7 @@ class iComm;
 class iRequest;
 
 #define MPI_COUT_EVERY_MESSAGE
+#define MPI_COUT_INITIALIZATION
 //#define SLOW_SENDS
 #define MAX_MESS_SIZE 3950
 
@@ -81,6 +84,10 @@ typedef double MPI_DOUBLE_PRECISION_T;
 typedef float _Complex MPI_COMPLEX_T;
 typedef double _Complex MPI_DOUBLE_COMPLEX_T;
 typedef bool MPI_LOGICAL_T;
+
+struct MPI_2REAL_T {MPI_REAL_T value; MPI_REAL_T index;};
+struct MPI_2DOUBLE_PRECISION_T {MPI_DOUBLE_PRECISION_T value; MPI_DOUBLE_PRECISION_T index;};
+struct MPI_2INTEGER_T {MPI_INTEGER_T value; MPI_INTEGER_T index;};
 
 typedef int MPI_Context;
 #define MPI_COMM_MASK ((int)0x7FFFFFFF)
@@ -129,6 +136,9 @@ void iReceiveNB(void *buf, int count, MPI_Datatype datatype, int source, int tag
 			MPI_Comm comm, MPI_Context context, MPI_Status *status, int *flag);
 void iProbe(int source, int tag, MPI_Comm comm, MPI_Context context, MPI_Status *status);
 void iProbeNB(int source, int tag, MPI_Comm comm, MPI_Context context, MPI_Status *status, int *flag);
+void iGetMessage(void *buf, int count, MPI_Datatype datatype, int source, int tag, 
+			MPI_Comm comm, MPI_Context context, MPI_Status *status, int *flag,
+			bool isProbe, bool isNB);
 int iSizeof(MPI_Datatype type);
 int iPerformOp(void *runningTotal, void *newValue, int count, MPI_Datatype type, MPI_Op op);
 int iStartOp(void *runningTotal, int count, MPI_Datatype type, MPI_Op op);

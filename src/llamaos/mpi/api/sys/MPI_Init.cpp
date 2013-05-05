@@ -60,13 +60,21 @@ static int iGetArgIndex(int argc, char *argv[], const std::string &arg) {
 }
 
 int MPI_Init (int *argc, char ***argv) {
+   #ifdef MPI_COUT_INITIALIZATION
    cout << "Starting llamaMPI..." << endl;
    cout.flush();
+   #endif
+   
+   //Initialize data structures
+   mpiData.hostTable.clear();
+   mpiData.comm.clear();
+   mpiData.group.clear();
+   mpiData.request.clear();
 
    //Check if rank is missing - running alone
    int rankIndex = iGetArgIndex(*argc, *argv, "--rank");
    if (rankIndex <= 0) {
-      cout << "No rank given: running alone" << endl;
+      cout << "WARNING: No rank given: running alone" << endl;
       mpiData.rank = 0;
       mpiData.totNodes = 1;
       return MPI_SUCCESS; //No sync necessary
@@ -74,12 +82,14 @@ int MPI_Init (int *argc, char ***argv) {
 
    //The first input argument gives the process its rank
    mpiData.rank = atoi((*argv)[rankIndex]);
+   #ifdef MPI_COUT_INITIALIZATION
    cout << "My Rank: "  << mpiData.rank << endl;
+   #endif
 
    //Check if host table is not present - running alone
    int hostTableIndex = iGetArgIndex(*argc, *argv, "--hostTable");
    if (hostTableIndex <= 0) {
-      cout << "Host table not present: running alone" << endl;
+      cout << "WARNING: Host table not present: running alone" << endl;
       mpiData.rank = 0;
       mpiData.totNodes = 1;
       (*argc) = rankIndex-1;
@@ -88,11 +98,13 @@ int MPI_Init (int *argc, char ***argv) {
 
    //Get host table size
    int hostTableSize = atoi((*argv)[hostTableIndex++]);
+   #ifdef MPI_COUT_INITIALIZATION
    cout << "Host Table Arguments: " << hostTableSize << endl;
+   #endif
 
    //Check for partial host table - running alone
    if (hostTableIndex + (hostTableSize*2) > *argc) {
-      cout << "Partial host table: running alone" << endl;
+      cout << "WARNING: Partial host table: running alone" << endl;
       mpiData.rank = 0;
       mpiData.totNodes = 1;
       (*argc) = rankIndex-1;
@@ -131,6 +143,7 @@ int MPI_Init (int *argc, char ***argv) {
    mpiData.pid = mpiData.hostTable[mpiData.rank].pid;
 
    //Display the constructed host table
+   #ifdef MPI_COUT_INITIALIZATION
    unsigned int addOn;
    cout << "The constructed host table consisting of " << mpiData.totNodes << " entries:" << endl;
    for (addOn = 0; addOn < mpiData.totNodes; addOn++) {
@@ -139,27 +152,51 @@ int MPI_Init (int *argc, char ***argv) {
       cout << "   PID " << mpiData.hostTable[addOn].pid << endl;
    }
    cout.flush();
+   #endif
 
    //Initialize Groups
+   #ifdef MPI_COUT_INITIALIZATION
    cout << "Initializing groups... ";
+   #endif
    new iGroup(IGROUP_CREATE_EMPTY);
+   #ifdef MPI_COUT_INITIALIZATION
    cout << "DONE" << endl;
+   #endif
 
    //Initialize Communicators
+   #ifdef MPI_COUT_INITIALIZATION
    cout << "Initializing communicators... ";
+   #endif
    new iComm(MPI_COMM_WORLD, new iGroup(IGROUP_CREATE_WORLD));
    new iComm(MPI_COMM_SELF, new iGroup(IGROUP_CREATE_SELF));
+   #ifdef MPI_COUT_INITIALIZATION
    cout << "DONE" << endl;
+   #endif
 
    //Initialize llamaNET connection
+   #ifdef MPI_COUT_INITIALIZATION
    cout << "Creating llamaNET interface... ";
+   #endif
    domid_t self_id = Hypervisor::get_instance()->domid;
-   llamaNetInterface = new llamaNET(self_id - 1 - mpiData.pid, mpiData.pid);
+   llamaNetInterface = new llamaNET(self_id - 1 - mpiData.pid, mpiData.pid); // Says same message
+   #ifdef MPI_COUT_INITIALIZATION
    cout << "DONE" << endl;
-   cout.flush();
+   #endif
 
    //The process waits for the sync to start
-   MPI_Barrier(MPI_COMM_WORLD);
+   #ifdef MPI_COUT_INITIALIZATION
+   cout << "Syncing processes... ";
+   #endif
+   unsigned char buf;
+   MPI_Bcast(&buf, 1, MPI_UNSIGNED_CHAR, mpiData.totNodes-1, MPI_COMM_WORLD);
+   #ifdef MPI_COUT_INITIALIZATION
+   cout << "DONE" << endl;
+   #endif
+   
+   #ifdef MPI_COUT_INITIALIZATION
+   cout << "Finished with MPI_Init" << endl;
+   cout.flush();
+   #endif
    (*argc) = rankIndex-1;
    return MPI_SUCCESS;
 }

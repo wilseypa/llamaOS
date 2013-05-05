@@ -30,17 +30,6 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 #include <iGlobals.h>
 
-
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <iostream>
-#include <llamaos/api/sleep.h>
-
-using namespace std;
-
-
-
 int MPI_Waitany(int count, MPI_Request array_of_requests[], int *index, 
                MPI_Status *status) {
    // Check to see if all requests are null
@@ -57,7 +46,6 @@ int MPI_Waitany(int count, MPI_Request array_of_requests[], int *index,
 
    // Wait until one request completes, ignoring null requests
    do {
-llamaos::api::sleep(1);
       for (int i = 0; i < count; i++) {
          if (array_of_requests[i] != MPI_REQUEST_NULL) {
             int flag;

@@ -37,8 +37,6 @@ int MPI_Alltoallv(void *sendbuf, int *sendcnts, int *sdispls,
                   int *rdispls, MPI_Datatype recvtype, MPI_Comm comm) {
    int size;
    MPI_Comm_size(comm, &size);
-   int rank; 
-   MPI_Comm_rank(comm, &rank);
 
    // Transpose the send buffers amoung the nodes' recv buffers
    for (int i = 0; i < size; i++) {

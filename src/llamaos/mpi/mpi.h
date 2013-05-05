@@ -78,6 +78,10 @@ typedef int MPI_Datatype;
 #define MPI_DOUBLE_COMPLEX  ((MPI_Datatype)31)
 #define MPI_LOGICAL  ((MPI_Datatype)32)
 
+#define MPI_2REAL  ((MPI_Datatype)33)
+#define MPI_2DOUBLE_PRECISION  ((MPI_Datatype)34)
+#define MPI_2INTEGER  ((MPI_Datatype)35)
+
 typedef int MPI_Op;
 #define MPI_MAX       ((MPI_Op)1)      //maximum
 #define MPI_MIN       ((MPI_Op)2)      //minimum
@@ -143,6 +147,9 @@ int MPI_Finalize (void);
 // POINT TO POINT - Blocking
 int MPI_Send(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm);
 int MPI_Recv(void *buf, int count, MPI_Datatype datatype, int source, int tag, MPI_Comm comm, MPI_Status *status);
+int MPI_Sendrecv(void *sendbuf, int sendcount, MPI_Datatype sendtype, int dest, int sendtag,
+                void *recvbuf, int recvcount, MPI_Datatype recvtype, int source, int recvtag,
+                MPI_Comm comm, MPI_Status *status);
 int MPI_Probe(int source, int tag, MPI_Comm comm, MPI_Status *status);
 // POINT TO POINT - Non-Blocking
 int MPI_Isend(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm, MPI_Request *request);

@@ -30,9 +30,15 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 #include <iGlobals.h>
 
+
+#include <iostream>
+#include <string.h>
+
+using namespace std;
+
 int MPI_Test(MPI_Request *request, int *flag, MPI_Status *status) {
    MAP_TYPE<MPI_Request,iRequest*>::iterator it = mpiData.request.find(*request);
-   if (it == mpiData.request.end()) {   
+   if (it == mpiData.request.end()) {
       (*flag) = true;
    } else {
       iRequest *pRequest = it->second;

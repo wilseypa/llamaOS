@@ -52,6 +52,7 @@ CPP_SOURCES += \
   llamaos/mpi/iComm.cpp \
   llamaos/mpi/iRequest.cpp \
   llamaos/mpi/iProbe.cpp \
+  llamaos/mpi/iGetMessage.cpp \
   llamaos/mpi/iReceive.cpp \
   llamaos/mpi/iSend.cpp \
   llamaos/mpi/iProbeNB.cpp \
@@ -60,6 +61,7 @@ CPP_SOURCES += \
   llamaos/mpi/op/iPerformOp.cpp \
   llamaos/mpi/api/pt2pt/MPI_Recv.cpp \
   llamaos/mpi/api/pt2pt/MPI_Send.cpp \
+  llamaos/mpi/api/pt2pt/MPI_Sendrecv.cpp \
   llamaos/mpi/api/pt2pt/MPI_Probe.cpp \
   llamaos/mpi/api/pt2pt/MPI_Iprobe.cpp \
   llamaos/mpi/api/pt2pt/MPI_Get_count.cpp \

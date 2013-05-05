@@ -32,12 +32,21 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 int MPI_Testsome(int incount, MPI_Request array_of_requests[], int *outcount, 
                 int array_of_indices[], MPI_Status array_of_statuses[]) {
+   int nullCount = 0;
+   (*outcount) = 0;
    for (int i = 0; i < incount; i++) {
-      int flag;
-      MPI_Test(&array_of_requests[i], &flag, &array_of_statuses[i]);
-      if (flag) {
-         array_of_indices[(*outcount)++] = i;
+      if (array_of_requests[i] == MPI_REQUEST_NULL) {
+         nullCount++;
+      } else {
+         int flag;
+         MPI_Test(&array_of_requests[i], &flag, &array_of_statuses[i]);
+         if (flag) {
+            array_of_indices[(*outcount)++] = i;
+         }
       }
+   }
+   if (nullCount == incount) {
+      (*outcount) = MPI_UNDEFINED;
    }
    return MPI_SUCCESS;
 }

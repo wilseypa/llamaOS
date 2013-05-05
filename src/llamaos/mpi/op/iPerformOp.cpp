@@ -42,6 +42,9 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <op/iPerformOpMaxloc.h>
 #include <op/iPerformOpMinloc.h>
 
+#include <iostream>
+using namespace std;
+
 int iPerformOp(void *runningTotal, void *newValue, int count, MPI_Datatype type, MPI_Op op) {
    switch (type) {
       case MPI_CHAR:
@@ -56,7 +59,7 @@ int iPerformOp(void *runningTotal, void *newValue, int count, MPI_Datatype type,
             case MPI_BOR:	return    iPerformOpBor<MPI_CHAR_T>(runningTotal, newValue, count);
             case MPI_LXOR:	return   iPerformOpLxor<MPI_CHAR_T>(runningTotal, newValue, count);
             case MPI_BXOR:	return   iPerformOpBxor<MPI_CHAR_T>(runningTotal, newValue, count);
-            default: return -1;
+            default: cout << "OP ERROR - Type:" << type << " Op:" << op << endl; while(1);
          }
       case MPI_BYTE:
          switch (op) {
@@ -70,7 +73,7 @@ int iPerformOp(void *runningTotal, void *newValue, int count, MPI_Datatype type,
             case MPI_BOR:	return    iPerformOpBor<MPI_BYTE_T>(runningTotal, newValue, count);
             case MPI_LXOR:	return   iPerformOpLxor<MPI_BYTE_T>(runningTotal, newValue, count);
             case MPI_BXOR:	return   iPerformOpBxor<MPI_BYTE_T>(runningTotal, newValue, count);
-            default: return -1;
+            default: cout << "OP ERROR - Type:" << type << " Op:" << op << endl; while(1);
          }
       case MPI_SHORT:
          switch (op) {
@@ -84,7 +87,7 @@ int iPerformOp(void *runningTotal, void *newValue, int count, MPI_Datatype type,
             case MPI_BOR:	return    iPerformOpBor<MPI_SHORT_T>(runningTotal, newValue, count);
             case MPI_LXOR:	return   iPerformOpLxor<MPI_SHORT_T>(runningTotal, newValue, count);
             case MPI_BXOR:	return   iPerformOpBxor<MPI_SHORT_T>(runningTotal, newValue, count);
-            default: return -1;
+            default: cout << "OP ERROR - Type:" << type << " Op:" << op << endl; while(1);
          }
       case MPI_INT:
          switch (op) {
@@ -98,7 +101,7 @@ int iPerformOp(void *runningTotal, void *newValue, int count, MPI_Datatype type,
             case MPI_BOR:	return    iPerformOpBor<MPI_INT_T>(runningTotal, newValue, count);
             case MPI_LXOR:	return   iPerformOpLxor<MPI_INT_T>(runningTotal, newValue, count);
             case MPI_BXOR:	return   iPerformOpBxor<MPI_INT_T>(runningTotal, newValue, count);
-            default: return -1;
+            default: cout << "OP ERROR - Type:" << type << " Op:" << op << endl; while(1);
          }
       case MPI_LONG:
          switch (op) {
@@ -112,7 +115,7 @@ int iPerformOp(void *runningTotal, void *newValue, int count, MPI_Datatype type,
             case MPI_BOR:	return    iPerformOpBor<MPI_LONG_T>(runningTotal, newValue, count);
             case MPI_LXOR:	return   iPerformOpLxor<MPI_LONG_T>(runningTotal, newValue, count);
             case MPI_BXOR:	return   iPerformOpBxor<MPI_LONG_T>(runningTotal, newValue, count);
-            default: return -1;
+            default: cout << "OP ERROR - Type:" << type << " Op:" << op << endl; while(1);
          }
       case MPI_FLOAT:
          switch (op) {
@@ -120,7 +123,7 @@ int iPerformOp(void *runningTotal, void *newValue, int count, MPI_Datatype type,
             case MPI_MIN:	return    iPerformOpMin<MPI_FLOAT_T>(runningTotal, newValue, count);
             case MPI_SUM:	return    iPerformOpSum<MPI_FLOAT_T>(runningTotal, newValue, count);
             case MPI_PROD:	return   iPerformOpProd<MPI_FLOAT_T>(runningTotal, newValue, count);
-            default: return -1;
+            default: cout << "OP ERROR - Type:" << type << " Op:" << op << endl; while(1);
          }
       case MPI_DOUBLE:
          switch (op) {
@@ -128,7 +131,7 @@ int iPerformOp(void *runningTotal, void *newValue, int count, MPI_Datatype type,
             case MPI_MIN:	return    iPerformOpMin<MPI_DOUBLE_T>(runningTotal, newValue, count);
             case MPI_SUM:	return    iPerformOpSum<MPI_DOUBLE_T>(runningTotal, newValue, count);
             case MPI_PROD:	return   iPerformOpProd<MPI_DOUBLE_T>(runningTotal, newValue, count);
-            default: return -1;
+            default: cout << "OP ERROR - Type:" << type << " Op:" << op << endl; while(1);
          }
       case MPI_UNSIGNED_CHAR:
          switch (op) {
@@ -142,7 +145,7 @@ int iPerformOp(void *runningTotal, void *newValue, int count, MPI_Datatype type,
             case MPI_BOR:	return    iPerformOpBor<MPI_UNSIGNED_CHAR_T>(runningTotal, newValue, count);
             case MPI_LXOR:	return   iPerformOpLxor<MPI_UNSIGNED_CHAR_T>(runningTotal, newValue, count);
             case MPI_BXOR:	return   iPerformOpBxor<MPI_UNSIGNED_CHAR_T>(runningTotal, newValue, count);
-            default: return -1;
+            default: cout << "OP ERROR - Type:" << type << " Op:" << op << endl; while(1);
          }
       case MPI_UNSIGNED_SHORT:
          switch (op) {
@@ -156,7 +159,7 @@ int iPerformOp(void *runningTotal, void *newValue, int count, MPI_Datatype type,
             case MPI_BOR:	return    iPerformOpBor<MPI_UNSIGNED_SHORT_T>(runningTotal, newValue, count);
             case MPI_LXOR:	return   iPerformOpLxor<MPI_UNSIGNED_SHORT_T>(runningTotal, newValue, count);
             case MPI_BXOR:	return   iPerformOpBxor<MPI_UNSIGNED_SHORT_T>(runningTotal, newValue, count);
-            default: return -1;
+            default: cout << "OP ERROR - Type:" << type << " Op:" << op << endl; while(1);
          }
       case MPI_UNSIGNED:
          switch (op) {
@@ -170,7 +173,7 @@ int iPerformOp(void *runningTotal, void *newValue, int count, MPI_Datatype type,
             case MPI_BOR:	return    iPerformOpBor<MPI_UNSIGNED_T>(runningTotal, newValue, count);
             case MPI_LXOR:	return   iPerformOpLxor<MPI_UNSIGNED_T>(runningTotal, newValue, count);
             case MPI_BXOR:	return   iPerformOpBxor<MPI_UNSIGNED_T>(runningTotal, newValue, count);
-            default: return -1;
+            default: cout << "OP ERROR - Type:" << type << " Op:" << op << endl; while(1);
          }
       case MPI_UNSIGNED_LONG:
          switch (op) {
@@ -184,7 +187,7 @@ int iPerformOp(void *runningTotal, void *newValue, int count, MPI_Datatype type,
             case MPI_BOR:	return    iPerformOpBor<MPI_UNSIGNED_LONG_T>(runningTotal, newValue, count);
             case MPI_LXOR:	return   iPerformOpLxor<MPI_UNSIGNED_LONG_T>(runningTotal, newValue, count);
             case MPI_BXOR:	return   iPerformOpBxor<MPI_UNSIGNED_LONG_T>(runningTotal, newValue, count);
-            default: return -1;
+            default: cout << "OP ERROR - Type:" << type << " Op:" << op << endl; while(1);
          }
       case MPI_LONG_DOUBLE:
          switch (op) {
@@ -192,7 +195,7 @@ int iPerformOp(void *runningTotal, void *newValue, int count, MPI_Datatype type,
             case MPI_MIN:	return    iPerformOpMin<MPI_LONG_DOUBLE_T>(runningTotal, newValue, count);
             case MPI_SUM:	return    iPerformOpSum<MPI_LONG_DOUBLE_T>(runningTotal, newValue, count);
             case MPI_PROD:	return   iPerformOpProd<MPI_LONG_DOUBLE_T>(runningTotal, newValue, count);
-            default: return -1;
+            default: cout << "OP ERROR - Type:" << type << " Op:" << op << endl; while(1);
          }
       case MPI_LONG_LONG_INT:
          switch (op) {
@@ -206,46 +209,159 @@ int iPerformOp(void *runningTotal, void *newValue, int count, MPI_Datatype type,
             case MPI_BOR:	return    iPerformOpBor<MPI_LONG_LONG_INT_T>(runningTotal, newValue, count);
             case MPI_LXOR:	return   iPerformOpLxor<MPI_LONG_LONG_INT_T>(runningTotal, newValue, count);
             case MPI_BXOR:	return   iPerformOpBxor<MPI_LONG_LONG_INT_T>(runningTotal, newValue, count);
-            default: return -1;
+            default: cout << "OP ERROR - Type:" << type << " Op:" << op << endl; while(1);
          }
 
       case MPI_FLOAT_INT:
          switch (op) {
             case MPI_MAXLOC:	return iPerformOpMaxloc<MPI_FLOAT_INT_T>(runningTotal, newValue, count);
             case MPI_MINLOC:	return iPerformOpMinloc<MPI_FLOAT_INT_T>(runningTotal, newValue, count);
-            default: return -1;
+            default: cout << "OP ERROR - Type:" << type << " Op:" << op << endl; while(1);
          }
       case MPI_LONG_INT:
          switch (op) {
             case MPI_MAXLOC:	return iPerformOpMaxloc<MPI_LONG_INT_T>(runningTotal, newValue, count);
             case MPI_MINLOC:	return iPerformOpMinloc<MPI_LONG_INT_T>(runningTotal, newValue, count);
-            default: return -1;
+            default: cout << "OP ERROR - Type:" << type << " Op:" << op << endl; while(1);
          }
       case MPI_DOUBLE_INT:
          switch (op) {
             case MPI_MAXLOC:	return iPerformOpMaxloc<MPI_DOUBLE_INT_T>(runningTotal, newValue, count);
             case MPI_MINLOC:	return iPerformOpMinloc<MPI_DOUBLE_INT_T>(runningTotal, newValue, count);
-            default: return -1;
+            default: cout << "OP ERROR - Type:" << type << " Op:" << op << endl; while(1);
          }
       case MPI_SHORT_INT:
          switch (op) {
             case MPI_MAXLOC:	return iPerformOpMaxloc<MPI_SHORT_INT_T>(runningTotal, newValue, count);
             case MPI_MINLOC:	return iPerformOpMinloc<MPI_SHORT_INT_T>(runningTotal, newValue, count);
-            default: return -1;
+            default: cout << "OP ERROR - Type:" << type << " Op:" << op << endl; while(1);
          }
       case MPI_2INT:
          switch (op) {
             case MPI_MAXLOC:	return iPerformOpMaxloc<MPI_2INT_T>(runningTotal, newValue, count);
             case MPI_MINLOC:	return iPerformOpMinloc<MPI_2INT_T>(runningTotal, newValue, count);
-            default: return -1;
+            default: cout << "OP ERROR - Type:" << type << " Op:" << op << endl; while(1);
          }
       case MPI_LONG_DOUBLE_INT:
          switch (op) {
             case MPI_MAXLOC:	return iPerformOpMaxloc<MPI_LONG_DOUBLE_INT_T>(runningTotal, newValue, count);
             case MPI_MINLOC:	return iPerformOpMinloc<MPI_LONG_DOUBLE_INT_T>(runningTotal, newValue, count);
-            default: return -1;
+            default: cout << "OP ERROR - Type:" << type << " Op:" << op << endl; while(1);
          }
-
-      default: return -1;
+         
+      case MPI_CHARACTER:
+         switch (op) {
+            case MPI_MAX:	return    iPerformOpMax<MPI_CHARACTER_T>(runningTotal, newValue, count);
+            case MPI_MIN:	return    iPerformOpMin<MPI_CHARACTER_T>(runningTotal, newValue, count);
+            case MPI_SUM:	return    iPerformOpSum<MPI_CHARACTER_T>(runningTotal, newValue, count);
+            case MPI_PROD:	return   iPerformOpProd<MPI_CHARACTER_T>(runningTotal, newValue, count);
+            case MPI_BAND:	return   iPerformOpBand<MPI_CHARACTER_T>(runningTotal, newValue, count);
+            case MPI_BOR:	return    iPerformOpBor<MPI_CHARACTER_T>(runningTotal, newValue, count);
+            case MPI_BXOR:	return   iPerformOpBxor<MPI_CHARACTER_T>(runningTotal, newValue, count);
+            default: cout << "OP ERROR - Type:" << type << " Op:" << op << endl; while(1);
+         }
+      case MPI_INTEGER:
+         switch (op) {
+            case MPI_MAX:	return    iPerformOpMax<MPI_INTEGER_T>(runningTotal, newValue, count);
+            case MPI_MIN:	return    iPerformOpMin<MPI_INTEGER_T>(runningTotal, newValue, count);
+            case MPI_SUM:	return    iPerformOpSum<MPI_INTEGER_T>(runningTotal, newValue, count);
+            case MPI_PROD:	return   iPerformOpProd<MPI_INTEGER_T>(runningTotal, newValue, count);
+            case MPI_BAND:	return   iPerformOpBand<MPI_INTEGER_T>(runningTotal, newValue, count);
+            case MPI_BOR:	return    iPerformOpBor<MPI_INTEGER_T>(runningTotal, newValue, count);
+            case MPI_BXOR:	return   iPerformOpBxor<MPI_INTEGER_T>(runningTotal, newValue, count);
+            default: cout << "OP ERROR - Type:" << type << " Op:" << op << endl; while(1);
+         }
+      case MPI_INTEGER1:
+         switch (op) {
+            case MPI_MAX:	return    iPerformOpMax<MPI_INTEGER1_T>(runningTotal, newValue, count);
+            case MPI_MIN:	return    iPerformOpMin<MPI_INTEGER1_T>(runningTotal, newValue, count);
+            case MPI_SUM:	return    iPerformOpSum<MPI_INTEGER1_T>(runningTotal, newValue, count);
+            case MPI_PROD:	return   iPerformOpProd<MPI_INTEGER1_T>(runningTotal, newValue, count);
+            case MPI_BAND:	return   iPerformOpBand<MPI_INTEGER1_T>(runningTotal, newValue, count);
+            case MPI_BOR:	return    iPerformOpBor<MPI_INTEGER1_T>(runningTotal, newValue, count);
+            case MPI_BXOR:	return   iPerformOpBxor<MPI_INTEGER1_T>(runningTotal, newValue, count);
+            default: cout << "OP ERROR - Type:" << type << " Op:" << op << endl; while(1);
+         }
+      case MPI_INTEGER2:
+         switch (op) {
+            case MPI_MAX:	return    iPerformOpMax<MPI_INTEGER2_T>(runningTotal, newValue, count);
+            case MPI_MIN:	return    iPerformOpMin<MPI_INTEGER2_T>(runningTotal, newValue, count);
+            case MPI_SUM:	return    iPerformOpSum<MPI_INTEGER2_T>(runningTotal, newValue, count);
+            case MPI_PROD:	return   iPerformOpProd<MPI_INTEGER2_T>(runningTotal, newValue, count);
+            case MPI_BAND:	return   iPerformOpBand<MPI_INTEGER2_T>(runningTotal, newValue, count);
+            case MPI_BOR:	return    iPerformOpBor<MPI_INTEGER2_T>(runningTotal, newValue, count);
+            case MPI_BXOR:	return   iPerformOpBxor<MPI_INTEGER2_T>(runningTotal, newValue, count);
+            default: cout << "OP ERROR - Type:" << type << " Op:" << op << endl; while(1);
+         }
+      case MPI_INTEGER4:
+         switch (op) {
+            case MPI_MAX:	return    iPerformOpMax<MPI_INTEGER4_T>(runningTotal, newValue, count);
+            case MPI_MIN:	return    iPerformOpMin<MPI_INTEGER4_T>(runningTotal, newValue, count);
+            case MPI_SUM:	return    iPerformOpSum<MPI_INTEGER4_T>(runningTotal, newValue, count);
+            case MPI_PROD:	return   iPerformOpProd<MPI_INTEGER4_T>(runningTotal, newValue, count);
+            case MPI_BAND:	return   iPerformOpBand<MPI_INTEGER4_T>(runningTotal, newValue, count);
+            case MPI_BOR:	return    iPerformOpBor<MPI_INTEGER4_T>(runningTotal, newValue, count);
+            case MPI_BXOR:	return   iPerformOpBxor<MPI_INTEGER4_T>(runningTotal, newValue, count);
+            default: cout << "OP ERROR - Type:" << type << " Op:" << op << endl; while(1);
+         }
+      case MPI_REAL:
+         switch (op) {
+            case MPI_MAX:	return    iPerformOpMax<MPI_REAL_T>(runningTotal, newValue, count);
+            case MPI_MIN:	return    iPerformOpMin<MPI_REAL_T>(runningTotal, newValue, count);
+            case MPI_SUM:	return    iPerformOpSum<MPI_REAL_T>(runningTotal, newValue, count);
+            case MPI_PROD:	return   iPerformOpProd<MPI_REAL_T>(runningTotal, newValue, count);
+            default: cout << "OP ERROR - Type:" << type << " Op:" << op << endl; while(1);
+         }               
+      case MPI_DOUBLE_PRECISION:
+         switch (op) {
+            case MPI_MAX:	return    iPerformOpMax<MPI_DOUBLE_PRECISION_T>(runningTotal, newValue, count);
+            case MPI_MIN:	return    iPerformOpMin<MPI_DOUBLE_PRECISION_T>(runningTotal, newValue, count);
+            case MPI_SUM:	return    iPerformOpSum<MPI_DOUBLE_PRECISION_T>(runningTotal, newValue, count);
+            case MPI_PROD:	return   iPerformOpProd<MPI_DOUBLE_PRECISION_T>(runningTotal, newValue, count);
+            default: cout << "OP ERROR - Type:" << type << " Op:" << op << endl; while(1);
+         } 
+      case MPI_COMPLEX:
+         switch (op) {
+            case MPI_SUM:	return    iPerformOpSum<MPI_COMPLEX_T>(runningTotal, newValue, count);
+            case MPI_PROD:	return   iPerformOpProd<MPI_COMPLEX_T>(runningTotal, newValue, count);
+            default: cout << "OP ERROR - Type:" << type << " Op:" << op << endl; while(1);
+         } 
+      case MPI_DOUBLE_COMPLEX:
+         switch (op) {
+            case MPI_SUM:	return    iPerformOpSum<MPI_DOUBLE_COMPLEX_T>(runningTotal, newValue, count);
+            case MPI_PROD:	return   iPerformOpProd<MPI_DOUBLE_COMPLEX_T>(runningTotal, newValue, count);
+            default: cout << "OP ERROR - Type:" << type << " Op:" << op << endl; while(1);
+         }                                                
+      case MPI_LOGICAL:
+         switch (op) {
+            case MPI_LAND:	return   iPerformOpLand<MPI_LOGICAL_T>(runningTotal, newValue, count);
+            case MPI_LOR:	return    iPerformOpLor<MPI_LOGICAL_T>(runningTotal, newValue, count);
+            case MPI_LXOR:	return   iPerformOpLxor<MPI_LOGICAL_T>(runningTotal, newValue, count);
+            default: cout << "OP ERROR - Type:" << type << " Op:" << op << endl; while(1);
+         }
+         
+      case MPI_2REAL:
+         switch (op) {
+            case MPI_MAXLOC:	return iPerformOpMaxloc<MPI_2REAL_T>(runningTotal, newValue, count);
+            case MPI_MINLOC:	return iPerformOpMinloc<MPI_2REAL_T>(runningTotal, newValue, count);
+            default: cout << "OP ERROR - Type:" << type << " Op:" << op << endl; while(1);
+         }
+      case MPI_2DOUBLE_PRECISION:
+         switch (op) {
+            case MPI_MAXLOC:	return iPerformOpMaxloc<MPI_2DOUBLE_PRECISION_T>(runningTotal, newValue, count);
+            case MPI_MINLOC:	return iPerformOpMinloc<MPI_2DOUBLE_PRECISION_T>(runningTotal, newValue, count);
+            default: cout << "OP ERROR - Type:" << type << " Op:" << op << endl; while(1);
+         }
+      case MPI_2INTEGER:
+         switch (op) {
+            case MPI_MAXLOC:	return iPerformOpMaxloc<MPI_2INTEGER_T>(runningTotal, newValue, count);
+            case MPI_MINLOC:	return iPerformOpMinloc<MPI_2INTEGER_T>(runningTotal, newValue, count);
+            default: cout << "OP ERROR - Type:" << type << " Op:" << op << endl; while(1);
+         }                  
+         
+      default: {
+         cout << "OP ERROR - Type:" << type << " Op:" << op << endl; while(1);
+      }
    }
+   return -1;
 }

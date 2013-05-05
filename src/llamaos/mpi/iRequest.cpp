@@ -71,8 +71,7 @@ int iRequest::test(int *flag, MPI_Status *status) {
       case IREQUEST_SEND:
          return MPI_SUCCESS;
       case IREQUEST_RECEIVE:
-         /*iReceiveNB(buf, count, datatype, rank, tag, comm, 
-MPI_CONTEXT_PT2PT, status, flag);*/
+         iReceiveNB(buf, count, datatype, rank, tag, comm, MPI_CONTEXT_PT2PT, status, flag);
          return MPI_SUCCESS;
       default:
          return -1;

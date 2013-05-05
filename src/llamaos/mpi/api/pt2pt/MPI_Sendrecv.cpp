@@ -29,16 +29,11 @@ either expressed or implied, of the copyright holder(s) or contributors.
 */
 
 #include <iGlobals.h>
-#include <llamaConn.h>
-#include <iRxBuffer.h>
-#include <iostream>
-#include <string.h>
 
-using namespace std;
-using namespace llamaos;
-using namespace llamaos::net;
-using namespace llamaos::xen;
-
-void iProbeNB(int source, int tag, MPI_Comm comm, MPI_Context context, MPI_Status *status, int *flag) {
-   iGetMessage(NULL, 0, MPI_CHAR, source, tag, comm, context, status, flag, true, true);
+int MPI_Sendrecv(void *sendbuf, int sendcount, MPI_Datatype sendtype, int dest, int sendtag,
+                void *recvbuf, int recvcount, MPI_Datatype recvtype, int source, int recvtag,
+                MPI_Comm comm, MPI_Status *status) {
+   iSend(sendbuf, sendcount, sendtype, dest, sendtag, comm, MPI_CONTEXT_PT2PT);
+   iReceive(recvbuf, recvcount, recvtype, source, recvtag, comm, MPI_CONTEXT_PT2PT, status);
+   return MPI_SUCCESS;
 }
