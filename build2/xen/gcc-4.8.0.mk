@@ -78,6 +78,7 @@ SOURCES = \
 HEADERS = 
 
 OBJECTS  = $(SOURCES:%.c=$(OBJDIR)/%.o)
+OBJECTS += $(OBJDIR)/_muldc3.o $(OBJDIR)/_mulsc3.o
 DEPENDS += $(OBJECTS:%.o=%.d)
 
 .PHONY: all
@@ -89,6 +90,17 @@ $(LIBDIR)/gcc.a: $(OBJECTS)
 	@$(AR) r $@ $(OBJECTS)
 	@echo successfully built: $@
 	@echo
+
+# /home/wmagato/Builds/gcc-4.8.0/./gcc/xgcc -B/home/wmagato/Builds/gcc-4.8.0/./gcc/ -B/opt/gcc-4.8.0/x86_64-unknown-linux-gnu/bin/ -B/opt/gcc-4.8.0/x86_64-unknown-linux-gnu/lib/ -isystem /opt/gcc-4.8.0/x86_64-unknown-linux-gnu/include -isystem /opt/gcc-4.8.0/x86_64-unknown-linux-gnu/sys-include    -g -O2 -O2  -g -O2 -DIN_GCC   -W -Wall -Wwrite-strings -Wcast-qual -Wstrict-prototypes -Wmissing-prototypes -Wold-style-definition  -isystem ./include   -fpic -mlong-double-80 -g -DIN_LIBGCC2 -fbuilding-libgcc -fno-stack-protector   -fpic -mlong-double-80 -I. -I. -I../.././gcc -I/usr/src/gcc-4.8.0/libgcc -I/usr/src/gcc-4.8.0/libgcc/. -I/usr/src/gcc-4.8.0/libgcc/../gcc -I/usr/src/gcc-4.8.0/libgcc/../include -I/usr/src/gcc-4.8.0/libgcc/config/libbid -DENABLE_DECIMAL_BID_FORMAT -DHAVE_CC_TLS  -DUSE_TLS -o _muldc3.o -MT _muldc3.o -MD -MP -MF _muldc3.dep -DL_muldc3 -c /usr/src/gcc-4.8.0/libgcc/libgcc2.c -fvisibility=hidden -DHIDE_EXPORTS
+$(OBJDIR)/_muldc3.o : gcc-$(GCC_VERSION)/libgcc/libgcc2.c $(MAKEFILE_SOURCES)
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo compiling: $<
+	@$(CC) -c $(CFLAGS) -DL_muldc3 -o $@ $<
+
+$(OBJDIR)/_mulsc3.o : gcc-$(GCC_VERSION)/libgcc/libgcc2.c $(MAKEFILE_SOURCES)
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo compiling: $<
+	@$(CC) -c $(CFLAGS) -DL_mulsc3 -o $@ $<
 
 include rules.mk
 

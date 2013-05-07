@@ -329,24 +329,26 @@ XFLAGS = \
   -fno-common \
   -mno-red-zone \
   -fno-reorder-blocks \
-  -fno-asynchronous-unwind-tables \
-  -include $(SRCDIR)/llamaos/__thread.h
+  -fno-asynchronous-unwind-tables
 
 # -Wextra
 # -ffreestanding
 
-ASMFLAGS = $(XFLAGS)
+ASMFLAGS = $(XFLAGS) \
+  -include $(SRCDIR)/llamaos/__thread.h
 
 CFLAGS = $(XFLAGS) \
   -nostdinc \
-  -std=gnu99 -fgnu89-inline
+  -std=gnu99 -fgnu89-inline \
+  -include $(SRCDIR)/llamaos/__thread.h
 #  -ffreestanding
 #  -std=gnu99 -fgnu89-inline
 
 CPPFLAGS = $(XFLAGS) \
   -std=gnu++11 \
   -nostdinc -nostdinc++ \
-  -fuse-cxa-atexit
+  -fuse-cxa-atexit \
+  -include $(SRCDIR)/llamaos/__thread.h
 #  -Wold-style-cast -Wzero-as-null-pointer-constant \
 
 F90FLAGS = $(XFLAGS) \
