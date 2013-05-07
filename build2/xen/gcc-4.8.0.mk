@@ -78,7 +78,74 @@ SOURCES = \
 HEADERS = 
 
 OBJECTS  = $(SOURCES:%.c=$(OBJDIR)/%.o)
-OBJECTS += $(OBJDIR)/_muldc3.o $(OBJDIR)/_mulsc3.o
+
+# add gcc functions embedded in libgcc2.c
+OBJECTS += $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/muldi3.o \
+           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/negdi2.o \
+           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/lshrdi3.o \
+           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/ashldi3.o \
+           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/ashrdi3.o \
+           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/cmpdi2.o \
+           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/ucmpdi2.o \
+           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/clear_cache.o \
+           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/trampoline.o \
+           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/absvsi2.o \
+           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/absvdi2.o \
+           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/addvsi3.o \
+           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/addvdi3.o \
+           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/subvsi3.o \
+           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/subvdi3.o \
+           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/mulvsi3.o \
+           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/mulvdi3.o \
+           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/negvsi2.o \
+           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/negvdi2.o \
+           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/ffssi2.o \
+           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/ffsdi2.o \
+           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/clzsi2.o \
+           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/clzdi2.o \
+           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/ctzsi2.o \
+           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/ctzdi2.o \
+           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/popcount_tab.o \
+           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/popcountsi2.o \
+           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/popcountdi2.o \
+           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/paritysi2.o \
+           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/paritydi2.o \
+           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/powisf2.o \
+           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/powidf2.o \
+           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/powixf2.o \
+           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/mulsc3.o \
+           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/muldc3.o \
+           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/mulxc3.o \
+           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/divsc3.o \
+           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/divdc3.o \
+           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/divxc3.o \
+           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/bswapsi2.o \
+           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/bswapdi2.o \
+           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/clrsbsi2.o \
+           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/clrsbdi2.o \
+           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/fixunssfsi.o \
+           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/fixunsdfsi.o \
+           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/fixunsxfsi.o \
+           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/fixsfdi.o \
+           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/fixdfdi.o \
+           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/fixxfdi.o \
+           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/fixunssfdi.o \
+           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/fixunsdfdi.o \
+           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/fixunsxfdi.o \
+           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/floatdisf.o \
+           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/floatdidf.o \
+           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/floatdixf.o \
+           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/floatundisf.o \
+           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/floatundidf.o \
+           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/floatundixf.o \
+           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/eprintf.o \
+           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/_gcc_bcmp.o \
+           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/divdi3.o \
+           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/moddi3.o \
+           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/udivdi3.o \
+           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/udiv_w_sdiv.o \
+           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/udivmoddi4.o
+
 DEPENDS += $(OBJECTS:%.o=%.d)
 
 .PHONY: all
@@ -91,16 +158,10 @@ $(LIBDIR)/gcc.a: $(OBJECTS)
 	@echo successfully built: $@
 	@echo
 
-# /home/wmagato/Builds/gcc-4.8.0/./gcc/xgcc -B/home/wmagato/Builds/gcc-4.8.0/./gcc/ -B/opt/gcc-4.8.0/x86_64-unknown-linux-gnu/bin/ -B/opt/gcc-4.8.0/x86_64-unknown-linux-gnu/lib/ -isystem /opt/gcc-4.8.0/x86_64-unknown-linux-gnu/include -isystem /opt/gcc-4.8.0/x86_64-unknown-linux-gnu/sys-include    -g -O2 -O2  -g -O2 -DIN_GCC   -W -Wall -Wwrite-strings -Wcast-qual -Wstrict-prototypes -Wmissing-prototypes -Wold-style-definition  -isystem ./include   -fpic -mlong-double-80 -g -DIN_LIBGCC2 -fbuilding-libgcc -fno-stack-protector   -fpic -mlong-double-80 -I. -I. -I../.././gcc -I/usr/src/gcc-4.8.0/libgcc -I/usr/src/gcc-4.8.0/libgcc/. -I/usr/src/gcc-4.8.0/libgcc/../gcc -I/usr/src/gcc-4.8.0/libgcc/../include -I/usr/src/gcc-4.8.0/libgcc/config/libbid -DENABLE_DECIMAL_BID_FORMAT -DHAVE_CC_TLS  -DUSE_TLS -o _muldc3.o -MT _muldc3.o -MD -MP -MF _muldc3.dep -DL_muldc3 -c /usr/src/gcc-4.8.0/libgcc/libgcc2.c -fvisibility=hidden -DHIDE_EXPORTS
-$(OBJDIR)/_muldc3.o : gcc-$(GCC_VERSION)/libgcc/libgcc2.c $(MAKEFILE_SOURCES)
+$(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/%.o : gcc-$(GCC_VERSION)/libgcc/libgcc2.c $(MAKEFILE_SOURCES)
 	@[ -d $(@D) ] || (mkdir -p $(@D))
-	@echo compiling: $<
-	@$(CC) -c $(CFLAGS) -DL_muldc3 -o $@ $<
-
-$(OBJDIR)/_mulsc3.o : gcc-$(GCC_VERSION)/libgcc/libgcc2.c $(MAKEFILE_SOURCES)
-	@[ -d $(@D) ] || (mkdir -p $(@D))
-	@echo compiling: $<
-	@$(CC) -c $(CFLAGS) -DL_mulsc3 -o $@ $<
+	@echo compiling: $< $(*F)
+	@$(CC) -c $(CFLAGS) -o $@ -DL_$(*F) $<
 
 include rules.mk
 
