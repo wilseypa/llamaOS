@@ -42,6 +42,7 @@ using namespace llamaos::xen;
 void iGetMessage(void *buf, int count, MPI_Datatype datatype, int source, int tag, 
 			MPI_Comm comm, MPI_Context context, MPI_Status *status, int *flag,
 			bool isProbe, bool isNB) {
+	int rxCommContext, rxTag, rxSource, rxTotSize, rxPart;
 	// Set initial state of flag to false (not received)
 	(*flag) = false;
 			
@@ -65,11 +66,17 @@ void iGetMessage(void *buf, int count, MPI_Datatype datatype, int source, int ta
    iComm *commPtr = it->second;
 
    // Determine source world rank from comm
-   int srcWorldRank = commPtr->getWorldRankFromRank(source);
-   if (srcWorldRank == MPI_UNDEFINED) { // Source rank is not in comm
-      cout << "WARNING: Source rank not found in comm" << endl;
-      return;
-   } 
+   int srcWorldRank;
+   if (source != MPI_ANY_SOURCE) {
+      srcWorldRank = commPtr->getWorldRankFromRank(source);
+      if (srcWorldRank == MPI_UNDEFINED) { // Source rank is not in comm
+         cout << "ERROR: Source rank " << source << " not found in comm " << comm << endl;
+         while(1);
+         return;
+      } 
+   } else {
+      srcWorldRank = source;
+   }
 
    // Print receive request
    #ifdef MPI_COUT_EVERY_MESSAGE
@@ -86,38 +93,47 @@ void iGetMessage(void *buf, int count, MPI_Datatype datatype, int source, int ta
 
    // Check through receive buffer
    int curRxSize = 0;
+   MPI_Status tmpStatus;
    if (isProbe) {
-      // Only check to see if complete message in buffer - either way do not touch it
-      if (rxBuff->probeMessage(source, tag, status)) {
+      // Only check to see if complete messge in buffer - either way do not touch it
+      if (rxBuff->probeMessage(source, tag, &tmpStatus)) {
          #ifdef MPI_COUT_EVERY_MESSAGE
+         srcWorldRank = commPtr->getWorldRankFromRank(tmpStatus.MPI_SOURCE);
          if (isNB) {cout << "[iProbeNB]";}
          else {cout << "[iProbe]";}
          cout << " SUCCESS from src " << srcWorldRank << endl;
          #endif
+         memcpy(status, &tmpStatus, sizeof(MPI_Status));
          (*flag) = true;
          return;
       }
    } else {
       // Pull even incomplete messages out of the buffer
-      curRxSize = rxBuff->popMessage(source, tag, buf, sizeInBytes, status);
+      curRxSize = rxBuff->popMessage(source, tag, buf, sizeInBytes, &tmpStatus);
       // Print buffer pull
+      if (curRxSize > 0) {
+         srcWorldRank = commPtr->getWorldRankFromRank(tmpStatus.MPI_SOURCE);
+         tag = tmpStatus.MPI_TAG;
+         rxTotSize = tmpStatus.size;
+      }
       #ifdef MPI_COUT_EVERY_MESSAGE
-
       if (curRxSize > 0) {
          if (isNB) {cout << "[iReceiveNB]";}
          else {cout << "[iReceive]";}
-         cout << " Pulled message from src " << srcWorldRank << " with curSize " << curRxSize << endl;
+         cout << " Pulled message from src " << srcWorldRank << " with tag " << tag;
+         cout << " and size " << curRxSize << "/" << rxTotSize << endl;
       } else if (!isNB) {
          cout << "[iReceive] Nothing found in rxBuffer" << endl;
       }
       #endif
       // Check if finished already
-      if (curRxSize == sizeInBytes) {
+      if ((curRxSize > 0) && (curRxSize == rxTotSize)) {
          #ifdef MPI_COUT_EVERY_MESSAGE
          if (isNB) {cout << "[iReceiveNB]";}
          else {cout << "[iReceive]";}
          cout << " COMPLETE from src " << srcWorldRank << endl;
          #endif
+         memcpy(status, &tmpStatus, sizeof(MPI_Status));
          (*flag) = true;
          return;
       }
@@ -125,7 +141,6 @@ void iGetMessage(void *buf, int count, MPI_Datatype datatype, int source, int ta
 
    // If not in receive buffer, wait until message received while buffering all other messages
    net::llamaNET::Protocol_header *header;
-   int rxCommContext, rxTag, rxSource, rxTotSize, rxPart;
    MPI_Comm rxComm;
    MPI_Context rxContext;
    for (;;) {
@@ -160,12 +175,15 @@ void iGetMessage(void *buf, int count, MPI_Datatype datatype, int source, int ta
       // Check if desired message type and not a probe
       if ( (!isProbe) && ((rxSource == srcWorldRank) || (srcWorldRank == MPI_ANY_SOURCE)) && 
                (rxComm == comm) && (rxContext == context) && ((rxTag == tag) || (tag == MPI_ANY_TAG))) {
+         srcWorldRank = rxSource;
+         tag = rxTag;
          // Verify length
          if (sizeInBytes < rxTotSize) { // Will not fit in buffer - discard
             cout << endl;
             cout << "ERROR: Message Size: " << rxTotSize;
             cout << " Buffer Size: " << sizeInBytes << " Will not fit" << endl;
             llamaNetInterface->release_recv_buffer(header);
+            while(1);
             return;
          }
             
@@ -219,6 +237,11 @@ void iGetMessage(void *buf, int count, MPI_Datatype datatype, int source, int ta
             if (rxCommRank != MPI_UNDEFINED) { // rank is in comm
                rxBuff->pushMessage((unsigned char*)data, header->len-16, rxCommRank, 
                      rxTag, rxTotSize, rxPart);
+            } else {
+               cout << "ERROR: Source rank " << rxCommRank << " not found in comm " << rxComm << endl;
+               llamaNetInterface->release_recv_buffer(header);
+               while(1);
+               return;
             }
             
             // Release llama rx message buffer
@@ -228,6 +251,8 @@ void iGetMessage(void *buf, int count, MPI_Datatype datatype, int source, int ta
             if ( (isProbe) && ((rxSource == srcWorldRank) || (srcWorldRank == MPI_ANY_SOURCE)) && 
                      (rxComm == comm) && (rxContext == context) && 
                      ((rxTag == tag) || (tag == MPI_ANY_TAG)) ) {
+               srcWorldRank = rxSource;
+               tag = rxTag;
                // Only check to see if complete message in buffer - either way do not touch it
                if (rxBuff->probeMessage(source, tag, status)) {
                   #ifdef MPI_COUT_EVERY_MESSAGE
@@ -240,8 +265,10 @@ void iGetMessage(void *buf, int count, MPI_Datatype datatype, int source, int ta
                }
             }
          } else {
-            cout << "WARNING: Received comm " << rxComm << " does not exist" << endl;
+            cout << "ERROR: Received comm " << rxComm << " does not exist" << endl;
             llamaNetInterface->release_recv_buffer(header); // Release llama rx message buffer
+            while(1);
+            return;
          }
       }
    }

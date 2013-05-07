@@ -323,13 +323,13 @@ int iPerformOp(void *runningTotal, void *newValue, int count, MPI_Datatype type,
       case MPI_COMPLEX:
          switch (op) {
             case MPI_SUM:	return    iPerformOpSum<MPI_COMPLEX_T>(runningTotal, newValue, count);
-            case MPI_PROD:	return   iPerformOpProd<MPI_COMPLEX_T>(runningTotal, newValue, count);
+            //case MPI_PROD:	return   iPerformOpProd<MPI_COMPLEX_T>(runningTotal, newValue, count);
             default: cout << "OP ERROR - Type:" << type << " Op:" << op << endl; while(1);
          } 
       case MPI_DOUBLE_COMPLEX:
          switch (op) {
             case MPI_SUM:	return    iPerformOpSum<MPI_DOUBLE_COMPLEX_T>(runningTotal, newValue, count);
-            case MPI_PROD:	return   iPerformOpProd<MPI_DOUBLE_COMPLEX_T>(runningTotal, newValue, count);
+            //case MPI_PROD:	return   iPerformOpProd<MPI_DOUBLE_COMPLEX_T>(runningTotal, newValue, count);
             default: cout << "OP ERROR - Type:" << type << " Op:" << op << endl; while(1);
          }                                                
       case MPI_LOGICAL:
