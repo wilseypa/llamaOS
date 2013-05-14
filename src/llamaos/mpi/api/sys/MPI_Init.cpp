@@ -189,6 +189,7 @@ int MPI_Init (int *argc, char ***argv) {
    #endif
    unsigned char buf;
    MPI_Bcast(&buf, 1, MPI_UNSIGNED_CHAR, mpiData.totNodes-1, MPI_COMM_WORLD);
+   MPI_Barrier(MPI_COMM_WORLD);
    #ifdef MPI_COUT_INITIALIZATION
    cout << "DONE" << endl;
    #endif
