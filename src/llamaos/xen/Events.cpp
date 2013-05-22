@@ -69,20 +69,24 @@ Events::Events (shared_info_t *shared_info)
       vcpu_info(&shared_info->vcpu_info [0]),
       handlers()
 {
-   vcpu_info->evtchn_upcall_mask = 1;
+// !BAM
+// something is really wrong with callbacks, either here or in entry.S
+// disable all together for now
 
-   Hypercall::set_callbacks (pointer_to_address (hypervisor_callback),
-                             pointer_to_address (failsafe_callback));
+//   vcpu_info->evtchn_upcall_mask = 1;
 
-   for (unsigned int i = 0; i < PENDING_SIZE; i++)
-   {
-      shared_info->evtchn_pending [i] = 0UL;
-      shared_info->evtchn_mask [i] = 0UL;
-   }
+//   Hypercall::set_callbacks (pointer_to_address (hypervisor_callback),
+//                             pointer_to_address (failsafe_callback));
 
-   vcpu_info->evtchn_upcall_pending = 0;
-   vcpu_info->evtchn_upcall_mask = 0;
-   vcpu_info->evtchn_pending_sel = 0UL;
+//   for (unsigned int i = 0; i < PENDING_SIZE; i++)
+//   {
+//      shared_info->evtchn_pending [i] = 0UL;
+//      shared_info->evtchn_mask [i] = 0UL;
+//   }
+
+//   vcpu_info->evtchn_upcall_pending = 0;
+//   vcpu_info->evtchn_upcall_mask = 0;
+//   vcpu_info->evtchn_pending_sel = 0UL;
 }
 
 Events::~Events ()
@@ -97,7 +101,7 @@ void Events::alloc (domid_t /* domid */, evtchn_port_t & /* port */)
 
 void Events::bind (unsigned int port, event_handler_t handler, void *data)
 {
-   handlers [port] = std::pair<event_handler_t, void *> (handler, data);
+//   handlers [port] = std::pair<event_handler_t, void *> (handler, data);
 }
 
 void Events::unbind (unsigned int /* port */)
@@ -107,6 +111,7 @@ void Events::unbind (unsigned int /* port */)
 
 void Events::bind_virq (unsigned int virq, event_handler_t handler, void *data)
 {
+#if 0
    evtchn_port_t port = 0;
 
    Hypercall::event_channel_bind_virq (virq, port);
@@ -114,6 +119,7 @@ void Events::bind_virq (unsigned int virq, event_handler_t handler, void *data)
    handlers [port] = std::pair<event_handler_t, void *> (handler, data);
    trace ("bind_virq: %x\n", port);
 //   shared_info->evtchn_mask [port / sizeof(unsigned long)] &= ~(1 << (port % sizeof(unsigned long)));
+#endif
 }
 
 void Events::unbind_virq (unsigned int /* virq */)

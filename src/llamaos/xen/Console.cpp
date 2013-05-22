@@ -31,6 +31,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <llamaos/memory/Memory.h>
 #include <llamaos/xen/Console.h>
 #include <llamaos/xen/Hypercall.h>
+#include <llamaos/Trace.h>
 
 using namespace llamaos::xen;
 
@@ -38,7 +39,16 @@ Console::Console (xencons_interface *interface, evtchn_port_t port)
    :  interface(interface),
       port(port)
 {
+   if (interface->in_cons != interface->in_prod)
+   {
+      trace ("Console in queue not initialized: %x, %x\n", interface->in_cons, interface->in_prod);
+      interface->in_cons = interface->in_prod;
+   }
 
+   if (interface->out_cons != interface->out_prod)
+   {
+      trace ("Console out queue not initialized: %x, %x\n", interface->out_cons, interface->out_prod);
+   }
 }
 
 Console::~Console ()
@@ -67,32 +77,36 @@ void Console::event_handler (void *data)
 
 void Console::write (char data) const
 {
-   // ensure write is processed
-   mb();
+   XENCONS_RING_IDX cons, prod;
 
-   // check for space in the ring
-//   while ((interface->out_prod - interface->out_cons) >= sizeof(interface->out))
-   // !BAM
-   // just stay well within the buffer?
-   while ((interface->out_prod - interface->out_cons) >= 1000)
+   cons = interface->out_cons;
+   prod = interface->out_prod;
+
+   if ((prod - cons) > sizeof(interface->out))
    {
-      // tell dom0 to consume some data
-      Hypercall::event_channel_send (port);
-
-      // yield cpu to dom0
-      llamaos::xen::Hypercall::sched_op_yield ();
-      mb();
+      trace ("Console out queue corrupted: %x, %x\n", cons, prod);
+      // throw
+      return;
    }
 
-   // get current index into ring and write data
-   XENCONS_RING_IDX index = MASK_XENCONS_IDX(interface->out_prod, interface->out);
+   while ((prod - cons) == sizeof(interface->out))
+   {
+      Hypercall::event_channel_send (port);
+      Hypercall::sched_op_yield ();
+
+      cons = interface->out_cons;
+      prod = interface->out_prod;
+   }
+
+   XENCONS_RING_IDX index = MASK_XENCONS_IDX(prod, interface->out);
+
+   mb ();
    interface->out [index] = data;
 
-   // ensure write is processed
    wmb();
+   interface->out_prod = prod + 1;
 
-   // increment index
-   interface->out_prod++;
+   Hypercall::event_channel_send (port);
 }
 
 void Console::write (const char *data, unsigned int length) const
@@ -103,21 +117,9 @@ void Console::write (const char *data, unsigned int length) const
       // console needs a CR when only an LF is seen
       if ('\n' == data [i])
       {
-         write ('\r');
+         this->write ('\r');
       }
 
       this->write (data [i]);
-   }
-
-   Hypercall::event_channel_send (port);
-
-   // empty in too
-   while ((interface->in_prod - interface->in_cons) > 0)
-   {
-      // increment index
-      interface->in_cons++;
-
-      // ensure write is processed
-      wmb();
    }
 }

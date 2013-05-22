@@ -126,6 +126,9 @@ public:
       write (key, sstream.str ());
    }
 
+   xenstore_domain_interface *const interface;
+   const evtchn_port_t port;
+
 private:
    Xenstore ();
    Xenstore (const Xenstore &);
@@ -139,8 +142,7 @@ private:
    std::string read_response (unsigned int length) const;
    std::string read_response () const;
 
-   xenstore_domain_interface *const interface;
-   const evtchn_port_t port;
+   mutable uint32_t req_id;
 
 };
 

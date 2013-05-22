@@ -48,6 +48,20 @@ int main (int argc, char *argv [])
 
    double third = (1.0 / 3.0);
    cout << "print floats again: " << third << endl;
-   
+#if 0
+      char data = 'a';
+      for (;;)
+      {
+         cout << data;
+         if (data == 'z')
+         {
+            data = 'a';
+         }
+         else
+         {
+            data++;
+         }
+      }
+#endif
    return 0;
 }

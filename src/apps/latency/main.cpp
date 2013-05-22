@@ -37,17 +37,17 @@ using namespace latency;
 
 int main (int argc, char *argv [])
 {
-   try
+//   try
    {
       cout << "starting latency app..." << endl;
       Latency latency (argc, argv);
 
       return latency.run () ? 0 : -1;
    }
-   catch (const exception &e)
-   {
-      cout << "exception: " << e.what () << endl;
-   }
+//   catch (const exception &e)
+//   {
+//      cout << "exception: " << e.what () << endl;
+//   }
 
    return -1;
 }

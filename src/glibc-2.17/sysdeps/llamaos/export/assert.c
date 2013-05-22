@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012, William Magato
+Copyright (c) 2013, William Magato
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,58 +28,33 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <sstream>
-#include <stdexcept>
-#include <string>
+#include <errno.h>
 
-template <typename T>
-static T convert (const std::string &s)
+// define function pointer
+typedef void (*llamaos_assert_fail_t) (const char *, const char *, unsigned int, const char *);
+
+// function pointer variable
+static llamaos_assert_fail_t llamaos_assert_fail = 0;
+
+// function called by llamaOS to register pointer
+void register_llamaos_assert_fail (llamaos_assert_fail_t func)
 {
-   std::stringstream ss (s);
-   T t;
-   ss >> t;
-
-   if (!ss.fail ())
-   {
-      return t;
-   }
-
-   std::stringstream err;
-   err << "failed to convert string: " << s;
-   // throw std::runtime_error (err.str ());
+   llamaos_assert_fail = func;
 }
 
-template <typename T>
-static T parse (int argc, char *argv [], const std::string &arg, const T &value)
+#undef __assert_fail
+void
+__assert_fail (const char *assertion, const char *file, unsigned int line,
+               const char *function)
 {
-   for (int i = 1; i < argc; i++)
+   if (0 != llamaos_assert_fail)
    {
-      if (arg == argv [i])
-      {
-         if ((i + 1) >= argc)
-         {
-            std::stringstream err;
-            err << "missing argument value for " << arg;
-            // throw std::runtime_error (err.str ());
-         }
-
-         return convert<T> (argv [i + 1]);
-      }
+      llamaos_assert_fail (assertion, file, line, function);
    }
-
-   return value;
-}
-
-template <>
-bool parse (int argc, char *argv [], const std::string &arg, const bool &value)
-{
-   for (int i = 1; i < argc; i++)
+   else
    {
-      if (arg == argv [i])
-      {
-         return true;
-      }
+      __set_errno (ENOSYS);
+      for (;;);
    }
-
-   return value;
 }
+hidden_def(__assert_fail)

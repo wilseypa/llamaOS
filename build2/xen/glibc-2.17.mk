@@ -122,13 +122,14 @@ CFLAGS += \
   -DNLSPATH='""' \
   -DSYSCONFDIR='""' \
   -D_IO_MTSAFE_IO \
-  -fexceptions \
   -DMORECORE_CLEARS=2 \
   -DEXEC_PAGESIZE=4096 \
   -D HAVE_MREMAP=0 \
   $(INCLUDES_DIRS) \
   -include  $(SRCDIR)/glibc-$(GLIBC_VERSION)/include/libc-symbols.h \
   -include $(SRCDIR)/llamaos/__thread.h
+
+#  -fexceptions \
 
 VPATH = $(SRCDIR)
 
@@ -226,8 +227,6 @@ ASM_SOURCES = \
 
 C_SOURCES = \
   glibc-$(GLIBC_VERSION)/assert/__assert.c \
-  glibc-$(GLIBC_VERSION)/assert/assert-perr.c \
-  glibc-$(GLIBC_VERSION)/assert/assert.c \
   glibc-$(GLIBC_VERSION)/catgets/catgets.c \
   glibc-$(GLIBC_VERSION)/catgets/open_catalog.c \
   glibc-$(GLIBC_VERSION)/csu/dso_handle.c \
@@ -1060,6 +1059,8 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/_exit.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/abort.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/access.c \
+  glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/assert-perr.c \
+  glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/assert.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/brk.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/close.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/dup.c \
@@ -1278,6 +1279,8 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/wctype/wctype_l.c
 
 # replaced with llamaOS export
+#  glibc-$(GLIBC_VERSION)/assert/assert-perr.c
+#  glibc-$(GLIBC_VERSION)/assert/assert.c
 #  glibc-$(GLIBC_VERSION)/elf/static-stubs.c
 #  glibc-$(GLIBC_VERSION)/io/access.c
 #  glibc-$(GLIBC_VERSION)/io/close.c

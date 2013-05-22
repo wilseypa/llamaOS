@@ -64,26 +64,8 @@ Grant_table::Grant_table ()
    if (!Hypercall::grant_table_setup_table (FRAME_LIST_SIZE, frame_list))
    {
       trace ("failed to create grant table\n");
-      throw runtime_error ("failed to create grant table");
+//      throw runtime_error ("failed to create grant table");
    }
-
-#if 0
-   trace ("calling update_va_mapping...\n");
-   if (!Hypercall::update_va_mapping (pointer_to_address(entries), page_to_address (frame_list [0])))
-   {
-      trace("failed to map grant table\n");
-      throw runtime_error ("failed to map grant table");
-   }
-   trace ("calling update_va_mapping returned.\n");
-
-   trace ("calling update_va_mapping...\n");
-   if (!Hypercall::update_va_mapping (pointer_to_address(entries) + PAGE_SIZE, page_to_address (frame_list [1])))
-   {
-      trace("failed to map grant table\n");
-      throw runtime_error ("failed to map grant table");
-   }
-   trace ("calling update_va_mapping returned.\n");
-#endif
 
    for (int i = 0; i < FRAME_LIST_SIZE; i++)
    {
@@ -91,7 +73,7 @@ Grant_table::Grant_table ()
       if (!Hypercall::update_va_mapping (pointer_to_address(entries) + (i * PAGE_SIZE), page_to_address (frame_list [i])))
       {
          trace("failed to map grant table\n");
-         throw runtime_error ("failed to map grant table");
+//         throw runtime_error ("failed to map grant table");
       }
       trace ("calling update_va_mapping returned.\n");
    }
@@ -114,7 +96,6 @@ grant_ref_t Grant_table::grant_access (domid_t domid, void *address)
    grant_ref_t ref = avail.back ();
    avail.pop_back ();
    inuse.push_back (ref);
-//cout << "grant_access (" << domid << ", " << address << ") to " << ref << endl;
    entries [ref].domid = domid;
    entries [ref].frame = virtual_pointer_to_machine_page(address);
 

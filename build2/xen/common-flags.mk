@@ -38,7 +38,10 @@ ASMFLAGS = \
   -g \
   -Wa,--gen-debug \
   -Wa,--warn \
-  -Wa,--fatal-warnings
+  -Wa,--fatal-warnings \
+  -fno-exceptions \
+  -fno-omit-frame-pointer \
+  -U__EXCEPTIONS
 
 CFLAGS = \
   -m64 \
@@ -47,7 +50,10 @@ CFLAGS = \
   -std=gnu99 \
   -fgnu89-inline \
   -fno-common \
-  -nostdinc
+  -nostdinc \
+  -fno-exceptions \
+  -fno-omit-frame-pointer \
+  -U__EXCEPTIONS
 
 CPPFLAGS = \
   -m64 \
@@ -57,13 +63,19 @@ CPPFLAGS = \
   -std=gnu++11 \
   -fno-common \
   -nostdinc \
-  -nostdinc++
+  -nostdinc++ \
+  -fno-exceptions \
+  -fno-omit-frame-pointer \
+  -U__EXCEPTIONS
 
 F90FLAGS = \
   -m64 \
   -O2 \
   -g \
-  -nostdinc
+  -nostdinc \
+  -fno-exceptions \
+  -fno-omit-frame-pointer \
+  -U__EXCEPTIONS
 
 LDFLAGS = \
  -nostdlib \

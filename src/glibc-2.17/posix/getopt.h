@@ -34,6 +34,9 @@
 # include <ctype.h>
 #endif
 
+// !BAM
+// stop exceptions
+#if 0
 #ifndef __THROW
 # ifndef __GNUC_PREREQ
 #  define __GNUC_PREREQ(maj, min) (0)
@@ -43,6 +46,9 @@
 # else
 #  define __THROW
 # endif
+#endif
+#else
+#  define __THROW
 #endif
 
 #ifdef	__cplusplus

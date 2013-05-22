@@ -49,12 +49,12 @@ static const start_info_t enforce_single_instance (const start_info_t *start_inf
 {
    if (nullptr != instance)
    {
-      throw runtime_error ("duplicate Hypervisor objects created");
+//      throw runtime_error ("duplicate Hypervisor objects created");
    }
 
    if (nullptr == start_info)
    {
-      throw runtime_error ("invalid start_info pointer");
+//      throw runtime_error ("invalid start_info pointer");
    }
 
    return *start_info;
@@ -79,20 +79,25 @@ static shared_info_t *map_shared_info (const start_info_t *start_info)
    return 0;
 }
 
-static void virq_timer_event (void * /* data */)
-{
-   // Hypervisor *hypervisor = reinterpret_cast<Hypervisor *> (data);
+// static void virq_timer_event (void *data)
+// {
+//   trace ("calling virq\n");
+//   Hypervisor *hypervisor = reinterpret_cast<Hypervisor *> (data);
 
    // cout << "virq_timer_event" << endl;
-   cout.flush ();
-   fflush (stdout);
-}
+//    cout.flush ();
+//    fflush (stdout);
+
+   // hit up both the console and the xenstore with an event_handler
+//   Hypercall::event_channel_send (hypervisor->console.port);
+//   Hypercall::event_channel_send (hypervisor->xenstore.port);
+// }
 
 Hypervisor *Hypervisor::get_instance ()
 {
    if (nullptr == instance)
    {
-      throw runtime_error ("invalid Hypervisor instance");
+//      throw runtime_error ("invalid Hypervisor instance");
    }
 
    return instance;
@@ -118,23 +123,28 @@ Hypervisor::~Hypervisor ()
 {
 
 }
+#include <vector>
+#include <string.h>
 
 void Hypervisor::initialize ()
 {
-   sleep (1);
+//   sleep (1);
+
+//   for (;;) { cout << "name: " << xenstore.read_string ("name") << endl; }
+//   long var_long = 0; for (;;) { cout << "long: " << var_long++ << endl; }
 
    name = xenstore.read_string ("name"); // .c_str ();
    trace ("Xenstore name: %s\n", name.c_str ()); 
    domid = xenstore.read<domid_t>("domid");
    trace ("Xenstore domid: %d\n", domid); 
 
-//   trace ("float math: %f, %f, %f\n", 1.0f / 2638.0f, 25 / 43219.0f, 1 / 3.0f);
+   trace ("float math: %f, %f, %f\n", 1.0f / 2638.0f, 25 / 43219.0f, 1 / 3.0f);
    trace ("double math: %lf, %lf, %lf\n", 1.0 / 2638.0, 25 / 43219.0, 1 / 3.0);
 
    trace ("binding to VIRQ_TIMER...\n");
-   events.bind_virq (VIRQ_TIMER, virq_timer_event, this);
+//   events.bind_virq (VIRQ_TIMER, virq_timer_event, this);
 
-   events.bind (console.port, console.event_handler, &console);
+//   events.bind (console.port, console.event_handler, &console);
 
    for (int i = 0; i < 64; i++)
    {

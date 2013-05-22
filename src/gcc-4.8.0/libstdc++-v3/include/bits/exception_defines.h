@@ -30,6 +30,7 @@
 #ifndef _EXCEPTION_DEFINES_H
 #define _EXCEPTION_DEFINES_H 1
 
+#if 0
 #ifndef __EXCEPTIONS
 // Iff -fno-exceptions, transform error handling code to work without it.
 # define __try      if (true)
@@ -40,6 +41,11 @@
 # define __try      try
 # define __catch(X) catch(X)
 # define __throw_exception_again throw
+#endif
+#else
+# define __try      if (true)
+# define __catch(X) if (false)
+# define __throw_exception_again
 #endif
 
 #endif

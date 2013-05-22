@@ -42,20 +42,6 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <llamaos/llamaOS.h>
 #include <llamaos/Trace.h>
 
-// runtime stack memory
-// char RUNTIME_STACK [2 * LLAMAOS_STACK_SIZE];
-
-// static int verify_magic (const start_info_t *start_info)
-// {
-//   if (   (0 != start_info)
-//       && (0 == strncmp (start_info->magic, "xen-", 4)))
-//   {
-//      return 1;
-//   }
-//
-//   return 0;
-//}
-
 static void trace_startup (const start_info_t *start_info)
 {
    trace ("\n\n\n**********************************\n");
@@ -105,6 +91,18 @@ int glibc_access (const char *file, int type)
 
    errno = ENOENT;
    return -1;
+}
+
+void glibc_assert_perror_fail (int err, const char *file, unsigned int line, const char *function)
+{
+   trace ("!!! glibc is calling assert fail !!!\n");
+   trace ("  errno: %d, file: %s, line: %d, function: %s\n", err, file, line, function);
+}
+
+void glibc_assert_fail (const char *assertion, const char *file, unsigned int line, const char *function)
+{
+   trace ("!!! glibc is calling assert fail !!!\n");
+   trace ("  assertion: %s, file: %s, line: %d, function: %s\n", assertion, file, line, function);
 }
 
 static void *glibc_brk (void *addr)
@@ -259,12 +257,12 @@ static off64_t glibc_lseek64 (int fd, off64_t offset, int whence)
    return -1;
 }
 
-static int glibc_lxstat64 (int vers, const char *file, struct stat64 *buf)
-{
-   trace("!!! ALERT: glibc calling lxstat64() before file system support is enabled.\n");
-   trace ("  vers: %d, file: %s\n", vers, file);
-   return -1;
-}
+// static int glibc_lxstat64 (int vers, const char *file, struct stat64 *buf)
+// {
+//    trace("!!! ALERT: glibc calling lxstat64() before file system support is enabled.\n");
+//    trace ("  vers: %d, file: %s\n", vers, file);
+//    return -1;
+// }
 
 static int glibc_madvise (__ptr_t addr, size_t len, int advice)
 {
@@ -366,17 +364,19 @@ static int glibc_xstat (int vers, const char *file, struct stat *buf)
    return -1;
 }
 
-static int glibc_xstat64 (int vers, const char *file, struct stat64 *buf)
-{
-   trace("!!! ALERT: glibc calling xstat64() before file system support is enabled.\n");
-   trace ("  vers: %d, file: %s\n", vers, file);
-   return -1;
-}
+// static int glibc_xstat64 (int vers, const char *file, struct stat64 *buf)
+// {
+//    trace("!!! ALERT: glibc calling xstat64() before file system support is enabled.\n");
+//    trace ("  vers: %d, file: %s\n", vers, file);
+//    return -1;
+// }
 
 static void register_glibc_exports (void)
 {
    register_llamaos_abort (glibc_abort);
    register_llamaos_access (glibc_access);
+   register_llamaos_assert_perror_fail (glibc_assert_perror_fail);
+   register_llamaos_assert_fail (glibc_assert_fail);
    register_llamaos_brk (glibc_brk);
    register_llamaos_close (glibc_close);
    register_llamaos_dup (glibc_dup);
@@ -396,7 +396,7 @@ static void register_glibc_exports (void)
    register_llamaos_libc_open (glibc_libc_open);
    register_llamaos_lseek (glibc_lseek);
    register_llamaos_lseek64 (glibc_lseek64);
-   register_llamaos_lxstat64 (glibc_lxstat64);
+//   register_llamaos_lxstat64 (glibc_lxstat64);
    register_llamaos_madvise (glibc_madvise);
    register_llamaos_mkdir (glibc_mkdir);
    register_llamaos_pathconf (glibc_pathconf);
@@ -413,7 +413,7 @@ static void register_glibc_exports (void)
    register_llamaos_write (glibc_libc_write);
    register_llamaos_writev (glibc_writev);
    register_llamaos_xstat (glibc_xstat);
-   register_llamaos_xstat64 (glibc_xstat64);
+//   register_llamaos_xstat64 (glibc_xstat64);
 }
 
 #define MXCSR_DEFAULT 0x1f80
@@ -451,7 +451,7 @@ void setup_xen_features(void)
         fi.submap_idx = i;
         if (HYPERVISOR_xen_version(XENVER_get_features, &fi) < 0)
             break;
-        
+
         for (j=0; j<32; j++)
             xen_features[i*32+j] = !!(fi.submap & 1<<j);
     }

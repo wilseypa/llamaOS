@@ -34,6 +34,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <stddef.h>
 #include <signal.h>
 #include <unistd.h>
+#include <stddef.h>
 #include <sys/poll.h>
 #include <sys/time.h>
 #include <sys/types.h>
@@ -50,6 +51,8 @@ either expressed or implied, of the copyright holder(s) or contributors.
 // why is this not defined?
 typedef int64_t off64_t;
 
+#define stat64(fname, buf) __xstat64 (_STAT_VER, fname, buf)
+
 // void abort (void)
 typedef void (*llamaos_abort_t) (void);
 EXTERN void register_llamaos_abort (llamaos_abort_t abort);
@@ -57,6 +60,14 @@ EXTERN void register_llamaos_abort (llamaos_abort_t abort);
 // int __access (const char *file, int type)
 typedef int (*llamaos_access_t) (const char *, int);
 EXTERN void register_llamaos_access (llamaos_access_t access);
+
+// void __assert_perror_fail (int errnum, const char *file, unsigned int line, const char *function)
+typedef void (*llamaos_assert_perror_fail_t) (int, const char *, unsigned int, const char *);
+EXTERN void register_llamaos_assert_perror_fail (llamaos_assert_perror_fail_t assert);
+
+// void __assert_fail (const char *assertion, const char *file, unsigned int line, const char *function)
+typedef void (*llamaos_assert_fail_t) (const char *, const char *, unsigned int, const char *);
+EXTERN void register_llamaos_assert_fail (llamaos_assert_fail_t assert);
 
 // int brk (void *addr)
 typedef void *(*llamaos_brk_t) (void *);
@@ -135,8 +146,8 @@ typedef off64_t (*llamaos_lseek64_t) (int, off64_t, int);
 EXTERN void register_llamaos_lseek64 (llamaos_lseek64_t func);
 
 // int __lxstat64 (int vers, const char *file, struct stat64 *buf)
-typedef int (*llamaos_lxstat64_t) (int, const char *, struct stat64 *);
-EXTERN void register_llamaos_lxstat64 (llamaos_lxstat64_t func);
+// typedef int (*llamaos_lxstat64_t) (int, const char *, struct stat64 *);
+// EXTERN void register_llamaos_lxstat64 (llamaos_lxstat64_t func);
 
 // int madvise (__ptr_t addr, size_t len, int advice)
 typedef int (*llamaos_madvise_t) (__ptr_t, size_t, int);
@@ -203,7 +214,7 @@ typedef int (*llamaos_xstat_t) (int, const char *, struct stat *);
 EXTERN void register_llamaos_xstat (llamaos_xstat_t func);
 
 // int __xstat64 (int vers, const char *file, struct stat64 *buf)
-typedef int (*llamaos_xstat64_t) (int, const char *, struct stat64 *);
-EXTERN void register_llamaos_xstat64 (llamaos_xstat64_t func);
+// typedef int (*llamaos_xstat64_t) (int, const char *, struct stat64 *);
+// EXTERN void register_llamaos_xstat64 (llamaos_xstat64_t func);
 
 #endif	//  llamaos_xen_export_glibc_h_

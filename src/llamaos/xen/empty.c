@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012, William Magato
+Copyright (c) 2013, William Magato
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,58 +28,8 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <sstream>
-#include <stdexcept>
-#include <string>
-
-template <typename T>
-static T convert (const std::string &s)
+// entry function called from entry.S
+void start (void)
 {
-   std::stringstream ss (s);
-   T t;
-   ss >> t;
 
-   if (!ss.fail ())
-   {
-      return t;
-   }
-
-   std::stringstream err;
-   err << "failed to convert string: " << s;
-   // throw std::runtime_error (err.str ());
-}
-
-template <typename T>
-static T parse (int argc, char *argv [], const std::string &arg, const T &value)
-{
-   for (int i = 1; i < argc; i++)
-   {
-      if (arg == argv [i])
-      {
-         if ((i + 1) >= argc)
-         {
-            std::stringstream err;
-            err << "missing argument value for " << arg;
-            // throw std::runtime_error (err.str ());
-         }
-
-         return convert<T> (argv [i + 1]);
-      }
-   }
-
-   return value;
-}
-
-template <>
-bool parse (int argc, char *argv [], const std::string &arg, const bool &value)
-{
-   for (int i = 1; i < argc; i++)
-   {
-      if (arg == argv [i])
-      {
-         return true;
-      }
-   }
-
-   return value;
 }

@@ -45,7 +45,6 @@ CFLAGS += \
   -DIN_LIBGCC2 \
   -fbuilding-libgcc \
   -fno-stack-protector \
-  -fexceptions \
   -fvisibility=hidden \
   -I $(SRCDIR)/gcc-$(GCC_VERSION)/gcc \
   -I $(SRCDIR)/gcc-$(GCC_VERSION)/libgcc \
@@ -55,6 +54,8 @@ CFLAGS += \
   -I $(SRCDIR)/gcc-$(GCC_VERSION)/libcpp/include \
   -I $(INCDIR) \
   -include $(SRCDIR)/llamaos/__thread.h
+
+#  -fexceptions \
 
 VPATH = $(SRCDIR)
 

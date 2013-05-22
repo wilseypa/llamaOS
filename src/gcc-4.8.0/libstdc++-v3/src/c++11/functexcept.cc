@@ -28,7 +28,9 @@
 #include <typeinfo>
 #include <ios>
 #include <system_error>
-#include <future>
+
+// BAM
+// #include <future>
 #include <functional>
 #include <regex>
 

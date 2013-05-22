@@ -320,8 +320,14 @@ struct exception
     double retval;
   };
 
+// !BAM
+// stop exceptions
+#if 0
 # ifdef __cplusplus
 extern int matherr (struct __exception *__exc) throw ();
+# else
+extern int matherr (struct exception *__exc);
+# endif
 # else
 extern int matherr (struct exception *__exc);
 # endif

@@ -327,9 +327,13 @@ XFLAGS = \
   -D__USE_FORTIFY_LEVEL=0 \
   -D_LIBC_REENTRANT \
   -fno-common \
-  -mno-red-zone \
   -fno-reorder-blocks \
-  -fno-asynchronous-unwind-tables
+  -fno-asynchronous-unwind-tables \
+  -fno-exceptions \
+  -fno-omit-frame-pointer\
+  -U__EXCEPTIONS
+
+#  -mno-red-zone
 
 # -Wextra
 # -ffreestanding

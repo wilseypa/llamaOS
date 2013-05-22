@@ -47,6 +47,9 @@
 #  define __LEAF_ATTR
 # endif
 
+// !BAM
+// stop exceptions
+#if 0
 /* GCC can always grok prototypes.  For C++ programs we add throw()
    to help it optimize the function calls.  But this works only with
    gcc 2.8.x and egcs.  For gcc 3.2 and up we even mark C functions
@@ -67,6 +70,11 @@
 #   define __NTH(fct)	fct
 #  endif
 # endif
+#else
+#   define __THROW
+#   define __THROWNL
+#   define __NTH(fct)   fct
+#endif
 
 #else	/* Not GCC.  */
 

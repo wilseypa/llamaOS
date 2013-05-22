@@ -44,16 +44,21 @@ using namespace std;
 using namespace llamaos::memory;
 using namespace llamaos::xen;
 
-#define mb()  __asm__ __volatile__ ( "mfence" : : : "memory")
-#define wmb() __asm__ __volatile__ ( "" : : : "memory")
-
-static uint32_t xenstore_req_id = 1;
-
 Xenstore::Xenstore (xenstore_domain_interface *interface, evtchn_port_t port)
    :  interface(interface),
-      port(port)
+      port(port),
+      req_id(1)
 {
+   if (interface->req_cons != interface->req_prod)
+   {
+      trace ("Xenstore request queue not initialized: %x, %x\n", interface->req_cons, interface->req_prod);
+   }
 
+   if (interface->rsp_cons != interface->rsp_prod)
+   {
+      trace ("Xenstore response queue not initialized: %x, %x\n", interface->rsp_cons, interface->rsp_prod);
+      interface->rsp_cons = interface->rsp_prod;
+   }
 }
 
 Xenstore::~Xenstore ()
@@ -66,7 +71,7 @@ void Xenstore::start_transaction (uint32_t id)
    struct xsd_sockmsg msg;
 
    msg.type = XS_TRANSACTION_START;
-   msg.req_id = xenstore_req_id;
+   msg.req_id = req_id;
    msg.tx_id = id;
    msg.len = 1;
 
@@ -85,7 +90,7 @@ void Xenstore::end_transaction (uint32_t id)
    struct xsd_sockmsg msg;
 
    msg.type = XS_TRANSACTION_END;
-   msg.req_id = xenstore_req_id;
+   msg.req_id = req_id;
    msg.tx_id = id;
    msg.len = 1;
 
@@ -125,65 +130,45 @@ void Xenstore::write (const std::string &key, const std::string &value) const
 
 void Xenstore::write_request (const char *data, unsigned int length) const
 {
-   if (length > XENSTORE_RING_SIZE)
-   {
-      cout << "Xenstore write: message too long" << endl;
-      cout.flush();
-      // throw runtime_error ("Xenstore write: message too long");
-      return;
-   }
+   unsigned long wd = 0;
+   XENSTORE_RING_IDX cons, prod;
 
-#if 0
-   for (unsigned int i = 0; i < length; i++)
+   // logic from Linux kernel
+   while (length > 0)
    {
-      // check for space in the ring
-      while ((interface->req_prod - interface->req_cons) >= XENSTORE_RING_SIZE)
+      cons = interface->req_cons;
+      prod = interface->req_prod;
+
+      if ((prod - cons) > XENSTORE_RING_SIZE)
       {
-         // tell dom0 to consume some data
-         Hypercall::event_channel_send (port);
+         trace ("Xenstore request queue corrupted: %x, %x\n", cons, prod);
+         // throw
+         return;
+      }
+      else if ((prod - cons) != XENSTORE_RING_SIZE)
+      {
+         XENSTORE_RING_IDX index = MASK_XENSTORE_IDX(prod);
 
-         // yield cpu to dom0
-         // llamaos::xen::Hypercall::sched_op_yield ();
-         mb();
+         mb ();
+         interface->req [index] = *data;
+
+//         trace ("write_request: (%d), %d, %d\n", (int)*data, length, prod);
+         data++;
+         length--;
+
+         wmb();
+         interface->req_prod = prod + 1;
+         wd = 0;
       }
 
-      // get current index into ring and write data
-      XENSTORE_RING_IDX index = MASK_XENSTORE_IDX(interface->req_prod);
-      interface->req [index] = data [i];
-
-      // ensure write is processed
-      wmb();
-
-      // increment index
-      interface->req_prod++;
-   }
-#else
-   // check for space in the ring
-   if ((interface->req_prod - interface->req_cons) < length)
-   {
-      // tell dom0 to consume some data
       Hypercall::event_channel_send (port);
 
-      // yield cpu to dom0
-      llamaos::xen::Hypercall::sched_op_yield ();
-      mb();
+      if (++wd > 10000000)
+      {
+         cout << "stuck in write_request" << endl;
+         break;
+      }
    }
-
-   XENSTORE_RING_IDX req_prod = interface->req_prod;
-
-   for (unsigned int i = 0; i < length; i++)
-   {
-      // get current index into ring and write data
-      XENSTORE_RING_IDX index = MASK_XENSTORE_IDX(req_prod++);
-      interface->req [index] = data [i];
-   }
-
-   // ensure write is processed
-   wmb();
-
-   // increment index
-   interface->req_prod += length;
-#endif
 }
 
 void Xenstore::write_read_request (const std::string &key) const
@@ -191,12 +176,13 @@ void Xenstore::write_read_request (const std::string &key) const
    struct xsd_sockmsg msg;
 
    msg.type = XS_READ;
-   msg.req_id = xenstore_req_id;
+   msg.req_id = req_id;
    msg.tx_id = 0;
    msg.len = key.size () + 1;
 
    write_request (reinterpret_cast<const char *>(&msg), sizeof(msg));
-   write_request (key.c_str (), key.size () + 1);
+   write_request (key.c_str (), key.size ());
+   write_request ("", 1);
 }
 
 void Xenstore::write_write_request (const std::string &key, const std::string &value) const
@@ -204,7 +190,7 @@ void Xenstore::write_write_request (const std::string &key, const std::string &v
    struct xsd_sockmsg msg;
 
    msg.type = XS_WRITE;
-   msg.req_id = xenstore_req_id;
+   msg.req_id = req_id;
    msg.tx_id = 0;
    msg.len = key.size () + 1 + value.size () + 1;
 
@@ -215,68 +201,91 @@ void Xenstore::write_write_request (const std::string &key, const std::string &v
 
 void Xenstore::read_response (char *data, unsigned int length) const
 {
-   if (length > XENSTORE_RING_SIZE)
-   {
-      cout << "Xenstore write: message too long" << endl;
-      cout.flush();
-      // throw runtime_error ("Xenstore write: message too long");
-      return;
-   }
+   unsigned long wd = 0;
+   XENSTORE_RING_IDX cons, prod;
 
-   XENSTORE_RING_IDX rsp_cons = interface->rsp_cons;
-
-   for (unsigned int i = 0; i < length; i++)
+   // logic from Linux kernel
+   while (length > 0)
    {
-      while (0 == (interface->rsp_prod - rsp_cons))
-//      while (0 == (interface->rsp_prod - interface->rsp_cons))
+      cons = interface->rsp_cons;
+      prod = interface->rsp_prod;
+
+      if ((prod - cons) > XENSTORE_RING_SIZE)
       {
-         // yield cpu to dom0
-         llamaos::xen::Hypercall::sched_op_yield ();
-         mb ();
+         trace ("Xenstore response queue corrupted: %x, %x\n", cons, prod);
+         interface->rsp_cons = interface->rsp_prod;
+         // throw
+         return;
+      }
+      else if ((prod - cons) != 0)
+      {
+         XENSTORE_RING_IDX index = MASK_XENSTORE_IDX(cons);
+
+         rmb();
+         *data = interface->rsp [index];
+
+//         trace ("read_response: %d\n", (int)*data);
+
+         data++;
+         length--;
+
+         mb();
+         interface->rsp_cons = cons + 1;
+         wd = 0;
       }
 
-      // get current index into ring and read data
-      XENSTORE_RING_IDX index = MASK_XENSTORE_IDX(rsp_cons++);
-//      XENSTORE_RING_IDX index = MASK_XENSTORE_IDX(interface->rsp_cons);
-      data [i] = interface->rsp [index];
+      Hypercall::event_channel_send (port);
 
-      mb ();
-
-//      interface->rsp_cons++;
+      if (++wd > 10000000)
+      {
+         cout << "stuck in read_response2" << endl;
+         break;
+      }
    }
-
-   interface->rsp_cons += length;
 }
 
 string Xenstore::read_response (unsigned int length) const
 {
-   xenstore_domain_interface *_interface = interface;
-   XENSTORE_RING_IDX rsp_cons = _interface->rsp_cons;
-   mb();
-
+   unsigned long wd = 0;
+   XENSTORE_RING_IDX cons, prod;
    stringstream sstream;
 
-   for (unsigned int i = 0; i < length; i++)
+   // logic from Linux kernel
+   while (length > 0)
    {
-      while (0 == (_interface->rsp_prod - rsp_cons))
-//      while (0 == (interface->rsp_prod - interface->rsp_cons))
+      cons = interface->rsp_cons;
+      prod = interface->rsp_prod;
+
+      if ((prod - cons) > XENSTORE_RING_SIZE)
       {
-         // yield cpu to dom0
-         llamaos::xen::Hypercall::sched_op_yield ();
-         mb ();
+         trace ("Xenstore response queue corrupted: %x, %x\n", cons, prod);
+         interface->rsp_cons = interface->rsp_prod;
+         // throw
+         return "error response queue corrupted";
+      }
+      else if ((prod - cons) != 0)
+      {
+         XENSTORE_RING_IDX index = MASK_XENSTORE_IDX(cons);
+
+         rmb();
+         sstream << interface->rsp [index];
+
+//         trace ("read_response: %s\n", sstream.str().c_str());
+         length--;
+
+         mb();
+         interface->rsp_cons = cons + 1;
+         wd = 0;
       }
 
-      // get current index into ring and read data
-      XENSTORE_RING_IDX index = MASK_XENSTORE_IDX(rsp_cons++);
-//      XENSTORE_RING_IDX index = MASK_XENSTORE_IDX(interface->rsp_cons);
-      sstream << _interface->rsp [index];
+      Hypercall::event_channel_send (port);
 
-      wmb ();
-      interface->rsp_cons++;
-      mb ();
+      if (++wd > 10000000)
+      {
+         cout << "stuck in read_response1" << endl;
+         break;
+      }
    }
-
-   _interface->rsp_cons = rsp_cons;
 
    return sstream.str ();
 }
@@ -286,11 +295,17 @@ string Xenstore::read_response () const
    struct xsd_sockmsg msg;
    read_response (reinterpret_cast<char *>(&msg), sizeof(msg));
 
-   if (msg.req_id != xenstore_req_id++)
+//   cout << "   read xsd message:" << endl;
+//   cout << "               type:" << msg.type << endl;
+//   cout << "             req_id:" << msg.req_id << endl;
+//   cout << "              tx_id:" << msg.tx_id << endl;
+//   cout << "                len:" << msg.len << endl;
+
+   if (msg.req_id != req_id++)
    {
       // !BAM lets not do this now since throw is unreliable
       // throw runtime_error ("Xenstore read: returned invalid request id");
-      std::cout << "wrong xenstore msg id detected: " << msg.req_id << " != " << (xenstore_req_id - 1) << std::endl;
+      std::cout << "wrong xenstore msg id detected: " << msg.req_id << " != " << (req_id - 1) << std::endl;
       cout.flush();
       for (;;);
    }
