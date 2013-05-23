@@ -20,6 +20,9 @@ obj/
 ###################
 build/custom-mpi-flags.mk
 build/custom-flags.mk
+build2/linux/custom-flags.mk
+build2/linux/custom-vars.mk
+build2/xen/custom-flags.mk
 build2/xen/custom-vars.mk
 
 # KDevelop files #
