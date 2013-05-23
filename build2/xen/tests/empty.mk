@@ -30,18 +30,41 @@
 # contributors.
 #
 
+# include common variables
+include common-vars.mk
+include common-flags.mk
 
-.PHONY: all
-all:
-	@$(MAKE) -C linux $@
-	@$(MAKE) -C xen $@
+MAKEFILE_SOURCES += tests/empty.mk
 
-.PHONY: install
-install:
-	@$(MAKE) -C linux $@
-	@$(MAKE) -C xen $@
+ASMFLAGS += 
 
-.PHONY: clean
-clean:
-	@$(MAKE) -C linux $@
-	@$(MAKE) -C xen $@
+CFLAGS += \
+  -I $(INCDIR)
+
+VPATH = $(SRCDIR)
+
+ASM_SOURCES = \
+  llamaos/xen/entry.S
+
+C_SOURCES = \
+  llamaos/xen/empty.c
+
+OBJECTS  = $(ASM_SOURCES:%.S=$(OBJDIR)/%.o)
+OBJECTS += $(C_SOURCES:%.c=$(OBJDIR)/%.o)
+DEPENDS += $(OBJECTS:%.o=%.d)
+
+.PHONY: empty
+empty : $(BINDIR)/empty
+
+$(BINDIR)/empty: $(OBJECTS)
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo linking: $@
+	@$(LD) $(LDFLAGS) -T llamaOS.lds -o $@ $^
+	@gzip -c -f --best $@ >$@.gz
+	@echo successfully built: $@
+	@echo
+
+include rules.mk
+
+# include auto-generated dependencies
+-include $(DEPENDS)

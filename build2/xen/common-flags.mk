@@ -81,3 +81,6 @@ LDFLAGS = \
  -nostdlib \
  -nostartfiles \
  -nodefaultlibs 
+
+# if present, include custom compiler flags
+-include custom-flags.mk

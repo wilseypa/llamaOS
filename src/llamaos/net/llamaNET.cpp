@@ -63,7 +63,6 @@ llamaNET::llamaNET (int domd_id, int index)
 //   Hypercall::update_va_mapping_nocache (pointer_to_address (control.get_pointer ()), virtual_pointer_to_machine_address(control.get_pointer ()));
 
    xen::Grant_map<grant_ref_t> tx_refs (domd_id, 16376 - index);
-   xen::Grant_map<grant_ref_t> rx_refs (domd_id, 16370 - index);
 
    for (unsigned int i = 0; i < TX_BUFFERS; i++)
    {
@@ -73,6 +72,8 @@ llamaNET::llamaNET (int domd_id, int index)
       tx_buffers.push_back (new Grant_map<Protocol_header>(domd_id, tx_refs.get_pointer () [i]));
    }
 //      sleep (3);
+
+   xen::Grant_map<grant_ref_t> rx_refs (domd_id, 16370 - index);
 
    for (unsigned int i = 0; i < RX_BUFFERS; i++)
    {

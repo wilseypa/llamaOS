@@ -30,18 +30,37 @@
 # contributors.
 #
 
+# include common variables
+include common-vars.mk
+include common-flags.mk
 
-.PHONY: all
-all:
-	@$(MAKE) -C linux $@
-	@$(MAKE) -C xen $@
+MAKEFILE_SOURCES += netpipe-$(NETPIPE_VERSION)-memcpy.mk
 
-.PHONY: install
-install:
-	@$(MAKE) -C linux $@
-	@$(MAKE) -C xen $@
+CFLAGS += \
+  -DMEMCPY
 
-.PHONY: clean
-clean:
-	@$(MAKE) -C linux $@
-	@$(MAKE) -C xen $@
+VPATH = $(SRCDIR)
+
+SOURCES = \
+  apps/netpipe-$(NETPIPE_VERSION)/src/memcpy.c
+
+OBJECTS  = $(OBJDIR)/apps/netpipe-$(NETPIPE_VERSION)/src/netpipe-memcpy.o
+OBJECTS += $(SOURCES:%.c=$(OBJDIR)/%.o)
+DEPENDS  = $(OBJECTS:%.o=%.d)
+
+$(BINDIR)/linux/netpipe-memcpy: $(OBJECTS)
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo linking: $@
+	@$(CC) $(LDFLAGS) -o $@ $^
+	@echo successfully built: $@
+	@echo
+
+$(OBJDIR)/apps/netpipe-$(NETPIPE_VERSION)/src/netpipe-memcpy.o : $(SRCDIR)/apps/netpipe-$(NETPIPE_VERSION)/src/netpipe.c $(MAKEFILE_SOURCES)
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo compiling: $<
+	@$(CC) -c $(CFLAGS) -o $@ $<
+
+include rules.mk
+
+# include auto-generated dependencies
+-include $(DEPENDS)

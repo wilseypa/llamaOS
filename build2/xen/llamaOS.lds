@@ -48,42 +48,27 @@ SECTIONS
   {
     _text = .;
     *(.text)
+     *(.rodata*)
     *(.gnu.linkonce.t*)
   }
 
-   .ctors :
-   {
-      __CTOR_LIST__ = .;
-      QUAD((__CTOR_END__ - __CTOR_LIST__) / 8 - 2)
-      *(.ctors)
-      QUAD(0)
-      __CTOR_END__ = .;
-   }
-
-   .dtors :
-   {
-      __DTOR_LIST__ = .;
-      QUAD((__DTOR_END__ - __DTOR_LIST__) / 8 - 2)
-      *(.dtors)
-      QUAD(0)
-      __DTOR_END__ = .;
-   }
-
-/*
-  .rodata ALIGN (0x1000) :
+  .ctors :
   {
+    . = ALIGN(4096);
     start_ctors = .;
-    *(SORT(.ctors*))
+    *(.init_array);
+    *(.ctors);
     end_ctors = .;
-
-    start_dtors = .;
-    *(SORT(.dtors*))
-    end_dtors = .;
-
-    *(.rodata*)
-    *(.gnu.linkonce.r*)
   }
-*/
+
+  .dtors :
+  {
+    . = ALIGN(4096);
+    start_dtors = .;
+    *(.fini_array);
+    *(.dtors);
+    end_dtors = .;
+  }
 
   .data ALIGN (0x1000) :
   {

@@ -30,18 +30,33 @@
 # contributors.
 #
 
+MAKEFILE_SOURCES += common-flags.mk
 
-.PHONY: all
-all:
-	@$(MAKE) -C linux $@
-	@$(MAKE) -C xen $@
+ASMFLAGS = \
+  -m64 \
+  -O2 \
+  -g
 
-.PHONY: install
-install:
-	@$(MAKE) -C linux $@
-	@$(MAKE) -C xen $@
+CFLAGS = \
+  -m64 \
+  -O2 \
+  -g \
+  -std=gnu99 \
+  -fgnu89-inline
 
-.PHONY: clean
-clean:
-	@$(MAKE) -C linux $@
-	@$(MAKE) -C xen $@
+CPPFLAGS = \
+  -m64 \
+  -O2 \
+  -g \
+  -Wall \
+  -std=gnu++11
+
+F90FLAGS = \
+  -m64 \
+  -O2 \
+  -g
+
+LDFLAGS = 
+
+# if present, include custom compiler flags
+-include custom-flags.mk
