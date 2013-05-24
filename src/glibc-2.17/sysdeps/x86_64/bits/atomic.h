@@ -16,6 +16,11 @@
    License along with the GNU C Library; if not, see
    <http://www.gnu.org/licenses/>.  */
 
+// !BAM
+// this needs an include protector?
+#ifndef llamaos_glibc_sysdeps_x86_64_bits_atomic_h
+#define llamaos_glibc_sysdeps_x86_64_bits_atomic_h
+
 #include <stdint.h>
 #include <tls.h>	/* For tcbhead_t.  */
 #include <libc-internal.h>
@@ -470,3 +475,5 @@ typedef uintmax_t uatomic_max_t;
 #define catomic_or(mem, mask) __arch_or_body (__arch_cprefix, mem, mask)
 
 #endif
+
+#endif  // llamaos_glibc_sysdeps_x86_64_bits_atomic_h
