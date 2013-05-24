@@ -153,7 +153,8 @@
 /* #undef HAVE_LIBIDN */
 
 /* Define if inlined system calls are available.  */
-#define HAVE_INLINED_SYSCALLS 1
+// !BAM
+/* #define HAVE_INLINED_SYSCALLS 1 */
 
 /* Define if your assembler and linker support R_PPC_REL16* relocs.  */
 /* #undef HAVE_ASM_PPC_REL16 */

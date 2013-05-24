@@ -34,3 +34,8 @@ int MPI_Send(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI
    iSend(buf, count, datatype, dest, tag, comm, MPI_CONTEXT_PT2PT);
    return MPI_SUCCESS;
 }
+
+int MPI_Ssend(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm) {
+   iSend(buf, count, datatype, dest, tag, comm, MPI_CONTEXT_PT2PT);
+   return MPI_SUCCESS;
+}

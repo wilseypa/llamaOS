@@ -171,6 +171,12 @@ static int glibc_get_nprocs_conf (void)
    return 1;
 }
 
+static int glibc_gethostname (char *name, size_t len)
+{
+   trace("!!! ALERT: glibc calling gethostname().\n");
+   return -1;
+}
+
 static int glibc_getpagesize (void)
 {
    return LLAMAOS_PAGE_SIZE;
@@ -386,6 +392,7 @@ static void register_glibc_exports (void)
    register_llamaos_get_avphys_pages (glibc_get_avphys_pages);
    register_llamaos_get_nprocs (glibc_get_nprocs);
    register_llamaos_get_nprocs_conf (glibc_get_nprocs_conf);
+   register_llamaos_gethostname (glibc_gethostname);
    register_llamaos_getpagesize (glibc_getpagesize);
    register_llamaos_get_phys_pages (glibc_get_phys_pages);
    register_llamaos_getcwd (glibc_getcwd);

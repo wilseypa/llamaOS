@@ -44,11 +44,11 @@ LD = ld
 MPICC = mpicc
 
 # shared common paths
-BINDIR = ../../build/bin
-LIBDIR = ../../build/lib
+BINDIR = bin
+LIBDIR = lib
 OBJDIR = obj
 
-INCDIR = ../../build/include
+INCDIR = include
 SRCDIR = ../../src
 
 NETPIPE_VERSION = 3.7.2

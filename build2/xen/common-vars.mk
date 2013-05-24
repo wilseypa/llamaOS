@@ -43,11 +43,11 @@ AS = as
 LD = ld
 
 # shared common paths
-BINDIR = ../../build/bin
-LIBDIR = ../../build/lib
+BINDIR = bin
+LIBDIR = lib
 OBJDIR = obj
 
-INCDIR = ../../build/include
+INCDIR = include
 SRCDIR = ../../src
 
 GLIBC_VERSION = 2.17
@@ -55,6 +55,7 @@ GCC_VERSION = 4.8.0
 XEN_VERSION = 4.2.0
 # XEN_VERSION = 4.2.1
 GTEST_VERSION = 1.6.0
+NETPIPE_VERSION = 3.7.2
 
 # auto dependency generation
 DEPENDS = 

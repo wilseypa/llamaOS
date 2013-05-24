@@ -48,7 +48,7 @@ OBJECTS  = $(OBJDIR)/apps/netpipe-$(NETPIPE_VERSION)/src/netpipe-memcpy.o
 OBJECTS += $(SOURCES:%.c=$(OBJDIR)/%.o)
 DEPENDS  = $(OBJECTS:%.o=%.d)
 
-$(BINDIR)/linux/netpipe-memcpy: $(OBJECTS)
+$(BINDIR)/netpipe-memcpy: $(OBJECTS)
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
 	@$(CC) $(LDFLAGS) -o $@ $^

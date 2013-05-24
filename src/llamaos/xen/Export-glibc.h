@@ -105,10 +105,6 @@ EXTERN void register_llamaos_get_nprocs (llamaos_get_nprocs_t get_nprocs);
 typedef int (*llamaos_get_nprocs_conf_t) (void);
 EXTERN void register_llamaos_get_nprocs_conf (llamaos_get_nprocs_conf_t get_nprocs_conf);
 
-// int getpagesize (void)
-typedef int (*llamaos_getpagesize_t) (void);
-EXTERN void register_llamaos_getpagesize (llamaos_getpagesize_t getpagesize);
-
 // long int get_phys_pages (void)
 typedef long int (*llamaos_get_phys_pages_t) (void);
 EXTERN void register_llamaos_get_phys_pages (llamaos_get_phys_pages_t get_phys_pages);
@@ -116,6 +112,14 @@ EXTERN void register_llamaos_get_phys_pages (llamaos_get_phys_pages_t get_phys_p
 // char *getcwd (char *buf, size_t size)
 typedef char *(*llamaos_getcwd_t) (char *, size_t);
 EXTERN void register_llamaos_getcwd (llamaos_getcwd_t getcwd);
+
+// int gethostname (char *buf, size_t len)
+typedef int (*llamaos_gethostname_t) (char *, size_t);
+EXTERN void register_llamaos_gethostname (llamaos_gethostname_t gethostname);
+
+// int getpagesize (void)
+typedef int (*llamaos_getpagesize_t) (void);
+EXTERN void register_llamaos_getpagesize (llamaos_getpagesize_t getpagesize);
 
 // int getpid (void)
 typedef int (*llamaos_getpid_t) (void);

@@ -29,6 +29,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 */
 
 #define __STDC_LIMIT_MACROS
+#include <cerrno>
 #include <cstdint>
 #include <cstring>
 
@@ -80,6 +81,21 @@ static inline uint64_t tsc_to_ns (const vcpu_time_info_t *time_info, uint64_t ts
    time_ns += (stsc * time_info->tsc_to_system_mul) >> 32;
 
    return time_ns;
+}
+
+static int glibc_gethostname (char *name, size_t len)
+{
+   stringstream ss;
+   ss << Hypervisor::get_instance ()->name << "." << Hypervisor::get_instance ()->domid;
+
+   if ((ss.str().size() + 1) > len)
+   {
+      errno = ENAMETOOLONG;
+      return -1;
+   }
+
+   memcpy(name, ss.str().c_str(), len < ss.str().size() + 1);
+   return 0;
 }
 
 static int glibc_getpid ()
@@ -163,6 +179,7 @@ static ssize_t glibc_libc_write (int fd, const void *buf, size_t nbytes)
 
 static void register_glibc_exports (void)
 {
+   register_llamaos_gethostname (glibc_gethostname);
    register_llamaos_getpid (glibc_getpid);
    register_llamaos_gettimeofday (glibc_gettimeofday);
    register_llamaos_sleep (glibc_libc_sleep);

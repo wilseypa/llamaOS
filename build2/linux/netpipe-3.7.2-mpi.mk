@@ -48,7 +48,7 @@ OBJECTS  = $(OBJDIR)/apps/netpipe-$(NETPIPE_VERSION)/src/netpipe-mpi.o
 OBJECTS += $(SOURCES:%.c=$(OBJDIR)/%.o)
 DEPENDS  = $(OBJECTS:%.o=%.d)
 
-$(BINDIR)/linux/netpipe-mpi: $(OBJECTS)
+$(BINDIR)/netpipe-mpi: $(OBJECTS)
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@ with $(MPICC)
 	@$(MPICC) $(LDFLAGS) -o $@ $^

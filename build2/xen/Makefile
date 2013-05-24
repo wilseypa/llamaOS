@@ -39,9 +39,15 @@ all:
 	@$(MAKE) -f stdc++-$(GCC_VERSION).mk
 	@$(MAKE) -f gfortran-$(GCC_VERSION).mk
 	@$(MAKE) -f gcc-$(GCC_VERSION).mk
-#	@$(MAKE) -f xen-$(XEN_VERSION).mk
+	@$(MAKE) -f xen-$(XEN_VERSION).mk
+	@$(MAKE) -f llamaOS.mk
+	@$(MAKE) -f llamaMPI.mk
+	@$(MAKE) -f llamaMPIF.mk
 
-#	@$(MAKE) -f llamaOS.mk
+	@$(MAKE) -f apps/netpipe-3.7.2-llamaNET.mk
+	@$(MAKE) -f apps/netpipe-3.7.2-memcpy.mk
+	@$(MAKE) -f apps/netpipe-3.7.2-mpi.mk
+
 #	@$(MAKE) -f apps/hello-c.mk
 #	@$(MAKE) -f apps/hello-f90.mk
 	@$(MAKE) -f tests/empty.mk
@@ -57,8 +63,7 @@ install:
 	@cp -r lib $(INSTALL_FOLDER)/lib
 	@cp -r include $(INSTALL_FOLDER)/include
 	@cp -r ../script $(INSTALL_FOLDER)/script
-#	@cp llamaOS-flags.mk $(INSTALL_FOLDER)/llamaOS-flags.mk
-#	@cp llamaOS.lds $(INSTALL_FOLDER)/llamaOS.lds
+	@cp llamaOS.lds $(INSTALL_FOLDER)/llamaOS.lds
 	@echo adjusting file attributes...
 	@chmod -R o+r $(INSTALL_FOLDER)
 	@echo install complete.

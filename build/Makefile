@@ -44,11 +44,11 @@ all:
 #	@$(MAKE) -f gcc-$(GCC_VERSION).mk
 #	@$(MAKE) -f gfortran-$(GCC_VERSION).mk
 #	@$(MAKE) -f stdc++-$(GCC_VERSION).mk
-	@$(MAKE) -f xen-$(XEN_VERSION).mk
-	@$(MAKE) -f llamaOS.mk xen
+#	@$(MAKE) -f xen-$(XEN_VERSION).mk
+#	@$(MAKE) -f llamaOS.mk xen
 #	@$(MAKE) -f llamaOS-xen-test.mk xen
-	@$(MAKE) -f llamaMPI.mk
-	@$(MAKE) -f llamaMPIF.mk
+#	@$(MAKE) -f llamaMPI.mk
+#	@$(MAKE) -f llamaMPIF.mk
 	@$(MAKE) -f apps/hello-f77-llamaOS.mk xen
 	@$(MAKE) -f apps/hello-f90-llamaOS.mk xen
 	@$(MAKE) -f apps/hello.mk xen

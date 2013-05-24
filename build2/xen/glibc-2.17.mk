@@ -244,18 +244,87 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/ctype/ctype.c \
   glibc-$(GLIBC_VERSION)/ctype/ctype_l.c \
   glibc-$(GLIBC_VERSION)/ctype/isctype.c \
+  glibc-$(GLIBC_VERSION)/debug/asprintf_chk.c \
   glibc-$(GLIBC_VERSION)/debug/chk_fail.c \
+  glibc-$(GLIBC_VERSION)/debug/confstr_chk.c \
+  glibc-$(GLIBC_VERSION)/debug/dprintf_chk.c \
+  glibc-$(GLIBC_VERSION)/debug/fdelt_chk.c \
+  glibc-$(GLIBC_VERSION)/debug/fgets_chk.c \
+  glibc-$(GLIBC_VERSION)/debug/fgets_u_chk.c \
+  glibc-$(GLIBC_VERSION)/debug/fgetws_chk.c \
+  glibc-$(GLIBC_VERSION)/debug/fgetws_u_chk.c \
   glibc-$(GLIBC_VERSION)/debug/fortify_fail.c \
   glibc-$(GLIBC_VERSION)/debug/fprintf_chk.c \
+  glibc-$(GLIBC_VERSION)/debug/fread_chk.c \
+  glibc-$(GLIBC_VERSION)/debug/fread_u_chk.c \
+  glibc-$(GLIBC_VERSION)/debug/fwprintf_chk.c \
+  glibc-$(GLIBC_VERSION)/debug/getcwd_chk.c \
+  glibc-$(GLIBC_VERSION)/debug/getdomainname_chk.c \
+  glibc-$(GLIBC_VERSION)/debug/getgroups_chk.c \
+  glibc-$(GLIBC_VERSION)/debug/gethostname_chk.c \
+  glibc-$(GLIBC_VERSION)/debug/getlogin_r_chk.c \
+  glibc-$(GLIBC_VERSION)/debug/gets_chk.c \
+  glibc-$(GLIBC_VERSION)/debug/getwd_chk.c \
+  glibc-$(GLIBC_VERSION)/debug/longjmp_chk.c \
+  glibc-$(GLIBC_VERSION)/debug/mbsnrtowcs_chk.c \
+  glibc-$(GLIBC_VERSION)/debug/mbsrtowcs_chk.c \
+  glibc-$(GLIBC_VERSION)/debug/mbstowcs_chk.c \
+  glibc-$(GLIBC_VERSION)/debug/memcpy_chk.c \
+  glibc-$(GLIBC_VERSION)/debug/memmove_chk.c \
+  glibc-$(GLIBC_VERSION)/debug/mempcpy_chk.c \
+  glibc-$(GLIBC_VERSION)/debug/memset_chk.c \
+  glibc-$(GLIBC_VERSION)/debug/noophooks.c \
+  glibc-$(GLIBC_VERSION)/debug/obprintf_chk.c \
+  glibc-$(GLIBC_VERSION)/debug/poll_chk.c \
+  glibc-$(GLIBC_VERSION)/debug/ppoll_chk.c \
+  glibc-$(GLIBC_VERSION)/debug/pread64_chk.c \
+  glibc-$(GLIBC_VERSION)/debug/pread_chk.c \
   glibc-$(GLIBC_VERSION)/debug/printf_chk.c \
+  glibc-$(GLIBC_VERSION)/debug/ptsname_r_chk.c \
+  glibc-$(GLIBC_VERSION)/debug/read_chk.c \
+  glibc-$(GLIBC_VERSION)/debug/readlink_chk.c \
+  glibc-$(GLIBC_VERSION)/debug/readlinkat_chk.c \
   glibc-$(GLIBC_VERSION)/debug/readonly-area.c \
+  glibc-$(GLIBC_VERSION)/debug/realpath_chk.c \
+  glibc-$(GLIBC_VERSION)/debug/recv_chk.c \
+  glibc-$(GLIBC_VERSION)/debug/recvfrom_chk.c \
   glibc-$(GLIBC_VERSION)/debug/snprintf_chk.c \
   glibc-$(GLIBC_VERSION)/debug/sprintf_chk.c \
   glibc-$(GLIBC_VERSION)/debug/stack_chk_fail.c \
   glibc-$(GLIBC_VERSION)/debug/stack_chk_fail_local.c \
+  glibc-$(GLIBC_VERSION)/debug/stpcpy_chk.c \
+  glibc-$(GLIBC_VERSION)/debug/stpncpy_chk.c \
   glibc-$(GLIBC_VERSION)/debug/strcat_chk.c \
+  glibc-$(GLIBC_VERSION)/debug/strcpy_chk.c \
+  glibc-$(GLIBC_VERSION)/debug/strncat_chk.c \
+  glibc-$(GLIBC_VERSION)/debug/strncpy_chk.c \
+  glibc-$(GLIBC_VERSION)/debug/swprintf_chk.c \
+  glibc-$(GLIBC_VERSION)/debug/ttyname_r_chk.c \
+  glibc-$(GLIBC_VERSION)/debug/vasprintf_chk.c \
+  glibc-$(GLIBC_VERSION)/debug/vdprintf_chk.c \
+  glibc-$(GLIBC_VERSION)/debug/vfprintf_chk.c \
+  glibc-$(GLIBC_VERSION)/debug/vfwprintf_chk.c \
+  glibc-$(GLIBC_VERSION)/debug/vprintf_chk.c \
   glibc-$(GLIBC_VERSION)/debug/vsnprintf_chk.c \
   glibc-$(GLIBC_VERSION)/debug/vsprintf_chk.c \
+  glibc-$(GLIBC_VERSION)/debug/vswprintf_chk.c \
+  glibc-$(GLIBC_VERSION)/debug/vwprintf_chk.c \
+  glibc-$(GLIBC_VERSION)/debug/wcpcpy_chk.c \
+  glibc-$(GLIBC_VERSION)/debug/wcpncpy_chk.c \
+  glibc-$(GLIBC_VERSION)/debug/wcrtomb_chk.c \
+  glibc-$(GLIBC_VERSION)/debug/wcscat_chk.c \
+  glibc-$(GLIBC_VERSION)/debug/wcscpy_chk.c \
+  glibc-$(GLIBC_VERSION)/debug/wcsncat_chk.c \
+  glibc-$(GLIBC_VERSION)/debug/wcsncpy_chk.c \
+  glibc-$(GLIBC_VERSION)/debug/wcsnrtombs_chk.c \
+  glibc-$(GLIBC_VERSION)/debug/wcsrtombs_chk.c \
+  glibc-$(GLIBC_VERSION)/debug/wcstombs_chk.c \
+  glibc-$(GLIBC_VERSION)/debug/wctomb_chk.c \
+  glibc-$(GLIBC_VERSION)/debug/wmemcpy_chk.c \
+  glibc-$(GLIBC_VERSION)/debug/wmemmove_chk.c \
+  glibc-$(GLIBC_VERSION)/debug/wmempcpy_chk.c \
+  glibc-$(GLIBC_VERSION)/debug/wmemset_chk.c \
+  glibc-$(GLIBC_VERSION)/debug/wprintf_chk.c \
   glibc-$(GLIBC_VERSION)/elf/dl-addr.c \
   glibc-$(GLIBC_VERSION)/elf/dl-cache.c \
   glibc-$(GLIBC_VERSION)/elf/dl-close.c \
@@ -689,6 +758,7 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/posix/getegid.c \
   glibc-$(GLIBC_VERSION)/posix/geteuid.c \
   glibc-$(GLIBC_VERSION)/posix/getgid.c \
+  glibc-$(GLIBC_VERSION)/posix/getopt.c \
   glibc-$(GLIBC_VERSION)/posix/getuid.c \
   glibc-$(GLIBC_VERSION)/posix/wait.c \
   glibc-$(GLIBC_VERSION)/setjmp/longjmp.c \
@@ -1070,9 +1140,10 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/get_avphys_pages.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/get_nprocs.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/get_nprocs_conf.c \
-  glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/getpagesize.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/get_phys_pages.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/getcwd.c \
+  glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/gethostname.c \
+  glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/getpagesize.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/getpid.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/isatty.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/libc_fatal.c \
@@ -1300,6 +1371,7 @@ C_SOURCES = \
 #  glibc-$(GLIBC_VERSION)/io/xstat64.c
 #  glibc-$(GLIBC_VERSION)/misc/brk.c
 #  glibc-$(GLIBC_VERSION)/misc/ftruncate.c
+#  glibc-$(GLIBC_VERSION)/misc/gethostname.c
 #  glibc-$(GLIBC_VERSION)/misc/getpagesize.c
 #  glibc-$(GLIBC_VERSION)/misc/getsysstats.c
 #  glibc-$(GLIBC_VERSION)/misc/madvise.c

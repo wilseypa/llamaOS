@@ -111,7 +111,7 @@ all : $(OBJDIR)/llamaos/xen/Entry.o $(LIBDIR)/xen/llamaOS.a $(HEADERS)
 .PHONY: headers
 headers : $(HEADERS)
 
-$(LIBDIR)/xen/llamaOS.a: $(OBJECTS)
+$(LIBDIR)/llamaOS.a: $(OBJECTS)
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo copying Entry object...
 	@cp $(OBJDIR)/llamaos/xen/Entry.o $(LIBDIR)/xen/Entry.o
