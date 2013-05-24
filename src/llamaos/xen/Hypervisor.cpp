@@ -123,8 +123,6 @@ Hypervisor::~Hypervisor ()
 {
 
 }
-#include <vector>
-#include <string.h>
 
 void Hypervisor::initialize ()
 {

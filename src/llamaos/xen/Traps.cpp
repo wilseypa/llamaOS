@@ -82,19 +82,24 @@ void do_simd_coprocessor_error(struct pt_regs *regs)
 
 }
 
-static trap_info_t table [2];
+static trap_info_t table [1];
 
 Traps::Traps ()
 {
-   table [0].vector = 19;
-   table [0].flags = 0;
-   table [0].cs = 0xe033;
-   table [0].address = pointer_to_address(simd_coprocessor_error);
+//   table [0].vector = 19;
+//   table [0].flags = 0;
+//   table [0].cs = 0xe033;
+//   table [0].address = pointer_to_address(simd_coprocessor_error);
 
-   table [1].vector = 0;
-   table [1].flags = 0;
-   table [1].cs = 0;
-   table [1].address = 0;
+//   table [1].vector = 0;
+//   table [1].flags = 0;
+//   table [1].cs = 0;
+//   table [1].address = 0;
+
+   table [0].vector = 0;
+   table [0].flags = 0;
+   table [0].cs = 0;
+   table [0].address = 0;
 
    Hypercall::set_trap_table (table);
 }

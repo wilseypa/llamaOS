@@ -44,13 +44,9 @@ CFLAGS += \
 VPATH = $(SRCDIR)
 
 ASM_SOURCES = \
-  llamaos/xen/entry.S
-
-C_SOURCES = \
-  llamaos/xen/empty.c
+  llamaos/xen/Empty.S
 
 OBJECTS  = $(ASM_SOURCES:%.S=$(OBJDIR)/%.o)
-OBJECTS += $(C_SOURCES:%.c=$(OBJDIR)/%.o)
 DEPENDS += $(OBJECTS:%.o=%.d)
 
 .PHONY: empty

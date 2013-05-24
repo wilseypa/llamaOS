@@ -44,11 +44,12 @@ all:
 	@$(MAKE) -f llamaMPI.mk
 	@$(MAKE) -f llamaMPIF.mk
 
+	@$(MAKE) -f apps/hello-c.mk
+	@$(MAKE) -f apps/hello-cpp.mk
 	@$(MAKE) -f apps/netpipe-3.7.2-llamaNET.mk
 	@$(MAKE) -f apps/netpipe-3.7.2-memcpy.mk
 	@$(MAKE) -f apps/netpipe-3.7.2-mpi.mk
 
-#	@$(MAKE) -f apps/hello-c.mk
 #	@$(MAKE) -f apps/hello-f90.mk
 	@$(MAKE) -f tests/empty.mk
 #	@$(MAKE) -f empty-glibc.mk

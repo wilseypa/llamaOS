@@ -55,23 +55,19 @@ stack_top:
 stack_top_buffer:
    .skip 0x1000
 
-.section .data
-
-.set __HYPERVISOR_sched_op, 29
-.comm sched_shutdown, 8
-
 .section .text
-
-.globl _start, shared_info, hypercall_page
 
 _start:
    /* set the stack pointer */
    movq $stack_top, %rsp
    movq %rsp, %rbp
 
+spin_forever:
+   jmp spin_forever
+
    /* pass the start_info pointer as parameter to entry_start */
-   movq %rsi, %rdi
-   callq start
+#   movq %rsi, %rdi
+#   callq entry_glibc
 
    /* call the shutdown hypercall */
    movq $2, %rdi
@@ -82,3 +78,11 @@ _start:
    /* loop forever if not shutdown */
 loop:
    jmp loop
+
+.set __HYPERVISOR_sched_op, 29
+.comm sched_shutdown, 8
+
+.globl _start, shared_info, hypercall_page, stack_bottom
+
+.data
+

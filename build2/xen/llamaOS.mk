@@ -106,15 +106,16 @@ OBJECTS += $(CPP_SOURCES:%.cpp=$(OBJDIR)/%.o)
 DEPENDS += $(OBJECTS:%.o=%.d)
 
 .PHONY: all
-all : $(OBJDIR)/llamaos/xen/Entry.o $(LIBDIR)/xen/llamaOS.a $(HEADERS)
+all : $(LIBDIR)/llamaOS.a headers
+# all : $(OBJDIR)/llamaos/xen/Entry.o $(LIBDIR)/xen/llamaOS.a $(HEADERS)
 
 .PHONY: headers
 headers : $(HEADERS)
 
 $(LIBDIR)/llamaOS.a: $(OBJECTS)
 	@[ -d $(@D) ] || (mkdir -p $(@D))
-	@echo copying Entry object...
-	@cp $(OBJDIR)/llamaos/xen/Entry.o $(LIBDIR)/xen/Entry.o
+#	@echo copying Entry object...
+#	@cp $(OBJDIR)/llamaos/xen/Entry.o $(LIBDIR)/xen/Entry.o
 	@echo linking: $@
 	@$(AR) r $@ $^
 	@echo successfully built: $@

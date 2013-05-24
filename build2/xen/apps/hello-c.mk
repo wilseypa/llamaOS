@@ -43,17 +43,13 @@ CFLAGS += \
 
 VPATH = $(SRCDIR)
 
-C_SOURCES = \
+SOURCES = \
   apps/hello-c/main.c
 
-OBJECTS  = $(C_SOURCES:%.c=$(OBJDIR)/%.o)
+OBJECTS  = $(SOURCES:%.c=$(OBJDIR)/%.o)
 DEPENDS += $(OBJECTS:%.o=%.d)
 
-.PHONY: all
-all : $(BINDIR)/hello-c
-
-# the entry object must be the first object listed here or the guest will crash!
-$(BINDIR)/hello-c: $(LIBDIR)/xen/Entry.o $(OBJECTS) $(LIBDIR)/xen/llamaOS.a $(LIBDIR)/stdc++.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
+$(BINDIR)/hello-c: $(OBJECTS) $(LIBDIR)/llamaOS.a $(LIBDIR)/stdc++.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
 	@$(LD) $(LDFLAGS) -T llamaOS.lds -o $@ $^

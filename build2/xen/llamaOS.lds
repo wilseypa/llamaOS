@@ -38,17 +38,15 @@ SECTIONS
 {
   . = 0x0;
 
-  /* needs to be at zero so hypercall page is located */
-  .absolute :
-  {
-    *(.absolute)
-  }
-
-  .text ALIGN (0x1000) :
+  .text :
   {
     _text = .;
+    /* needs to be at zero so hypercall page is located */
+    *(.absolute)
+    . = ALIGN (4096);
     *(.text)
-     *(.rodata*)
+    . = ALIGN (4096);
+    *(.rodata*)
     *(.gnu.linkonce.t*)
   }
 
