@@ -44,7 +44,7 @@ all:
 #	@$(MAKE) -f gcc-$(GCC_VERSION).mk
 #	@$(MAKE) -f gfortran-$(GCC_VERSION).mk
 #	@$(MAKE) -f stdc++-$(GCC_VERSION).mk
-#	@$(MAKE) -f xen-$(XEN_VERSION).mk
+	@$(MAKE) -f xen-$(XEN_VERSION).mk
 	@$(MAKE) -f llamaOS.mk xen
 #	@$(MAKE) -f llamaOS-xen-test.mk xen
 	@$(MAKE) -f llamaMPI.mk

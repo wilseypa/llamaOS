@@ -39,7 +39,7 @@ all:
 	@$(MAKE) -f stdc++-$(GCC_VERSION).mk
 	@$(MAKE) -f gfortran-$(GCC_VERSION).mk
 	@$(MAKE) -f gcc-$(GCC_VERSION).mk
-	@$(MAKE) -f xen-$(XEN_VERSION).mk
+#	@$(MAKE) -f xen-$(XEN_VERSION).mk
 
 #	@$(MAKE) -f llamaOS.mk
 #	@$(MAKE) -f apps/hello-c.mk

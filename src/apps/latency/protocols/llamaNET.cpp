@@ -59,8 +59,8 @@ static domid_t get_domd_id (int node)
 
 llamaNET::llamaNET (int argc, char *argv [])
    :  node(parse<uint32_t>(argc, argv, "--node", 0U)),
-//      client((node % 2) != 0),
-      client(node == 2),
+      client((node % 2) != 0),
+//      client(node == 2),
       interface(get_domd_id (node), (node / 2))
 {
    cout << "latency-llamaNET" << endl
@@ -106,8 +106,8 @@ bool llamaNET::run_verify (unsigned long msg_size)
    {
 //      cout << "waiting for send..." << endl;
       header = interface.get_send_buffer ();
-//      header->dest = (node % 2) ? (node - 1) : (node + 1);
-      header->dest = (node == 2) ? 0 : 2;
+      header->dest = (node % 2) ? (node - 1) : (node + 1);
+//      header->dest = (node == 2) ? 0 : 2;
       header->src = node;
       header->type = 1;
       header->seq = seq++;
@@ -154,8 +154,8 @@ bool llamaNET::run_verify (unsigned long msg_size)
 
 //      cout << "waiting for send..." << endl;
          header = interface.get_send_buffer ();
-//         header->dest = (node % 2) ? (node - 1) : (node + 1);
-         header->dest = (node == 2) ? 0 : 2;
+         header->dest = (node % 2) ? (node - 1) : (node + 1);
+//         header->dest = (node == 2) ? 0 : 2;
          header->src = node;
          header->type = 1;
          header->seq = seq++;
@@ -192,8 +192,8 @@ bool llamaNET::run_trial (unsigned long msg_size, unsigned long trial_number)
    {
 //      cout << "waiting for send..." << endl;
       header = interface.get_send_buffer ();
-//      header->dest = (node % 2) ? (node - 1) : (node + 1);
-      header->dest = (node == 2) ? 0 : 2;
+      header->dest = (node % 2) ? (node - 1) : (node + 1);
+//      header->dest = (node == 2) ? 0 : 2;
       header->src = node;
       header->type = 1;
       header->seq = seq++;
@@ -229,8 +229,8 @@ bool llamaNET::run_trial (unsigned long msg_size, unsigned long trial_number)
 
 //      cout << "waiting for send..." << endl;
       header = interface.get_send_buffer ();
-//      header->dest = (node % 2) ? (node - 1) : (node + 1);
-      header->dest = (node == 2) ? 0 : 2;
+      header->dest = (node % 2) ? (node - 1) : (node + 1);
+//      header->dest = (node == 2) ? 0 : 2;
       header->src = node;
       header->type = 1;
       header->seq = seq++;
