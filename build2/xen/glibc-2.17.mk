@@ -253,6 +253,7 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/debug/sprintf_chk.c \
   glibc-$(GLIBC_VERSION)/debug/stack_chk_fail.c \
   glibc-$(GLIBC_VERSION)/debug/stack_chk_fail_local.c \
+  glibc-$(GLIBC_VERSION)/debug/strcat_chk.c \
   glibc-$(GLIBC_VERSION)/debug/vsnprintf_chk.c \
   glibc-$(GLIBC_VERSION)/debug/vsprintf_chk.c \
   glibc-$(GLIBC_VERSION)/elf/dl-addr.c \

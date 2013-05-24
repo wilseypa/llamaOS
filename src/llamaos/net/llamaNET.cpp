@@ -43,8 +43,8 @@ using namespace llamaos::net;
 using namespace llamaos::xen;
 
 // #define HARD_CODED_MACS
-#define DALAI_REDPJ
-// #define BEOWULF1
+// #define DALAI_REDPJ
+#define BEOWULF1
 
 const unsigned int llamaNET::HEADER_LENGTH = sizeof(llamaNET::Protocol_header);
 
