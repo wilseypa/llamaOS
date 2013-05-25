@@ -315,8 +315,14 @@ enum communication_types {
      char read_type;   /* c-char  d-double  s-stream */
   };
 
+#elif defined(LLAMANET)
+  typedef struct protocolstruct ProtocolStruct;
+  struct protocolstruct {
+     int nothing;
+  };
+
 #else
-  #error "One of TCP, TCP6, SCTP, SCTP6, IPX, MPI, PVM, TCGMSG, LAPI, SHMEM, MX, GM, ATOLL, MEMCPY, DISK, VMSPLICE, or KNEM must be defined during compilation"
+  #error "One of TCP, TCP6, SCTP, SCTP6, IPX, MPI, PVM, TCGMSG, LAPI, SHMEM, MX, GM, ATOLL, MEMCPY, DISK, VMSPLICE, or KNEM must be defined during compilation (or LLAMANET)"
 
 #endif
 

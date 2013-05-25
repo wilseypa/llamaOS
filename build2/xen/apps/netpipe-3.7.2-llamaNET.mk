@@ -39,22 +39,29 @@ NETPIPE_VERSION = 3.7.2
 MAKEFILE_SOURCES += apps/netpipe-$(NETPIPE_VERSION)-llamaNET.mk
 
 CFLAGS += \
-  -DMEMCPY \
+  -DLLAMANET \
+  -I $(INCDIR) \
+  -I $(SRCDIR) \
+  -include $(SRCDIR)/llamaos/__thread.h
+
+CPPFLAGS += \
   -I $(INCDIR) \
   -I $(SRCDIR) \
   -include $(SRCDIR)/llamaos/__thread.h
 
 VPATH = $(SRCDIR)
 
-SOURCES = \
-  apps/netpipe-$(NETPIPE_VERSION)/src/memcpy.c
+C_SOURCES = \
+  apps/netpipe-$(NETPIPE_VERSION)/src/llamaNET.c
+
+CPP_SOURCES = \
+  apps/netpipe-$(NETPIPE_VERSION)/src/llamaNET_impl.cpp
 
 OBJECTS  = $(OBJDIR)/apps/netpipe-$(NETPIPE_VERSION)/src/netpipe-llamaNET.o
-OBJECTS += $(SOURCES:%.c=$(OBJDIR)/%.o)
+OBJECTS += $(C_SOURCES:%.c=$(OBJDIR)/%.o)
+OBJECTS += $(CPP_SOURCES:%.cpp=$(OBJDIR)/%.o)
 DEPENDS += $(OBJECTS:%.o=%.d)
 
-# the entry object must be the first object listed here or the guest will crash!
-# $(BINDIR)/netpipe-llamaNET: $(LIBDIR)/xen/Entry.o $(OBJECTS) $(LIBDIR)/xen/llamaOS.a $(LIBDIR)/stdc++.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
 $(BINDIR)/netpipe-llamaNET: $(OBJECTS) $(LIBDIR)/llamaOS.a $(LIBDIR)/stdc++.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@

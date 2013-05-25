@@ -210,7 +210,7 @@ static ssize_t glibc_libc_write (int fd, const void *buf, size_t nbytes)
 
    if (fd == 10)
    {
-      for (int i = 0; i < nbytes; i++)
+      for (size_t i = 0; i < nbytes; i++)
       {
          np_out << static_cast<const char *>(buf) [i];
       }

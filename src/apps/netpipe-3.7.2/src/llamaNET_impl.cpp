@@ -45,10 +45,9 @@ static uint32_t seq = 1;
 
 static domid_t get_domd_id (int node)
 {
-   // for now it's just self minus node % 6
-   domid_t self_id = Hypervisor::get_instance ()->xenstore.read<domid_t>("domid");
+   domid_t self_id = Hypervisor::get_instance ()->domid;
 
-   return (self_id - 1 - (node % 6));
+   return (self_id - 1 - (node / 2));
 }
 
 extern "C"
@@ -56,8 +55,7 @@ void llamaNET_setup (int _node)
 {
    cout << "calling llamaNET_setup " << _node << endl;
    node = _node;
-   interface = new llamaNET (get_domd_id (_node), (node % 6));
-   cout << "calling llamaNET_setup " << _node << endl;
+   interface = new llamaNET (get_domd_id (node), (node / 2));
 }
 
 extern "C"
@@ -74,7 +72,7 @@ void llamaNET_sync (int client)
    {
 //      cout << "syncing client..." << endl;
       header = interface->get_send_buffer ();
-      header->dest = (node >= 6) ? (node - 6) : (node + 6);
+      header->dest = (node % 2) ? (node - 1) : (node + 1);
       header->src = node;
       header->type = 1;
       header->seq = seq++;
@@ -99,7 +97,9 @@ void llamaNET_sync (int client)
             interface->release_recv_buffer (header);
             break;
          }
+
          cout << "found wrong data in sync..." << endl;
+         interface->release_recv_buffer (header);
       }
    }
    else
@@ -117,11 +117,13 @@ void llamaNET_sync (int client)
             interface->release_recv_buffer (header);
             break;
          }
+
          cout << "found wrong data in sync..." << endl;
+         interface->release_recv_buffer (header);
       }
 
       header = interface->get_send_buffer ();
-      header->dest = (node >= 6) ? (node - 6) : (node + 6);
+      header->dest = (node % 2) ? (node - 1) : (node + 1);
       header->src = node;
       header->type = 1;
       header->seq = seq++;
@@ -145,7 +147,7 @@ void llamaNET_send_data (const char *_data, unsigned int length)
       char *data;
 
       header = interface->get_send_buffer ();
-      header->dest = (node >= 6) ? (node - 6) : (node + 6);
+      header->dest = (node % 2) ? (node - 1) : (node + 1);
       header->src = node;
       header->type = 1;
       header->seq = seq++;
@@ -193,7 +195,7 @@ void llamaNET_send_time (double t)
 
    llamaNET::Protocol_header *header;
    header = interface->get_send_buffer ();
-   header->dest = (node >= 6) ? (node - 6) : (node + 6);
+   header->dest = (node % 2) ? (node - 1) : (node + 1);
    header->src = node;
    header->type = 1;
    header->seq = seq++;
@@ -235,7 +237,7 @@ void llamaNET_send_repeat (int rpt)
 
    llamaNET::Protocol_header *header;
    header = interface->get_send_buffer ();
-   header->dest = (node >= 6) ? (node - 6) : (node + 6);
+   header->dest = (node % 2) ? (node - 1) : (node + 1);
    header->src = node;
    header->type = 1;
    header->seq = seq++;
@@ -282,7 +284,7 @@ void llamaNET_cleanup (int client)
    if (client)
    {
       header = interface->get_send_buffer ();
-      header->dest = (node >= 6) ? (node - 6) : (node + 6);
+      header->dest = (node % 2) ? (node - 1) : (node + 1);
       header->src = node;
       header->type = 1;
       header->seq = seq++;
@@ -328,7 +330,7 @@ void llamaNET_cleanup (int client)
       }
 
       header = interface->get_send_buffer ();
-      header->dest = (node >= 6) ? (node - 6) : (node + 6);
+      header->dest = (node % 2) ? (node - 1) : (node + 1);
       header->src = node;
       header->type = 1;
       header->seq = seq++;
