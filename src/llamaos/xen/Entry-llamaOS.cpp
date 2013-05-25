@@ -164,16 +164,62 @@ static unsigned int glibc_libc_sleep (unsigned int seconds)
    return 0;
 }
 
+static stringstream np_out;
+
+static int glibc_libc_open (const char *file, int oflag)
+{
+   if (strcmp (file, "fort.6") == 0)
+   {
+      return 6;
+   }
+   else if (strcmp (file, "np.out") == 0)
+   {
+      return 10;
+   }
+
+//   trace("!!! ALERT: glibc calling libc_open() before file system support is enabled.\n");
+   trace (" opening file %s, %x\n", file, oflag);
+
+//   errno = ENOENT;
+//   return -1;
+   return 10;
+}
+
+static int glibc_close (int fd)
+{
+   trace("!!! ALERT: glibc calling close() on %d.\n", fd);
+
+   if (fd == 10)
+   {
+      cout << "np.out:" << endl;
+      cout << np_out.str() << endl;
+   }
+
+   return 0;
+}
+
 static ssize_t glibc_libc_write (int fd, const void *buf, size_t nbytes)
 {
    if (   (stdout->_fileno != fd)
        && (stderr->_fileno != fd)
-       && (6 != fd))                    // fortran uses 6 for alt std output
+       && (6 != fd)                     // fortran uses 6 for alt std output
+       && (10 != fd))                    // fortran uses 6 for alt std output
    {
       cout << "Alert: writing to fileno " << fd << endl;
    }
 
-   Hypervisor::get_instance ()->console.write (static_cast<const char *>(buf), nbytes);
+   if (fd == 10)
+   {
+      for (int i = 0; i < nbytes; i++)
+      {
+         np_out << static_cast<const char *>(buf) [i];
+      }
+   }
+   else
+   {
+      Hypervisor::get_instance ()->console.write (static_cast<const char *>(buf), nbytes);
+   }
+
    return nbytes;
 }
 
@@ -183,6 +229,8 @@ static void register_glibc_exports (void)
    register_llamaos_getpid (glibc_getpid);
    register_llamaos_gettimeofday (glibc_gettimeofday);
    register_llamaos_sleep (glibc_libc_sleep);
+   register_llamaos_close (glibc_close);
+   register_llamaos_libc_open (glibc_libc_open);
    register_llamaos_write (glibc_libc_write);
 }
 

@@ -49,7 +49,7 @@ stack_bottom_buffer:
    .skip 0x1000
 
 stack_bottom:
-   .skip 0x10000
+   .skip 0x400000
 stack_top:
 
 stack_top_buffer:
