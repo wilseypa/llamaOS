@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2013, William Magato
+# Copyright (c) 2012, William Magato
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -34,44 +34,43 @@
 include common-vars.mk
 include common-flags.mk
 
-MAKEFILE_SOURCES += apps/netpipe-$(NETPIPE_VERSION)-llamaNET.mk
-
-CFLAGS += \
-  -DLLAMANET \
-  -I $(INCDIR) \
-  -I $(SRCDIR) \
-  -include $(SRCDIR)/llamaos/__thread.h
+# make file list
+MAKEFILE_SOURCES += net/i82574.mk
 
 CPPFLAGS += \
   -I $(INCDIR) \
   -I $(SRCDIR) \
+  -D__XEN_INTERFACE_VERSION__=0x00030205 \
   -include $(SRCDIR)/llamaos/__thread.h
 
 VPATH = $(SRCDIR)
 
-C_SOURCES = \
-  apps/netpipe-$(NETPIPE_VERSION)/src/llamaNET.c
+SOURCES = \
+  llamaos/net/i82574/CSR.cpp \
+  llamaos/net/i82574/CTRL.cpp \
+  llamaos/net/i82574/CTRL_EXT.cpp \
+  llamaos/net/i82574/EXTCNF_CTRL.cpp \
+  llamaos/net/i82574/GCR.cpp \
+  llamaos/net/i82574/IMC.cpp \
+  llamaos/net/i82574/IMS.cpp \
+  llamaos/net/i82574/main.cpp \
+  llamaos/net/i82574/RCTL.cpp \
+  llamaos/net/i82574/RXDCTL.cpp \
+  llamaos/net/i82574/STATUS.cpp \
+  llamaos/net/i82574/SWSM.cpp \
+  llamaos/net/i82574/TCTL.cpp \
+  llamaos/net/i82574/TXDCTL.cpp
 
-CPP_SOURCES = \
-  apps/netpipe-$(NETPIPE_VERSION)/src/llamaNET_impl.cpp
+OBJECTS = $(SOURCES:%.cpp=$(OBJDIR)/%.o)
+DEPENDS = $(OBJECTS:%.o=%.d)
 
-OBJECTS  = $(OBJDIR)/apps/netpipe-$(NETPIPE_VERSION)/src/netpipe-llamaNET.o
-OBJECTS += $(C_SOURCES:%.c=$(OBJDIR)/%.o)
-OBJECTS += $(CPP_SOURCES:%.cpp=$(OBJDIR)/%.o)
-DEPENDS += $(OBJECTS:%.o=%.d)
-
-$(BINDIR)/netpipe-llamaNET: $(OBJECTS) $(LIBDIR)/llamaOS.a $(LIBDIR)/stdc++.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
+$(BINDIR)/i82574: $(OBJECTS) $(LIBDIR)/llamaOS.a $(LIBDIR)/stdc++.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
 	@$(LD) $(LDFLAGS) -T llamaOS.lds -o $@ $^
 	@gzip -c -f --best $@ >$@.gz
 	@echo successfully built: $@
 	@echo
-
-$(OBJDIR)/apps/netpipe-$(NETPIPE_VERSION)/src/netpipe-llamaNET.o : $(SRCDIR)/apps/netpipe-$(NETPIPE_VERSION)/src/netpipe.c $(MAKEFILE_SOURCES)
-	@[ -d $(@D) ] || (mkdir -p $(@D))
-	@echo compiling: $<
-	@$(CC) -c $(CFLAGS) -o $@ $<
 
 include rules.mk
 

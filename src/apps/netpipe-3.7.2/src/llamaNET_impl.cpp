@@ -138,9 +138,44 @@ void llamaNET_sync (int client)
    }
 }
 
+#define MAX_MESSAGE_LENGTH 3968
+
 extern "C"
 void llamaNET_send_data (const char *_data, unsigned int length)
 {
+//   cout << "sending " << length << " in " << (double)length / MAX_MESSAGE_LENGTH << " messaged" << endl;
+   unsigned int current_length;
+
+   while (length > 0)
+   {
+      current_length = (length > MAX_MESSAGE_LENGTH) ? MAX_MESSAGE_LENGTH : length;
+
+      llamaNET::Protocol_header *header;
+      char *data;
+
+      header = interface->get_send_buffer ();
+      header->dest = (node % 2) ? (node - 1) : (node + 1);
+      header->src = node;
+      header->type = 1;
+      header->seq = seq++;
+      header->len = current_length;
+
+      // get pointer to data section of buffer
+      data = reinterpret_cast<char *>(header + 1);
+
+      // !BAM can I loose this?
+      memcpy (data, _data, current_length);
+
+//      cout << "   sending " << current_length << endl;
+      // send/recv and verify the data has been changed
+      interface->send (header);
+//      cout << "   sent " << current_length << endl;
+
+      _data += current_length;
+      length -= current_length;
+   }
+
+#if 0
    if (length < (4096 - llamaNET::HEADER_LENGTH))
    {
       llamaNET::Protocol_header *header;
@@ -162,11 +197,40 @@ void llamaNET_send_data (const char *_data, unsigned int length)
       // send/recv and verify the data has been changed
       interface->send (header);
    }
+#endif
 }
 
 extern "C"
 void llamaNET_recv_data (char *_data, unsigned int length)
 {
+//   cout << "receiving " << length << endl;
+   unsigned int current_length;
+
+   while (length > 0)
+   {
+      llamaNET::Protocol_header *header;
+      char *data;
+
+//      cout << "  waiting..." << endl;
+      header = interface->recv (node);
+
+      current_length = header->len;
+//      cout << "   received " << current_length << endl;
+
+      // get pointer to data section of buffer
+      data = reinterpret_cast<char *>(header + 1);
+
+      // !BAM can I loose this?
+      memcpy (_data, data, current_length);
+
+      interface->release_recv_buffer (header);
+
+      _data += current_length;
+      length -= current_length;
+   }
+
+#if 0
+
    if (length < (4096 - llamaNET::HEADER_LENGTH))
    {
       llamaNET::Protocol_header *header;
@@ -182,6 +246,7 @@ void llamaNET_recv_data (char *_data, unsigned int length)
 
       interface->release_recv_buffer (header);
    }
+#endif
 }
 
 extern "C"

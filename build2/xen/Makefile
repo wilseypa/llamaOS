@@ -49,6 +49,7 @@ all:
 	@$(MAKE) -f apps/netpipe-3.7.2-llamaNET.mk
 	@$(MAKE) -f apps/netpipe-3.7.2-memcpy.mk
 	@$(MAKE) -f apps/netpipe-3.7.2-mpi.mk
+	@$(MAKE) -f net/i82574.mk
 
 #	@$(MAKE) -f apps/hello-f90.mk
 	@$(MAKE) -f tests/empty.mk

@@ -81,7 +81,8 @@ public:
       volatile unsigned int rx_head;
       volatile unsigned int tx_head;
 
-      volatile unsigned int next_tx_index;
+      volatile unsigned long next_tx_index;
+      volatile unsigned long tx_count;
 
    };
 

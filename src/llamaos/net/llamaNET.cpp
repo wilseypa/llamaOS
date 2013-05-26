@@ -83,6 +83,8 @@ llamaNET::llamaNET (int domd_id, int index)
       rx_buffers.push_back (new Grant_map<Protocol_header>(domd_id, rx_refs.get_pointer () [i], true));
 //      sleep (1);
    }
+
+   control->app [index].online = true;
 }
 
 llamaNET::~llamaNET ()
@@ -198,6 +200,9 @@ llamaNET::Protocol_header *llamaNET::get_send_buffer ()
    // wait for driver to deliver index
    // while (control->app [index].tx_index_request);
    // mb ();
+
+   // wait if buffer is full
+   while ((control->driver.next_tx_index - control->driver.tx_count) >= 128) cout << "waiting to send" << endl;
 
    return tx_buffers [control->app [index].tx_index]->get_pointer ();
 }

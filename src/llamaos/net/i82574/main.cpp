@@ -470,6 +470,9 @@ int main (int /* argc */, char ** /* argv [] */)
 
    queue<unsigned int> tx_indexes;
 
+   uint16_t rx_tail_global = 0;
+   unsigned long rx_outstanding = 0;
+
    for (;;)
    {
       if (rx_desc [rx_head].status != 0)
@@ -482,24 +485,12 @@ int main (int /* argc */, char ** /* argv [] */)
          head++;
          head %= RX_BUFFERS;
          llamaNET_control->driver.rx_head = head;
-
-         // !bam can't do this until all guest tail is updated
-         entry = rx_sw.front ();
-         rx_sw.pop ();
-
-//         rx_desc [rx_tail].buffer = rx_desc [rx_head].buffer;
-         rx_desc [rx_tail].buffer = entry.address;
-         rx_desc [rx_tail].checksum = 0;
-         rx_desc [rx_tail].error = 0;
-         rx_desc [rx_tail].length = 0;
-         rx_desc [rx_tail].status = 0;
-         rx_desc [rx_tail].vlan = 0;
-         rx_tail++;
-         rx_tail %= 256;
-         csr.write_RDT (rx_tail);
+//         cout << "rx_head: " << rx_head << ", driver.rx_head: " << llamaNET_control->driver.rx_head << endl;
 
          rx_head++;
          rx_head %= 256;
+
+         rx_outstanding++;
       }
 
       for (int i = 0; i < 6; i++)
@@ -518,6 +509,11 @@ int main (int /* argc */, char ** /* argv [] */)
 
             tx_tail++;
             tx_tail %= 256;
+
+            // holding for phys buffer space....
+//            while (csr.read_TDH() == tx_tail);
+            while (tx_desc [tx_tail].CMD == 0x0B && tx_desc [tx_tail].STA == 0);
+
             csr.write_TDT (tx_tail);
 
 // ignore the ordering problem for now
@@ -527,14 +523,16 @@ int main (int /* argc */, char ** /* argv [] */)
                head++;
                head %= TX_BUFFERS;
                llamaNET_control->driver.tx_head = head;
+               llamaNET_control->driver.tx_count++;
 
                while (llamaNET_control->driver.tx_head == tx_indexes.front ())
                {
                   head = llamaNET_control->driver.tx_head;
-//                  cout << "correcting out of order send: " << head << endl;
+                  cout << "correcting out of order send: " << head << endl;
                   head++;
                   head %= TX_BUFFERS;
                   llamaNET_control->driver.tx_head = head;
+                  llamaNET_control->driver.tx_count++;
 
                   tx_indexes.pop ();
                }
@@ -546,6 +544,45 @@ int main (int /* argc */, char ** /* argv [] */)
             }
 
             llamaNET_control->app [i].tx_request = false;
+         }
+      }
+
+      if (rx_tail_global != llamaNET_control->driver.rx_head)
+      {
+         bool update = true;
+
+         for (int i = 0; i < 6; i++)
+         {
+            if (   (llamaNET_control->app [i].online)
+                && (rx_tail_global == llamaNET_control->app [i].rx_tail))
+            {
+               update = false;
+               break;
+            }
+         }
+
+         if (update)
+         {
+            // !bam can't do this until all guest tail is updated
+            buffer_entry entry;
+            entry = rx_sw.front ();
+            rx_sw.pop ();
+
+   //         rx_desc [rx_tail].buffer = rx_desc [rx_head].buffer;
+            rx_desc [rx_tail].buffer = entry.address;
+            rx_desc [rx_tail].checksum = 0;
+            rx_desc [rx_tail].error = 0;
+            rx_desc [rx_tail].length = 0;
+            rx_desc [rx_tail].status = 0;
+            rx_desc [rx_tail].vlan = 0;
+            rx_tail++;
+            rx_tail %= 256;
+            csr.write_RDT (rx_tail);
+   
+            rx_tail_global++;
+            rx_tail_global %= RX_BUFFERS;
+
+            --rx_outstanding;
          }
       }
 
@@ -561,6 +598,11 @@ int main (int /* argc */, char ** /* argv [] */)
 //            tx_head++;
 //            tx_head %= 256;
 //         }
+
+         if (rx_outstanding > 128)
+         {
+//            cout << "rx_outstanding: " << rx_outstanding << endl;
+         }
 
          if (llamaNET_control->close_driver)
          {
