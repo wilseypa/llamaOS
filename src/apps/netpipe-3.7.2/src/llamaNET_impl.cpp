@@ -143,8 +143,8 @@ void llamaNET_sync (int client)
 extern "C"
 void llamaNET_send_data (const char *_data, unsigned int length)
 {
-//   cout << "sending " << length << " in " << (double)length / MAX_MESSAGE_LENGTH << " messaged" << endl;
    unsigned int current_length;
+   unsigned int tx_index = 0;
 
    while (length > 0)
    {
@@ -153,7 +153,7 @@ void llamaNET_send_data (const char *_data, unsigned int length)
       llamaNET::Protocol_header *header;
       char *data;
 
-      header = interface->get_send_buffer ();
+      header = interface->get_send_buffer (tx_index);
       header->dest = (node % 2) ? (node - 1) : (node + 1);
       header->src = node;
       header->type = 1;
@@ -166,38 +166,14 @@ void llamaNET_send_data (const char *_data, unsigned int length)
       // !BAM can I loose this?
       memcpy (data, _data, current_length);
 
-//      cout << "   sending " << current_length << endl;
-      // send/recv and verify the data has been changed
-      interface->send (header);
-//      cout << "   sent " << current_length << endl;
-
       _data += current_length;
       length -= current_length;
+
+      interface->send (header, tx_index, (length == 0) || (tx_index == 31));
+
+      tx_index++;
+      tx_index %= 32;
    }
-
-#if 0
-   if (length < (4096 - llamaNET::HEADER_LENGTH))
-   {
-      llamaNET::Protocol_header *header;
-      char *data;
-
-      header = interface->get_send_buffer ();
-      header->dest = (node % 2) ? (node - 1) : (node + 1);
-      header->src = node;
-      header->type = 1;
-      header->seq = seq++;
-      header->len = length;
-
-      // get pointer to data section of buffer
-      data = reinterpret_cast<char *>(header + 1);
-
-      // !BAM can I loose this?
-      memcpy (data, _data, length);
-
-      // send/recv and verify the data has been changed
-      interface->send (header);
-   }
-#endif
 }
 
 extern "C"

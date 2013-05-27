@@ -95,8 +95,9 @@ public:
       volatile unsigned int tx_tail;
 
       volatile bool tx_request;
-      volatile unsigned int tx_index;
-      volatile unsigned int tx_length;
+      volatile unsigned int tx_count;
+      volatile unsigned int tx_index [32];
+      volatile unsigned int tx_length [32];
 
    };
 
@@ -121,6 +122,9 @@ public:
 
    Protocol_header *get_send_buffer ();
    void send (Protocol_header *header);
+
+   Protocol_header *get_send_buffer (unsigned int tx_index);
+   void send (Protocol_header *header, unsigned int tx_index, bool tx_last);
 
    const int domd_id;
    const int index;

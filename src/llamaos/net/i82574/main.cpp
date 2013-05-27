@@ -497,50 +497,51 @@ int main (int /* argc */, char ** /* argv [] */)
       {
          if (llamaNET_control->app [i].tx_request)
          {
-            unsigned int index = llamaNET_control->app [i].tx_index;
+            unsigned int count = llamaNET_control->app [i].tx_count;
 
-            tx_desc [tx_tail].buffer = tx_buffers [index].address;
-            tx_desc [tx_tail].length = llamaNET_control->app [i].tx_length;
-            tx_desc [tx_tail].CSO = 0;
-            tx_desc [tx_tail].CMD = 0x0B;
-            tx_desc [tx_tail].STA = 0;
-            tx_desc [tx_tail].CSS = 0;
-            tx_desc [tx_tail].VLAN = 0;
-
-            tx_tail++;
-            tx_tail %= 256;
-
-            // holding for phys buffer space....
-//            while (csr.read_TDH() == tx_tail);
-            while (tx_desc [tx_tail].CMD == 0x0B && tx_desc [tx_tail].STA == 0);
-
-            csr.write_TDT (tx_tail);
-
-// ignore the ordering problem for now
-            if (llamaNET_control->driver.tx_head == index)
+            for (int j = 0; j < count; j++)
             {
-               head = llamaNET_control->driver.tx_head;
-               head++;
-               head %= TX_BUFFERS;
-               llamaNET_control->driver.tx_head = head;
-               llamaNET_control->driver.tx_count++;
+               unsigned int index = llamaNET_control->app [i].tx_index [j];
 
-               while (llamaNET_control->driver.tx_head == tx_indexes.front ())
+               tx_desc [tx_tail].buffer = tx_buffers [index].address;
+               tx_desc [tx_tail].length = llamaNET_control->app [i].tx_length [j];
+               tx_desc [tx_tail].CSO = 0;
+               tx_desc [tx_tail].CMD = 0x0B;
+               tx_desc [tx_tail].STA = 0;
+               tx_desc [tx_tail].CSS = 0;
+               tx_desc [tx_tail].VLAN = 0;
+
+               tx_tail++;
+               tx_tail %= 256;
+
+               // holding for phys buffer space....
+               while (tx_desc [tx_tail].CMD == 0x0B && tx_desc [tx_tail].STA == 0);
+
+               csr.write_TDT (tx_tail);
+
+               if (llamaNET_control->driver.tx_head == index)
                {
                   head = llamaNET_control->driver.tx_head;
-                  cout << "correcting out of order send: " << head << endl;
                   head++;
                   head %= TX_BUFFERS;
                   llamaNET_control->driver.tx_head = head;
                   llamaNET_control->driver.tx_count++;
 
-                  tx_indexes.pop ();
+                  while (llamaNET_control->driver.tx_head == tx_indexes.front ())
+                  {
+                     head = llamaNET_control->driver.tx_head;
+                     head++;
+                     head %= TX_BUFFERS;
+                     llamaNET_control->driver.tx_head = head;
+                     llamaNET_control->driver.tx_count++;
+
+                     tx_indexes.pop ();
+                  }
                }
-            }
-            else
-            {
-//               cout << "out of order send: " << index << endl;
-               tx_indexes.push(index);
+               else
+               {
+                  tx_indexes.push(index);
+               }
             }
 
             llamaNET_control->app [i].tx_request = false;

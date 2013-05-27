@@ -192,7 +192,7 @@ llamaNET::Protocol_header *llamaNET::get_send_buffer ()
    while (control->app [index].tx_request);
 
    // get next index
-   control->app [index].tx_index = __sync_fetch_and_add (&control->driver.next_tx_index, 1) % TX_BUFFERS;
+   control->app [index].tx_index [0] = __sync_fetch_and_add (&control->driver.next_tx_index, 1) % TX_BUFFERS;
    // cout << "get_send_buffer " << control->app [index].tx_index << endl;
    // need atomic increment before this works with multiple llamaNET instances
    // control->app [index].tx_index_request = true;
@@ -204,7 +204,7 @@ llamaNET::Protocol_header *llamaNET::get_send_buffer ()
    // wait if buffer is full
    while ((control->driver.next_tx_index - control->driver.tx_count) >= 128) cout << "waiting to send" << endl;
 
-   return tx_buffers [control->app [index].tx_index]->get_pointer ();
+   return tx_buffers [control->app [index].tx_index [0]]->get_pointer ();
 }
 
 void llamaNET::send (Protocol_header *header)
@@ -359,7 +359,8 @@ void llamaNET::send (Protocol_header *header)
 
 //   unsigned int head = control->app [0].tx_head;
 //   control->app [0].tx_length [head] = HEADER_LENGTH + header->len;
-   control->app [index].tx_length = HEADER_LENGTH + header->len;
+   control->app [index].tx_length [0] = HEADER_LENGTH + header->len;
+   control->app [index].tx_count = 1;
 
    // ensure write is processed
    wmb();
@@ -369,4 +370,184 @@ void llamaNET::send (Protocol_header *header)
 //   head++;
 //   head %= control->tx_buffer_size;
 //   control->app [0].tx_head = head;
+}
+
+
+llamaNET::Protocol_header *llamaNET::get_send_buffer (unsigned int tx_index)
+{
+   // wait for last buffer to send
+   while (control->app [index].tx_request);
+
+   // get next index
+   control->app [index].tx_index [tx_index] = __sync_fetch_and_add (&control->driver.next_tx_index, 1) % TX_BUFFERS;
+   // cout << "get_send_buffer " << control->app [index].tx_index << endl;
+   // need atomic increment before this works with multiple llamaNET instances
+   // control->app [index].tx_index_request = true;
+
+   // wait for driver to deliver index
+   // while (control->app [index].tx_index_request);
+   // mb ();
+
+   return tx_buffers [control->app [index].tx_index [tx_index]]->get_pointer ();
+}
+
+void llamaNET::send (Protocol_header *header, unsigned int tx_index, bool tx_last)
+{
+//   Protocol_header *header = reinterpret_cast<Protocol_header *>(get_send_buffer ());
+
+   // !BAM get these in a config soon
+   // dalai node 0 mac 00-1b-21-d5-66-ef
+   // redpj node 1 mac 68-05-ca-01-f7-db
+#ifdef HARD_CODED_MACS
+
+#ifdef DALAI_REDPJ
+   if ((header->dest % 2) == 0)
+   {
+      // sending to dalai
+      header->eth_dest [0] = 0x00;
+      header->eth_dest [1] = 0x1b;
+      header->eth_dest [2] = 0x21;
+      header->eth_dest [3] = 0xd5;
+      header->eth_dest [4] = 0x66;
+      header->eth_dest [5] = 0xef;
+   }
+   else
+   {
+      // sending to redpj
+      header->eth_dest [0] = 0x68;
+      header->eth_dest [1] = 0x05;
+      header->eth_dest [2] = 0xca;
+      header->eth_dest [3] = 0x01;
+      header->eth_dest [4] = 0xf7;
+      header->eth_dest [5] = 0xdb;
+   }
+
+   if ((header->src % 2) == 0)
+   {
+      // sending from dalai
+      header->eth_src [0] = 0x00;
+      header->eth_src [1] = 0x1b;
+      header->eth_src [2] = 0x21;
+      header->eth_src [3] = 0xd5;
+      header->eth_src [4] = 0x66;
+      header->eth_src [5] = 0xef;
+   }
+   else
+   {
+      // sending from redpj
+      header->eth_src [0] = 0x68;
+      header->eth_src [1] = 0x05;
+      header->eth_src [2] = 0xca;
+      header->eth_src [3] = 0x01;
+      header->eth_src [4] = 0xf7;
+      header->eth_src [5] = 0xdb;
+   }
+#endif
+
+#ifdef THOR_WILEY
+   // !BAM get these in a config soon
+   // dalai node 0 (even) mac 00-1b-21-d5-66-ef
+   // redpj node 1 (odd)  mac 68-05-ca-01-f7-db
+
+   if ((header->dest % 2) == 0)
+   {
+      // sending to thor
+      header->eth_dest [0] = 0x68;
+      header->eth_dest [1] = 0x05;
+      header->eth_dest [2] = 0xca;
+      header->eth_dest [3] = 0x06;
+      header->eth_dest [4] = 0xde;
+      header->eth_dest [5] = 0xc0;
+   }
+   else
+   {
+      // sending to wiley
+      header->eth_dest [0] = 0x68;
+      header->eth_dest [1] = 0x05;
+      header->eth_dest [2] = 0xca;
+      header->eth_dest [3] = 0x06;
+      header->eth_dest [4] = 0xf7;
+      header->eth_dest [5] = 0x72;
+   }
+
+   if ((header->src % 2) == 0)
+   {
+      // sending from thor
+      header->eth_src [0] = 0x68;
+      header->eth_src [1] = 0x05;
+      header->eth_src [2] = 0xca;
+      header->eth_src [3] = 0x06;
+      header->eth_src [4] = 0xde;
+      header->eth_src [5] = 0xc0;
+   }
+   else
+   {
+      // sending from wiley
+      header->eth_src [0] = 0x68;
+      header->eth_src [1] = 0x05;
+      header->eth_src [2] = 0xca;
+      header->eth_src [3] = 0x06;
+      header->eth_src [4] = 0xf7;
+      header->eth_src [5] = 0x72;
+   }
+#endif
+
+#ifdef BEOWULF1
+   // n021 = even = 00:1e:8c:7e:d4:1b
+   // n022 = odd  = 00:1e:8c:91:a4:45
+   if ((header->dest % 2) == 0)
+   {
+      // sending to n021
+      header->eth_dest [0] = 0x00;
+      header->eth_dest [1] = 0x1e;
+      header->eth_dest [2] = 0x8c;
+      header->eth_dest [3] = 0x7e;
+      header->eth_dest [4] = 0xd4;
+      header->eth_dest [5] = 0x1b;
+   }
+   else
+   {
+      // sending to n022
+      header->eth_dest [0] = 0x00;
+      header->eth_dest [1] = 0x1e;
+      header->eth_dest [2] = 0x8c;
+      header->eth_dest [3] = 0x91;
+      header->eth_dest [4] = 0xa4;
+      header->eth_dest [5] = 0x45;
+   }
+
+   if ((header->src % 2) == 0)
+   {
+      // sending from n021
+      header->eth_src [0] = 0x00;
+      header->eth_src [1] = 0x1e;
+      header->eth_src [2] = 0x8c;
+      header->eth_src [3] = 0x7e;
+      header->eth_src [4] = 0xd4;
+      header->eth_src [5] = 0x1b;
+   }
+   else
+   {
+      // sending from n022
+      header->eth_src [0] = 0x00;
+      header->eth_src [1] = 0x1e;
+      header->eth_src [2] = 0x8c;
+      header->eth_src [3] = 0x91;
+      header->eth_src [4] = 0xa4;
+      header->eth_src [5] = 0x45;
+   }
+#endif
+
+#endif
+   header->eth_type = 0x0C09;
+
+//   unsigned int head = control->app [0].tx_head;
+//   control->app [0].tx_length [head] = HEADER_LENGTH + header->len;
+   control->app [index].tx_length [tx_index] = HEADER_LENGTH + header->len;
+   control->app [index].tx_count = tx_index + 1;
+
+   // ensure write is processed
+   wmb();
+
+   control->app [index].tx_request = tx_last;
 }
