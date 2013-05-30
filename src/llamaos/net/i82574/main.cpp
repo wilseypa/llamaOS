@@ -322,23 +322,29 @@ int main (int /* argc */, char ** /* argv [] */)
 
    cout << "create transmit descriptors..." << endl;
 
-//   struct tx_desc_t *tx_desc = static_cast<struct tx_desc_t *>(memalign (PAGE_SIZE, PAGE_SIZE));
-//   memset(tx_desc, 0, PAGE_SIZE);
-   struct tx_desc_t *tx_desc = static_cast<struct tx_desc_t *>(memalign (PAGE_SIZE, 4 * PAGE_SIZE));
-   memset(tx_desc, 0, 4 * PAGE_SIZE);
+   struct tx_desc_t *tx_desc = static_cast<struct tx_desc_t *>(memalign (PAGE_SIZE, PAGE_SIZE));
+   memset(tx_desc, 0, PAGE_SIZE);
    uint64_t tx_desc_machine_address = virtual_pointer_to_machine_address(tx_desc);
    Hypercall::update_va_mapping_nocache (pointer_to_address (tx_desc), tx_desc_machine_address);
-   Hypercall::update_va_mapping_nocache (pointer_to_address (tx_desc+256), tx_desc_machine_address+PAGE_SIZE);
-   Hypercall::update_va_mapping_nocache (pointer_to_address (tx_desc+256+256), tx_desc_machine_address+PAGE_SIZE+PAGE_SIZE);
-   Hypercall::update_va_mapping_nocache (pointer_to_address (tx_desc+256+256+256), tx_desc_machine_address+PAGE_SIZE+PAGE_SIZE+PAGE_SIZE);
+//   struct tx_desc_t *tx_desc = static_cast<struct tx_desc_t *>(memalign (PAGE_SIZE, 4 * PAGE_SIZE));
+//   memset(tx_desc, 0, 4 * PAGE_SIZE);
+//cout << "tx_desc page 0: " << virtual_pointer_to_machine_address(tx_desc+256+256+256) << endl;
+//cout << "tx_desc page 1: " << virtual_pointer_to_machine_address(tx_desc+256+256) << endl;
+//cout << "tx_desc page 2: " << virtual_pointer_to_machine_address(tx_desc+256) << endl;
+//cout << "tx_desc page 3: " << virtual_pointer_to_machine_address(tx_desc) << endl;
+//   uint64_t tx_desc_machine_address = virtual_pointer_to_machine_address(tx_desc+256+256+256);
+//   Hypercall::update_va_mapping_nocache (pointer_to_address (tx_desc+256+256+256), tx_desc_machine_address);
+//   Hypercall::update_va_mapping_nocache (pointer_to_address (tx_desc+256+256), tx_desc_machine_address+PAGE_SIZE);
+//   Hypercall::update_va_mapping_nocache (pointer_to_address (tx_desc+256), tx_desc_machine_address+PAGE_SIZE+PAGE_SIZE);
+//   Hypercall::update_va_mapping_nocache (pointer_to_address (tx_desc), tx_desc_machine_address+PAGE_SIZE+PAGE_SIZE+PAGE_SIZE);
 
    csr.write_TDBA (tx_desc_machine_address);
 //   csr.write_TDLEN (1024);    // 64 descriptors
 //   csr.write_TDLEN (128);     // 8 descriptors
-//   csr.write_TDLEN (PAGE_SIZE); // 256 descriptors
+   csr.write_TDLEN (PAGE_SIZE); // 256 descriptors
 //   csr.write_TDLEN (2 * PAGE_SIZE); // 512 descriptors
 //   csr.write_TDLEN (3 * PAGE_SIZE); // 768 descriptors
-   csr.write_TDLEN (4 * PAGE_SIZE); // 1024 descriptors
+//   csr.write_TDLEN (4 * PAGE_SIZE); // 1024 descriptors
    cout << "TDBA: " << hex << csr.read_TDBA() << ", " << tx_desc_machine_address << endl;
 
    buffer_entry tx_buffers [TX_BUFFERS];
@@ -363,11 +369,23 @@ int main (int /* argc */, char ** /* argv [] */)
    memset(rx_desc, 0, PAGE_SIZE);
    uint64_t rx_desc_machine_address = virtual_pointer_to_machine_address(rx_desc);
    Hypercall::update_va_mapping_nocache (pointer_to_address (rx_desc), rx_desc_machine_address);
+//   struct rx_desc_t *rx_desc = static_cast<struct rx_desc_t *>(memalign (PAGE_SIZE, 4 * PAGE_SIZE));
+//   memset(rx_desc, 0, 4 * PAGE_SIZE);
+//cout << "rx_desc page 0: " << virtual_pointer_to_machine_address(rx_desc+256+256+256) << endl;
+//cout << "rx_desc page 1: " << virtual_pointer_to_machine_address(rx_desc+256+256) << endl;
+//cout << "rx_desc page 2: " << virtual_pointer_to_machine_address(rx_desc+256) << endl;
+//cout << "rx_desc page 3: " << virtual_pointer_to_machine_address(rx_desc) << endl;
+//   uint64_t rx_desc_machine_address = virtual_pointer_to_machine_address(rx_desc+256+256+256);
+//   Hypercall::update_va_mapping_nocache (pointer_to_address (rx_desc+256+256+256), rx_desc_machine_address);
+//   Hypercall::update_va_mapping_nocache (pointer_to_address (rx_desc+256+256), rx_desc_machine_address+PAGE_SIZE);
+//   Hypercall::update_va_mapping_nocache (pointer_to_address (rx_desc+256), rx_desc_machine_address+PAGE_SIZE+PAGE_SIZE);
+//   Hypercall::update_va_mapping_nocache (pointer_to_address (rx_desc), rx_desc_machine_address+PAGE_SIZE+PAGE_SIZE+PAGE_SIZE);
 
    csr.write_RDBA (rx_desc_machine_address);
 //   csr.write_RDLEN (1024);    // 64 descriptors
 //   csr.write_RDLEN (128);     // 8 descriptors
    csr.write_RDLEN (PAGE_SIZE); // 256 descriptors
+//   csr.write_RDLEN (4 * PAGE_SIZE); // 256 descriptors
    cout << "RDBA: " << hex << csr.read_RDBA() << ", " << rx_desc_machine_address << endl;
 
    buffer_entry rx_buffers [RX_BUFFERS];
@@ -381,6 +399,8 @@ int main (int /* argc */, char ** /* argv [] */)
       Hypercall::update_va_mapping_nocache (pointer_to_address (rx_buffers [i].pointer), rx_buffers [i].address);
 
       if (i < 255)
+//      if (i < 767)
+//      if (i < 1023)
       {
          rx_desc [i].buffer = rx_buffers [i].address;
          rx_desc [i].status = 0;
@@ -393,7 +413,9 @@ int main (int /* argc */, char ** /* argv [] */)
    }
 
    uint16_t rx_head = 0;
-   uint16_t rx_tail = 255; // RX_BUFFERS;
+//   uint16_t rx_tail = 255; // RX_BUFFERS;
+//   uint16_t rx_tail = 767; // RX_BUFFERS;
+   uint16_t rx_tail = 1023; // RX_BUFFERS;
    csr.write_RDT (rx_tail);
 
    // create memory for the control page
@@ -503,6 +525,8 @@ int main (int /* argc */, char ** /* argv [] */)
 
          rx_head++;
          rx_head %= 256;
+//         rx_head %= 768;
+//         rx_head %= 1024;
 
          rx_outstanding++;
       }
@@ -553,10 +577,10 @@ int main (int /* argc */, char ** /* argv [] */)
                   tx_desc [tx_tail].VLAN = 0;
 
                   tx_tail++;
-      //            tx_tail %= 256;
+                  tx_tail %= 256;
       //            tx_tail %= 512;
       //            tx_tail %= 768;
-                  tx_tail %= 1024;
+      //            tx_tail %= 1024;
 
 
                   // holding for phys buffer space....
@@ -770,6 +794,8 @@ int main (int /* argc */, char ** /* argv [] */)
                rx_desc [rx_tail].vlan = 0;
                rx_tail++;
                rx_tail %= 256;
+//               rx_tail %= 768;
+//               rx_tail %= 1024;
                csr.write_RDT (rx_tail);
       
                rx_tail_global++;

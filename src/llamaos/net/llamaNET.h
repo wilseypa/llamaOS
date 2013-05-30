@@ -36,12 +36,6 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 #include <llamaos/xen/Grant_map.h>
 
-// do not exceed 942 or control structure spills out of grant ref
-// also running out of grant id when running all 6 guests
-// #define TX_BUFFERS 48
-// #define RX_BUFFERS 96
-
-// !BAM
 // buffer grant reference numbers are now in their own pages
 // so we can allocate huge sizes provided the grant framelist
 // and reserved memory space is big enough
@@ -81,9 +75,6 @@ public:
       volatile unsigned int rx_head;
       volatile unsigned int tx_head;
 
-//      volatile unsigned long next_tx_index;
-//      volatile unsigned long tx_count;
-
       volatile uint64_t tx_next_index;
       volatile uint64_t tx_last_index;
       volatile uint64_t tx_done_index;
@@ -99,11 +90,6 @@ public:
 
       volatile unsigned int rx_tail;
       volatile unsigned int tx_tail;
-
-//      volatile bool tx_request;
-//      volatile unsigned int tx_count;
-//      volatile unsigned int tx_index [32];
-//      volatile unsigned int tx_length [32];
 
       volatile uint64_t tx_index;
 
@@ -128,13 +114,11 @@ public:
    Protocol_header *recvNB (uint32_t node);
    void release_recv_buffer (Protocol_header *header);
 
+   Protocol_header **recvv (uint32_t node, uint32_t &count);
+   void release_recv_bufferv (uint32_t count);
+
    Protocol_header *get_send_buffer ();
    void send (Protocol_header *header);
-
-#if 0
-   Protocol_header *get_send_buffer (unsigned int tx_index);
-   void send (Protocol_header *header, unsigned int tx_index, bool tx_last);
-#endif
 
    Protocol_header **get_send_bufferv (unsigned int tx_count);
    void sendv (Protocol_header **header, unsigned int tx_count);
