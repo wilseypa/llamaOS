@@ -81,8 +81,14 @@ public:
       volatile unsigned int rx_head;
       volatile unsigned int tx_head;
 
-      volatile unsigned long next_tx_index;
-      volatile unsigned long tx_count;
+//      volatile unsigned long next_tx_index;
+//      volatile unsigned long tx_count;
+
+      volatile uint64_t tx_next_index;
+      volatile uint64_t tx_last_index;
+      volatile uint64_t tx_done_index;
+
+      volatile uint32_t tx_mask [32];
 
    };
 
@@ -94,10 +100,12 @@ public:
       volatile unsigned int rx_tail;
       volatile unsigned int tx_tail;
 
-      volatile bool tx_request;
-      volatile unsigned int tx_count;
-      volatile unsigned int tx_index [32];
-      volatile unsigned int tx_length [32];
+//      volatile bool tx_request;
+//      volatile unsigned int tx_count;
+//      volatile unsigned int tx_index [32];
+//      volatile unsigned int tx_length [32];
+
+      volatile uint64_t tx_index;
 
    };
 
@@ -123,8 +131,13 @@ public:
    Protocol_header *get_send_buffer ();
    void send (Protocol_header *header);
 
+#if 0
    Protocol_header *get_send_buffer (unsigned int tx_index);
    void send (Protocol_header *header, unsigned int tx_index, bool tx_last);
+#endif
+
+   Protocol_header **get_send_bufferv (unsigned int tx_count);
+   void sendv (Protocol_header **header, unsigned int tx_count);
 
    const int domd_id;
    const int index;
@@ -138,8 +151,6 @@ private:
    std::vector<xen::Grant_map<Protocol_header> *> rx_buffers;
    std::vector<xen::Grant_map<Protocol_header> *> tx_buffers;
 
-//   protected:
-//   int& __sync_fetch_and_add(volatile unsigned int* next_tx_index, int arg2);
 };
 
 } }

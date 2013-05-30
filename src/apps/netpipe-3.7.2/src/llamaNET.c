@@ -41,6 +41,7 @@ void Init(ArgStruct *p, int* argc, char*** argv)
 void Setup(ArgStruct *p)
 {
    llamaNET_setup ((p->tr) ? 1 : 0);
+//   llamaNET_setup ((p->tr) ? 3 : 1);
 }
 
 void establish(ArgStruct *p)
@@ -50,7 +51,7 @@ void establish(ArgStruct *p)
 
 void Sync(ArgStruct *p)
 {
-   llamaNET_sync ((p->tr) ? 1 : 0);
+   llamaNET_sync ();
 }
 
 void PrepareToReceive(ArgStruct *p)
@@ -65,7 +66,7 @@ void SendData(ArgStruct *p)
 
 void RecvData(ArgStruct *p)
 {
-  llamaNET_recv_data (p->s_ptr, p->bufflen);
+  llamaNET_recv_data (p->r_ptr, p->bufflen);
 }
 
 void SendTime(ArgStruct *p, double *t)

@@ -59,52 +59,111 @@ void llamaNET_setup (int _node)
 }
 
 extern "C"
-void llamaNET_sync (int client)
+void llamaNET_sync ()
 {
-//   cout << "calling llamaNET_sync..." << endl;
-
-   const char *sync_string = "SyncMe";
+   static bool first_sync = true;
+   static const char *sync_string = "SyncMe";
 
    llamaNET::Protocol_header *header;
    char *data;
 
-   if (client)
+   if (first_sync)
    {
-//      cout << "syncing client..." << endl;
-      header = interface->get_send_buffer ();
-      header->dest = (node % 2) ? (node - 1) : (node + 1);
-      header->src = node;
-      header->type = 1;
-      header->seq = seq++;
-      header->len = strlen(sync_string);
+      first_sync = false;
 
-      // get pointer to data section of buffer
-      data = reinterpret_cast<char *>(header + 1);
-      strcpy (data, sync_string);
-
-      // send/recv and verify the data has been changed
-      interface->send (header);
-
-      for (;;)
+      if (node % 2)
+//      if (node == 3)
       {
-         header = interface->recv (node);
+cout << "3 is get_send_buffer..." << endl;         
+         header = interface->get_send_buffer ();
+         header->dest = (node % 2) ? (node - 1) : (node + 1);
+//         header->dest = (node == 1) ? 3 : 1;
+         header->src = node;
+         header->type = 1;
+         header->seq = seq++;
+         header->len = strlen(sync_string);
 
          // get pointer to data section of buffer
          data = reinterpret_cast<char *>(header + 1);
+         strcpy (data, sync_string);
 
-         if (0 == strncmp (data, sync_string, strlen(sync_string)))
+         // send/recv and verify the data has been changed
+cout << "3 is send..." << endl;         
+         interface->send (header);
+
+         for (;;)
          {
+cout << "3 is recv..." << endl;         
+            header = interface->recv (node);
+
+            // get pointer to data section of buffer
+            data = reinterpret_cast<char *>(header + 1);
+
+            if (0 == strncmp (data, sync_string, strlen(sync_string)))
+            {
+               interface->release_recv_buffer (header);
+               break;
+            }
+
+            cout << "found wrong data in sync..." << endl;
             interface->release_recv_buffer (header);
-            break;
+         }
+      }
+      else
+      {
+         for (;;)
+         {
+cout << "1 is recv..." << endl;         
+            header = interface->recv (node);
+
+            // get pointer to data section of buffer
+            data = reinterpret_cast<char *>(header + 1);
+
+            if (0 == strncmp (data, sync_string, strlen(sync_string)))
+            {
+               interface->release_recv_buffer (header);
+               break;
+            }
+
+            cout << "found wrong data in sync..." << endl;
+            interface->release_recv_buffer (header);
          }
 
-         cout << "found wrong data in sync..." << endl;
-         interface->release_recv_buffer (header);
+cout << "1 is get_send_buffer..." << endl;         
+         header = interface->get_send_buffer ();
+         header->dest = (node % 2) ? (node - 1) : (node + 1);
+//         header->dest = (node == 1) ? 3 : 1;
+         header->src = node;
+         header->type = 1;
+         header->seq = seq++;
+         header->len = strlen(sync_string);
+
+         // get pointer to data section of buffer
+         data = reinterpret_cast<char *>(header + 1);
+         strcpy (data, sync_string);
+
+         // send/recv and verify the data has been changed
+cout << "1 is send..." << endl;         
+         interface->send (header);
       }
    }
    else
    {
-//      cout << "syncing server..." << endl;
+      header = interface->get_send_buffer ();
+      header->dest = (node % 2) ? (node - 1) : (node + 1);
+//      header->dest = (node == 1) ? 3 : 1;
+      header->src = node;
+      header->type = 1;
+      header->seq = seq++;
+      header->len = strlen(sync_string);
+
+      // get pointer to data section of buffer
+      data = reinterpret_cast<char *>(header + 1);
+      strcpy (data, sync_string);
+
+      // send/recv and verify the data has been changed
+      interface->send (header);
+
       for (;;)
       {
          header = interface->recv (node);
@@ -121,40 +180,73 @@ void llamaNET_sync (int client)
          cout << "found wrong data in sync..." << endl;
          interface->release_recv_buffer (header);
       }
-
-      header = interface->get_send_buffer ();
-      header->dest = (node % 2) ? (node - 1) : (node + 1);
-      header->src = node;
-      header->type = 1;
-      header->seq = seq++;
-      header->len = strlen(sync_string);
-
-      // get pointer to data section of buffer
-      data = reinterpret_cast<char *>(header + 1);
-      strcpy (data, sync_string);
-
-      // send/recv and verify the data has been changed
-      interface->send (header);
    }
 }
 
-#define MAX_MESSAGE_LENGTH 3968
+// #define MAX_MESSAGE_LENGTH 3968
+#define MAX_MESSAGE_LENGTH 4032U
+// #define MAX_MESSAGE_LENGTH (4096 - llamaNET::HEADER_LENGTH - 2)
+
+// static char dummy_header [4096];
 
 extern "C"
 void llamaNET_send_data (const char *_data, unsigned int length)
 {
+#if 1
+   unsigned int current_length;
+   unsigned int tx_count;
+   llamaNET::Protocol_header **headerv;
+   unsigned int i;
+
+   while (length > 0)
+   {
+      tx_count = ((length + MAX_MESSAGE_LENGTH) / MAX_MESSAGE_LENGTH);
+      tx_count = min(32U, tx_count);
+
+      // clear buffer
+      interface->recvNB (node);
+      headerv = interface->get_send_bufferv (tx_count);
+
+      for (i = 0; i < tx_count; i++)
+      {
+         current_length = min(length, MAX_MESSAGE_LENGTH);
+
+         headerv [i]->dest = (node % 2) ? (node - 1) : (node + 1);
+//         headerv [i]->dest = (node == 1) ? 3 : 1;
+         headerv [i]->src = node;
+         headerv [i]->type = 1;
+         headerv [i]->seq = seq++;
+         headerv [i]->len = current_length;
+
+         length -= current_length;
+
+//         if ((length == 0) || (i == 127))
+//         {
+//            interface->sendv (headerv, tx_count);
+//         }
+      }
+
+      interface->sendv (headerv, tx_count);
+   }
+#else
+//cout << "llamaNET_send_data" << endl;
    unsigned int current_length;
    unsigned int tx_index = 0;
+
+   llamaNET::Protocol_header *header;
+   char *data;
 
    while (length > 0)
    {
       current_length = (length > MAX_MESSAGE_LENGTH) ? MAX_MESSAGE_LENGTH : length;
 
-      llamaNET::Protocol_header *header;
-      char *data;
+//cout << "get_send_buffer" << endl;
+      header = interface->get_send_buffer ();
+//      header = interface->get_send_buffer (tx_index);
+//      header = (llamaNET::Protocol_header *)&dummy_header;
 
-      header = interface->get_send_buffer (tx_index);
-      header->dest = (node % 2) ? (node - 1) : (node + 1);
+//      header->dest = (node % 2) ? (node - 1) : (node + 1);
+      header->dest = (node == 1) ? 3 : 1;
       header->src = node;
       header->type = 1;
       header->seq = seq++;
@@ -164,22 +256,24 @@ void llamaNET_send_data (const char *_data, unsigned int length)
       data = reinterpret_cast<char *>(header + 1);
 
       // !BAM can I loose this?
-      memcpy (data, _data, current_length);
+//      memcpy (data, _data, current_length);
 
       _data += current_length;
       length -= current_length;
 
-      interface->send (header, tx_index, (length == 0) || (tx_index == 31));
+//cout << "send" << endl;
+      interface->send (header);
+//      interface->send (header, tx_index, (length == 0) || (tx_index == 31));
 
       tx_index++;
       tx_index %= 32;
    }
+#endif
 }
 
 extern "C"
 void llamaNET_recv_data (char *_data, unsigned int length)
 {
-//   cout << "receiving " << length << endl;
    unsigned int current_length;
 
    while (length > 0)
@@ -187,17 +281,15 @@ void llamaNET_recv_data (char *_data, unsigned int length)
       llamaNET::Protocol_header *header;
       char *data;
 
-//      cout << "  waiting..." << endl;
       header = interface->recv (node);
 
       current_length = header->len;
-//      cout << "   received " << current_length << endl;
 
       // get pointer to data section of buffer
       data = reinterpret_cast<char *>(header + 1);
 
       // !BAM can I loose this?
-      memcpy (_data, data, current_length);
+//      memcpy (_data, data, current_length);
 
       interface->release_recv_buffer (header);
 
@@ -237,6 +329,7 @@ void llamaNET_send_time (double t)
    llamaNET::Protocol_header *header;
    header = interface->get_send_buffer ();
    header->dest = (node % 2) ? (node - 1) : (node + 1);
+//   header->dest = (node == 1) ? 3 : 1;
    header->src = node;
    header->type = 1;
    header->seq = seq++;
@@ -279,6 +372,7 @@ void llamaNET_send_repeat (int rpt)
    llamaNET::Protocol_header *header;
    header = interface->get_send_buffer ();
    header->dest = (node % 2) ? (node - 1) : (node + 1);
+//   header->dest = (node == 1) ? 3 : 1;
    header->src = node;
    header->type = 1;
    header->seq = seq++;
@@ -326,6 +420,7 @@ void llamaNET_cleanup (int client)
    {
       header = interface->get_send_buffer ();
       header->dest = (node % 2) ? (node - 1) : (node + 1);
+//      header->dest = (node == 1) ? 3 : 1;
       header->src = node;
       header->type = 1;
       header->seq = seq++;
@@ -372,6 +467,7 @@ void llamaNET_cleanup (int client)
 
       header = interface->get_send_buffer ();
       header->dest = (node % 2) ? (node - 1) : (node + 1);
+//      header->dest = (node == 1) ? 3 : 1;
       header->src = node;
       header->type = 1;
       header->seq = seq++;
