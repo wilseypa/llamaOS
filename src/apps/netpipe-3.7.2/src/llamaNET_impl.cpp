@@ -184,16 +184,42 @@ cout << "1 is send..." << endl;
 }
 
 // #define MAX_MESSAGE_LENGTH 3968
+// #define MAX_MESSAGE_LENGTH 1436U
 #define MAX_MESSAGE_LENGTH 4032U
 // #define MAX_MESSAGE_LENGTH (4096 - llamaNET::HEADER_LENGTH - 2)
+
+#include <sys/time.h>
+#include <stdlib.h>
 
 extern "C"
 void llamaNET_send_data (const char *_data, unsigned int length)
 {
+   char *data;
+
+   if (length < MAX_MESSAGE_LENGTH)
+   {
+      llamaNET::Protocol_header *header = interface->get_send_buffer ();
+
+      header->dest = (node % 2) ? (node - 1) : (node + 1);
+//      header->dest = (node == 1) ? 3 : 1;
+      header->src = node;
+      header->type = 1;
+      header->seq = seq++;
+      header->len = length;
+
+      // get pointer to data section of buffer
+      data = reinterpret_cast<char *>(header + 1);
+
+      // !BAM can I loose this?
+      memcpy (data, _data, length);
+
+      interface->send (header);
+      return;
+   }
+
    unsigned int current_length;
    unsigned int tx_count;
    llamaNET::Protocol_header **headerv;
-   char *data;
 
    unsigned int i;
 
@@ -234,15 +260,30 @@ void llamaNET_send_data (const char *_data, unsigned int length)
 extern "C"
 void llamaNET_recv_data (char *_data, unsigned int length)
 {
+   char *data;
+
+   if (length < MAX_MESSAGE_LENGTH)
+   {
+      llamaNET::Protocol_header *header = interface->recv(node);
+
+      // get pointer to data section of buffer
+      data = reinterpret_cast<char *>(header + 1);
+
+      // !BAM can I loose this?
+      memcpy (_data, data, length);
+
+      interface->release_recv_buffer (header);
+      return;
+   }
+
    unsigned int current_length;
-   uint32_t rx_count;
+   uint32_t rx_count, needed_count;;
 
    llamaNET::Protocol_header **headerv;
-   char *data;
 
    while (length > 0)
    {
-      rx_count = ((length + MAX_MESSAGE_LENGTH) / MAX_MESSAGE_LENGTH);
+      rx_count = min(256U, ((length + MAX_MESSAGE_LENGTH) / MAX_MESSAGE_LENGTH));
 
       headerv = interface->recvv(node, rx_count);
 

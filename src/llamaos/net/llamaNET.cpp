@@ -176,18 +176,29 @@ void llamaNET::release_recv_buffer (Protocol_header *header)
    }
 }
 
-static llamaNET::Protocol_header *recv_headerv [32];
+static llamaNET::Protocol_header *recv_headerv [256];
 
 llamaNET::Protocol_header **llamaNET::recvv (uint32_t node, uint32_t &count)
 {
    llamaNET::Protocol_header *header;
-   uint32_t max_count = min(32U, count);
-   count = 0;
+   uint32_t max_count = min(256U, count);
 
    unsigned int rx_head = control->driver.rx_head;
    unsigned int tx_head = control->driver.tx_head;
-   unsigned int rx_tail;
-   unsigned int tx_tail;
+   unsigned int rx_tail = control->app [index].rx_tail;
+   unsigned int tx_tail = control->app [index].tx_tail;
+
+//   if (count > 8)
+//   {
+//      cout << "count is " << count << endl;
+//      cout << "rx_head is " << rx_head << endl;
+//      cout << "tx_head is " << tx_head << endl;
+//      cout << "rx_tail is " << rx_tail << endl;
+//      cout << "tx_tail is " << tx_tail << endl;
+//   }
+
+   uint32_t _count = count;
+   count = 0;
 
    // find the first one (if exists) while moving tails along
    for (;;)
@@ -207,7 +218,6 @@ llamaNET::Protocol_header **llamaNET::recvv (uint32_t node, uint32_t &count)
             rx_tail = control->app [index].rx_tail;
             rx_tail++;
             rx_tail %= RX_BUFFERS;
-            tx_tail = control->app [index].tx_tail;
             break;
          }
       }
@@ -222,7 +232,6 @@ llamaNET::Protocol_header **llamaNET::recvv (uint32_t node, uint32_t &count)
             recv_headerv [count++] = header;
 
             // create local tail states
-            rx_tail = control->app [index].rx_tail;
             tx_tail = control->app [index].tx_tail;
             tx_tail++;
             tx_tail %= TX_BUFFERS;
@@ -271,10 +280,18 @@ llamaNET::Protocol_header **llamaNET::recvv (uint32_t node, uint32_t &count)
          }
          else
          {
-            break;
+            // break;
+            rx_head = control->driver.rx_head;
+            tx_head = control->driver.tx_head;
          }
       }
    }
+
+//   if (_count > 8)
+//   {
+//      cout << "count is " << count << endl;
+//      for (;;);
+//   }
 
    return recv_headerv;
 }
@@ -283,6 +300,9 @@ void llamaNET::release_recv_bufferv (uint32_t count)
 {
    unsigned int rx_head = control->driver.rx_head;
    unsigned int tx_head = control->driver.tx_head;
+
+   unsigned int new_rx_tail = control->app [index].rx_tail;
+   unsigned int new_tx_tail = control->app [index].tx_tail;
 
    for (uint32_t i = 0; i < count; i++)
    {
@@ -299,7 +319,7 @@ void llamaNET::release_recv_bufferv (uint32_t count)
             {
                rx_tail++;
                rx_tail %= RX_BUFFERS;
-               control->app [index].rx_tail = rx_tail;
+               new_rx_tail = rx_tail;
                break;
             }
 
@@ -312,7 +332,7 @@ void llamaNET::release_recv_bufferv (uint32_t count)
             {
                tx_tail++;
                tx_tail %= TX_BUFFERS;
-               control->app [index].tx_tail = tx_tail;
+               new_tx_tail = tx_tail;
                break;
             }
 
@@ -321,6 +341,9 @@ void llamaNET::release_recv_bufferv (uint32_t count)
          }
       }
    }
+
+   control->app [index].rx_tail = new_rx_tail;
+   control->app [index].tx_tail = new_tx_tail;
 }
 
 llamaNET::Protocol_header *llamaNET::get_send_buffer ()
@@ -333,7 +356,7 @@ llamaNET::Protocol_header *llamaNET::get_send_buffer ()
    {
       if (control->app [index].tx_tail == control->driver.tx_done_index)
       {
-         cout << "stuck on self..." << endl;
+//         cout << "stuck on self..." << endl;
          control->app [index].tx_tail++;
          control->app [index].tx_tail %= TX_BUFFERS;
       }
@@ -495,7 +518,7 @@ void llamaNET::send (Protocol_header *header)
 #endif
 
    header->eth_type = 0x0C09;
-
+//cout << "sending..." << endl;
    // ensure write is processed
    wmb();
 
@@ -514,7 +537,7 @@ llamaNET::Protocol_header **llamaNET::get_send_bufferv (unsigned int tx_count)
    {
       if (control->app [index].tx_tail == control->driver.tx_done_index)
       {
-//         cout << "stuck on self..." << endl;
+         cout << "stuck on self..." << endl;
          control->app [index].tx_tail++;
          control->app [index].tx_tail %= TX_BUFFERS;
       }
@@ -549,7 +572,10 @@ void llamaNET::sendv (llamaNET::Protocol_header **headerv, unsigned int tx_count
    // ensure write is processed
    wmb();
 
-   uint64_t tx_index = control->app [index].tx_index;
+   // write the mask backwards to allow driver to batch send packets
+   uint64_t tx_index = control->app [index].tx_index + tx_count - 1;
+   tx_index %= TX_BUFFERS;
+
    uint32_t byte_index = tx_index / 32;
    uint32_t tx_mask = 0;
 
@@ -557,15 +583,14 @@ void llamaNET::sendv (llamaNET::Protocol_header **headerv, unsigned int tx_count
    {
       if ((tx_index / 32) != byte_index)
       {
-         ::__sync_fetch_and_or(&control->driver.tx_mask [byte_index], tx_mask);
+         __sync_fetch_and_or(&control->driver.tx_mask [byte_index], tx_mask);
 
          byte_index = tx_index / 32;
          tx_mask = 0;
       }
 
-// cout << "  setting index " << tx_index + i << endl;         
       tx_mask |= (1 << (tx_index % 32));
-      tx_index++;
+      tx_index--;
       tx_index %= TX_BUFFERS;
    }
 

@@ -83,6 +83,38 @@ struct buffer_entry
    uint64_t address;
 };
 
+static inline unsigned int rx_desc_index (unsigned int index)
+{
+   if (index < 256)
+   {
+      return index + 768;
+   }
+   else if (index < 512)
+   {
+      return index + 256;
+   }
+   else if (index < 768)
+   {
+      return index - 256;
+   }
+
+   return index - 768;
+}
+
+static inline unsigned int tx_desc_index (unsigned int index)
+{
+   if (index < 256)
+   {
+      return index + 512;
+   }
+   else if (index < 512)
+   {
+      return index;
+   }
+
+   return index - 512;
+}
+
 int main (int /* argc */, char ** /* argv [] */)
 {
    bool hw_is_82574 = false;
@@ -239,7 +271,7 @@ int main (int /* argc */, char ** /* argv [] */)
    ctrl.PHY_RST(true);
    csr.write_CTRL(ctrl);
 
-   sleep (1);
+//   sleep (1);
 
    cout << "masking interrupts..." << endl;
    cout << csr.read_IMS () << endl;
@@ -252,6 +284,7 @@ int main (int /* argc */, char ** /* argv [] */)
    CTRL_EXT ctrl_ext = csr.read_CTRL_EXT ();
    cout << "CSR CTRL_EXT: " << hex << ctrl_ext << endl;
    ctrl_ext.SPD_BYPS (true);
+   ctrl_ext.PHY_PDE(false);
    ctrl_ext.DRV_LOAD(true);
    csr.write_CTRL_EXT (ctrl_ext);
    cout << "CSR CTRL_EXT: " << hex << ctrl_ext << endl;
@@ -263,17 +296,35 @@ int main (int /* argc */, char ** /* argv [] */)
    ctrl.FRCSPD (true);
    ctrl.FRCDPLX (true);
    ctrl.ADVD3WUC (true);
+   ctrl.RFCE(true);
+   ctrl.TFCE(true);
    csr.write_CTRL (ctrl);
 
-   sleep (1);
+   // flow control header
+   csr.write (0x28, 0x00C28001);
+   csr.write (0x2c, 0x0100);
+   csr.write (0x30, 0x8808);
+
+   // transmit timer value
+   csr.write (0x170, 10);       // 5 microseconds?
+   csr.write (0x5f40, 5);
+
+   csr.write(0x2160, 0x4800|0x80000000);
+   csr.write(0x2168, 0x3C00);
+//   sleep (1);
 
    status = csr.read_STATUS ();
    cout << "CSR STATUS: " << hex << status << endl;
 
    cout << "setting link up..." << endl;
+   ctrl = csr.read_CTRL();
+   cout << ctrl << endl;
    ctrl.SLU (true);
    csr.write_CTRL (ctrl);
 
+   status = csr.read_STATUS ();
+   cout << "CSR STATUS: " << hex << status << endl;
+   sleep (1);
    status = csr.read_STATUS ();
    cout << "CSR STATUS: " << hex << status << endl;
 
@@ -288,7 +339,9 @@ int main (int /* argc */, char ** /* argv [] */)
    cout << "initialize transmitter..." << endl;
    TXDCTL txdctl (0);
    txdctl.GRAN (true);
-   txdctl.WTHRESH (32);
+   txdctl.WTHRESH (1);
+   txdctl.HTHRESH (1);
+   txdctl.PTHRESH (31);
    csr.write_TXDCTL (txdctl);
 
    TCTL tctl (0);
@@ -297,12 +350,16 @@ int main (int /* argc */, char ** /* argv [] */)
    tctl.PSP (true);
    tctl.EN (true);
    tctl.PBE(true);
+   tctl.MULR(true);
+   tctl.RRTHRESH(TCTL::THREASHOLD_4_LINES);
    csr.write_TCTL (tctl);
 
    cout << "initialize receiver..." << endl;
    RXDCTL rxdctl (0);
    rxdctl.GRAN (true);
-   rxdctl.WTHRESH (1);
+   rxdctl.WTHRESH (4);
+   rxdctl.HTHRESH (4);
+   rxdctl.PTHRESH (20);
    csr.write_RXDCTL (rxdctl);
 
    cout << "enabling receiver..." << endl;
@@ -322,30 +379,24 @@ int main (int /* argc */, char ** /* argv [] */)
 
    cout << "create transmit descriptors..." << endl;
 
-   struct tx_desc_t *tx_desc = static_cast<struct tx_desc_t *>(memalign (PAGE_SIZE, PAGE_SIZE));
-   memset(tx_desc, 0, PAGE_SIZE);
-   uint64_t tx_desc_machine_address = virtual_pointer_to_machine_address(tx_desc);
-   Hypercall::update_va_mapping_nocache (pointer_to_address (tx_desc), tx_desc_machine_address);
-//   struct tx_desc_t *tx_desc = static_cast<struct tx_desc_t *>(memalign (PAGE_SIZE, 4 * PAGE_SIZE));
-//   memset(tx_desc, 0, 4 * PAGE_SIZE);
-//cout << "tx_desc page 0: " << virtual_pointer_to_machine_address(tx_desc+256+256+256) << endl;
-//cout << "tx_desc page 1: " << virtual_pointer_to_machine_address(tx_desc+256+256) << endl;
-//cout << "tx_desc page 2: " << virtual_pointer_to_machine_address(tx_desc+256) << endl;
-//cout << "tx_desc page 3: " << virtual_pointer_to_machine_address(tx_desc) << endl;
-//   uint64_t tx_desc_machine_address = virtual_pointer_to_machine_address(tx_desc+256+256+256);
-//   Hypercall::update_va_mapping_nocache (pointer_to_address (tx_desc+256+256+256), tx_desc_machine_address);
-//   Hypercall::update_va_mapping_nocache (pointer_to_address (tx_desc+256+256), tx_desc_machine_address+PAGE_SIZE);
-//   Hypercall::update_va_mapping_nocache (pointer_to_address (tx_desc+256), tx_desc_machine_address+PAGE_SIZE+PAGE_SIZE);
-//   Hypercall::update_va_mapping_nocache (pointer_to_address (tx_desc), tx_desc_machine_address+PAGE_SIZE+PAGE_SIZE+PAGE_SIZE);
+   const unsigned int tx_desc_size = 3 * PAGE_SIZE;
+   const unsigned int tx_desc_max = tx_desc_size / 16;
 
-   csr.write_TDBA (tx_desc_machine_address);
-//   csr.write_TDLEN (1024);    // 64 descriptors
-//   csr.write_TDLEN (128);     // 8 descriptors
-   csr.write_TDLEN (PAGE_SIZE); // 256 descriptors
-//   csr.write_TDLEN (2 * PAGE_SIZE); // 512 descriptors
-//   csr.write_TDLEN (3 * PAGE_SIZE); // 768 descriptors
-//   csr.write_TDLEN (4 * PAGE_SIZE); // 1024 descriptors
-   cout << "TDBA: " << hex << csr.read_TDBA() << ", " << tx_desc_machine_address << endl;
+   struct tx_desc_t *tx_desc = static_cast<struct tx_desc_t *>(memalign (PAGE_SIZE, tx_desc_size));
+   memset(tx_desc, 0, tx_desc_size);
+
+//   uint64_t tx_desc_machine_address = virtual_pointer_to_machine_address(tx_desc);
+   Hypercall::update_va_mapping_nocache (pointer_to_address (tx_desc), virtual_pointer_to_machine_address(tx_desc));
+   Hypercall::update_va_mapping_nocache (pointer_to_address (tx_desc+256), virtual_pointer_to_machine_address(tx_desc+256));
+   Hypercall::update_va_mapping_nocache (pointer_to_address (tx_desc+256+256), virtual_pointer_to_machine_address(tx_desc+256+256));
+//   Hypercall::update_va_mapping_nocache (pointer_to_address (tx_desc+256+256+256), virtual_pointer_to_machine_address(tx_desc+256+256+256));
+
+//   csr.write_TDBA (virtual_pointer_to_machine_address(tx_desc+256+256+256));
+   csr.write_TDBA (virtual_pointer_to_machine_address(tx_desc+256+256));
+   csr.write_TDLEN (tx_desc_size);
+
+   cout << "TDBA: " << hex << csr.read_TDBA() << ", " << virtual_pointer_to_machine_address(tx_desc+256+256) << endl;
+   cout << "TDLEN: " << hex << csr.read_TDLEN() << endl;
 
    buffer_entry tx_buffers [TX_BUFFERS];
    queue<buffer_entry> tx_hw;
@@ -365,32 +416,31 @@ int main (int /* argc */, char ** /* argv [] */)
 
    cout << "create receiver descriptors..." << endl;
 
-   struct rx_desc_t *rx_desc = static_cast<struct rx_desc_t *>(memalign (PAGE_SIZE, PAGE_SIZE));
-   memset(rx_desc, 0, PAGE_SIZE);
-   uint64_t rx_desc_machine_address = virtual_pointer_to_machine_address(rx_desc);
-   Hypercall::update_va_mapping_nocache (pointer_to_address (rx_desc), rx_desc_machine_address);
-//   struct rx_desc_t *rx_desc = static_cast<struct rx_desc_t *>(memalign (PAGE_SIZE, 4 * PAGE_SIZE));
-//   memset(rx_desc, 0, 4 * PAGE_SIZE);
-//cout << "rx_desc page 0: " << virtual_pointer_to_machine_address(rx_desc+256+256+256) << endl;
-//cout << "rx_desc page 1: " << virtual_pointer_to_machine_address(rx_desc+256+256) << endl;
-//cout << "rx_desc page 2: " << virtual_pointer_to_machine_address(rx_desc+256) << endl;
-//cout << "rx_desc page 3: " << virtual_pointer_to_machine_address(rx_desc) << endl;
-//   uint64_t rx_desc_machine_address = virtual_pointer_to_machine_address(rx_desc+256+256+256);
-//   Hypercall::update_va_mapping_nocache (pointer_to_address (rx_desc+256+256+256), rx_desc_machine_address);
-//   Hypercall::update_va_mapping_nocache (pointer_to_address (rx_desc+256+256), rx_desc_machine_address+PAGE_SIZE);
-//   Hypercall::update_va_mapping_nocache (pointer_to_address (rx_desc+256), rx_desc_machine_address+PAGE_SIZE+PAGE_SIZE);
-//   Hypercall::update_va_mapping_nocache (pointer_to_address (rx_desc), rx_desc_machine_address+PAGE_SIZE+PAGE_SIZE+PAGE_SIZE);
+   const unsigned int rx_desc_size = 4 * PAGE_SIZE;
+   const unsigned int rx_desc_max = rx_desc_size / 16;
 
-   csr.write_RDBA (rx_desc_machine_address);
-//   csr.write_RDLEN (1024);    // 64 descriptors
-//   csr.write_RDLEN (128);     // 8 descriptors
-   csr.write_RDLEN (PAGE_SIZE); // 256 descriptors
-//   csr.write_RDLEN (4 * PAGE_SIZE); // 256 descriptors
-   cout << "RDBA: " << hex << csr.read_RDBA() << ", " << rx_desc_machine_address << endl;
+   struct rx_desc_t *rx_desc = static_cast<struct rx_desc_t *>(memalign (PAGE_SIZE, rx_desc_size));
+   memset(rx_desc, 0, rx_desc_size);
+
+//   uint64_t rx_desc_machine_address = virtual_pointer_to_machine_address(rx_desc);
+   Hypercall::update_va_mapping_nocache (pointer_to_address (rx_desc), virtual_pointer_to_machine_address(rx_desc));
+   Hypercall::update_va_mapping_nocache (pointer_to_address (rx_desc+256), virtual_pointer_to_machine_address(rx_desc+256));
+   Hypercall::update_va_mapping_nocache (pointer_to_address (rx_desc+256+256), virtual_pointer_to_machine_address(rx_desc+256+256));
+   Hypercall::update_va_mapping_nocache (pointer_to_address (rx_desc+256+256+256), virtual_pointer_to_machine_address(rx_desc+256+256+256));
+
+   csr.write_RDBA (virtual_pointer_to_machine_address(rx_desc+256+256+256));
+   csr.write_RDLEN (rx_desc_size);
+
+   cout << "RDBA: " << hex << csr.read_RDBA() << ", " << virtual_pointer_to_machine_address(rx_desc+256+256+256) << endl;
+   cout << "RDLEN: " << hex << csr.read_RDLEN() << endl;
 
    buffer_entry rx_buffers [RX_BUFFERS];
    queue<buffer_entry> rx_hw;
    queue<buffer_entry> rx_sw;
+
+   uint16_t rx_head = csr.read_RDH ();
+   uint16_t rx_tail = rx_head;
+   unsigned int rx_buffer_filled = 0;
 
    for (unsigned int i = 0; i < RX_BUFFERS; i++)
    {
@@ -398,13 +448,13 @@ int main (int /* argc */, char ** /* argv [] */)
       rx_buffers [i].address = virtual_pointer_to_machine_address(rx_buffers [i].pointer);
       Hypercall::update_va_mapping_nocache (pointer_to_address (rx_buffers [i].pointer), rx_buffers [i].address);
 
-      if (i < 255)
-//      if (i < 767)
-//      if (i < 1023)
+      if (i < (rx_desc_max - 2))  // !BAM WHY? WHY DOES THIS HAVE TO BE 2 OFF INSTEAD OF 1? WHY?
       {
-         rx_desc [i].buffer = rx_buffers [i].address;
-         rx_desc [i].status = 0;
+         rx_desc [rx_desc_index(rx_tail)].buffer = rx_buffers [i].address;
+         rx_desc [rx_desc_index(rx_tail)].status = 0;
          rx_hw.push(rx_buffers [i]);
+         rx_tail++;
+         rx_buffer_filled++;
       }
       else
       {
@@ -412,10 +462,6 @@ int main (int /* argc */, char ** /* argv [] */)
       }
    }
 
-   uint16_t rx_head = 0;
-//   uint16_t rx_tail = 255; // RX_BUFFERS;
-//   uint16_t rx_tail = 767; // RX_BUFFERS;
-   uint16_t rx_tail = 1023; // RX_BUFFERS;
    csr.write_RDT (rx_tail);
 
    // create memory for the control page
@@ -457,13 +503,6 @@ int main (int /* argc */, char ** /* argv [] */)
    // allow tx_buffer guest access
    for (unsigned int i = 0; i < TX_BUFFERS; i++)
    {
-//      llamaNET_control->app [0].tx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+1, tx_buffers [i].pointer);
-//      llamaNET_control->app [1].tx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+2, tx_buffers [i].pointer);
-//      llamaNET_control->app [2].tx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+3, tx_buffers [i].pointer);
-//      llamaNET_control->app [3].tx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+4, tx_buffers [i].pointer);
-//      llamaNET_control->app [4].tx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+5, tx_buffers [i].pointer);
-//      llamaNET_control->app [5].tx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+6, tx_buffers [i].pointer);
-
       for (int j = 0; j < 6; j++)
       {
          grant_ref_t *tx_ref = tx_refs [j];
@@ -476,13 +515,6 @@ int main (int /* argc */, char ** /* argv [] */)
    // allow rx_buffer guest access
    for (unsigned int i = 0; i < RX_BUFFERS; i++)
    {
-//      llamaNET_control->app [0].rx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+1, rx_buffers [i].pointer);
-//      llamaNET_control->app [1].rx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+2, rx_buffers [i].pointer);
-//      llamaNET_control->app [2].rx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+3, rx_buffers [i].pointer);
-//      llamaNET_control->app [3].rx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+4, rx_buffers [i].pointer);
-//      llamaNET_control->app [4].rx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+5, rx_buffers [i].pointer);
-//      llamaNET_control->app [5].rx_refs [i] = Hypervisor::get_instance ()->grant_table.grant_access (self_id+6, rx_buffers [i].pointer);
-
       for (int j = 0; j < 6; j++)
       {
          grant_ref_t *rx_ref = rx_refs [j];
@@ -501,53 +533,61 @@ int main (int /* argc */, char ** /* argv [] */)
    queue<unsigned int> tx_indexes;
 
    uint16_t rx_tail_global = 0;
-   unsigned long rx_outstanding = 0;
-
-   bool write_tx_tail = false;
-   unsigned int tx_tail_count = 0;
 
    unsigned int total_write_TDT = 0;
 
    unsigned int send_delay = 0;
 
+   unsigned int rx_count = 0;
+   unsigned int tx_tail2 = 0;
+
    for (;;)
    {
-      if (rx_desc [rx_head].status != 0)
+      if (rx_desc [rx_desc_index(rx_head)].status != 0)
       {
+//cout << "recv'ed " << rx_head << endl;
          buffer_entry entry;
-         entry.address = rx_desc [rx_head].buffer;
+         entry.address = rx_desc [rx_desc_index(rx_head)].buffer;
          rx_sw.push (entry);
 
+         rx_head++;
+         rx_head %= rx_desc_max;
+
+         rx_count++;
+         continue;
+      }
+
+      if (rx_count > 0)
+      {
          head = llamaNET_control->driver.rx_head;
-         head++;
+         head += rx_count;
          head %= RX_BUFFERS;
          llamaNET_control->driver.rx_head = head;
-
-         rx_head++;
-         rx_head %= 256;
-//         rx_head %= 768;
-//         rx_head %= 1024;
-
-         rx_outstanding++;
+         rx_buffer_filled -= rx_count;
+         if (rx_buffer_filled < 16)
+         {
+            cout << "rx buffer low: " << rx_buffer_filled << endl;
+         }
+//if (rx_count > 2) cout << "rx_count is " << rx_count << endl;
+         rx_count = 0;
       }
-//      else
 
       if (++send_delay > 0)
       {
          send_delay = 0;
-       
+
          uint64_t tx_next_index = llamaNET_control->driver.tx_next_index;
          uint64_t tx_last_index = llamaNET_control->driver.tx_last_index;
 
          if (tx_next_index != tx_last_index)
          {
-   //cout << "sending..." << endl;         
+//cout << "sending..." << endl;         
             uint32_t tx_mask = 0;
             uint32_t tx_count = 0;
 
             for (uint32_t i = (tx_last_index % 32); i < 32; i++)
             {
-   //cout << "  sending index " << tx_last_index + tx_count << endl;         
+//cout << "  sending index " << tx_last_index + tx_count << endl;         
                tx_mask |= (1 << i);
                tx_count++;
 
@@ -559,7 +599,6 @@ int main (int /* argc */, char ** /* argv [] */)
 
             tx_mask &= __sync_fetch_and_and(&llamaNET_control->driver.tx_mask [(tx_last_index % TX_BUFFERS) / 32], ~tx_mask);
 
-
    //cout << "  sending tx_mask " << tx_mask << endl;         
    //cout << "  sending tx_count " << tx_count << endl;         
             tx_count = 0;
@@ -567,29 +606,33 @@ int main (int /* argc */, char ** /* argv [] */)
             {
                if (tx_mask & (1 << i))
                {
-   //cout << "  sending index " << tx_last_index + tx_count << endl;         
-                  tx_desc [tx_tail].buffer = tx_buffers [(tx_last_index + tx_count) % TX_BUFFERS].address;
-                  tx_desc [tx_tail].length = llamaos::net::llamaNET::HEADER_LENGTH + reinterpret_cast<llamaos::net::llamaNET::Protocol_header *> (tx_buffers [(tx_last_index + tx_count) % TX_BUFFERS].pointer)->len;
-                  tx_desc [tx_tail].CSO = 0;
-                  tx_desc [tx_tail].CMD = 0x0B;
-                  tx_desc [tx_tail].STA = 0;
-                  tx_desc [tx_tail].CSS = 0;
-                  tx_desc [tx_tail].VLAN = 0;
+//cout << "  sending index " << tx_tail << endl;         
+
+                  tx_desc [tx_desc_index(tx_tail)].buffer = tx_buffers [(tx_last_index + tx_count) % TX_BUFFERS].address;
+                  tx_desc [tx_desc_index(tx_tail)].length = llamaos::net::llamaNET::HEADER_LENGTH + reinterpret_cast<llamaos::net::llamaNET::Protocol_header *> (tx_buffers [(tx_last_index + tx_count) % TX_BUFFERS].pointer)->len;
+                  tx_desc [tx_desc_index(tx_tail)].CSO = 0;
+                  tx_desc [tx_desc_index(tx_tail)].CMD = 0x0B;
+                  tx_desc [tx_desc_index(tx_tail)].STA = 0;
+                  tx_desc [tx_desc_index(tx_tail)].CSS = 0;
+                  tx_desc [tx_desc_index(tx_tail)].VLAN = 0;
 
                   tx_tail++;
-                  tx_tail %= 256;
+                  tx_tail %= tx_desc_max;
+      //            tx_tail %= 256;
       //            tx_tail %= 512;
       //            tx_tail %= 768;
       //            tx_tail %= 1024;
 
 
+                  tx_tail2 = tx_tail + 1;
+                  tx_tail2 %= tx_desc_max;
                   // holding for phys buffer space....
-                  while (tx_desc [tx_tail].CMD == 0x0B && tx_desc [tx_tail].STA == 0);
+                  while (tx_desc [tx_desc_index(tx_tail2)].CMD == 0x0B && tx_desc [tx_desc_index(tx_tail2)].STA == 0);
+//                  cout << "tx_tail " << tx_tail << " ready" << endl;
       //            if (tx_desc [tx_tail].CMD == 0x0B && tx_desc [tx_tail].STA == 0)
       //            {
       //               break;
       //            }
-
 
                   tx_count++;
                }
@@ -600,185 +643,71 @@ int main (int /* argc */, char ** /* argv [] */)
                }
             }
 
-            wmb();
-            csr.write_TDT (tx_tail);
-
-            head = llamaNET_control->driver.tx_head;
-            head += tx_count;
-            head %= TX_BUFFERS;
-            llamaNET_control->driver.tx_head = head;
-
-            llamaNET_control->driver.tx_last_index += tx_count;
-            wmb();
-         }
-      }
-#if 0
-      while (llamaNET_control->driver.tx_next_index != llamaNET_control->driver.tx_last_index)
-      {
-         unsigned long tx_last_index = llamaNET_control->driver.tx_last_index % TX_BUFFERS;
-
-         tx_mask = __sync_fetch_and_and(&llamaNET_control->driver.tx_mask [tx_last_index / 64], ~(1 << (tx_last_index % 64)));
-
-         if (tx_mask & (1 << (tx_last_index % 64)))
-         {
-            tx_desc [tx_tail].buffer = tx_buffers [tx_last_index].address;
-            tx_desc [tx_tail].length = llamaos::net::llamaNET::HEADER_LENGTH;// + reinterpret_cast<llamaos::net::llamaNET::Protocol_header *> (tx_buffers [tx_last_index].pointer)->len;
-            tx_desc [tx_tail].CSO = 0;
-            tx_desc [tx_tail].CMD = 0x0B;
-            tx_desc [tx_tail].STA = 0;
-            tx_desc [tx_tail].CSS = 0;
-            tx_desc [tx_tail].VLAN = 0;
-
-            tx_tail++;
-//            tx_tail %= 256;
-//            tx_tail %= 512;
-//            tx_tail %= 768;
-            tx_tail %= 1024;
-            write_tx_tail = true;
-
-            if (++tx_tail_count > 768)
+            if (tx_count > 0)
             {
-               break;
+               wmb();
+               csr.write_TDT (tx_tail);
+//cout << "  next index " << tx_tail << endl;         
+//if (tx_count > 2) cout << "tx_count is " << tx_count << endl;
+
+               head = llamaNET_control->driver.tx_head;
+               head += tx_count;
+               head %= TX_BUFFERS;
+               llamaNET_control->driver.tx_head = head;
+
+               llamaNET_control->driver.tx_last_index += tx_count;
             }
-
-            // holding for phys buffer space....
-//            while (tx_desc [tx_tail].CMD == 0x0B && tx_desc [tx_tail].STA == 0);
-//            if (tx_desc [tx_tail].CMD == 0x0B && tx_desc [tx_tail].STA == 0)
-//            {
-//               break;
-//            }
-
-//            wmb();
-//            csr.write_TDT (tx_tail);
-
-            head = llamaNET_control->driver.tx_head;
-            head++;
-            head %= TX_BUFFERS;
-            llamaNET_control->driver.tx_head = head;
-
-            llamaNET_control->driver.tx_last_index++;
-            mb();
-         }
-         else
-         {
-            break;
          }
       }
 
-      if (write_tx_tail)
+//      if (++cleanup_delay > 100)
       {
-         write_tx_tail = false;
-//         if (tx_tail_count > 1) cout << ".";
-         tx_tail_count = 0;
-
-//         // holding for phys buffer space....
-//         while (tx_desc [tx_tail].CMD == 0x0B && tx_desc [tx_tail].STA == 0);
-//
-         wmb();
-  //       csr.write_TDT (tx_tail);
-         total_write_TDT++;
-      }
-#endif
-      if (llamaNET_control->driver.tx_last_index != llamaNET_control->driver.tx_done_index)
-      {
-         unsigned long tx_done_index = llamaNET_control->driver.tx_done_index % TX_BUFFERS;
-
-//         if (tx_desc [tx_done_index].CMD != 0x0B || tx_desc [tx_done_index].STA != 0)
+         cleanup_delay = 0;
+#if 1
+         if (llamaNET_control->driver.tx_last_index != llamaNET_control->driver.tx_done_index)
          {
-            bool update = true;
+   //         unsigned long tx_done_index = llamaNET_control->driver.tx_done_index % TX_BUFFERS;
+
+   //         if (tx_desc [tx_done_index].CMD != 0x0B || tx_desc [tx_done_index].STA != 0)
+            {
+               bool update = true;
+
+               for (int i = 0; i < 6; i++)
+               {
+                  if (   (llamaNET_control->app [i].online)
+                     && (llamaNET_control->driver.tx_done_index == llamaNET_control->app [i].tx_tail))
+                  {
+                     update = false;
+                     break;
+                  }
+               }
+
+               if (update)
+               {
+                  llamaNET_control->driver.tx_done_index++;
+               }
+            }
+         }
+
+
+         bool write_rx_tail = false;
+         bool move_rx_tail = false;
+
+         while (rx_tail_global != llamaNET_control->driver.rx_head)
+         {
+            move_rx_tail = true;
 
             for (int i = 0; i < 6; i++)
             {
                if (   (llamaNET_control->app [i].online)
-                   && (llamaNET_control->driver.tx_done_index == llamaNET_control->app [i].tx_tail))
+                   && (rx_tail_global == llamaNET_control->app [i].rx_tail))
                {
-                  update = false;
+                  move_rx_tail = false;
                   break;
                }
             }
 
-            if (update)
-            {
-               llamaNET_control->driver.tx_done_index++;
-            }
-         }
-      }
-//      else
-      {
-#if 0
-         for (int i = 0; i < 6; i++)
-         {
-            if (llamaNET_control->app [i].tx_request)
-            {
-               unsigned int count = llamaNET_control->app [i].tx_count;
-
-               for (int j = 0; j < count; j++)
-               {
-                  unsigned int index = llamaNET_control->app [i].tx_index [j];
-
-                  tx_desc [tx_tail].buffer = tx_buffers [index].address;
-                  tx_desc [tx_tail].length = llamaNET_control->app [i].tx_length [j];
-                  tx_desc [tx_tail].CSO = 0;
-                  tx_desc [tx_tail].CMD = 0x0B;
-                  tx_desc [tx_tail].STA = 0;
-                  tx_desc [tx_tail].CSS = 0;
-                  tx_desc [tx_tail].VLAN = 0;
-
-                  tx_tail++;
-//                  tx_tail %= 256;
-//                  tx_tail %= 512;
-                  tx_tail %= 768;
-//                  tx_tail %= 1024;
-
-                  // holding for phys buffer space....
-                  while (tx_desc [tx_tail].CMD == 0x0B && tx_desc [tx_tail].STA == 0);
-
-                  csr.write_TDT (tx_tail);
-
-                  if (llamaNET_control->driver.tx_head == index)
-                  {
-                     head = llamaNET_control->driver.tx_head;
-                     head++;
-                     head %= TX_BUFFERS;
-                     llamaNET_control->driver.tx_head = head;
-                     llamaNET_control->driver.tx_count++;
-
-                     while (llamaNET_control->driver.tx_head == tx_indexes.front ())
-                     {
-                        head = llamaNET_control->driver.tx_head;
-                        head++;
-                        head %= TX_BUFFERS;
-                        llamaNET_control->driver.tx_head = head;
-                        llamaNET_control->driver.tx_count++;
-
-                        tx_indexes.pop ();
-                     }
-                  }
-                  else
-                  {
-                     tx_indexes.push(index);
-                  }
-               }
-
-               llamaNET_control->app [i].tx_request = false;
-            }
-         }
-#endif
-         if (rx_tail_global != llamaNET_control->driver.rx_head)
-         {
-            bool update = true;
-
-            for (int i = 0; i < 6; i++)
-            {
-               if (   (llamaNET_control->app [i].online)
-                  && (rx_tail_global == llamaNET_control->app [i].rx_tail))
-               {
-                  update = false;
-                  break;
-               }
-            }
-
-            if (update)
+            if (move_rx_tail)
             {
                // !bam can't do this until all guest tail is updated
                buffer_entry entry;
@@ -786,49 +715,38 @@ int main (int /* argc */, char ** /* argv [] */)
                rx_sw.pop ();
 
       //         rx_desc [rx_tail].buffer = rx_desc [rx_head].buffer;
-               rx_desc [rx_tail].buffer = entry.address;
-               rx_desc [rx_tail].checksum = 0;
-               rx_desc [rx_tail].error = 0;
-               rx_desc [rx_tail].length = 0;
-               rx_desc [rx_tail].status = 0;
-               rx_desc [rx_tail].vlan = 0;
+               rx_desc [rx_desc_index(rx_tail)].buffer = entry.address;
+               rx_desc [rx_desc_index(rx_tail)].checksum = 0;
+               rx_desc [rx_desc_index(rx_tail)].error = 0;
+               rx_desc [rx_desc_index(rx_tail)].length = 0;
+               rx_desc [rx_desc_index(rx_tail)].status = 0;
+               rx_desc [rx_desc_index(rx_tail)].vlan = 0;
                rx_tail++;
-               rx_tail %= 256;
-//               rx_tail %= 768;
-//               rx_tail %= 1024;
-               csr.write_RDT (rx_tail);
+               rx_tail %= rx_desc_max;
+//cout << "inserted rx_tail " << rx_tail << endl;
+//               csr.write_RDT (rx_tail);
+               write_rx_tail = true;
       
                rx_tail_global++;
                rx_tail_global %= RX_BUFFERS;
-
-               --rx_outstanding;
+               rx_buffer_filled++;
+            }
+            else
+            {
+               break;
             }
          }
 
-         if (++cleanup_delay > 1000)
+         if (write_rx_tail)
          {
-            cleanup_delay = 0;
-
-            // cleanup tx while waiting
-   //         while (tx_head != csr.read_TDH())
-   //         {
-   //            tx_sw.push(tx_hw.front());
-   //            tx_hw.pop();
-   //            tx_head++;
-   //            tx_head %= 256;
-   //         }
-
-            if (rx_outstanding > 128)
-            {
-   //            cout << "rx_outstanding: " << rx_outstanding << endl;
-            }
-
-            if (llamaNET_control->close_driver)
-            {
-               cout << "close_driver is: " << llamaNET_control->close_driver << endl;
-               // leave driver, app is done
-               break;
-            }
+            csr.write_RDT (rx_tail);
+         }
+#endif
+         if (llamaNET_control->close_driver)
+         {
+            cout << "close_driver is: " << llamaNET_control->close_driver << endl;
+            // leave driver, app is done
+            break;
          }
       }
    }
