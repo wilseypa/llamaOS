@@ -34,36 +34,57 @@
 include common-vars.mk
 include common-flags.mk
 
-MAKEFILE_SOURCES += netpipe-$(NETPIPE_VERSION)-mpi.mk
+# override this
+CC = $(MPICC)
+
+MAKEFILE_SOURCES += IMB.mk
 
 CFLAGS += \
-  -DMPI -DFINAL
+  -DMPI1
 
 VPATH = $(SRCDIR)
 
 SOURCES = \
-  apps/netpipe-$(NETPIPE_VERSION)/src/mpi.c
+  apps/imb-3.2.3/src/IMB.c \
+  apps/imb-3.2.3/src/IMB_allgather.c \
+  apps/imb-3.2.3/src/IMB_allgatherv.c \
+  apps/imb-3.2.3/src/IMB_allreduce.c \
+  apps/imb-3.2.3/src/IMB_alltoall.c \
+  apps/imb-3.2.3/src/IMB_alltoallv.c \
+  apps/imb-3.2.3/src/IMB_barrier.c \
+  apps/imb-3.2.3/src/IMB_bcast.c \
+  apps/imb-3.2.3/src/IMB_benchlist.c \
+  apps/imb-3.2.3/src/IMB_cpu_exploit.c \
+  apps/imb-3.2.3/src/IMB_declare.c \
+  apps/imb-3.2.3/src/IMB_err_handler.c \
+  apps/imb-3.2.3/src/IMB_exchange.c \
+  apps/imb-3.2.3/src/IMB_g_info.c \
+  apps/imb-3.2.3/src/IMB_gather.c \
+  apps/imb-3.2.3/src/IMB_gatherv.c \
+  apps/imb-3.2.3/src/IMB_init.c \
+  apps/imb-3.2.3/src/IMB_init_transfer.c \
+  apps/imb-3.2.3/src/IMB_mem_manager.c \
+  apps/imb-3.2.3/src/IMB_output.c \
+  apps/imb-3.2.3/src/IMB_parse_name_mpi1.c \
+  apps/imb-3.2.3/src/IMB_pingpong.c \
+  apps/imb-3.2.3/src/IMB_pingping.c \
+  apps/imb-3.2.3/src/IMB_reduce.c \
+  apps/imb-3.2.3/src/IMB_reduce_scatter.c \
+  apps/imb-3.2.3/src/IMB_scatter.c \
+  apps/imb-3.2.3/src/IMB_scatterv.c \
+  apps/imb-3.2.3/src/IMB_sendrecv.c \
+  apps/imb-3.2.3/src/IMB_strgs.c \
+  apps/imb-3.2.3/src/IMB_warm_up.c
 
-OBJECTS  = $(OBJDIR)/apps/netpipe-$(NETPIPE_VERSION)/src/netpipe-mpi.o
-OBJECTS += $(SOURCES:%.c=$(OBJDIR)/%.o)
-DEPENDS  = $(OBJECTS:%.o=%.d)
+OBJECTS = $(SOURCES:%.c=$(OBJDIR)/%.o)
+DEPENDS = $(OBJECTS:%.o=%.d)
 
-$(BINDIR)/netpipe-mpi: $(OBJECTS)
+$(BINDIR)/IMB: $(OBJECTS)
 	@[ -d $(@D) ] || (mkdir -p $(@D))
-	@echo linking: $@ with $(MPICC)
+	@echo linking: $@
 	@$(MPICC) $(LDFLAGS) -o $@ $^
 	@echo successfully built: $@
 	@echo
-
-$(OBJDIR)/apps/netpipe-$(NETPIPE_VERSION)/src/mpi.o : $(SRCDIR)/apps/netpipe-$(NETPIPE_VERSION)/src/mpi.c $(MAKEFILE_SOURCES)
-	@[ -d $(@D) ] || (mkdir -p $(@D))
-	@echo compiling: $< with $(MPICC)
-	@$(MPICC) -c $(CFLAGS) -o $@ $<
-
-$(OBJDIR)/apps/netpipe-$(NETPIPE_VERSION)/src/netpipe-mpi.o : $(SRCDIR)/apps/netpipe-$(NETPIPE_VERSION)/src/netpipe.c $(MAKEFILE_SOURCES)
-	@[ -d $(@D) ] || (mkdir -p $(@D))
-	@echo compiling: $< with $(MPICC)
-	@$(MPICC) -c $(CFLAGS) -o $@ $<
 
 include rules.mk
 

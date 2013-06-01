@@ -183,13 +183,15 @@ cout << "1 is send..." << endl;
    }
 }
 
-// #define MAX_MESSAGE_LENGTH 3968
-// #define MAX_MESSAGE_LENGTH 1436U
-#define MAX_MESSAGE_LENGTH 4032U
-// #define MAX_MESSAGE_LENGTH (4096 - llamaNET::HEADER_LENGTH - 2)
 
-#include <sys/time.h>
-#include <stdlib.h>
+// 1500 - 64
+#define MAX_MESSAGE_LENGTH 1436U
+
+// 4096 - 64
+// #define MAX_MESSAGE_LENGTH 4032U
+
+//#include <sys/time.h>
+//#include <stdlib.h>
 
 extern "C"
 void llamaNET_send_data (const char *_data, unsigned int length)
@@ -277,7 +279,7 @@ void llamaNET_recv_data (char *_data, unsigned int length)
    }
 
    unsigned int current_length;
-   uint32_t rx_count, needed_count;;
+   uint32_t rx_count;//, needed_count;
 
    llamaNET::Protocol_header **headerv;
 

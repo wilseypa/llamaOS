@@ -37,6 +37,7 @@ include common-vars.mk
 all:
 	@$(MAKE) -f netpipe-$(NETPIPE_VERSION)-memcpy.mk
 	@$(MAKE) -f netpipe-$(NETPIPE_VERSION)-tcp.mk
+	@-command -v $(MPICC) >/dev/null && ($(MAKE) -f IMB.mk)
 	@-command -v $(MPICC) >/dev/null && ($(MAKE) -f netpipe-$(NETPIPE_VERSION)-mpi.mk)
 
 .PHONY: install

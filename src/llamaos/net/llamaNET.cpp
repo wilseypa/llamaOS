@@ -42,7 +42,7 @@ using namespace llamaos::memory;
 using namespace llamaos::net;
 using namespace llamaos::xen;
 
-#define HARD_CODED_MACS
+//#define HARD_CODED_MACS
 #define DALAI_REDPJ
 //#define BEOWULF1
 

@@ -65,7 +65,9 @@ void iSend(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_C
    int remMessSize = sizeInBytes%MAX_MESS_SIZE;
    for (int partOn=0; partOn <= numFullMess; partOn++) {
       int messSize = (partOn==numFullMess) ? remMessSize : MAX_MESS_SIZE;
-      if (messSize == 0) {break;}
+
+// !BAM?
+//      if (messSize == 0) {break;}
 
       #ifdef SLOW_SENDS
       llamaos::api::sleep(1);

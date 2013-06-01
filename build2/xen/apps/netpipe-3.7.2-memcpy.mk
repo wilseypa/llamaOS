@@ -40,6 +40,7 @@ MAKEFILE_SOURCES += apps/netpipe-$(NETPIPE_VERSION)-memcpy.mk
 
 CFLAGS += \
   -DMEMCPY \
+  -DFINAL \
   -I $(INCDIR) \
   -I $(SRCDIR) \
   -include $(SRCDIR)/llamaos/__thread.h

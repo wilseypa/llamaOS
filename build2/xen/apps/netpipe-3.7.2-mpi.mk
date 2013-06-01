@@ -40,6 +40,7 @@ MAKEFILE_SOURCES += apps/netpipe-$(NETPIPE_VERSION)-mpi.mk
 
 CFLAGS += \
   -DMPI \
+  -DFINAL \
   -I $(INCDIR)/llamaos/mpi \
   -I $(INCDIR) \
   -I $(SRCDIR) \

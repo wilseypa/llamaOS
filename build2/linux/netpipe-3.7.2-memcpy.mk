@@ -37,7 +37,7 @@ include common-flags.mk
 MAKEFILE_SOURCES += netpipe-$(NETPIPE_VERSION)-memcpy.mk
 
 CFLAGS += \
-  -DMEMCPY
+  -DMEMCPY -DFINAL
 
 VPATH = $(SRCDIR)
 

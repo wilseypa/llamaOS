@@ -46,6 +46,7 @@ all:
 
 	@$(MAKE) -f apps/hello-c.mk
 	@$(MAKE) -f apps/hello-cpp.mk
+	@$(MAKE) -f apps/IMB-llamaMPI.mk
 	@$(MAKE) -f apps/netpipe-3.7.2-llamaNET.mk
 	@$(MAKE) -f apps/netpipe-3.7.2-memcpy.mk
 	@$(MAKE) -f apps/netpipe-3.7.2-mpi.mk

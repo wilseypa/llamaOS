@@ -37,7 +37,7 @@ include common-flags.mk
 MAKEFILE_SOURCES += netpipe-$(NETPIPE_VERSION)-tcp.mk
 
 CFLAGS += \
-  -DTCP
+  -DTCP -DFINAL
 
 VPATH = $(SRCDIR)
 

@@ -49,9 +49,16 @@ class iComm;
 class iRequest;
 
 //#define MPI_COUT_EVERY_MESSAGE
-#define MPI_COUT_INITIALIZATION
+//#define MPI_COUT_INITIALIZATION
 //#define SLOW_SENDS
-#define MAX_MESS_SIZE 3950
+
+// #define MAX_MESS_SIZE 3950
+
+// 1500 - 64
+#define MAX_MESS_SIZE 1436
+
+// 4096 - 64
+// #define MAX_MESS_SIZE 4032
 
 typedef char MPI_CHAR_T;
 typedef unsigned char MPI_BYTE_T;		

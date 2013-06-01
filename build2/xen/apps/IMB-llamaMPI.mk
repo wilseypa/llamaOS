@@ -34,36 +34,49 @@
 include common-vars.mk
 include common-flags.mk
 
-MAKEFILE_SOURCES += netpipe-$(NETPIPE_VERSION)-mpi.mk
+MAKEFILE_SOURCES += apps/IMB-llamaMPI.mk
 
 CFLAGS += \
-  -DMPI -DFINAL
+  -I $(INCDIR)/llamaos/mpi \
+  -I $(INCDIR) \
+  -I $(SRCDIR) \
+  -I ../src/apps \
+  -D__XEN_INTERFACE_VERSION__=0x00030205 \
+  -include $(SRCDIR)/llamaos/__thread.h \
+  -DMPI1
 
 VPATH = $(SRCDIR)
 
 SOURCES = \
-  apps/netpipe-$(NETPIPE_VERSION)/src/mpi.c
+  apps/imb-3.2.3/src/IMB.c \
+  apps/imb-3.2.3/src/IMB_benchlist.c \
+  apps/imb-3.2.3/src/IMB_cpu_exploit.c \
+  apps/imb-3.2.3/src/IMB_declare.c \
+  apps/imb-3.2.3/src/IMB_err_handler.c \
+  apps/imb-3.2.3/src/IMB_exchange.c \
+  apps/imb-3.2.3/src/IMB_g_info.c \
+  apps/imb-3.2.3/src/IMB_init.c \
+  apps/imb-3.2.3/src/IMB_init_transfer.c \
+  apps/imb-3.2.3/src/IMB_mem_manager.c \
+  apps/imb-3.2.3/src/IMB_output.c \
+  apps/imb-3.2.3/src/IMB_parse_name_mpi1.c \
+  apps/imb-3.2.3/src/IMB_pingpong.c \
+  apps/imb-3.2.3/src/IMB_strgs.c \
+  apps/imb-3.2.3/src/IMB_warm_up.c \
+  apps/imb-3.2.3/src/IMB_sendrecv.c \
+  apps/imb-3.2.3/src/IMB_exchange.c
 
-OBJECTS  = $(OBJDIR)/apps/netpipe-$(NETPIPE_VERSION)/src/netpipe-mpi.o
-OBJECTS += $(SOURCES:%.c=$(OBJDIR)/%.o)
-DEPENDS  = $(OBJECTS:%.o=%.d)
+OBJECTS = $(SOURCES:%.c=$(OBJDIR)/%.o)
+DEPENDS = $(OBJECTS:%.o=%.d)
 
-$(BINDIR)/netpipe-mpi: $(OBJECTS)
+# the entry object must be the first object listed here or the guest will crash!
+$(BINDIR)/IMB-llamaMPI: $(OBJECTS) $(LIBDIR)/llamaMPI.a $(LIBDIR)/llamaOS.a $(LIBDIR)/stdc++.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
 	@[ -d $(@D) ] || (mkdir -p $(@D))
-	@echo linking: $@ with $(MPICC)
-	@$(MPICC) $(LDFLAGS) -o $@ $^
+	@echo linking: $@
+	@$(LD) $(LDFLAGS) -T llamaOS.lds -o $@ $^
+	@gzip -c -f --best $@ >$@.gz
 	@echo successfully built: $@
 	@echo
-
-$(OBJDIR)/apps/netpipe-$(NETPIPE_VERSION)/src/mpi.o : $(SRCDIR)/apps/netpipe-$(NETPIPE_VERSION)/src/mpi.c $(MAKEFILE_SOURCES)
-	@[ -d $(@D) ] || (mkdir -p $(@D))
-	@echo compiling: $< with $(MPICC)
-	@$(MPICC) -c $(CFLAGS) -o $@ $<
-
-$(OBJDIR)/apps/netpipe-$(NETPIPE_VERSION)/src/netpipe-mpi.o : $(SRCDIR)/apps/netpipe-$(NETPIPE_VERSION)/src/netpipe.c $(MAKEFILE_SOURCES)
-	@[ -d $(@D) ] || (mkdir -p $(@D))
-	@echo compiling: $< with $(MPICC)
-	@$(MPICC) -c $(CFLAGS) -o $@ $<
 
 include rules.mk
 

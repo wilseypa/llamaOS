@@ -534,8 +534,6 @@ int main (int /* argc */, char ** /* argv [] */)
 
    uint16_t rx_tail_global = 0;
 
-   unsigned int total_write_TDT = 0;
-
    unsigned int send_delay = 0;
 
    unsigned int rx_count = 0;
@@ -618,21 +616,12 @@ int main (int /* argc */, char ** /* argv [] */)
 
                   tx_tail++;
                   tx_tail %= tx_desc_max;
-      //            tx_tail %= 256;
-      //            tx_tail %= 512;
-      //            tx_tail %= 768;
-      //            tx_tail %= 1024;
-
 
                   tx_tail2 = tx_tail + 1;
                   tx_tail2 %= tx_desc_max;
                   // holding for phys buffer space....
                   while (tx_desc [tx_desc_index(tx_tail2)].CMD == 0x0B && tx_desc [tx_desc_index(tx_tail2)].STA == 0);
 //                  cout << "tx_tail " << tx_tail << " ready" << endl;
-      //            if (tx_desc [tx_tail].CMD == 0x0B && tx_desc [tx_tail].STA == 0)
-      //            {
-      //               break;
-      //            }
 
                   tx_count++;
                }
@@ -660,35 +649,29 @@ int main (int /* argc */, char ** /* argv [] */)
          }
       }
 
-//      if (++cleanup_delay > 100)
+      if (++cleanup_delay > 100)
       {
          cleanup_delay = 0;
 #if 1
          if (llamaNET_control->driver.tx_last_index != llamaNET_control->driver.tx_done_index)
          {
-   //         unsigned long tx_done_index = llamaNET_control->driver.tx_done_index % TX_BUFFERS;
+            bool update = true;
 
-   //         if (tx_desc [tx_done_index].CMD != 0x0B || tx_desc [tx_done_index].STA != 0)
+            for (int i = 0; i < 6; i++)
             {
-               bool update = true;
-
-               for (int i = 0; i < 6; i++)
+               if (   (llamaNET_control->app [i].online)
+                  && (llamaNET_control->driver.tx_done_index == llamaNET_control->app [i].tx_tail))
                {
-                  if (   (llamaNET_control->app [i].online)
-                     && (llamaNET_control->driver.tx_done_index == llamaNET_control->app [i].tx_tail))
-                  {
-                     update = false;
-                     break;
-                  }
-               }
-
-               if (update)
-               {
-                  llamaNET_control->driver.tx_done_index++;
+                  update = false;
+                  break;
                }
             }
-         }
 
+            if (update)
+            {
+               llamaNET_control->driver.tx_done_index++;
+            }
+         }
 
          bool write_rx_tail = false;
          bool move_rx_tail = false;
@@ -751,7 +734,6 @@ int main (int /* argc */, char ** /* argv [] */)
       }
    }
 
-   cout << "total_write_TDT = " << total_write_TDT << endl;
    cout << "waiting 3 sec, then exit..." << endl;
    cout.flush ();
    sleep (3);

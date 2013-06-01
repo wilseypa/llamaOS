@@ -38,6 +38,7 @@ MAKEFILE_SOURCES += apps/netpipe-$(NETPIPE_VERSION)-llamaNET.mk
 
 CFLAGS += \
   -DLLAMANET \
+  -DFINAL \
   -I $(INCDIR) \
   -I $(SRCDIR) \
   -include $(SRCDIR)/llamaos/__thread.h

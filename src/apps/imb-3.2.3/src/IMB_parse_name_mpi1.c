@@ -212,6 +212,7 @@ In/out variables:
 	Bmark->bench_comments 	= &PingPing_cmt[0];
 	type 			= SingleTransfer;
     }
+#endif
     else if (!strcmp(Bmark->name,"sendrecv"))
     { 
 	strcpy(Bmark->name,"Sendrecv");
@@ -221,7 +222,6 @@ In/out variables:
 	Bmark->scale_time = 1.0;
 	Bmark->scale_bw   = 2.0;
     }
-#endif
     else if (!strcmp(Bmark->name,"exchange") )
     { 
 	strcpy(Bmark->name,"Exchange");
