@@ -52,10 +52,10 @@ class iRequest;
 //#define MPI_COUT_INITIALIZATION
 //#define SLOW_SENDS
 
-// #define MAX_MESS_SIZE 3950
+#define MAX_MESS_SIZE 3950
 
 // 1500 - 64
-#define MAX_MESS_SIZE 1436
+// #define MAX_MESS_SIZE 1436
 
 // 4096 - 64
 // #define MAX_MESS_SIZE 4032
