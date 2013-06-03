@@ -39,7 +39,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 using namespace std;
 
-void iSend(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm, MPI_Context context) {
+void iSend(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm, MPI_Context context) { 
    static uint32_t seq = 1;
    net::llamaNET::Protocol_header *header;
 
@@ -64,10 +64,9 @@ void iSend(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_C
    int numFullMess = sizeInBytes/MAX_MESS_SIZE;
    int remMessSize = sizeInBytes%MAX_MESS_SIZE;
    for (int partOn=0; partOn <= numFullMess; partOn++) {
+      iBufferMessage();
       int messSize = (partOn==numFullMess) ? remMessSize : MAX_MESS_SIZE;
-
-// !BAM?
-//      if (messSize == 0) {break;}
+      if (messSize == 0) {break;}
 
       #ifdef SLOW_SENDS
       llamaos::api::sleep(1);
