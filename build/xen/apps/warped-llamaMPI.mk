@@ -31,7 +31,8 @@
 #
 
 # include common variables
-include common.mk
+include common-vars.mk
+include common-flags.mk
 
 MAKEFILE_SOURCES += apps/warped-llamaMPI.mk
 
@@ -50,6 +51,8 @@ CPPFLAGS += \
   -I ../src/apps/WARPED \
   -D__XEN_INTERFACE_VERSION__=0x00030205 \
   -include $(SRCDIR)/llamaos/__thread.h
+
+VPATH = $(SRCDIR)
 
 CPP_SOURCES = \
    $(WARPED_PATH)/warped/AdaptiveOutputManager.cpp \
@@ -205,11 +208,7 @@ OBJECTS = $(CPP_SOURCES:%.cpp=$(OBJDIR)/%.o)
 OBJECTS += $(CC_SOURCES:%.cc=$(OBJDIR)/%.o)
 DEPENDS = $(OBJECTS:%.o=%.d)
 
-.PHONY: xen
-xen : $(BINDIR)/xen/warped-llamaMPI
-
-# the entry object must be the first object listed here or the guest will crash!
-$(BINDIR)/xen/warped-llamaMPI: $(LIBDIR)/xen/Entry.o $(OBJECTS) $(LIBDIR)/xen/llamaMPI.a $(LIBDIR)/xen/llamaOS.a $(LIBDIR)/stdc++.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
+$(BINDIR)/warped-llamaMPI: $(OBJECTS) $(LIBDIR)/llamaMPI.a $(LIBDIR)/llamaOS.a $(LIBDIR)/stdc++.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
 	@$(LD) $(LDFLAGS) -T llamaOS.lds -o $@ $^
