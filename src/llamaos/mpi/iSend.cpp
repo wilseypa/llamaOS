@@ -39,7 +39,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 using namespace std;
 
-void iSend(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm, MPI_Context context) {
+void iSend(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm, MPI_Context context) { 
    static uint32_t seq = 1;
    net::llamaNET::Protocol_header *header;
 
@@ -50,25 +50,46 @@ void iSend(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_C
    }
    iComm *commPtr = it->second;
 
-   // Determine actual send size in bytes
+   // Determine actual send size in bytes and the union of comm and context
    unsigned int sizeInBytes = count*iSizeof(datatype);
+   int commContext = comm | context;
+   
+   // Check if sending message to self
+   if (commPtr->getLocalRank() == dest) {
+      // Print header
+      #ifdef MPI_COUT_EVERY_MESSAGE
+      cout << "[SendToSelf]";
+      cout << " Message received from self src/dest " << dest << " Context: " << commContext;
+      cout << " Tag: " << tag << " TotSize: " << sizeInBytes;
+      #endif
+      
+      // Get receive buffer
+      iRxBuffer *rxBuff;
+      if (context == MPI_CONTEXT_PT2PT) {
+         rxBuff = it->second->getPt2ptRxBuffer();
+      } else {
+         rxBuff = it->second->getCollectiveRxBuffer();
+      }
+      
+      // Add to receive buffer
+      rxBuff->pushMessage((unsigned char*)buf, sizeInBytes, dest, tag, sizeInBytes, 0);
+      return;
+   }
 
    // Translate comm ranks into world ranks
    int destWorldRank = commPtr->getWorldRankFromRank(dest);
    if (destWorldRank == MPI_UNDEFINED) {return;} // Destination rank is not in comm
    int srcWorldRank = commPtr->getLocalWorldRank();
    if (srcWorldRank == MPI_UNDEFINED) {return;} // Source rank is not in comm
-   int commContext = comm | context;
 
    // Split large messages into multiple sends
    int numFullMess = sizeInBytes/MAX_MESS_SIZE;
    int remMessSize = sizeInBytes%MAX_MESS_SIZE;
    for (int partOn=0; partOn <= numFullMess; partOn++) {
+      iBufferMessage();
       int messSize = (partOn==numFullMess) ? remMessSize : MAX_MESS_SIZE;
 
-// !BAM?
-// this will have to change to support zero length message data
-      if (messSize == 0) {break;}
+      if (messSize == 0 && partOn != 0) {break;} // Exception for zero-sized messages
 
       #ifdef SLOW_SENDS
       llamaos::api::sleep(1);

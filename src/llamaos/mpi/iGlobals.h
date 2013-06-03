@@ -48,8 +48,8 @@ class iGroup;
 class iComm;
 class iRequest;
 
-//#define MPI_COUT_EVERY_MESSAGE
-//#define MPI_COUT_INITIALIZATION
+#define MPI_COUT_EVERY_MESSAGE
+#define MPI_COUT_INITIALIZATION
 //#define SLOW_SENDS
 
 #define MAX_MESS_SIZE 3950
@@ -149,6 +149,7 @@ void iGetMessage(void *buf, int count, MPI_Datatype datatype, int source, int ta
 int iSizeof(MPI_Datatype type);
 int iPerformOp(void *runningTotal, void *newValue, int count, MPI_Datatype type, MPI_Op op);
 int iStartOp(void *runningTotal, int count, MPI_Datatype type, MPI_Op op);
+void iBufferMessage();
 
 // Tools
 void iPrintMAC(uint8_t mac[]);

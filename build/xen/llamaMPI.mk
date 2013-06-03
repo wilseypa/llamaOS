@@ -56,6 +56,7 @@ CPP_SOURCES += \
   llamaos/mpi/iRequest.cpp \
   llamaos/mpi/iProbe.cpp \
   llamaos/mpi/iGetMessage.cpp \
+  llamaos/mpi/iBufferMessage.cpp \
   llamaos/mpi/iReceive.cpp \
   llamaos/mpi/iSend.cpp \
   llamaos/mpi/iProbeNB.cpp \

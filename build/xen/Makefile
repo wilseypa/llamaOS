@@ -73,7 +73,7 @@ install:
 	@cp -r bin $(INSTALL_FOLDER)/bin
 	@cp -r lib $(INSTALL_FOLDER)/lib
 	@cp -r include $(INSTALL_FOLDER)/include
-	@cp -r ../script $(INSTALL_FOLDER)/script
+	@cp -r ../../script $(INSTALL_FOLDER)/script
 	@cp llamaOS.lds $(INSTALL_FOLDER)/llamaOS.lds
 	@echo adjusting file attributes...
 	@chmod -R o+r $(INSTALL_FOLDER)
