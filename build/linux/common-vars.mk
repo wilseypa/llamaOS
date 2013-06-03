@@ -30,17 +30,32 @@
 # contributors.
 #
 
-.PHONY: all
-all:
-	@$(MAKE) -C linux $@
-	@$(MAKE) -C xen $@
+# make parameters
+MAKEFLAGS = --silent
 
-.PHONY: install
-install:
-	@$(MAKE) -C linux $@
-	@$(MAKE) -C xen $@
+MAKEFILE_SOURCES = common-vars.mk
 
-.PHONY: clean
-clean:
-	@$(MAKE) -C linux $@
-	@$(MAKE) -C xen $@
+# compiler tools
+CC = gcc
+CXX = g++
+F90 = gfortran
+AS = as
+LD = ld
+MPICC = mpicc
+MPICXX = mpicxx
+
+# shared common paths
+BINDIR = bin
+LIBDIR = lib
+OBJDIR = obj
+
+INCDIR = include
+SRCDIR = ../../src
+
+NETPIPE_VERSION = 3.7.2
+
+# auto dependency generation
+DEPENDS = 
+
+# if present, include custom variables
+-include custom-vars.mk

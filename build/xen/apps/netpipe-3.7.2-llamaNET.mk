@@ -30,17 +30,50 @@
 # contributors.
 #
 
-.PHONY: all
-all:
-	@$(MAKE) -C linux $@
-	@$(MAKE) -C xen $@
+# include common variables
+include common-vars.mk
+include common-flags.mk
 
-.PHONY: install
-install:
-	@$(MAKE) -C linux $@
-	@$(MAKE) -C xen $@
+MAKEFILE_SOURCES += apps/netpipe-$(NETPIPE_VERSION)-llamaNET.mk
 
-.PHONY: clean
-clean:
-	@$(MAKE) -C linux $@
-	@$(MAKE) -C xen $@
+CFLAGS += \
+  -DLLAMANET \
+  -I $(INCDIR) \
+  -I $(SRCDIR) \
+  -include $(SRCDIR)/llamaos/__thread.h
+
+CPPFLAGS += \
+  -I $(INCDIR) \
+  -I $(SRCDIR) \
+  -include $(SRCDIR)/llamaos/__thread.h
+
+VPATH = $(SRCDIR)
+
+C_SOURCES = \
+  apps/netpipe-$(NETPIPE_VERSION)/src/llamaNET.c
+
+CPP_SOURCES = \
+  apps/netpipe-$(NETPIPE_VERSION)/src/llamaNET_impl.cpp
+
+OBJECTS  = $(OBJDIR)/apps/netpipe-$(NETPIPE_VERSION)/src/netpipe-llamaNET.o
+OBJECTS += $(C_SOURCES:%.c=$(OBJDIR)/%.o)
+OBJECTS += $(CPP_SOURCES:%.cpp=$(OBJDIR)/%.o)
+DEPENDS += $(OBJECTS:%.o=%.d)
+
+$(BINDIR)/netpipe-llamaNET: $(OBJECTS) $(LIBDIR)/llamaOS.a $(LIBDIR)/stdc++.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo linking: $@
+	@$(LD) $(LDFLAGS) -T llamaOS.lds -o $@ $^
+	@gzip -c -f --best $@ >$@.gz
+	@echo successfully built: $@
+	@echo
+
+$(OBJDIR)/apps/netpipe-$(NETPIPE_VERSION)/src/netpipe-llamaNET.o : $(SRCDIR)/apps/netpipe-$(NETPIPE_VERSION)/src/netpipe.c $(MAKEFILE_SOURCES)
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo compiling: $<
+	@$(CC) -c $(CFLAGS) -o $@ $<
+
+include rules.mk
+
+# include auto-generated dependencies
+-include $(DEPENDS)

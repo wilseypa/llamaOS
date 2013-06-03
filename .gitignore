@@ -1,29 +1,25 @@
 
 # Generated binaries and dependency files #
 ###########################################
-build/bin/
-build/include/
-build/include-fixed/
-build/lib/
-build/obj/
-build/test/
-build2/xen/bin/
-build2/xen/include/
-build2/xen/lib/
-build2/xen/obj/
-build2/xen/test/
+build/linux/bin/
+build/linux/lib/
+build/linux/obj/
+build/linux/test/
+build/xen/bin/
+build/xen/include/
+build/xen/lib/
+build/xen/obj/
+build/xen/test/
 bin/
 lib/
 obj/
 
 # User make files #
 ###################
-build/custom-mpi-flags.mk
-build/custom-flags.mk
-build2/linux/custom-flags.mk
-build2/linux/custom-vars.mk
-build2/xen/custom-flags.mk
-build2/xen/custom-vars.mk
+build/linux/custom-flags.mk
+build/linux/custom-vars.mk
+build/xen/custom-flags.mk
+build/xen/custom-vars.mk
 
 # KDevelop files #
 # ############## #

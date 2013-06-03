@@ -30,17 +30,36 @@
 # contributors.
 #
 
-.PHONY: all
-all:
-	@$(MAKE) -C linux $@
-	@$(MAKE) -C xen $@
+# include common variables
+include common-vars.mk
+include common-flags.mk
 
-.PHONY: install
-install:
-	@$(MAKE) -C linux $@
-	@$(MAKE) -C xen $@
+MAKEFILE_SOURCES += apps/NAS/NAS-mg.mk
 
-.PHONY: clean
-clean:
-	@$(MAKE) -C linux $@
-	@$(MAKE) -C xen $@
+F90FLAGS += -I $(SRCDIR)/llamaos/mpi \
+  -I util/NAS/mg
+
+VPATH = $(SRCDIR)
+
+SOURCES = \
+  apps/NPB3.2-MPI/MG/mg.f \
+  apps/NPB3.2-MPI/common/timers.f \
+  apps/NPB3.2-MPI/common/randi8.f \
+  apps/NPB3.2-MPI/common/print_results.f
+
+OBJECTS = $(SOURCES:%.f=$(OBJDIR)/%.o)
+DEPENDS = $(OBJECTS:%.o=%.d)
+
+$(BINDIR)/NAS/mg: $(OBJECTS) $(LIBDIR)/llamaMPIF.a $(LIBDIR)/llamaMPI.a $(LIBDIR)/llamaOS.a $(LIBDIR)/stdc++.a $(LIBDIR)/gfortran.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo linking: $@
+	@echo $(LDFLAGS)
+	@$(LD) $(LDFLAGS) -T llamaOS.lds -o $@ $^
+	@gzip -c -f --best $@ >$@.gz
+	@echo successfully built: $@
+	@echo
+
+include rules.mk
+
+# include auto-generated dependencies
+-include $(DEPENDS)

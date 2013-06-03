@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2013, William Magato
+# Copyright (c) 2012, William Magato
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -30,17 +30,35 @@
 # contributors.
 #
 
-.PHONY: all
-all:
-	@$(MAKE) -C linux $@
-	@$(MAKE) -C xen $@
+# include common variables
+include common-vars.mk
+include common-flags.mk
 
-.PHONY: install
-install:
-	@$(MAKE) -C linux $@
-	@$(MAKE) -C xen $@
+MAKEFILE_SOURCES += apps/latency-TCPIP.mk
 
-.PHONY: clean
-clean:
-	@$(MAKE) -C linux $@
-	@$(MAKE) -C xen $@
+CPPFLAGS += \
+  -I $(SRCDIR)/apps
+
+# source paths
+VPATH = $(SRCDIR)
+
+SOURCES = \
+  apps/latency/protocols/TCPIP.cpp \
+  apps/latency/Latency.cpp \
+  apps/latency/main.cpp \
+  apps/latency/verify.cpp
+
+OBJECTS = $(SOURCES:%.cpp=$(OBJDIR)/%.o)
+DEPENDS = $(OBJECTS:%.o=%.d)
+
+$(BINDIR)/latency-TCPIP: $(OBJECTS)
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo linking: $@
+	@$(CXX) $(LDFLAGS) -o $@ $^
+	@echo successfully built: $@
+	@echo
+
+include rules.mk
+
+# include auto-generated dependencies
+-include $(DEPENDS)

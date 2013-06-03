@@ -30,17 +30,31 @@
 # contributors.
 #
 
-.PHONY: all
-all:
-	@$(MAKE) -C linux $@
-	@$(MAKE) -C xen $@
+# include common variables
+include common-vars.mk
+include common-flags.mk
 
-.PHONY: install
-install:
-	@$(MAKE) -C linux $@
-	@$(MAKE) -C xen $@
+MAKEFILE_SOURCES += apps/hello-f90.mk
 
-.PHONY: clean
-clean:
-	@$(MAKE) -C linux $@
-	@$(MAKE) -C xen $@
+F90FLAGS += 
+
+# source paths
+VPATH = $(SRCDIR)
+
+SOURCES = \
+  apps/hello-f90/main.f90
+
+OBJECTS = $(SOURCES:%.f90=$(OBJDIR)/%.o)
+DEPENDS = $(OBJECTS:%.o=%.d)
+
+$(BINDIR)/hello-f90: $(OBJECTS)
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo linking: $@
+	@$(F90) -o $@ $^
+	@echo successfully built: $@
+	@echo
+
+include rules.mk
+
+# include auto-generated dependencies
+-include $(DEPENDS)

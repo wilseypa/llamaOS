@@ -30,17 +30,37 @@
 # contributors.
 #
 
-.PHONY: all
-all:
-	@$(MAKE) -C linux $@
-	@$(MAKE) -C xen $@
+# include common variables
+include common-vars.mk
+include common-flags.mk
 
-.PHONY: install
-install:
-	@$(MAKE) -C linux $@
-	@$(MAKE) -C xen $@
+MAKEFILE_SOURCES += apps/testMPI-llamaMPI.mk
 
-.PHONY: clean
-clean:
-	@$(MAKE) -C linux $@
-	@$(MAKE) -C xen $@
+CPPFLAGS += \
+  -I $(INCDIR) \
+  -I $(SRCDIR) \
+  -I $(SRCDIR)/llamaos/mpi \
+  -I ../src/apps \
+  -D__XEN_INTERFACE_VERSION__=0x00030205 \
+  -include $(SRCDIR)/llamaos/__thread.h
+
+VPATH = $(SRCDIR)
+
+SOURCES = \
+  apps/testMPI/main.cpp
+
+OBJECTS = $(SOURCES:%.cpp=$(OBJDIR)/%.o)
+DEPENDS = $(OBJECTS:%.o=%.d)
+
+$(BINDIR)/testMPI-llamaMPI: $(OBJECTS) $(LIBDIR)/llamaMPI.a $(LIBDIR)/llamaOS.a $(LIBDIR)/stdc++.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo linking: $@
+	@$(LD) $(LDFLAGS) -T llamaOS.lds -o $@ $^
+	@gzip -c -f --best $@ >$@.gz
+	@echo successfully built: $@
+	@echo
+
+include rules.mk
+
+# include auto-generated dependencies
+-include $(DEPENDS)

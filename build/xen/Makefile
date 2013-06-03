@@ -30,17 +30,64 @@
 # contributors.
 #
 
+# include common variables
+include common-vars.mk
+
+MAKEFILE_SOURCES += Makefile
+
+INSTALL_DIR = ~
+INSTALL_FOLDER = $(INSTALL_DIR)/llamaOS-1.0
+
 .PHONY: all
 all:
-	@$(MAKE) -C linux $@
-	@$(MAKE) -C xen $@
+	@$(MAKE) -f glibc-$(GLIBC_VERSION).mk
+	@$(MAKE) -f stdc++-$(GCC_VERSION).mk
+	@$(MAKE) -f gfortran-$(GCC_VERSION).mk
+	@$(MAKE) -f gcc-$(GCC_VERSION).mk
+	@$(MAKE) -f xen-$(XEN_VERSION).mk
+	@$(MAKE) -f llamaOS.mk
+	@$(MAKE) -f llamaMPI.mk
+	@$(MAKE) -f llamaMPIF.mk
+	@$(MAKE) -f apps/NAS/NAS.mk
+	@$(MAKE) -f apps/hello-c.mk
+	@$(MAKE) -f apps/hello-cpp.mk
+	@$(MAKE) -f apps/hello-f77-llamaOS.mk
+	@$(MAKE) -f apps/hello-f90-llamaOS.mk
+	@$(MAKE) -f apps/IMB-llamaMPI.mk
+	@$(MAKE) -f apps/latency-llamaMPI.mk
+	@$(MAKE) -f apps/latency-llamaNET.mk
+	@$(MAKE) -f apps/netpipe-3.7.2-llamaNET.mk
+	@$(MAKE) -f apps/netpipe-3.7.2-memcpy.mk
+	@$(MAKE) -f apps/netpipe-3.7.2-mpi.mk
+	@$(MAKE) -f apps/testMPI-llamaMPI.mk
+	@$(MAKE) -f apps/testMPIF-llamaMPI.mk
+#	@$(MAKE) -f apps/warped-llamaMPI.mk
+	@$(MAKE) -f net/i82574.mk
+	@$(MAKE) -f net/lspci.mk
+	@$(MAKE) -f tests/empty.mk
 
 .PHONY: install
 install:
-	@$(MAKE) -C linux $@
-	@$(MAKE) -C xen $@
+	@echo installing llamaOS into $(INSTALL_FOLDER) folder...
+	@[ -d $(INSTALL_FOLDER) ] || (mkdir -p $(INSTALL_FOLDER))
+	@cp -r bin $(INSTALL_FOLDER)/bin
+	@cp -r lib $(INSTALL_FOLDER)/lib
+	@cp -r include $(INSTALL_FOLDER)/include
+	@cp -r ../script $(INSTALL_FOLDER)/script
+	@cp llamaOS.lds $(INSTALL_FOLDER)/llamaOS.lds
+	@echo adjusting file attributes...
+	@chmod -R o+r $(INSTALL_FOLDER)
+	@echo install complete.
+	@echo 
 
 .PHONY: clean
 clean:
-	@$(MAKE) -C linux $@
-	@$(MAKE) -C xen $@
+	@echo cleaning build folder...
+	@echo removing: $(OBJDIR)
+	@rm -rf $(OBJDIR)
+	@echo removing: $(BINDIR)
+	@rm -rf $(BINDIR)
+	@echo removing: $(LIBDIR)
+	@rm -rf $(LIBDIR)
+	@echo removing: $(INCDIR)
+	@rm -rf $(INCDIR)

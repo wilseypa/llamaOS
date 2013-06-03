@@ -30,17 +30,46 @@
 # contributors.
 #
 
-.PHONY: all
-all:
-	@$(MAKE) -C linux $@
-	@$(MAKE) -C xen $@
+# include common variables
+include common-vars.mk
+include common-flags.mk
 
-.PHONY: install
-install:
-	@$(MAKE) -C linux $@
-	@$(MAKE) -C xen $@
+NETPIPE_VERSION = 3.7.2
 
-.PHONY: clean
-clean:
-	@$(MAKE) -C linux $@
-	@$(MAKE) -C xen $@
+MAKEFILE_SOURCES += apps/netpipe-$(NETPIPE_VERSION)-mpi.mk
+
+CFLAGS += \
+  -DMPI \
+  -I $(INCDIR)/llamaos/mpi \
+  -I $(INCDIR) \
+  -I $(SRCDIR) \
+  -include $(SRCDIR)/llamaos/__thread.h
+
+VPATH = $(SRCDIR)
+
+SOURCES = \
+  apps/netpipe-$(NETPIPE_VERSION)/src/mpi.c
+
+OBJECTS  = $(OBJDIR)/apps/netpipe-$(NETPIPE_VERSION)/src/netpipe-mpi.o
+OBJECTS += $(SOURCES:%.c=$(OBJDIR)/%.o)
+DEPENDS += $(OBJECTS:%.o=%.d)
+
+# the entry object must be the first object listed here or the guest will crash!
+# $(BINDIR)/netpipe-mpi: $(LIBDIR)/xen/Entry.o $(OBJECTS) $(LIBDIR)/xen/llamaMPI.a $(LIBDIR)/xen/llamaOS.a $(LIBDIR)/stdc++.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
+$(BINDIR)/netpipe-mpi: $(OBJECTS) $(LIBDIR)/llamaMPI.a $(LIBDIR)/llamaOS.a $(LIBDIR)/stdc++.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo linking: $@
+	@$(LD) $(LDFLAGS) -T llamaOS.lds -o $@ $^
+	@gzip -c -f --best $@ >$@.gz
+	@echo successfully built: $@
+	@echo
+
+$(OBJDIR)/apps/netpipe-$(NETPIPE_VERSION)/src/netpipe-mpi.o : $(SRCDIR)/apps/netpipe-$(NETPIPE_VERSION)/src/netpipe.c $(MAKEFILE_SOURCES)
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo compiling: $<
+	@$(CC) -c $(CFLAGS) -o $@ $<
+
+include rules.mk
+
+# include auto-generated dependencies
+-include $(DEPENDS)

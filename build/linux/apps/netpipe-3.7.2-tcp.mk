@@ -30,17 +30,37 @@
 # contributors.
 #
 
-.PHONY: all
-all:
-	@$(MAKE) -C linux $@
-	@$(MAKE) -C xen $@
+# include common variables
+include common-vars.mk
+include common-flags.mk
 
-.PHONY: install
-install:
-	@$(MAKE) -C linux $@
-	@$(MAKE) -C xen $@
+MAKEFILE_SOURCES += apps/netpipe-$(NETPIPE_VERSION)-tcp.mk
 
-.PHONY: clean
-clean:
-	@$(MAKE) -C linux $@
-	@$(MAKE) -C xen $@
+CFLAGS += \
+  -DTCP
+
+VPATH = $(SRCDIR)
+
+SOURCES = \
+  apps/netpipe-$(NETPIPE_VERSION)/src/tcp.c
+
+OBJECTS  = $(OBJDIR)/apps/netpipe-$(NETPIPE_VERSION)/src/netpipe-tcp.o
+OBJECTS += $(SOURCES:%.c=$(OBJDIR)/%.o)
+DEPENDS  = $(OBJECTS:%.o=%.d)
+
+$(BINDIR)/netpipe-tcp: $(OBJECTS)
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo linking: $@
+	@$(CC) $(LDFLAGS) -o $@ $^
+	@echo successfully built: $@
+	@echo
+
+$(OBJDIR)/apps/netpipe-$(NETPIPE_VERSION)/src/netpipe-tcp.o : $(SRCDIR)/apps/netpipe-$(NETPIPE_VERSION)/src/netpipe.c $(MAKEFILE_SOURCES)
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo compiling: $<
+	@$(CC) -c $(CFLAGS) -o $@ $<
+
+include rules.mk
+
+# include auto-generated dependencies
+-include $(DEPENDS)

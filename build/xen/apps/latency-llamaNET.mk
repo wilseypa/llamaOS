@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2013, William Magato
+# Copyright (c) 2012, William Magato
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -30,17 +30,40 @@
 # contributors.
 #
 
-.PHONY: all
-all:
-	@$(MAKE) -C linux $@
-	@$(MAKE) -C xen $@
+# include common variables
+include common-vars.mk
+include common-flags.mk
 
-.PHONY: install
-install:
-	@$(MAKE) -C linux $@
-	@$(MAKE) -C xen $@
+MAKEFILE_SOURCES += apps/latency-llamaNET.mk
 
-.PHONY: clean
-clean:
-	@$(MAKE) -C linux $@
-	@$(MAKE) -C xen $@
+CPPFLAGS += \
+  -I $(INCDIR) \
+  -I $(SRCDIR)/apps \
+  -I $(SRCDIR) \
+  -I ../src/apps \
+  -D__XEN_INTERFACE_VERSION__=0x00030205 \
+  -include $(SRCDIR)/llamaos/__thread.h
+
+VPATH = $(SRCDIR)
+
+SOURCES = \
+  apps/latency/protocols/llamaNET.cpp \
+  apps/latency/Latency.cpp \
+  apps/latency/main.cpp \
+  apps/latency/verify.cpp
+
+OBJECTS = $(SOURCES:%.cpp=$(OBJDIR)/%.o)
+DEPENDS = $(OBJECTS:%.o=%.d)
+
+$(BINDIR)/latency-llamaNET: $(OBJECTS) $(LIBDIR)/llamaOS.a $(LIBDIR)/stdc++.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo linking: $@
+	@$(LD) $(LDFLAGS) -T llamaOS.lds -o $@ $^
+	@gzip -c -f --best $@ >$@.gz
+	@echo successfully built: $@
+	@echo
+
+include rules.mk
+
+# include auto-generated dependencies
+-include $(DEPENDS)

@@ -30,17 +30,42 @@
 # contributors.
 #
 
-.PHONY: all
-all:
-	@$(MAKE) -C linux $@
-	@$(MAKE) -C xen $@
+# include common variables
+include common-vars.mk
+include common-flags.mk
 
-.PHONY: install
-install:
-	@$(MAKE) -C linux $@
-	@$(MAKE) -C xen $@
+MAKEFILE_SOURCES += apps/netpipe-$(NETPIPE_VERSION)-mpi.mk
 
-.PHONY: clean
-clean:
-	@$(MAKE) -C linux $@
-	@$(MAKE) -C xen $@
+CFLAGS += \
+  -DMPI
+
+VPATH = $(SRCDIR)
+
+SOURCES = \
+  apps/netpipe-$(NETPIPE_VERSION)/src/mpi.c
+
+OBJECTS  = $(OBJDIR)/apps/netpipe-$(NETPIPE_VERSION)/src/netpipe-mpi.o
+OBJECTS += $(SOURCES:%.c=$(OBJDIR)/%.o)
+DEPENDS  = $(OBJECTS:%.o=%.d)
+
+$(BINDIR)/netpipe-mpi: $(OBJECTS)
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo linking: $@ with $(MPICC)
+	@$(MPICC) $(LDFLAGS) -o $@ $^
+	@echo successfully built: $@
+	@echo
+
+$(OBJDIR)/apps/netpipe-$(NETPIPE_VERSION)/src/mpi.o : $(SRCDIR)/apps/netpipe-$(NETPIPE_VERSION)/src/mpi.c $(MAKEFILE_SOURCES)
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo compiling: $< with $(MPICC)
+	@$(MPICC) -c $(CFLAGS) -o $@ $<
+
+$(OBJDIR)/apps/netpipe-$(NETPIPE_VERSION)/src/netpipe-mpi.o : $(SRCDIR)/apps/netpipe-$(NETPIPE_VERSION)/src/netpipe.c $(MAKEFILE_SOURCES)
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo compiling: $< with $(MPICC)
+	@$(MPICC) -c $(CFLAGS) -o $@ $<
+
+include rules.mk
+
+# include auto-generated dependencies
+-include $(DEPENDS)
