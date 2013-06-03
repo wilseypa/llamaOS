@@ -101,6 +101,7 @@ static inline unsigned int rx_desc_index (unsigned int index)
    return index - 768;
 }
 
+#if 1
 static inline unsigned int tx_desc_index (unsigned int index)
 {
    if (index < 256)
@@ -114,6 +115,18 @@ static inline unsigned int tx_desc_index (unsigned int index)
 
    return index - 512;
 }
+#else
+static inline unsigned int tx_desc_index (unsigned int index)
+{
+   return index;
+//   if (index < 256)
+//   {
+//     return index + 256;
+//   }
+//
+//   return index - 256;
+}
+#endif
 
 int main (int /* argc */, char ** /* argv [] */)
 {
@@ -387,15 +400,19 @@ int main (int /* argc */, char ** /* argv [] */)
 
 //   uint64_t tx_desc_machine_address = virtual_pointer_to_machine_address(tx_desc);
    Hypercall::update_va_mapping_nocache (pointer_to_address (tx_desc), virtual_pointer_to_machine_address(tx_desc));
-   Hypercall::update_va_mapping_nocache (pointer_to_address (tx_desc+256), virtual_pointer_to_machine_address(tx_desc+256));
+//   Hypercall::update_va_mapping_nocache (pointer_to_address (tx_desc+256), virtual_pointer_to_machine_address(tx_desc+256));
    Hypercall::update_va_mapping_nocache (pointer_to_address (tx_desc+256+256), virtual_pointer_to_machine_address(tx_desc+256+256));
 //   Hypercall::update_va_mapping_nocache (pointer_to_address (tx_desc+256+256+256), virtual_pointer_to_machine_address(tx_desc+256+256+256));
 
 //   csr.write_TDBA (virtual_pointer_to_machine_address(tx_desc+256+256+256));
    csr.write_TDBA (virtual_pointer_to_machine_address(tx_desc+256+256));
+//   csr.write_TDBA (virtual_pointer_to_machine_address(tx_desc+256));
+//   csr.write_TDBA (virtual_pointer_to_machine_address(tx_desc));
    csr.write_TDLEN (tx_desc_size);
 
    cout << "TDBA: " << hex << csr.read_TDBA() << ", " << virtual_pointer_to_machine_address(tx_desc+256+256) << endl;
+//   cout << "TDBA: " << hex << csr.read_TDBA() << ", " << virtual_pointer_to_machine_address(tx_desc+256) << endl;
+//   cout << "TDBA: " << hex << csr.read_TDBA() << ", " << virtual_pointer_to_machine_address(tx_desc) << endl;
    cout << "TDLEN: " << hex << csr.read_TDLEN() << endl;
 
    buffer_entry tx_buffers [TX_BUFFERS];
