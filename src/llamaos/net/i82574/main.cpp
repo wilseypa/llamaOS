@@ -585,6 +585,8 @@ int main (int /* argc */, char ** /* argv [] */)
    unsigned int rx_count = 0;
    unsigned int tx_tail2 = 0;
 
+   int stat_delay = 10000;
+
    for (;;)
    {
       if (rx_desc [rx_desc_index(rx_head)].status != 0)
@@ -787,6 +789,12 @@ int main (int /* argc */, char ** /* argv [] */)
             // leave driver, app is done
             break;
          }
+      }
+      if (++stat_delay > 10000)
+      {
+         stat_delay = 0;
+
+         cout << "Missed Packets Count = " << csr.read (0x4010) << endl;
       }
    }
 
