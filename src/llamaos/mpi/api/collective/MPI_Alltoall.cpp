@@ -29,12 +29,23 @@ either expressed or implied, of the copyright holder(s) or contributors.
 */
 
 #include <iGlobals.h>
+#include <string.h>
+#include <iostream>
 
 using namespace std;
 
 int MPI_Alltoall(void *sendbuf, int sendcount, MPI_Datatype sendtype, 
                  void *recvbuf, int recvcount, MPI_Datatype recvtype, 
                  MPI_Comm comm) {
+   #ifdef MPI_COUT_COLLECTIVE_FUNCTIONS
+   iLevelSpacesPrint();
+   cout << "--- MPI_Alltoall ---" << endl;
+   iLevelSpacesIncrease();
+   #endif
+   #ifdef MPI_BARRIER_ALL_COLLECTIVE
+   MPI_Barrier(comm);
+   #endif
+                 
    int size;
    MPI_Comm_size(comm, &size);
 
@@ -51,6 +62,10 @@ int MPI_Alltoall(void *sendbuf, int sendcount, MPI_Datatype sendtype,
             MPI_FUNC_TAG_ALLTOALL, comm, MPI_CONTEXT_COLLECTIVE, 0);
       bufPartPtr += recvcount*iSizeof(recvtype);
    }
+   
+   #ifdef MPI_COUT_COLLECTIVE_FUNCTIONS
+   iLevelSpacesDecrease();
+   #endif
 
    return MPI_SUCCESS;
 }

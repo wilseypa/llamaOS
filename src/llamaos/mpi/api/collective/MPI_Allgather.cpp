@@ -30,12 +30,22 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 #include <iGlobals.h>
 #include <string.h>
+#include <iostream>
 
 using namespace std;
 
 int MPI_Allgather(void *sendbuf, int sendcnt, MPI_Datatype sendtype, 
                void *recvbuf, int recvcnt, MPI_Datatype recvtype, 
                MPI_Comm comm) {
+   #ifdef MPI_COUT_COLLECTIVE_FUNCTIONS
+   iLevelSpacesPrint();
+   cout << "--- MPI_Allgather ---" << endl;
+   iLevelSpacesIncrease();
+   #endif
+   #ifdef MPI_BARRIER_ALL_COLLECTIVE
+   MPI_Barrier(comm);
+   #endif
+               
    int size;
    MPI_Comm_size(comm, &size);
 
@@ -46,6 +56,10 @@ int MPI_Allgather(void *sendbuf, int sendcnt, MPI_Datatype sendtype,
       MPI_Bcast(bufPartPtr, sendcnt, sendtype, i, comm); // Broadcast out message
       bufPartPtr += recvcnt*iSizeof(recvtype);
    }
+   
+   #ifdef MPI_COUT_COLLECTIVE_FUNCTIONS
+   iLevelSpacesDecrease();
+   #endif
 
    return MPI_SUCCESS;
 }

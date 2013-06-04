@@ -29,10 +29,18 @@ either expressed or implied, of the copyright holder(s) or contributors.
 */
 
 #include <iGlobals.h>
+#include <string.h>
+#include <iostream>
 
 using namespace std;
 
 int MPI_Barrier (MPI_Comm comm) {
+   #ifdef MPI_COUT_COLLECTIVE_FUNCTIONS
+   iLevelSpacesPrint();
+   cout << "--- MPI_Barrier ---" << endl;
+   iLevelSpacesIncrease();
+   #endif
+
    // Determine process rank
    int rank; 
    MPI_Comm_rank(comm, &rank);
@@ -52,6 +60,10 @@ int MPI_Barrier (MPI_Comm comm) {
    }
    // Wait until root sends out message to everyone
    MPI_Bcast(&buf, 1, MPI_UNSIGNED_CHAR, MPI_RANK_ROOT, comm);
+
+   #ifdef MPI_COUT_COLLECTIVE_FUNCTIONS
+   iLevelSpacesDecrease();
+   #endif
 
    return MPI_SUCCESS;
 }

@@ -33,6 +33,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <iomanip>
 
 using namespace std;
+int MPI_Level_Tabs = 0;
 
 void iPrintMAC(uint8_t mac[]) {
    int macPart;
@@ -43,4 +44,18 @@ void iPrintMAC(uint8_t mac[]) {
       }
    }
    cout << dec << setfill(' ');
+}
+
+void iLevelSpacesPrint() {
+   for (int i = 0; i < MPI_Level_Tabs; i++) {
+      cout << MPI_COUT_TAB;
+   }
+}
+
+void iLevelSpacesIncrease() {
+   MPI_Level_Tabs++;
+}
+
+void iLevelSpacesDecrease() {
+   MPI_Level_Tabs--;
 }

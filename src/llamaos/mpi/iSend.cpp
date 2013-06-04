@@ -58,6 +58,7 @@ void iSend(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_C
    if (commPtr->getLocalRank() == dest) {
       // Print header
       #ifdef MPI_COUT_EVERY_MESSAGE
+      iLevelSpacesPrint();
       cout << "[SendToSelf]";
       cout << " Message received from self src/dest " << dest << " Context: " << commContext;
       cout << " Tag: " << tag << " TotSize: " << sizeInBytes;
@@ -91,7 +92,7 @@ void iSend(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_C
 
       if (messSize == 0 && partOn != 0) {break;} // Exception for zero-sized messages
 
-      #ifdef SLOW_SENDS
+      #ifdef MPI_SLOW_SENDS
       llamaos::api::sleep(1);
       #endif
 
@@ -116,6 +117,7 @@ void iSend(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_C
       #ifdef MPI_COUT_EVERY_MESSAGE
       int totParts = sizeInBytes / MAX_MESS_SIZE;
       if (sizeInBytes % MAX_MESS_SIZE != 0) {totParts++;}
+      iLevelSpacesPrint();
       cout << "Sending to dest " << header->dest << " Context: " << commContext;
       cout << " Tag: " << tag << " TotSize: " << sizeInBytes << " Part: " << partOn+1 << "/" << totParts;
       cout << endl;

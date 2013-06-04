@@ -29,10 +29,18 @@ either expressed or implied, of the copyright holder(s) or contributors.
 */
 
 #include <iGlobals.h>
+#include <string.h>
+#include <iostream>
 
 using namespace std;
 
 int MPI_Bcast(void *buffer, int count, MPI_Datatype datatype, int root, MPI_Comm comm ) {
+   #ifdef MPI_COUT_COLLECTIVE_FUNCTIONS
+   iLevelSpacesPrint();
+   cout << "--- MPI_Bcast ---" << endl;
+   iLevelSpacesIncrease();
+   #endif
+
    // Determine process rank
    int rank; 
    MPI_Comm_rank(comm, &rank);
@@ -50,6 +58,10 @@ int MPI_Bcast(void *buffer, int count, MPI_Datatype datatype, int root, MPI_Comm
       iReceive(buffer, count, datatype, root, MPI_FUNC_TAG_BROADCAST, 
                        comm, MPI_CONTEXT_COLLECTIVE, 0);
    }
+
+   #ifdef MPI_COUT_COLLECTIVE_FUNCTIONS
+   iLevelSpacesDecrease();
+   #endif
 
    return MPI_SUCCESS;
 }

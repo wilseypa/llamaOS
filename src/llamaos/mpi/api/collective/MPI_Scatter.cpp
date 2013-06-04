@@ -29,12 +29,23 @@ either expressed or implied, of the copyright holder(s) or contributors.
 */
 
 #include <iGlobals.h>
+#include <string.h>
+#include <iostream>
 
 using namespace std;
 
 int MPI_Scatter(void *sendbuf, int sendcnt, MPI_Datatype sendtype, 
                void *recvbuf, int recvcnt, MPI_Datatype recvtype, int root, 
                MPI_Comm comm) {
+   #ifdef MPI_COUT_COLLECTIVE_FUNCTIONS
+   iLevelSpacesPrint();
+   cout << "--- MPI_Scatter ---" << endl;
+   iLevelSpacesIncrease();
+   #endif
+   #ifdef MPI_BARRIER_ALL_COLLECTIVE
+   MPI_Barrier(comm);
+   #endif
+               
    // Determine process rank
    int rank; 
    MPI_Comm_rank(comm, &rank);
@@ -52,6 +63,10 @@ int MPI_Scatter(void *sendbuf, int sendcnt, MPI_Datatype sendtype,
    }
    // Receive message from root with tag MPI_FUNC_TAG_SCATTER
    iReceive(recvbuf, recvcnt, recvtype, root, MPI_FUNC_TAG_SCATTER, comm, MPI_CONTEXT_COLLECTIVE, 0);
+
+   #ifdef MPI_COUT_COLLECTIVE_FUNCTIONS
+   iLevelSpacesDecrease();
+   #endif
 
    return MPI_SUCCESS;
 }

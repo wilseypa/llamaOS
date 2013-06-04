@@ -48,9 +48,12 @@ class iGroup;
 class iComm;
 class iRequest;
 
-//#define MPI_COUT_EVERY_MESSAGE
+#define MPI_COUT_EVERY_MESSAGE
 #define MPI_COUT_INITIALIZATION
-//#define SLOW_SENDS
+#define MPI_COUT_COLLECTIVE_FUNCTIONS
+#define MPI_COUT_TAB "    "
+//#define MPI_SLOW_SENDS
+#define MPI_BARRIER_ALL_COLLECTIVE
 
 #define MAX_MESS_SIZE 3950
 
@@ -104,13 +107,13 @@ typedef int MPI_Context;
 
 #define MPI_RANK_ROOT ((int)0)
 
-#define MPI_FUNC_TAG_BARRIER ((int)0xFFFFFFFE)
-#define MPI_FUNC_TAG_BROADCAST ((int)0xFFFFFFFD)
-#define MPI_FUNC_TAG_GATHER ((int)0xFFFFFFFC)
-#define MPI_FUNC_TAG_SCATTER ((int)0xFFFFFFFB)
-#define MPI_FUNC_TAG_ALLTOALL ((int)0xFFFFFFFA)
-#define MPI_FUNC_TAG_REDUCE ((int)0xFFFFFFF9)
-#define MPI_FUNC_TAG_ALLTOALLV ((int)0xFFFFFFF8)
+#define MPI_FUNC_TAG_BARRIER     ((int)-2)
+#define MPI_FUNC_TAG_BROADCAST   ((int)-3)
+#define MPI_FUNC_TAG_GATHER      ((int)-4)
+#define MPI_FUNC_TAG_SCATTER     ((int)-5)
+#define MPI_FUNC_TAG_ALLTOALL    ((int)-6)
+#define MPI_FUNC_TAG_REDUCE      ((int)-7)
+#define MPI_FUNC_TAG_ALLTOALLV   ((int)-8)
 
 typedef struct MpiHostTable_T {
    uint8_t address[6];
@@ -153,5 +156,8 @@ void iBufferMessage();
 
 // Tools
 void iPrintMAC(uint8_t mac[]);
+void iLevelSpacesPrint();
+void iLevelSpacesIncrease();
+void iLevelSpacesDecrease();
 
 #endif

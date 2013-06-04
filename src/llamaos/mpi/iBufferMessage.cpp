@@ -64,6 +64,7 @@ void iBufferMessage() {
       #ifdef MPI_COUT_EVERY_MESSAGE
       int totParts = rxTotSize / MAX_MESS_SIZE;
       if (rxTotSize % MAX_MESS_SIZE != 0) {totParts++;}
+      iLevelSpacesPrint();
       cout << "[iBufferMessage]";
       cout << " Message received from src " << header->src << " Context: " << rxCommContext;
       cout << " Tag: " << rxTag << " TotSize: " << rxTotSize << " Part: " << rxPart+1 << "/" << totParts;
