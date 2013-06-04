@@ -87,7 +87,9 @@ void iSend(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_C
    int numFullMess = sizeInBytes/MAX_MESS_SIZE;
    int remMessSize = sizeInBytes%MAX_MESS_SIZE;
    for (int partOn=0; partOn <= numFullMess; partOn++) {
+      #ifdef MPI_RX_BEFORE_TX
       iBufferMessage();
+      #endif
       int messSize = (partOn==numFullMess) ? remMessSize : MAX_MESS_SIZE;
 
       if (messSize == 0 && partOn != 0) {break;} // Exception for zero-sized messages
