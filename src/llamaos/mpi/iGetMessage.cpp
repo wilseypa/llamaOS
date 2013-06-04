@@ -81,6 +81,7 @@ void iGetMessage(void *buf, int count, MPI_Datatype datatype, int source, int ta
    // Print receive request
    #ifdef MPI_COUT_EVERY_MESSAGE
    if (!isNB) {
+      iLevelSpacesPrint();
       if (!isProbe) {cout << "[iReceive]";}
       else {cout << "[iProbe]";}
       int commContext = comm | context;
@@ -99,6 +100,7 @@ void iGetMessage(void *buf, int count, MPI_Datatype datatype, int source, int ta
       if (rxBuff->probeMessage(source, tag, &tmpStatus)) {
          #ifdef MPI_COUT_EVERY_MESSAGE
          srcWorldRank = commPtr->getWorldRankFromRank(tmpStatus.MPI_SOURCE);
+         iLevelSpacesPrint();
          if (isNB) {cout << "[iProbeNB]";}
          else {cout << "[iProbe]";}
          cout << " SUCCESS from src " << srcWorldRank << endl;
@@ -117,6 +119,7 @@ void iGetMessage(void *buf, int count, MPI_Datatype datatype, int source, int ta
          rxTotSize = tmpStatus.size;
       }
       #ifdef MPI_COUT_EVERY_MESSAGE
+      iLevelSpacesPrint();
       if (curRxSize > 0) {
          if (isNB) {cout << "[iReceiveNB]";}
          else {cout << "[iReceive]";}
@@ -129,6 +132,7 @@ void iGetMessage(void *buf, int count, MPI_Datatype datatype, int source, int ta
       // Check if finished already
       if ((curRxSize > 0) && (curRxSize == rxTotSize)) {
          #ifdef MPI_COUT_EVERY_MESSAGE
+         iLevelSpacesPrint();
          if (isNB) {cout << "[iReceiveNB]";}
          else {cout << "[iReceive]";}
          cout << " COMPLETE from src " << srcWorldRank << endl;
@@ -162,6 +166,7 @@ void iGetMessage(void *buf, int count, MPI_Datatype datatype, int source, int ta
 
       // Print header
       #ifdef MPI_COUT_EVERY_MESSAGE
+      iLevelSpacesPrint();
       int totParts = rxTotSize / MAX_MESS_SIZE;
       if (rxTotSize % MAX_MESS_SIZE != 0) {totParts++;}
       if (!isProbe && !isNB) {cout << "[iReceive]";}
@@ -215,6 +220,7 @@ void iGetMessage(void *buf, int count, MPI_Datatype datatype, int source, int ta
                status->size = rxTotSize;
             }
             #ifdef MPI_COUT_EVERY_MESSAGE
+            iLevelSpacesPrint();
             if (isNB) {cout << "[iReceiveNB]";}
             else {cout << "[iReceive]";}
             cout << " COMPLETE from src " << srcWorldRank << endl;
@@ -256,6 +262,7 @@ void iGetMessage(void *buf, int count, MPI_Datatype datatype, int source, int ta
                // Only check to see if complete message in buffer - either way do not touch it
                if (rxBuff->probeMessage(source, tag, status)) {
                   #ifdef MPI_COUT_EVERY_MESSAGE
+                  iLevelSpacesPrint();
                   if (isNB) {cout << "[iProbeNB]";}
                   else {cout << "[iProbe]";}
                   cout << " SUCCESS from src " << srcWorldRank << endl;

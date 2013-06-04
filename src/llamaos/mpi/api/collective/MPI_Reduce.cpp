@@ -29,11 +29,22 @@ either expressed or implied, of the copyright holder(s) or contributors.
 */
 
 #include <iGlobals.h>
+#include <string.h>
+#include <iostream>
 
 using namespace std;
 
 int MPI_Reduce(void *sendbuf, void *recvbuf, int count, MPI_Datatype datatype, 
                MPI_Op op, int root, MPI_Comm comm) {
+   #ifdef MPI_COUT_COLLECTIVE_FUNCTIONS
+   iLevelSpacesPrint();
+   cout << "--- MPI_Reduce ---" << endl;
+   iLevelSpacesIncrease();
+   #endif
+   #ifdef MPI_BARRIER_ALL_COLLECTIVE
+   MPI_Barrier(comm);
+   #endif
+               
    // Determine process rank
    int rank; 
    MPI_Comm_rank(comm, &rank);
@@ -56,6 +67,10 @@ int MPI_Reduce(void *sendbuf, void *recvbuf, int count, MPI_Datatype datatype,
       mpiData.isPerformingOp = false;
       delete[] opBuf;
    }
+   
+   #ifdef MPI_COUT_COLLECTIVE_FUNCTIONS
+   iLevelSpacesDecrease();
+   #endif
    
    return MPI_SUCCESS;
 }

@@ -29,13 +29,29 @@ either expressed or implied, of the copyright holder(s) or contributors.
 */
 
 #include <iGlobals.h>
+#include <string.h>
+#include <iostream>
 
 using namespace std;
 
 int MPI_Allreduce ( void *sendbuf, void *recvbuf, int count, 
                    MPI_Datatype datatype, MPI_Op op, MPI_Comm comm ) {
+   #ifdef MPI_COUT_COLLECTIVE_FUNCTIONS
+   iLevelSpacesPrint();
+   cout << "--- MPI_Allreduce ---" << endl;
+   iLevelSpacesIncrease();
+   #endif
+   #ifdef MPI_BARRIER_ALL_COLLECTIVE
+   MPI_Barrier(comm);
+   #endif
+   
    // Reduce and broadcast from root node
    MPI_Reduce(sendbuf, recvbuf, count, datatype, op, MPI_RANK_ROOT, comm);
    MPI_Bcast(recvbuf, count, datatype, MPI_RANK_ROOT, comm);
+   
+   #ifdef MPI_COUT_COLLECTIVE_FUNCTIONS
+   iLevelSpacesDecrease();
+   #endif
+   
    return MPI_SUCCESS;
 }
