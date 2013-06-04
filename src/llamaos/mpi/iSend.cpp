@@ -95,7 +95,7 @@ void iSend(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_C
       llamaos::api::sleep(1);
       #endif
 
-      header = llamaNetInterface->get_send_buffer();
+      header = llamaNetInterface->get_send_buffer(static_cast<uint32_t>(srcWorldRank));
       header->dest = static_cast<uint32_t>(destWorldRank);
       header->src = static_cast<uint32_t>(srcWorldRank);
       header->type = 1;

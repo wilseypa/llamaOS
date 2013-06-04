@@ -30,6 +30,9 @@
 # contributors.
 #
 
+# make parameters
+MAKEFLAGS = --silent
+
 # include common variables
 include common-vars.mk
 

@@ -118,10 +118,13 @@ public:
    void release_recv_bufferv (uint32_t count);
 
    Protocol_header *get_send_buffer ();
+   Protocol_header *get_send_buffer (uint32_t node);
    void send (Protocol_header *header);
 
    Protocol_header **get_send_bufferv (unsigned int tx_count);
    void sendv (Protocol_header **header, unsigned int tx_count);
+
+   void purge_buffers (uint32_t node);
 
    const int domd_id;
    const int index;

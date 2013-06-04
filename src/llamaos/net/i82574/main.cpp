@@ -35,6 +35,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <iostream>
 #include <queue>
 
+#include <llamaos/api/io.h>
 #include <llamaos/api/pci/BAR.h>
 #include <llamaos/api/pci/Command.h>
 #include <llamaos/api/pci/PCI.h>
@@ -135,8 +136,8 @@ int main (int /* argc */, char ** /* argv [] */)
    cout << "running 82574 llamaNET domain...\n" << endl;
    PCI pci;
    sleep (1);
-//   cout << "PCI config:" << endl;
-//   cout << pci << endl;
+   cout << "PCI config:" << endl;
+   cout << pci << endl;
 
    cout << "checking PCI config for valid 82574..." << endl;
    uint16_t vendor_id = pci.read_config_word (0);
@@ -212,6 +213,30 @@ int main (int /* argc */, char ** /* argv [] */)
    }
 
    CSR csr (virtual_address);
+
+   uint32_t RAL = csr.read (0x5400);
+   uint32_t RAH = csr.read (0x5404);
+
+   cout << endl;
+   cout << "RAL " << hex << RAL << endl;
+   cout << "RAH " << hex << RAH << endl;
+   cout << endl;
+
+   uint8_t mac_addr [6];
+   mac_addr [0] = ((RAL >> 0) & 0xFF);
+   mac_addr [1] = ((RAL >> 8) & 0xFF);
+   mac_addr [2] = ((RAL >> 16) & 0xFF);
+   mac_addr [3] = ((RAL >> 24) & 0xFF);
+   mac_addr [4] = ((RAH >> 0) & 0xFF);
+   mac_addr [5] = ((RAH >> 8) & 0xFF);
+
+   cout << "MAC address: " << hex << static_cast<int>(mac_addr [0])
+                           << ":" << static_cast<int>(mac_addr [1])
+                           << ":" << static_cast<int>(mac_addr [2])
+                           << ":" << static_cast<int>(mac_addr [3])
+                           << ":" << static_cast<int>(mac_addr [4])
+                           << ":" << static_cast<int>(mac_addr [5]) << endl << endl; 
+
    CTRL ctrl = csr.read_CTRL ();
    STATUS status = csr.read_STATUS ();
 
@@ -622,23 +647,33 @@ int main (int /* argc */, char ** /* argv [] */)
                if (tx_mask & (1 << i))
                {
 //cout << "  sending index " << tx_tail << endl;         
+                  llamaos::net::llamaNET::Protocol_header *header =
+                     reinterpret_cast<llamaos::net::llamaNET::Protocol_header *> (tx_buffers [(tx_last_index + tx_count) % TX_BUFFERS].pointer);
 
-                  tx_desc [tx_desc_index(tx_tail)].buffer = tx_buffers [(tx_last_index + tx_count) % TX_BUFFERS].address;
-                  tx_desc [tx_desc_index(tx_tail)].length = llamaos::net::llamaNET::HEADER_LENGTH + reinterpret_cast<llamaos::net::llamaNET::Protocol_header *> (tx_buffers [(tx_last_index + tx_count) % TX_BUFFERS].pointer)->len;
-                  tx_desc [tx_desc_index(tx_tail)].CSO = 0;
-                  tx_desc [tx_desc_index(tx_tail)].CMD = 0x0B;
-                  tx_desc [tx_desc_index(tx_tail)].STA = 0;
-                  tx_desc [tx_desc_index(tx_tail)].CSS = 0;
-                  tx_desc [tx_desc_index(tx_tail)].VLAN = 0;
+                  if (   (header->eth_dest [0] != mac_addr [0])
+                      || (header->eth_dest [1] != mac_addr [1])
+                      || (header->eth_dest [2] != mac_addr [2])
+                      || (header->eth_dest [3] != mac_addr [3])
+                      || (header->eth_dest [4] != mac_addr [4])
+                      || (header->eth_dest [5] != mac_addr [5]))
+                  {
+                     tx_desc [tx_desc_index(tx_tail)].buffer = tx_buffers [(tx_last_index + tx_count) % TX_BUFFERS].address;
+                     tx_desc [tx_desc_index(tx_tail)].length = llamaos::net::llamaNET::HEADER_LENGTH + header->len;
+                     tx_desc [tx_desc_index(tx_tail)].CSO = 0;
+                     tx_desc [tx_desc_index(tx_tail)].CMD = 0x0B;
+                     tx_desc [tx_desc_index(tx_tail)].STA = 0;
+                     tx_desc [tx_desc_index(tx_tail)].CSS = 0;
+                     tx_desc [tx_desc_index(tx_tail)].VLAN = 0;
 
-                  tx_tail++;
-                  tx_tail %= tx_desc_max;
+                     tx_tail++;
+                     tx_tail %= tx_desc_max;
 
-                  tx_tail2 = tx_tail + 1;
-                  tx_tail2 %= tx_desc_max;
-                  // holding for phys buffer space....
-                  while (tx_desc [tx_desc_index(tx_tail2)].CMD == 0x0B && tx_desc [tx_desc_index(tx_tail2)].STA == 0);
+                     tx_tail2 = tx_tail + 1;
+                     tx_tail2 %= tx_desc_max;
+                     // holding for phys buffer space....
+                     while (tx_desc [tx_desc_index(tx_tail2)].CMD == 0x0B && tx_desc [tx_desc_index(tx_tail2)].STA == 0);
 //                  cout << "tx_tail " << tx_tail << " ready" << endl;
+                  }
 
                   tx_count++;
                }

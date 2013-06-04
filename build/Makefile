@@ -30,6 +30,9 @@
 # contributors.
 #
 
+# make parameters
+MAKEFLAGS = --silent
+
 .PHONY: all
 all:
 	@$(MAKE) -C linux $@

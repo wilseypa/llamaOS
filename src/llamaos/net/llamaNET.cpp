@@ -114,6 +114,7 @@ llamaNET::Protocol_header *llamaNET::recv ()
 
       if (control->driver.tx_head != control->app [index].tx_tail)
       {
+//   cout << "recv " << control->app [index].tx_tail << endl;
          return tx_buffers [control->app [index].tx_tail]->get_pointer ();
       }
    }
@@ -141,7 +142,7 @@ llamaNET::Protocol_header *llamaNET::recvNB (uint32_t node)
 {
    llamaNET::Protocol_header *header;
 
-   if (recv_poll())
+   while (recv_poll ())
    {
       header = recv ();
 
@@ -149,13 +150,12 @@ llamaNET::Protocol_header *llamaNET::recvNB (uint32_t node)
           && (header->dest == node))
       {
          return header;
-      } else {
-         release_recv_buffer (header);
-         return NULL;
       }
-   } else {
-      return NULL;
+
+      release_recv_buffer (header);
    }
+
+   return NULL;
 }
 
 void llamaNET::release_recv_buffer (Protocol_header *header)
@@ -352,18 +352,54 @@ llamaNET::Protocol_header *llamaNET::get_send_buffer ()
    unsigned long tx_next_index = __sync_fetch_and_add (&control->driver.tx_next_index, 1);
 
    // wait to use if other indexes are behind
-   while ((tx_next_index - control->driver.tx_done_index) >= 768)
+   while ((tx_next_index - control->driver.tx_done_index) > (TX_BUFFERS - 64))
    {
       if (control->app [index].tx_tail == control->driver.tx_done_index)
       {
-//         cout << "stuck on self..." << endl;
-         control->app [index].tx_tail++;
-         control->app [index].tx_tail %= TX_BUFFERS;
+         cout << "stuck on self..." << endl;
+//         for (;;);
+//         control->app [index].tx_tail++;
+//         control->app [index].tx_tail %= TX_BUFFERS;
       }
    }
 
    control->app [index].tx_index = tx_next_index % TX_BUFFERS;
 
+   return tx_buffers [control->app [index].tx_index]->get_pointer ();
+}
+
+llamaNET::Protocol_header *llamaNET::get_send_buffer (uint32_t node)
+{
+   // get next index
+   unsigned long tx_next_index = __sync_fetch_and_add (&control->driver.tx_next_index, 1);
+
+   // wait to use if other indexes are behind
+   while ((tx_next_index - control->driver.tx_done_index) > (TX_BUFFERS - 64))
+   {
+      if (control->app [index].tx_tail == control->driver.tx_done_index)
+      {
+         cout << "stuck on self..." << endl;
+         cout << "tx_next_index: " << tx_next_index << endl;
+         cout << "control->driver.tx_next_index " << control->driver.tx_next_index << endl;
+         cout << "control->driver.tx_last_index " << control->driver.tx_last_index << endl;
+         cout << "control->driver.tx_done_index " << control->driver.tx_done_index << endl;
+         cout << "index " << index << endl;
+         cout << "control->app [0].tx_tail " << control->app [0].tx_tail << endl;
+         cout << "control->app [1].tx_tail " << control->app [1].tx_tail << endl;
+         cout << "control->app [2].tx_tail " << control->app [2].tx_tail << endl;
+
+         // purge out unneeded messages to move the shared tail pointers forward,
+         // otherwise, send can fill the buffer and deadlock with itself
+         purge_buffers (node);
+//         for (;;);
+//         control->app [index].tx_tail++;
+//         control->app [index].tx_tail %= TX_BUFFERS;
+      }
+   }
+
+   control->app [index].tx_index = tx_next_index % TX_BUFFERS;
+
+//   cout << "get_send_buffer " << control->app [index].tx_index << endl;
    return tx_buffers [control->app [index].tx_index]->get_pointer ();
 }
 
@@ -533,13 +569,13 @@ llamaNET::Protocol_header **llamaNET::get_send_bufferv (unsigned int tx_count)
    unsigned long tx_next_index = __sync_fetch_and_add (&control->driver.tx_next_index, tx_count);
 
    // wait to use if other indexes are behind
-   while (((tx_next_index + tx_count) - control->driver.tx_done_index) >= 768)
+   while (((tx_next_index + tx_count) - control->driver.tx_done_index) > (TX_BUFFERS - 64))
    {
       if (control->app [index].tx_tail == control->driver.tx_done_index)
       {
-         cout << "stuck on self..." << endl;
-         control->app [index].tx_tail++;
-         control->app [index].tx_tail %= TX_BUFFERS;
+//         cout << "stuck on self..." << endl;
+//         control->app [index].tx_tail++;
+//         control->app [index].tx_tail %= TX_BUFFERS;
       }
 
 //      cout << "stuck on other..." << endl;
@@ -595,4 +631,51 @@ void llamaNET::sendv (llamaNET::Protocol_header **headerv, unsigned int tx_count
    }
 
    __sync_fetch_and_or(&control->driver.tx_mask [byte_index], tx_mask);
+}
+
+void llamaNET::purge_buffers (uint32_t node)
+{
+   llamaNET::Protocol_header *header;
+
+   // move rx_tail ahead as far as possible (until a message destined for node is found)
+   unsigned int rx_head = control->driver.rx_head;
+   unsigned int rx_tail = control->app [index].rx_tail;
+
+   while (rx_head != rx_tail)
+   {
+      header = rx_buffers [rx_tail]->get_pointer ();
+
+      if (   (header->eth_type == 0x0C09)
+          && (header->dest == node))
+      {
+         break;
+      }
+
+      rx_tail++;
+      rx_tail %= RX_BUFFERS;
+   }
+
+   // update shared rx_tail with (possibly) new value
+   control->app [index].rx_tail = rx_tail;
+
+   // move tx_tail ahead as far as possible (until a message destined for node is found)
+   unsigned int tx_head = control->driver.tx_head;
+   unsigned int tx_tail = control->app [index].tx_tail;
+
+   while (tx_head != tx_tail)
+   {
+      header = tx_buffers [control->app [index].tx_tail]->get_pointer ();
+
+      if (   (header->eth_type == 0x0C09)
+          && (header->dest == node))
+      {
+         break;
+      }
+
+      tx_tail++;
+      tx_tail %= TX_BUFFERS;
+   }
+
+   // update shared tx_tail with (possibly) new value
+   control->app [index].tx_tail = tx_tail;
 }
