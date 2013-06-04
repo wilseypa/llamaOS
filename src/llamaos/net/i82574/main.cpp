@@ -334,8 +334,11 @@ int main (int /* argc */, char ** /* argv [] */)
    ctrl.FRCSPD (true);
    ctrl.FRCDPLX (true);
    ctrl.ADVD3WUC (true);
+
+   // enable flow control, make false to disable
    ctrl.RFCE(true);
    ctrl.TFCE(true);
+
    csr.write_CTRL (ctrl);
 
    // flow control header
@@ -343,12 +346,13 @@ int main (int /* argc */, char ** /* argv [] */)
    csr.write (0x2c, 0x0100);
    csr.write (0x30, 0x8808);
 
-   // transmit timer value
-   csr.write (0x170, 10);       // 5 microseconds?
-   csr.write (0x5f40, 5);
+   // transmit timer value in 512 nanoseconds units
+   csr.write (0x170, 100);
+   csr.write (0x5f40, 50);
 
-   csr.write(0x2160, 0x4800|0x80000000);
-   csr.write(0x2168, 0x3C00);
+   // high threshold out of 20KB or 0x5000
+   csr.write(0x2160, 0x2500|0x80000000);  // 0x4800|0x80000000);
+   csr.write(0x2168, 0x2000);
 //   sleep (1);
 
    status = csr.read_STATUS ();
