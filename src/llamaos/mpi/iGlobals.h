@@ -54,6 +54,7 @@ class iRequest;
 #define MPI_COUT_TAB "    "
 //#define MPI_SLOW_SENDS
 //#define MPI_BARRIER_ALL_COLLECTIVE
+//#define MPI_RX_BEFORE_TX
 
 #define MAX_MESS_SIZE 3950
 
