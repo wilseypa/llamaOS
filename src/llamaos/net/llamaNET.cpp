@@ -109,14 +109,18 @@ llamaNET::Protocol_header *llamaNET::recv ()
    {
       if (control->driver.rx_head != control->app [index].rx_tail)
       {
+//         cout << "*** llamaNET::recv rx_tail: " << control->app [index].rx_tail << endl;
          return rx_buffers [control->app [index].rx_tail]->get_pointer ();
       }
 
       if (control->driver.tx_head != control->app [index].tx_tail)
       {
 //   cout << "recv " << control->app [index].tx_tail << endl;
+//         cout << "*** llamaNET::recv tx_tail: " << control->app [index].tx_tail << endl;
          return tx_buffers [control->app [index].tx_tail]->get_pointer ();
       }
+
+      mb ();
    }
 }
 
@@ -365,6 +369,7 @@ llamaNET::Protocol_header *llamaNET::get_send_buffer ()
 
    control->app [index].tx_index = tx_next_index % TX_BUFFERS;
 
+   cout << "*** llamaNET::get_send_buffer tx_index: " << control->app [index].tx_index << endl;
    return tx_buffers [control->app [index].tx_index]->get_pointer ();
 }
 
@@ -400,6 +405,7 @@ llamaNET::Protocol_header *llamaNET::get_send_buffer (uint32_t node)
    control->app [index].tx_index = tx_next_index % TX_BUFFERS;
 
 //   cout << "get_send_buffer " << control->app [index].tx_index << endl;
+//   cout << "*** llamaNET::get_send_buffer tx_index: " << control->app [index].tx_index << endl;
    return tx_buffers [control->app [index].tx_index]->get_pointer ();
 }
 
@@ -554,7 +560,7 @@ void llamaNET::send (Protocol_header *header)
 #endif
 
    header->eth_type = 0x0C09;
-//cout << "sending..." << endl;
+//cout << "sending tx_index " << control->app [index].tx_index << endl;
    // ensure write is processed
    wmb();
 

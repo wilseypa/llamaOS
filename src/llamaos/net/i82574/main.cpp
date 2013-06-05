@@ -643,7 +643,9 @@ int main (int /* argc */, char ** /* argv [] */)
                }
             }
 
-            tx_mask &= __sync_fetch_and_and(&llamaNET_control->driver.tx_mask [(tx_last_index % TX_BUFFERS) / 32], ~tx_mask);
+            // !BAM can't do this!
+            // tx_mask &= __sync_fetch_and_and(&llamaNET_control->driver.tx_mask [(tx_last_index % TX_BUFFERS) / 32], ~tx_mask);
+            tx_mask = llamaNET_control->driver.tx_mask [(tx_last_index % TX_BUFFERS) / 32];
 
    //cout << "  sending tx_mask " << tx_mask << endl;         
    //cout << "  sending tx_count " << tx_count << endl;         
@@ -682,6 +684,8 @@ int main (int /* argc */, char ** /* argv [] */)
                   }
 
                   tx_count++;
+
+                  __sync_fetch_and_and(&llamaNET_control->driver.tx_mask [(tx_last_index % TX_BUFFERS) / 32], ~(1 << i));
                }
                else
                {
@@ -701,7 +705,9 @@ int main (int /* argc */, char ** /* argv [] */)
                head += tx_count;
                head %= TX_BUFFERS;
                llamaNET_control->driver.tx_head = head;
+//cout << "tx_head = " << llamaNET_control->driver.tx_head << endl;
 
+               wmb();
                llamaNET_control->driver.tx_last_index += tx_count;
             }
          }
@@ -790,12 +796,13 @@ int main (int /* argc */, char ** /* argv [] */)
             break;
          }
       }
-      if (++stat_delay > 10000)
-      {
-         stat_delay = 0;
 
-         cout << "Missed Packets Count = " << csr.read (0x4010) << endl;
-      }
+//      if (++stat_delay > 10000)
+//      {
+//         stat_delay = 0;
+//
+//         cout << "Missed Packets Count = " << csr.read (0x4010) << endl;
+//      }
    }
 
    cout << "waiting 3 sec, then exit..." << endl;
