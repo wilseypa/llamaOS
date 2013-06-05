@@ -180,9 +180,8 @@ static int glibc_libc_open (const char *file, int oflag)
 //   trace("!!! ALERT: glibc calling libc_open() before file system support is enabled.\n");
    trace (" opening file %s, %x\n", file, oflag);
 
-//   errno = ENOENT;
-//   return -1;
-   return 10;
+   errno = ENOENT;
+   return -1;
 }
 
 static int glibc_close (int fd)
