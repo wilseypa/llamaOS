@@ -30,10 +30,20 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 #include <iGlobals.h>
 #include <llamaConn.h>
+#include <llamaos/api/sleep.h>
+#include <iostream>
+#include <string.h>
+
+using namespace std;
 
 int MPI_Finalize (void) {
    //The process waits for the sync to start
+   cout << "Finalize Sync... ";
    MPI_Barrier(MPI_COMM_WORLD);
+   cout << "DONE" << endl;
+   
+   //Sleep for a bit
+   llamaos::api::sleep(5);   
 
    //Cleanup
    delete llamaNetInterface;
