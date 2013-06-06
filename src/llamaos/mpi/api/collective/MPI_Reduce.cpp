@@ -44,12 +44,11 @@ int MPI_Reduce(void *sendbuf, void *recvbuf, int count, MPI_Datatype datatype,
    #ifdef MPI_BARRIER_ALL_COLLECTIVE
    MPI_Barrier(comm);
    #endif
-               
+   
+   // Linear Method - Gather all messages into array at root
    // Determine process rank
    int rank; 
    MPI_Comm_rank(comm, &rank);
-   // Gather all messages into array at root
-   // Linear Method
    // Send message to root with tag MPI_FUNC_TAG_REDUCE
    // If root, wait for all other ranks to send message with tag MPI_FUNC_TAG_REDUCE
    if (rank == root) {
