@@ -1,4 +1,4 @@
-#define CLASS 'W'
+#define CLASS 'A'
 #define NUM_PROCS 4
 /*
    This file is generated automatically by the setparams utility.

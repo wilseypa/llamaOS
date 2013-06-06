@@ -30,6 +30,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 #include <unistd.h>
 #include <iostream>
+#include <string.h>
 
 #include <llamaos/api/sleep.h>
 #include <llamaos/memory/Memory.h>
@@ -126,14 +127,15 @@ llamaNET::Protocol_header *llamaNET::recv ()
 
 llamaNET::Protocol_header *llamaNET::recv (uint32_t node)
 {
+   const unsigned char BROADCAST_MAC[6] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
    llamaNET::Protocol_header *header;
 
    for (;;)
    {
       header = recv ();
 
-      if (   (header->eth_type == 0x0C09)
-          && (header->dest == node))
+      if (   (header->eth_type == 0x0C09) && (node != header->src)
+          && (header->dest == node || memcmp(header->eth_dest, BROADCAST_MAC, 6) == 0))
       {
          return header;
       }
@@ -144,14 +146,15 @@ llamaNET::Protocol_header *llamaNET::recv (uint32_t node)
 
 llamaNET::Protocol_header *llamaNET::recvNB (uint32_t node)
 {
+   const unsigned char BROADCAST_MAC[6] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
    llamaNET::Protocol_header *header;
 
    while (recv_poll ())
    {
       header = recv ();
 
-      if (   (header->eth_type == 0x0C09)
-          && (header->dest == node))
+      if (   (header->eth_type == 0x0C09) && (node != header->src)
+          && (header->dest == node || memcmp(header->eth_dest, BROADCAST_MAC, 6) == 0))
       {
          return header;
       }

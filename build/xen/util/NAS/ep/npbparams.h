@@ -1,4 +1,4 @@
-c NPROCS = 4 CLASS = S
+c NPROCS = 4 CLASS = A
 c  
 c  
 c  This file is generated automatically by the setparams utility.
@@ -6,9 +6,9 @@ c  It sets the number of processors and the class of the NPB
 c  in this directory. Do not modify it by hand.
 c  
         character class
-        parameter (class ='S')
+        parameter (class ='A')
         integer m, npm
-        parameter (m=24, npm=4)
+        parameter (m=28, npm=4)
         logical  convertdouble
         parameter (convertdouble = .false.)
         character*11 compiletime

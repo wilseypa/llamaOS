@@ -47,12 +47,20 @@ int MPI_Bcast(void *buffer, int count, MPI_Datatype datatype, int root, MPI_Comm
    // linear
    // Send a message to all nodes if process is root
    if (rank == root) { 
-      int size;
-      MPI_Comm_size(comm, &size);
-      for (int i = 0; i < size; i++) {
-         if (i == root) {continue;}
-         iSend(buffer, count, datatype, i, MPI_FUNC_TAG_BROADCAST, comm, MPI_CONTEXT_COLLECTIVE);
+      #ifdef MPI_USE_BCAST_HARDWARE
+      if (comm == MPI_COMM_WORLD) {
+         iSend(buffer, count, datatype, MPI_SEND_BCAST, MPI_FUNC_TAG_BROADCAST, comm, MPI_CONTEXT_COLLECTIVE);
+      } else {
+      #endif
+         int size;
+         MPI_Comm_size(comm, &size);
+         for (int i = 0; i < size; i++) {
+            if (i == root) {continue;}
+            iSend(buffer, count, datatype, i, MPI_FUNC_TAG_BROADCAST, comm, MPI_CONTEXT_COLLECTIVE);
+         }
+      #ifdef MPI_USE_BCAST_HARDWARE
       }
+      #endif
    } else {
       // Receive the broadcast message
       iReceive(buffer, count, datatype, root, MPI_FUNC_TAG_BROADCAST, 

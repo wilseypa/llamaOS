@@ -48,13 +48,14 @@ class iGroup;
 class iComm;
 class iRequest;
 
-#define MPI_COUT_EVERY_MESSAGE
+//#define MPI_COUT_EVERY_MESSAGE
 #define MPI_COUT_INITIALIZATION
-#define MPI_COUT_COLLECTIVE_FUNCTIONS
+//#define MPI_COUT_COLLECTIVE_FUNCTIONS
 #define MPI_COUT_TAB "    "
 //#define MPI_SLOW_SENDS
-#define MPI_BARRIER_ALL_COLLECTIVE
+//#define MPI_BARRIER_ALL_COLLECTIVE
 #define MPI_RX_BEFORE_TX
+#define MPI_USE_BCAST_HARDWARE
 
 #define MAX_MESS_SIZE 3950
 
@@ -107,6 +108,7 @@ typedef int MPI_Context;
 #define MPI_CONTEXT_COLLECTIVE ((int)0x80000000)
 
 #define MPI_RANK_ROOT ((int)0)
+#define MPI_SEND_BCAST ((int)-1)
 
 #define MPI_FUNC_TAG_BARRIER     ((int)-2)
 #define MPI_FUNC_TAG_BROADCAST   ((int)-3)

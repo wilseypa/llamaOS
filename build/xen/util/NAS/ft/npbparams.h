@@ -1,4 +1,4 @@
-c NPROCS = 4 CLASS = S
+c NPROCS = 4 CLASS = A
 c  
 c  
 c  This file is generated automatically by the setparams utility.
@@ -6,7 +6,7 @@ c  It sets the number of processors and the class of the NPB
 c  in this directory. Do not modify it by hand.
 c  
         integer nx, ny, nz, maxdim, niter_default, ntdivnp, np_min
-        parameter (nx=64, ny=64, nz=64, maxdim=64)
+        parameter (nx=256, ny=256, nz=128, maxdim=256)
         parameter (niter_default=6)
         parameter (np_min = 4)
         parameter (ntdivnp=((nx*ny)/np_min)*nz)

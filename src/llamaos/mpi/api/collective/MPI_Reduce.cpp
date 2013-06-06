@@ -51,7 +51,6 @@ int MPI_Reduce(void *sendbuf, void *recvbuf, int count, MPI_Datatype datatype,
    // Gather all messages into array at root
    // Linear Method
    // Send message to root with tag MPI_FUNC_TAG_REDUCE
-   iSend(sendbuf, count, datatype, root, MPI_FUNC_TAG_REDUCE, comm, MPI_CONTEXT_COLLECTIVE);
    // If root, wait for all other ranks to send message with tag MPI_FUNC_TAG_REDUCE
    if (rank == root) {
       // inorder
@@ -59,13 +58,18 @@ int MPI_Reduce(void *sendbuf, void *recvbuf, int count, MPI_Datatype datatype,
       MPI_Comm_size(comm, &size);
       char *opBuf = new char[count*iSizeof(datatype)]; // Allocate temp buffer for receives
       mpiData.isPerformingOp = false;
+      iPerformOp(recvbuf, sendbuf, count, datatype, op);
       for (int i = 0; i < size; i++) {
-         iReceive(opBuf, count, datatype, i, MPI_FUNC_TAG_REDUCE, 
-               comm, MPI_CONTEXT_COLLECTIVE, 0); // Receive new message into temp buffer
-         iPerformOp(recvbuf, opBuf, count, datatype, op); // Perform operation on new values
+         if (i != root) {
+            iReceive(opBuf, count, datatype, i, MPI_FUNC_TAG_REDUCE, 
+                  comm, MPI_CONTEXT_COLLECTIVE, 0); // Receive new message into temp buffer
+            iPerformOp(recvbuf, opBuf, count, datatype, op); // Perform operation on new values
+         }
       }
       mpiData.isPerformingOp = false;
       delete[] opBuf;
+   } else {
+      iSend(sendbuf, count, datatype, root, MPI_FUNC_TAG_REDUCE, comm, MPI_CONTEXT_COLLECTIVE);
    }
    
    #ifdef MPI_COUT_COLLECTIVE_FUNCTIONS
