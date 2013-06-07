@@ -30,6 +30,9 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 #include <iRequest.h>
 #include <string.h>
+#include <iostream>
+
+using namespace std;
 
 // Return the next unique identifier
 MPI_Request iRequest::getNextId() {
@@ -48,6 +51,24 @@ iRequest::iRequest(IREQUEST_TYPE ptype, void *pbuf, int pcount, MPI_Datatype pda
    tag = ptag;
    comm = pcomm;
    mpiData.request[id] = this;
+
+   // If this is a receive request, add an entry to the associated buffer
+   if (ptype == IREQUEST_RECEIVE) {
+      int sizeInBytes = count*iSizeof(datatype);
+   
+      #ifdef MPI_COUT_EVERY_MESSAGE
+      iLevelSpacesPrint();
+      cout << "Creating Request for rank " << rank << " Comm: " << comm;
+      cout << " Tag: " << tag << " TotSize: " << sizeInBytes;
+      #endif
+   
+      MAP_TYPE<MPI_Comm,iComm*>::iterator it = mpiData.comm.find(comm);
+      if (it != mpiData.comm.end()) { // Comm is declared
+         // Get receive buffer
+         iRxBuffer *rxBuff = it->second->getPt2ptRxBuffer();
+         rxBuff->pushMessageReq((unsigned char*)buf, rank, tag, sizeInBytes);
+      }
+   }
 }
 
 iRequest::~iRequest() {
@@ -69,6 +90,7 @@ int iRequest::wait(MPI_Status *status) {
 int iRequest::test(int *flag, MPI_Status *status) {
    switch (type) {
       case IREQUEST_SEND:
+         (*flag) = true;
          return MPI_SUCCESS;
       case IREQUEST_RECEIVE:
          iReceiveNB(buf, count, datatype, rank, tag, comm, MPI_CONTEXT_PT2PT, status, flag);
