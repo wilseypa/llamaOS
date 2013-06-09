@@ -37,8 +37,8 @@ using namespace std;
 
 std::list<MpiRxMessage_T>::iterator iRxBuffer::getMessage(int source, int tag) {
    for (std::list<MpiRxMessage_T>::iterator it = buffer.begin(); it != buffer.end(); it++) {
-      if (((it->source == source) || (source == MPI_ANY_SOURCE)) &&
-               ((it->tag == tag) || (tag == MPI_ANY_TAG))) {
+      if (((it->source == source) || (source == MPI_ANY_SOURCE) || (it->source == MPI_ANY_SOURCE)) &&
+               ((it->tag == tag) || (tag == MPI_ANY_TAG) || (it->tag == MPI_ANY_TAG))) {
          return it;
       }
    }
@@ -47,8 +47,9 @@ std::list<MpiRxMessage_T>::iterator iRxBuffer::getMessage(int source, int tag) {
 
 std::list<MpiRxMessage_T>::iterator iRxBuffer::getInProgressMessage(int source, int tag) {
    for (std::list<MpiRxMessage_T>::iterator it = buffer.begin(); it != buffer.end(); it++) {
-      if (((it->source == source) || (source == MPI_ANY_SOURCE)) &&
-               ((it->tag == tag) || (tag == MPI_ANY_TAG)) && (it->curSize < it->size)) {
+      if (((it->source == source) || (source == MPI_ANY_SOURCE) || (it->source == MPI_ANY_SOURCE)) &&
+               ((it->tag == tag) || (tag == MPI_ANY_TAG) || (it->tag == MPI_ANY_TAG))
+               && (it->curSize < it->size)) {
          return it;
       }
    }
@@ -72,6 +73,9 @@ void iRxBuffer::pushMessage(unsigned char *buf, int size, int source, int tag, i
       cout << " CurSize: " << size << endl;
       #endif
    } else { //In progress message
+      it->source = source; // Used for wildcards
+      it->tag = tag;       // Used for wildcards
+      it->size = totSize;  // Used for wildcards
       it->curSize += size;
       dataPt = it->buf;
       #ifdef MPI_COUT_EVERY_MESSAGE

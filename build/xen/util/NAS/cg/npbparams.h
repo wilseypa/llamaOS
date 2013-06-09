@@ -1,4 +1,4 @@
-c NPROCS = 4 CLASS = B
+c NPROCS = 4 CLASS = S
 c  
 c  
 c  This file is generated automatically by the setparams utility.
@@ -7,10 +7,10 @@ c  in this directory. Do not modify it by hand.
 c  
         integer            na, nonzer, niter
         double precision   shift, rcond
-        parameter(  na=75000,
-     >              nonzer=13,
-     >              niter=75,
-     >              shift=60.,
+        parameter(  na=1400,
+     >              nonzer=7,
+     >              niter=15,
+     >              shift=10.,
      >              rcond=1.0d-1 )
 
 c number of nodes for which this version is compiled
