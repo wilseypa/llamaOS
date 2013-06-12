@@ -37,8 +37,8 @@ using namespace std;
 
 std::list<MpiRxMessage_T>::iterator iRxBuffer::getMessage(int source, int tag) {
    for (std::list<MpiRxMessage_T>::iterator it = buffer.begin(); it != buffer.end(); it++) {
-      if (((it->source == source) || (source == MPI_ANY_SOURCE)) &&
-               ((it->tag == tag) || (tag == MPI_ANY_TAG))) {
+      if (((it->source == source) || (source == MPI_ANY_SOURCE) || (it->source == MPI_ANY_SOURCE)) &&
+               ((it->tag == tag) || (tag == MPI_ANY_TAG) || (it->tag == MPI_ANY_TAG))) {
          return it;
       }
    }
@@ -47,8 +47,9 @@ std::list<MpiRxMessage_T>::iterator iRxBuffer::getMessage(int source, int tag) {
 
 std::list<MpiRxMessage_T>::iterator iRxBuffer::getInProgressMessage(int source, int tag) {
    for (std::list<MpiRxMessage_T>::iterator it = buffer.begin(); it != buffer.end(); it++) {
-      if (((it->source == source) || (source == MPI_ANY_SOURCE)) &&
-               ((it->tag == tag) || (tag == MPI_ANY_TAG)) && (it->curSize < it->size)) {
+      if (((it->source == source) || (source == MPI_ANY_SOURCE) || (it->source == MPI_ANY_SOURCE)) &&
+               ((it->tag == tag) || (tag == MPI_ANY_TAG) || (it->tag == MPI_ANY_TAG))
+               && (it->curSize < it->size)) {
          return it;
       }
    }
@@ -62,6 +63,7 @@ void iRxBuffer::pushMessage(unsigned char *buf, int size, int source, int tag, i
       dataPt = new unsigned char[totSize];
       MpiRxMessage_T newRxMessage;
       newRxMessage.buf = dataPt;
+      newRxMessage.hasSepBuf = false;
       newRxMessage.size = totSize;
       newRxMessage.source = source;
       newRxMessage.tag = tag;
@@ -71,6 +73,9 @@ void iRxBuffer::pushMessage(unsigned char *buf, int size, int source, int tag, i
       cout << " CurSize: " << size << endl;
       #endif
    } else { //In progress message
+      it->source = source; // Used for wildcards
+      it->tag = tag;       // Used for wildcards
+      it->size = totSize;  // Used for wildcards
       it->curSize += size;
       dataPt = it->buf;
       #ifdef MPI_COUT_EVERY_MESSAGE
@@ -80,6 +85,32 @@ void iRxBuffer::pushMessage(unsigned char *buf, int size, int source, int tag, i
    // Copy over data
    dataPt += part*MAX_MESS_SIZE;
    memcpy(dataPt, buf, size);
+}
+
+void iRxBuffer::pushMessageReq(unsigned char *buf, int source, int tag, int totSize) {
+   std::list<MpiRxMessage_T>::iterator it = getMessage(source, tag);
+   if (it == buffer.end()) { //New message
+      MpiRxMessage_T newRxMessage;
+      newRxMessage.buf = buf;
+      newRxMessage.hasSepBuf = true;
+      newRxMessage.size = totSize;
+      newRxMessage.source = source;
+      newRxMessage.tag = tag;
+      newRxMessage.curSize = 0;
+      buffer.push_back(newRxMessage);
+      #ifdef MPI_COUT_EVERY_MESSAGE
+      cout << " (New)" << endl;
+      #endif
+   } else { //In progress message
+      // Copy parts of message already received
+      memcpy(buf, it->buf, it->curSize);
+      delete it->buf;
+      it->buf = buf;
+      it->hasSepBuf = true;
+      #ifdef MPI_COUT_EVERY_MESSAGE
+      cout << " (Copy Size: " << it->curSize << ")" << endl;
+      #endif
+   }
 }
 
 int iRxBuffer::popMessage(int source, int tag, void *buf, int size, MPI_Status *status) {
@@ -100,7 +131,9 @@ int iRxBuffer::popMessage(int source, int tag, void *buf, int size, MPI_Status *
    }
 
    // Copy data into buffer
-   memcpy(buf, it->buf, cpySize);
+   if (!it->hasSepBuf) {
+      memcpy(buf, it->buf, cpySize);
+   }
 
    // Copy data into status
    if (status != MPI_STATUS_IGNORE) {
@@ -111,7 +144,9 @@ int iRxBuffer::popMessage(int source, int tag, void *buf, int size, MPI_Status *
    }
 
    // Clean up list
-   delete[] it->buf;
+   if (!it->hasSepBuf) {
+      delete[] it->buf;
+   }
    buffer.erase(it);
    return retSize;
 }
@@ -135,4 +170,11 @@ bool iRxBuffer::probeMessage(int source, int tag, MPI_Status *status) {
       status->size = it->size;
    }
    return true;
+}
+
+void iRxBuffer::removeMessage(int source, int tag) {
+   std::list<MpiRxMessage_T>::iterator it = getMessage(source, tag);
+   if (it != buffer.end()) {
+      buffer.erase(it);
+   }
 }

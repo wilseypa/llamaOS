@@ -79,7 +79,7 @@ void iSend(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_C
 
    // Translate comm ranks into world ranks
    int destWorldRank = commPtr->getWorldRankFromRank(dest);
-   if (destWorldRank == MPI_UNDEFINED) {return;} // Destination rank is not in comm
+   //if (destWorldRank == MPI_UNDEFINED) {return;} // Destination rank is not in comm (Removed for BCast)
    int srcWorldRank = commPtr->getLocalWorldRank();
    if (srcWorldRank == MPI_UNDEFINED) {return;} // Source rank is not in comm
 
@@ -104,7 +104,16 @@ void iSend(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_C
       header->type = 1;
       header->seq = seq++; 
       header->len = messSize + 16;
-      memcpy(header->eth_dest, mpiData.hostTable[destWorldRank].address, 6);
+      if (dest == MPI_SEND_BCAST) {
+         header->eth_dest[0] = 0xFF; 
+         header->eth_dest[1] = 0xFF; 
+         header->eth_dest[2] = 0xFF; 
+         header->eth_dest[3] = 0xFF; 
+         header->eth_dest[4] = 0xFF; 
+         header->eth_dest[5] = 0xFF; 
+      } else {
+         memcpy(header->eth_dest, mpiData.hostTable[destWorldRank].address, 6);
+      }
       memcpy(header->eth_src, mpiData.address, 6);
 
       // get pointer to data section of buffer

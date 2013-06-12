@@ -33,6 +33,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <iRxBuffer.h>
 #include <iostream>
 #include <string.h>
+#include <iRequest.h>
 
 using namespace std;
 using namespace llamaos;
@@ -90,13 +91,25 @@ void iGetMessage(void *buf, int count, MPI_Datatype datatype, int source, int ta
       cout << " TotSize: " << sizeInBytes;
       cout << endl;
    }
+   #ifdef MPI_COUT_NB_MESSAGES
+   else {
+      iLevelSpacesPrint();
+      if (!isProbe) {cout << "[iReceiveNB]";}
+      else {cout << "[iProbeNB]";}
+      int commContext = comm | context;
+      cout << " Waiting for message from src " << srcWorldRank;
+      cout << " Context: " << commContext << " Tag: " << tag;
+      cout << " TotSize: " << sizeInBytes;
+      cout << endl;
+   }
+   #endif
    #endif
 
    // Check through receive buffer
    int curRxSize = 0;
    MPI_Status tmpStatus;
    if (isProbe) {
-      // Only check to see if complete messge in buffer - either way do not touch it
+      // Only check to see if complete message in buffer - either way do not touch it
       if (rxBuff->probeMessage(source, tag, &tmpStatus)) {
          #ifdef MPI_COUT_EVERY_MESSAGE
          srcWorldRank = commPtr->getWorldRankFromRank(tmpStatus.MPI_SOURCE);
@@ -109,7 +122,7 @@ void iGetMessage(void *buf, int count, MPI_Datatype datatype, int source, int ta
          (*flag) = true;
          return;
       }
-   } else {
+   } else if (!isNB) {
       // Pull even incomplete messages out of the buffer
       curRxSize = rxBuff->popMessage(source, tag, buf, sizeInBytes, &tmpStatus);
       // Print buffer pull
@@ -133,12 +146,22 @@ void iGetMessage(void *buf, int count, MPI_Datatype datatype, int source, int ta
       if ((curRxSize > 0) && (curRxSize == rxTotSize)) {
          #ifdef MPI_COUT_EVERY_MESSAGE
          iLevelSpacesPrint();
-         if (isNB) {cout << "[iReceiveNB]";}
-         else {cout << "[iReceive]";}
-         cout << " COMPLETE from src " << srcWorldRank << endl;
+         cout << "[iReceive]";
+         cout << " COMPLETE from src " << srcWorldRank << " Comm: " << comm << " Tag: " << tag << endl;
          #endif
          memcpy(status, &tmpStatus, sizeof(MPI_Status));
          (*flag) = true;
+         return;
+      }
+   } else {
+      // Check to see if finished with recvNB
+      if (rxBuff->probeMessage(source, tag, status)) {
+         // Message is complete
+         (*flag) = true;
+         rxBuff->removeMessage(source, tag);
+         #ifdef MPI_COUT_EVERY_MESSAGE
+         cout << "[iReceiveNB] COMPLETE from src " << srcWorldRank << " Comm: " << comm << " Tag: " << tag << endl;
+         #endif
          return;
       }
    }
@@ -178,7 +201,7 @@ void iGetMessage(void *buf, int count, MPI_Datatype datatype, int source, int ta
       #endif
 
       // Check if desired message type and not a probe
-      if ( (!isProbe) && ((rxSource == srcWorldRank) || (srcWorldRank == MPI_ANY_SOURCE)) && 
+      if ( (!isProbe) && (!isNB) && ((rxSource == srcWorldRank) || (srcWorldRank == MPI_ANY_SOURCE)) && 
                (rxComm == comm) && (rxContext == context) && ((rxTag == tag) || (tag == MPI_ANY_TAG))) {
          srcWorldRank = rxSource;
          tag = rxTag;
@@ -221,11 +244,9 @@ void iGetMessage(void *buf, int count, MPI_Datatype datatype, int source, int ta
             }
             #ifdef MPI_COUT_EVERY_MESSAGE
             iLevelSpacesPrint();
-            if (isNB) {cout << "[iReceiveNB]";}
-            else {cout << "[iReceive]";}
-            cout << " COMPLETE from src " << srcWorldRank << endl;
+            cout << "[iReceive]";
+            cout << " COMPLETE from src " << srcWorldRank << " Comm: " << comm << " Tag: " << tag << endl;
             #endif
-            (*flag) = true;
             return;
          }
       } else { // Store in receive buffer
@@ -251,24 +272,36 @@ void iGetMessage(void *buf, int count, MPI_Datatype datatype, int source, int ta
             }
             
             // Release llama rx message buffer
-            llamaNetInterface->release_recv_buffer(header); 
+            llamaNetInterface->release_recv_buffer(header);
             
-            // Check if desired message type and probing
-            if ( (isProbe) && ((rxSource == srcWorldRank) || (srcWorldRank == MPI_ANY_SOURCE)) && 
+            // Check if desired message type and probing or recvNB
+            if ( (isProbe || isNB) && ((rxSource == srcWorldRank) || (srcWorldRank == MPI_ANY_SOURCE)) && 
                      (rxComm == comm) && (rxContext == context) && 
                      ((rxTag == tag) || (tag == MPI_ANY_TAG)) ) {
-               srcWorldRank = rxSource;
+               source = rxSource;
                tag = rxTag;
-               // Only check to see if complete message in buffer - either way do not touch it
-               if (rxBuff->probeMessage(source, tag, status)) {
-                  #ifdef MPI_COUT_EVERY_MESSAGE
-                  iLevelSpacesPrint();
-                  if (isNB) {cout << "[iProbeNB]";}
-                  else {cout << "[iProbe]";}
-                  cout << " SUCCESS from src " << srcWorldRank << endl;
-                  #endif
-                  (*flag) = true;
-                  return;
+               if (isProbe) {               
+                  // Only check to see if complete message in buffer - either way do not touch it
+                  if (rxBuff->probeMessage(source, tag, status)) {
+                     #ifdef MPI_COUT_EVERY_MESSAGE
+                     iLevelSpacesPrint();
+                     if (isNB) {cout << "[iProbeNB]";}
+                     else {cout << "[iProbe]";}
+                     cout << " SUCCESS from src " << srcWorldRank << endl;
+                     #endif
+                     (*flag) = true;
+                     return;
+                  }
+               } else {
+                  if (rxBuff->probeMessage(source, tag, status)) {
+                     // Message is complete
+                     (*flag) = true;
+                     rxBuff->removeMessage(source, tag);
+                     #ifdef MPI_COUT_EVERY_MESSAGE
+                     cout << "[iReceiveNB] COMPLETE from src " << srcWorldRank << " Comm: " << comm << " Tag: " << tag << endl;
+                     #endif
+                     return;
+                  }
                }
             }
          } else {
@@ -279,5 +312,4 @@ void iGetMessage(void *buf, int count, MPI_Datatype datatype, int source, int ta
          }
       }
    }
-   if (isNB) {return;} // Non-blocking so stop even though not finished
 }

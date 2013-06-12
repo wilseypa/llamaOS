@@ -32,8 +32,24 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 int MPI_Waitall(int count, MPI_Request array_of_requests[], 
                MPI_Status array_of_statuses[]) {
-   for (int i = 0; i < count; i++) {
+   // Blocking implementation
+   /*for (int i = 0; i < count; i++) {
       MPI_Wait(&array_of_requests[i], &array_of_statuses[i]);
-   }
+   }*/
+   
+   // Non-blocking implementation
+   int numDone;
+   int *flag = new int[count];
+   do {
+      numDone = 0;
+      for (int i = 0; i < count; i++) {
+         MPI_Test(&array_of_requests[i], &flag[i], &array_of_statuses[i]);
+         if (flag[i]) {
+            numDone++;
+         }
+      }
+   } while (numDone != count);
+   delete[] flag;
+    
    return MPI_SUCCESS;
 }

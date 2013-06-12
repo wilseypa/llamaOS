@@ -43,7 +43,7 @@ int MPI_Finalize (void) {
    cout << "DONE" << endl;
    
    //Sleep for a bit
-   llamaos::api::sleep(5);   
+   llamaos::api::sleep(3);   
 
    //Cleanup
    delete llamaNetInterface;

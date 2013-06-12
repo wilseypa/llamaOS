@@ -190,7 +190,7 @@ int MPI_Init (int *argc, char ***argv) {
    #endif
    unsigned char buf;
    if (mpiData.rank == mpiData.totNodes-1) {
-      llamaos::api::sleep(5);   
+      llamaos::api::sleep(3);   
    }
    MPI_Bcast(&buf, 1, MPI_UNSIGNED_CHAR, mpiData.totNodes-1, MPI_COMM_WORLD);
    MPI_Barrier(MPI_COMM_WORLD);
