@@ -30,36 +30,35 @@
 # contributors.
 #
 
-# make parameters
-MAKEFLAGS = --silent
+# include common variables
+include common-vars.mk
+include common-flags.mk
 
-MAKEFILE_SOURCES = common-vars.mk
+MAKEFILE_SOURCES += apps/tinyxml.mk
 
-# compiler tools
-CC = gcc
-CXX = g++
-F90 = gfortran
-AS = as
-LD = ld
+CPPFLAGS += \
+  -DTIXML_USE_STL \
+  -I $(INCDIR) \
+  -I $(SRCDIR) \
+  -include $(SRCDIR)/llamaos/__thread.h
 
-# shared common paths
-BINDIR = bin
-LIBDIR = lib
-OBJDIR = obj
+VPATH = $(SRCDIR)
 
-INCDIR = include
-SRCDIR = ../../src
+SOURCES = \
+  apps/tinyxml/main.cpp
 
-GLIBC_VERSION = 2.17
-GCC_VERSION = 4.8.0
-XEN_VERSION = 4.2.0
-# XEN_VERSION = 4.2.1
-GTEST_VERSION = 1.6.0
-NETPIPE_VERSION = 3.7.2
-TINYXML_VERSION = 2.6.2
+OBJECTS  = $(SOURCES:%.cpp=$(OBJDIR)/%.o)
+DEPENDS += $(OBJECTS:%.o=%.d)
 
-# auto dependency generation
-DEPENDS = 
+$(BINDIR)/tinyxml: $(OBJECTS) $(LIBDIR)/llamaOS.a $(LIBDIR)/tinyXML.a $(LIBDIR)/stdc++.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo linking: $@
+	@$(LD) $(LDFLAGS) -T llamaOS.lds -o $@ $^
+	@gzip -c -f --best $@ >$@.gz
+	@echo successfully built: $@
+	@echo
 
-# if present, include custom variables
--include custom-vars.mk
+include rules.mk
+
+# include auto-generated dependencies
+-include $(DEPENDS)

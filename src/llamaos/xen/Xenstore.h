@@ -37,6 +37,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <vector>
 
 #include <xen/xen.h>
 #include <xen/event_channel.h>
@@ -106,7 +107,7 @@ public:
     * @param value
     *
     */
-   void write (const std::string &key, const std::string &value) const;
+   void write_string (const std::string &key, const std::string &value) const;
 
    template <typename T>
    void write (const std::string &key, const T &value) const
@@ -123,8 +124,10 @@ public:
          for (;;);
       }
 
-      write (key, sstream.str ());
+      write_string (key, sstream.str ());
    }
+
+   std::vector<std::string> list (const std::string &key) const;
 
    xenstore_domain_interface *const interface;
    const evtchn_port_t port;

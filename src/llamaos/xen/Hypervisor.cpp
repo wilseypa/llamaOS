@@ -111,8 +111,8 @@ Hypervisor::Hypervisor (const start_info_t *start_info)
       events(shared_info),
       grant_table(),
       xenstore(machine_page_to_virtual_pointer<xenstore_domain_interface>(start_info->store_mfn), start_info->store_evtchn),
-      name(""),
-      domid(0),
+      name(xenstore.read_string ("name")),
+      domid(xenstore.read<domid_t>("domid")),
       argc(0)
 {
    instance = this;
@@ -131,10 +131,10 @@ void Hypervisor::initialize ()
 //   for (;;) { cout << "name: " << xenstore.read_string ("name") << endl; }
 //   long var_long = 0; for (;;) { cout << "long: " << var_long++ << endl; }
 
-   name = xenstore.read_string ("name"); // .c_str ();
-   trace ("Xenstore name: %s\n", name.c_str ()); 
-   domid = xenstore.read<domid_t>("domid");
-   trace ("Xenstore domid: %d\n", domid); 
+//   name = xenstore.read_string ("name"); // .c_str ();
+//   trace ("Xenstore name: %s\n", name.c_str ()); 
+//   domid = xenstore.read<domid_t>("domid");
+//   trace ("Xenstore domid: %d\n", domid); 
 
    trace ("float math: %f, %f, %f\n", 1.0f / 2638.0f, 25 / 43219.0f, 1 / 3.0f);
    trace ("double math: %lf, %lf, %lf\n", 1.0 / 2638.0, 25 / 43219.0, 1 / 3.0);
@@ -147,5 +147,15 @@ void Hypervisor::initialize ()
    for (int i = 0; i < 64; i++)
    {
       argv [i] = '\0';
+   }
+
+   // go looking for block devices
+   vector<string> keys = xenstore.list("device/vbd");
+//   cout << "keys: " << keys.size() << endl;
+
+   for (size_t i = 0; i < keys.size(); i++)
+   {
+//      cout << "keys [" << i << "]: " << keys [i] << endl;
+      blocks.push_back(new Block(string("device/vbd/") + keys [i]));
    }
 }

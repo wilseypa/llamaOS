@@ -28,88 +28,21 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#ifndef llamaos_xen_hypervisor_h_
-#define llamaos_xen_hypervisor_h_
+#include <iostream>
+#include <tinyXML-2.6.2/tinyxml.h>
 
-#include <cstdint>
+#include <tinyxml/tinyxml.h>
 
-#include <xen/xen.h>
+using namespace std;
 
-#include <llamaos/xen/Block.h>
-#include <llamaos/xen/Console.h>
-#include <llamaos/xen/Events.h>
-#include <llamaos/xen/Grant_table.h>
-#include <llamaos/xen/Traps.h>
-#include <llamaos/xen/Xenstore.h>
-
-namespace llamaos {
-namespace xen {
-
-/**
- * @brief Hypervisor class.
- *
- */
-class Hypervisor
+int main (int argc, char *argv [])
 {
-public:
-   /**
-    * @brief Allow public access to singleton Hypervisor object.
-    *
-    */
-   static Hypervisor *get_instance ();
+   cout << endl << "hello llamaOS" << endl;
+   cout.flush ();
 
-   /**
-    * @brief Only public constructor (throws if called more than once).
-    *
-    */
-   Hypervisor (const start_info_t *start_info);
+   TiXmlDocument doc ("test.xml");
+   doc.LoadFile();
+   doc.Print ();
 
-   /**
-    * @brief Destructor.
-    *
-    */
-   virtual ~Hypervisor ();
-
-   void initialize ();
-   
-   /**
-    * @brief Xen start_info structure.
-    *
-    */
-   const start_info_t start_info;
-
-   /**
-    * @brief Xen shared_info structure.
-    *
-    */
-   shared_info_t *const shared_info;
-
-   /**
-    * @brief Systme console.
-    *
-    */
-   Console console;
-
-   Traps traps;
-   Events events;
-   Grant_table grant_table;
-   Xenstore xenstore;
-
-   const std::string name;
-   const int domid;
-
-   int argc;
-   char *argv [64];
-
-   std::vector<Block *> blocks;
-
-private:
-   Hypervisor ();
-   Hypervisor (const Hypervisor &);
-   Hypervisor &operator= (const Hypervisor &);
-
-};
-
-} }
-
-#endif  // llamaos_xen_hypervisor_h_
+   return 0;
+}

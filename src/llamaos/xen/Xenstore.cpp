@@ -116,7 +116,7 @@ string Xenstore::read_string (const string &key) const
    return read_response ();
 }
 
-void Xenstore::write (const std::string &key, const std::string &value) const
+void Xenstore::write_string (const std::string &key, const std::string &value) const
 {
    // write request to Xenstore
    write_write_request (key, value);
@@ -192,11 +192,15 @@ void Xenstore::write_write_request (const std::string &key, const std::string &v
    msg.type = XS_WRITE;
    msg.req_id = req_id;
    msg.tx_id = 0;
-   msg.len = key.size () + 1 + value.size () + 1;
+// even though I read this is needed, it isn't?
+// trying it makes weird values like "2\000", "2" without
+//   msg.len = key.size () + 1 + value.size () + 1;
+   msg.len = key.size () + 1 + value.size ();
 
    write_request (reinterpret_cast<const char *>(&msg), sizeof(msg));
    write_request (key.c_str (), key.size () + 1);
-   write_request (value.c_str (), value.size () + 1);
+//   write_request (value.c_str (), value.size () + 1);
+   write_request (value.c_str (), value.size ());
 }
 
 void Xenstore::read_response (char *data, unsigned int length) const
@@ -311,4 +315,62 @@ string Xenstore::read_response () const
    }
 
    return read_response (msg.len);
+}
+
+static vector<string> split (const string &input)
+{
+   vector<string> tokens;
+
+   string::const_iterator first = input.begin ();
+   string::const_iterator mark = input.begin ();
+   string::const_iterator last = input.end ();
+
+   while (first != last)
+   {
+//      if (isspace (*first))
+      if ('\0' == *first)
+      {
+         string token = string (mark, first);
+
+         if (token.length () > 0)
+         {
+            tokens.push_back (token);
+         }
+
+         mark = first + 1;
+      }
+
+      first++;
+   }
+
+   string token = string (mark, first);
+
+   if (token.length () > 0)
+   {
+      tokens.push_back (token);
+   }
+
+   return tokens;
+}
+
+vector<string> Xenstore::list (const string &key) const
+{
+   // write request to Xenstore
+   // write_read_request (key);
+   struct xsd_sockmsg msg;
+
+   msg.type = XS_DIRECTORY;
+   msg.req_id = req_id;
+   msg.tx_id = 0;
+   msg.len = key.size () + 1;
+
+   write_request (reinterpret_cast<const char *>(&msg), sizeof(msg));
+   write_request (key.c_str (), key.size ());
+   write_request ("", 1);
+
+   // alert Xenstore of our message
+   Hypercall::event_channel_send (port);
+
+   // read response from Xenstore
+   return split (read_response ());
 }

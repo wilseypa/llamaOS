@@ -34,21 +34,10 @@
 include common-vars.mk
 include common-flags.mk
 
-MAKEFILE_SOURCES += llamaOS.mk
-
-ASMFLAGS += \
-  -I $(INCDIR) \
-  -I $(SRCDIR) \
-  -include $(SRCDIR)/llamaos/__thread.h \
-  -D__XEN_INTERFACE_VERSION__=0x00030205
-
-CFLAGS += \
-  -I $(INCDIR) \
-  -I $(SRCDIR) \
-  -include $(SRCDIR)/llamaos/__thread.h \
-  -D__XEN_INTERFACE_VERSION__=0x00030205
+MAKEFILE_SOURCES += tinyxml-$(TINYXML_VERSION).mk
 
 CPPFLAGS += \
+  -DTIXML_USE_STL \
   -I $(INCDIR) \
   -I $(SRCDIR) \
   -include $(SRCDIR)/llamaos/__thread.h \
@@ -56,73 +45,31 @@ CPPFLAGS += \
 
 VPATH = $(SRCDIR)
 
-ASM_SOURCES = \
-  llamaos/xen/Entry.S
-
-C_SOURCES = \
-  llamaos/xen/Entry-glibc.c \
-  llamaos/xen/Trace.c
-
 CPP_SOURCES = \
-  llamaos/api/pci/BAR.cpp \
-  llamaos/api/pci/Command.cpp \
-  llamaos/api/pci/PCI.cpp \
-  llamaos/api/pci/Status.cpp \
-  llamaos/memory/Entry.cpp \
-  llamaos/memory/Memory.cpp \
-  llamaos/net/llamaNET.cpp \
-  llamaos/xen/Block.cpp \
-  llamaos/xen/Console.cpp \
-  llamaos/xen/Entry-gcc.cpp \
-  llamaos/xen/Entry-llamaOS.cpp \
-  llamaos/xen/Events.cpp \
-  llamaos/xen/Grant_map.cpp \
-  llamaos/xen/Grant_table.cpp \
-  llamaos/xen/Hypercall.cpp \
-  llamaos/xen/Hypervisor.cpp \
-  llamaos/xen/Memory.cpp \
-  llamaos/xen/PCI.cpp \
-  llamaos/xen/Traps.cpp \
-  llamaos/xen/Xenstore.cpp
+  tinyXML-$(TINYXML_VERSION)/tinyxml.cpp \
+  tinyXML-$(TINYXML_VERSION)/tinyxmlerror.cpp \
+  tinyXML-$(TINYXML_VERSION)/tinyxmlparser.cpp
 
 HEADERS = \
-  $(INCDIR)/llamaos/api/io.h \
-  $(INCDIR)/llamaos/api/sleep.h \
-  $(INCDIR)/llamaos/memory/Memory.h \
-  $(INCDIR)/llamaos/net/llamaNET.h \
-  $(INCDIR)/llamaos/xen/Console.h \
-  $(INCDIR)/llamaos/xen/Events.h \
-  $(INCDIR)/llamaos/xen/Grant_map.h \
-  $(INCDIR)/llamaos/xen/Grant_table.h \
-  $(INCDIR)/llamaos/xen/Hypercall.h \
-  $(INCDIR)/llamaos/xen/Hypervisor.h \
-  $(INCDIR)/llamaos/xen/Traps.h \
-  $(INCDIR)/llamaos/xen/Xenstore.h \
-  $(INCDIR)/llamaos/__thread.h \
-  $(INCDIR)/llamaos/Trace.h
+  $(INCDIR)/tinyxml/tinyxml.h
 
-OBJECTS  = $(ASM_SOURCES:%.S=$(OBJDIR)/%.o)
-OBJECTS += $(C_SOURCES:%.c=$(OBJDIR)/%.o)
-OBJECTS += $(CPP_SOURCES:%.cpp=$(OBJDIR)/%.o)
+OBJECTS  = $(CPP_SOURCES:%.cpp=$(OBJDIR)/%.o)
 DEPENDS += $(OBJECTS:%.o=%.d)
 
 .PHONY: all
-all : $(LIBDIR)/llamaOS.a headers
-# all : $(OBJDIR)/llamaos/xen/Entry.o $(LIBDIR)/xen/llamaOS.a $(HEADERS)
+all : $(LIBDIR)/tinyXML.a headers
 
 .PHONY: headers
 headers : $(HEADERS)
 
-$(LIBDIR)/llamaOS.a: $(OBJECTS)
+$(LIBDIR)/tinyXML.a: $(OBJECTS)
 	@[ -d $(@D) ] || (mkdir -p $(@D))
-#	@echo copying Entry object...
-#	@cp $(OBJDIR)/llamaos/xen/Entry.o $(LIBDIR)/xen/Entry.o
 	@echo linking: $@
 	@$(AR) r $@ $^
 	@echo successfully built: $@
 	@echo
 
-$(INCDIR)/% : $(SRCDIR)/%
+$(INCDIR)/tinyxml/% : $(SRCDIR)/tinyXML-$(TINYXML_VERSION)/%
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo copying: $@ from $<
 	cp $< $@

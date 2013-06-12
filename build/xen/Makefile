@@ -47,6 +47,7 @@ all:
 	@$(MAKE) -f stdc++-$(GCC_VERSION).mk
 	@$(MAKE) -f gfortran-$(GCC_VERSION).mk
 	@$(MAKE) -f gcc-$(GCC_VERSION).mk
+	@$(MAKE) -f tinyxml-$(TINYXML_VERSION).mk
 	@$(MAKE) -f xen-$(XEN_VERSION).mk
 	@$(MAKE) -f llamaOS.mk
 	@$(MAKE) -f llamaMPI.mk
@@ -64,6 +65,7 @@ all:
 	@$(MAKE) -f apps/netpipe-3.7.2-mpi.mk
 	@$(MAKE) -f apps/testMPI-llamaMPI.mk
 	@$(MAKE) -f apps/testMPIF-llamaMPI.mk
+	@$(MAKE) -f apps/tinyxml.mk
 #	@$(MAKE) -f apps/warped-llamaMPI.mk
 	@$(MAKE) -f net/i82574.mk
 	@$(MAKE) -f net/lspci.mk

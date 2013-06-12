@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012, William Magato
+Copyright (c) 2013, William Magato
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,88 +28,57 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#ifndef llamaos_xen_hypervisor_h_
-#define llamaos_xen_hypervisor_h_
+#ifndef llamaos_xen_block_h_
+#define llamaos_xen_block_h_
 
 #include <cstdint>
+#include <cstring>
+#include <sstream>
+#include <string>
 
 #include <xen/xen.h>
+#include <xen/event_channel.h>
 
-#include <llamaos/xen/Block.h>
-#include <llamaos/xen/Console.h>
-#include <llamaos/xen/Events.h>
-#include <llamaos/xen/Grant_table.h>
-#include <llamaos/xen/Traps.h>
-#include <llamaos/xen/Xenstore.h>
+#include <xen/io/blkif.h>
+#include <xen/io/console.h>
 
 namespace llamaos {
 namespace xen {
 
-/**
- * @brief Hypervisor class.
- *
- */
-class Hypervisor
+class Block
 {
 public:
-   /**
-    * @brief Allow public access to singleton Hypervisor object.
-    *
-    */
-   static Hypervisor *get_instance ();
+   Block (const std::string &key);
+   virtual ~Block ();
 
-   /**
-    * @brief Only public constructor (throws if called more than once).
-    *
-    */
-   Hypervisor (const start_info_t *start_info);
+   ssize_t read (void *buf, size_t nbytes);
+   off64_t lseek64 (off64_t offset, int whence);
 
-   /**
-    * @brief Destructor.
-    *
-    */
-   virtual ~Hypervisor ();
+   const std::string frontend_key;
 
-   void initialize ();
-   
-   /**
-    * @brief Xen start_info structure.
-    *
-    */
-   const start_info_t start_info;
-
-   /**
-    * @brief Xen shared_info structure.
-    *
-    */
-   shared_info_t *const shared_info;
-
-   /**
-    * @brief Systme console.
-    *
-    */
-   Console console;
-
-   Traps traps;
-   Events events;
-   Grant_table grant_table;
-   Xenstore xenstore;
-
-   const std::string name;
-   const int domid;
-
-   int argc;
-   char *argv [64];
-
-   std::vector<Block *> blocks;
+   std::string get_name () const { return name; }
+   std::string get_dev () const { return dev; }
+   unsigned int get_size () const { return size; }
 
 private:
-   Hypervisor ();
-   Hypervisor (const Hypervisor &);
-   Hypervisor &operator= (const Hypervisor &);
+   Block ();
+   Block (const Block &);
+   Block &operator= (const Block &);
+
+   blkif_sring_t *const shared;
+
+   evtchn_port_t port;
+
+   std::string name;
+   std::string dev;
+   unsigned int size;
+
+   unsigned int position;
+
+   std::string data;
 
 };
 
 } }
 
-#endif  // llamaos_xen_hypervisor_h_
+#endif  // llamaos_xen_block_h_

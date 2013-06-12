@@ -176,6 +176,18 @@ static int glibc_libc_open (const char *file, int oflag)
    {
       return 10;
    }
+   else
+   {
+      Hypervisor *hypervisor = Hypervisor::get_instance ();
+
+      for (size_t i = 0; i < hypervisor->blocks.size (); i++)
+      {
+         if (strcmp (file, hypervisor->blocks [i]->get_name ().c_str ()) == 0)
+         {
+            return 100 + i;
+         }
+      }
+   }
 
 //   trace("!!! ALERT: glibc calling libc_open() before file system support is enabled.\n");
    trace (" opening file %s, %x\n", file, oflag);
@@ -193,11 +205,39 @@ static int glibc_close (int fd)
       cout << "np.out:" << endl;
       cout << np_out.str() << endl;
    }
+   else
+   {
+      Hypervisor *hypervisor = Hypervisor::get_instance ();
+
+      for (size_t i = 0; i < hypervisor->blocks.size (); i++)
+      {
+         if (fd == static_cast<int>(100 + i))
+         {
+            // special close?
+            break;
+         }
+      }
+   }
 
    return 0;
 }
 
-static ssize_t glibc_libc_write (int fd, const void *buf, size_t nbytes)
+static ssize_t glibc_read (int fd, void *buf, size_t nbytes)
+{
+   Hypervisor *hypervisor = Hypervisor::get_instance ();
+
+   for (size_t i = 0; i < hypervisor->blocks.size (); i++)
+   {
+      if (fd == static_cast<int>(100 + i))
+      {
+         return hypervisor->blocks [i]->read (buf, nbytes);
+      }
+   }
+
+   return -1;
+}
+
+static ssize_t glibc_write (int fd, const void *buf, size_t nbytes)
 {
    if (   (stdout->_fileno != fd)
        && (stderr->_fileno != fd)
@@ -222,6 +262,35 @@ static ssize_t glibc_libc_write (int fd, const void *buf, size_t nbytes)
    return nbytes;
 }
 
+static off_t glibc_lseek (int fd, off_t offset, int whence)
+{
+   if (fd == 6)
+   {
+      return offset;
+   }
+
+   trace("!!! ALERT: glibc calling lseek() before file system support is enabled.\n");
+   trace ("   fd: %d, offset: %d, whence: %d\n", fd, offset, whence);
+   return -1;
+}
+
+static off64_t glibc_lseek64 (int fd, off64_t offset, int whence)
+{
+   Hypervisor *hypervisor = Hypervisor::get_instance ();
+
+   for (size_t i = 0; i < hypervisor->blocks.size (); i++)
+   {
+      if (fd == static_cast<int>(100 + i))
+      {
+         return hypervisor->blocks [i]->lseek64 (offset, whence);
+      }
+   }
+
+   cout << "lseek64 " << fd << endl;
+   trace("!!! ALERT: glibc calling lseek64() before file system support is enabled.\n");
+   return -1;
+}
+
 static void register_glibc_exports (void)
 {
    register_llamaos_gethostname (glibc_gethostname);
@@ -230,7 +299,10 @@ static void register_glibc_exports (void)
    register_llamaos_sleep (glibc_libc_sleep);
    register_llamaos_close (glibc_close);
    register_llamaos_libc_open (glibc_libc_open);
-   register_llamaos_write (glibc_libc_write);
+   register_llamaos_read (glibc_read);
+   register_llamaos_write (glibc_write);
+   register_llamaos_lseek (glibc_lseek);
+   register_llamaos_lseek64 (glibc_lseek64);
 }
 
 static vector<string> split (const string &input)

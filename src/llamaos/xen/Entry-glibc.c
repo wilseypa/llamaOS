@@ -247,11 +247,6 @@ static int glibc_libc_open (const char *file, int oflag)
 
 static off_t glibc_lseek (int fd, off_t offset, int whence)
 {
-   if (fd == 6)
-   {
-      return offset;
-   }
-
    trace("!!! ALERT: glibc calling lseek() before file system support is enabled.\n");
    trace ("   fd: %d, offset: %d, whence: %d\n", fd, offset, whence);
    return -1;

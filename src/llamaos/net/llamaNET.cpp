@@ -201,7 +201,7 @@ llamaNET::Protocol_header **llamaNET::recvv (uint32_t node, uint32_t &count)
 //      cout << "tx_tail is " << tx_tail << endl;
 //   }
 
-   uint32_t _count = count;
+//   uint32_t _count = count;
    count = 0;
 
    // find the first one (if exists) while moving tails along
@@ -409,6 +409,7 @@ llamaNET::Protocol_header *llamaNET::get_send_buffer (uint32_t node)
    return tx_buffers [control->app [index].tx_index]->get_pointer ();
 }
 
+#ifdef HARD_CODED_MACS
 static void hardcoded_macs (llamaNET::Protocol_header *header)
 {
    // !BAM get these in a config soon
@@ -552,6 +553,7 @@ static void hardcoded_macs (llamaNET::Protocol_header *header)
    }
 #endif
 }
+#endif
 
 void llamaNET::send (Protocol_header *header)
 {
