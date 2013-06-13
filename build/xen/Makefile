@@ -68,6 +68,7 @@ all:
 	@$(MAKE) -f apps/tinyxml.mk
 #	@$(MAKE) -f apps/warped-llamaMPI.mk
 	@$(MAKE) -f apps/llamaWARPED.mk
+	@$(MAKE) -f apps/WARPED/phold-llamaWARPED.mk
 	@$(MAKE) -f net/i82574.mk
 	@$(MAKE) -f net/lspci.mk
 	@$(MAKE) -f tests/empty.mk
