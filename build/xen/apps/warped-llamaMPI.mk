@@ -36,9 +36,10 @@ include common-flags.mk
 
 MAKEFILE_SOURCES += apps/warped-llamaMPI.mk
 
-WARPED_PATH = /home/jgideon/pdes/warped/src
-WARPED_RND_PATH = /home/jgideon/pdes/warped/simulationmodels/rnd
-WARPED_UTILS_PATH = /home/jgideon/pdes/utils/src
+WARPED_PATH = /home/gideonjn/pdes/warped/src
+WARPED_RND_PATH = /home/gideonjn/pdes/warped/simulationmodels/rnd
+WARPED_UTILS_PATH = /home/gideonjn/pdes/utils/src
+PCCTS_PATH = /home/gideonjn/pccts/h
 
 CPPFLAGS += \
   -I $(INCDIR) \
@@ -48,9 +49,12 @@ CPPFLAGS += \
   -I $(WARPED_PATH) \
   -I $(WARPED_RND_PATH) \
   -I $(WARPED_UTILS_PATH) \
+  -I $(WARPED_PATH)/warped \
+  -I $(PCCTS_PATH) \
   -I ../src/apps/WARPED \
   -D__XEN_INTERFACE_VERSION__=0x00030205 \
-  -include $(SRCDIR)/llamaos/__thread.h
+  -include $(SRCDIR)/llamaos/__thread.h \
+  -Wno-reorder
 
 VPATH = $(SRCDIR)
 
@@ -58,9 +62,6 @@ CPP_SOURCES = \
    $(WARPED_PATH)/warped/AdaptiveOutputManager.cpp \
    $(WARPED_PATH)/warped/AdaptiveStateManagerBase.cpp \
    $(WARPED_PATH)/warped/AggressiveOutputManager.cpp \
-   $(WARPED_PATH)/warped/Application.cpp \
-   $(WARPED_PATH)/warped/builtin.cpp \
-   $(WARPED_PATH)/warped/CentralizedEventSetSchedulingImplementationBase.cpp \
    $(WARPED_PATH)/warped/CentralizedEventSetSchedulingManager.cpp \
    $(WARPED_PATH)/warped/ChebyFossilCollManager.cpp \
    $(WARPED_PATH)/warped/CirculateInitializationMessage.cpp \
@@ -86,6 +87,12 @@ CPP_SOURCES = \
    $(WARPED_PATH)/warped/DistributedDVFSManager.cpp \
    $(WARPED_PATH)/warped/DVFSManagerFactory.cpp \
    $(WARPED_PATH)/warped/DVFSManagerImplementationBase.cpp \
+   $(WARPED_PATH)/warped/eclmplConfigFileTable.cpp \
+   $(WARPED_PATH)/warped/eclmplConnectionInterface.cpp \
+   $(WARPED_PATH)/warped/eclmplConnectionInterfaceImplementationBase.cpp \
+   $(WARPED_PATH)/warped/eclmplPhysicalCommunicationLayer.cpp \
+   $(WARPED_PATH)/warped/eclmplReliablePhysicalCommunicationLayer.cpp \
+   $(WARPED_PATH)/warped/eclmplTimer.cpp \
    $(WARPED_PATH)/warped/Event.cpp \
    $(WARPED_PATH)/warped/EventMessage.cpp \
    $(WARPED_PATH)/warped/EventMessageBase.cpp \
@@ -107,9 +114,12 @@ CPP_SOURCES = \
    $(WARPED_PATH)/warped/MatternGVTManager.cpp \
    $(WARPED_PATH)/warped/MatternGVTMessage.cpp \
    $(WARPED_PATH)/warped/MessageManager.cpp \
+   $(WARPED_PATH)/warped/MPIMessage.cpp \
+   $(WARPED_PATH)/warped/MPIPhysicalCommunicationLayer.cpp \
    $(WARPED_PATH)/warped/MsgAggregatingCommunicationManager.cpp \
    $(WARPED_PATH)/warped/NegativeEvent.cpp \
    $(WARPED_PATH)/warped/NegativeEventMessage.cpp \
+   $(WARPED_PATH)/warped/NetworkMessage.cpp \
    $(WARPED_PATH)/warped/ObjectStub.cpp \
    $(WARPED_PATH)/warped/OptFossilCollManager.cpp \
    $(WARPED_PATH)/warped/OptFossilCollManagerFactory.cpp \
@@ -119,7 +129,6 @@ CPP_SOURCES = \
    $(WARPED_PATH)/warped/Partitioner.cpp \
    $(WARPED_PATH)/warped/PartitionInfo.cpp \
    $(WARPED_PATH)/warped/PeriodicStateManager.cpp \
-   $(WARPED_PATH)/warped/Random.cpp \
    $(WARPED_PATH)/warped/RestoreCkptMessage.cpp \
    $(WARPED_PATH)/warped/RoundRobinPartitioner.cpp \
    $(WARPED_PATH)/warped/SchedulingManagerFactory.cpp \
@@ -140,6 +149,7 @@ CPP_SOURCES = \
    $(WARPED_PATH)/warped/SingleLinkedList.cpp \
    $(WARPED_PATH)/warped/SinkObject.cpp \
    $(WARPED_PATH)/warped/Socket.cpp \
+   $(WARPED_PATH)/warped/SocketBasedConnectionInterface.cpp \
    $(WARPED_PATH)/warped/SourceObject.cpp \
    $(WARPED_PATH)/warped/Spinner.cpp \
    $(WARPED_PATH)/warped/SplayTree.cpp \
@@ -149,6 +159,8 @@ CPP_SOURCES = \
    $(WARPED_PATH)/warped/StateManagerImplementationBase.cpp \
    $(WARPED_PATH)/warped/StopWatch.cpp \
    $(WARPED_PATH)/warped/StragglerEvent.cpp \
+   $(WARPED_PATH)/warped/TCPConnectionInterface.cpp \
+   $(WARPED_PATH)/warped/TCPSelectPhysicalCommunicationLayer.cpp \
    $(WARPED_PATH)/warped/TerminateToken.cpp \
    $(WARPED_PATH)/warped/ThreadedAggressiveOutputManager.cpp \
    $(WARPED_PATH)/warped/ThreadedChebyFossilCollManager.cpp \
@@ -167,7 +179,6 @@ CPP_SOURCES = \
    $(WARPED_PATH)/warped/ThreadedTimeWarpMultiSetLTSF.cpp \
    $(WARPED_PATH)/warped/ThreadedTimeWarpMultiSetSchedulingManager.cpp \
    $(WARPED_PATH)/warped/ThreadedTimeWarpSimulationManager.cpp \
-   $(WARPED_PATH)/warped/TimeWarpAppendQueue.cpp \
    $(WARPED_PATH)/warped/TimeWarpCentralizedEventSetFactory.cpp \
    $(WARPED_PATH)/warped/TimeWarpConfigurationManager.cpp \
    $(WARPED_PATH)/warped/TimeWarpDecentralizedEventSetFactory.cpp \
@@ -176,7 +187,6 @@ CPP_SOURCES = \
    $(WARPED_PATH)/warped/TimeWarpMultiSet.cpp \
    $(WARPED_PATH)/warped/TimeWarpMultiSetOneAntiMsg.cpp \
    $(WARPED_PATH)/warped/TimeWarpMultiSetSchedulingManager.cpp \
-   $(WARPED_PATH)/warped/TimeWarpReceiverQueue.cpp \
    $(WARPED_PATH)/warped/TimeWarpSenderQueue.cpp \
    $(WARPED_PATH)/warped/TimeWarpSimulationManager.cpp \
    $(WARPED_PATH)/warped/TimeWarpSimulationManagerFactory.cpp \
@@ -185,11 +195,23 @@ CPP_SOURCES = \
    $(WARPED_PATH)/warped/TimeWarpSimulationStream.cpp \
    $(WARPED_PATH)/warped/TokenPassingTerminationManager.cpp \
    $(WARPED_PATH)/warped/Transceiver.cpp \
+   $(WARPED_PATH)/warped/UDPConnectionInterface.cpp \
+   $(WARPED_PATH)/warped/UDPSelectPhysicalCommunicationLayer.cpp \
    $(WARPED_PATH)/warped/UsefulWorkMessage.cpp \
    $(WARPED_PATH)/warped/VTime.cpp \
    $(WARPED_PATH)/warped/warped.cpp \
    $(WARPED_PATH)/warped/WarpedMain.cpp \
-   $(WARPED_UTILS_PATH)/utils/Debug.cpp
+   $(PCCTS_PATH)/AParser.cpp \
+   $(PCCTS_PATH)/ASTBase.cpp \
+   $(PCCTS_PATH)/ATokenBuffer.cpp \
+   $(PCCTS_PATH)/BufFileInput.cpp \
+   $(PCCTS_PATH)/DLexerBase.cpp \
+   $(PCCTS_PATH)/PCCTSAST.cpp \
+   $(PCCTS_PATH)/slist.cpp \
+   $(WARPED_UTILS_PATH)/utils/Debug.cpp 
+   
+CFLAGS += \
+  -I $(INCDIR)
    
 CC_SOURCES = \
    $(WARPED_RND_PATH)/Binomial.cc \
@@ -202,7 +224,9 @@ CC_SOURCES = \
    $(WARPED_RND_PATH)/Poisson.cc \
    $(WARPED_RND_PATH)/Random.cc \
    $(WARPED_RND_PATH)/RNG.cc \
-   $(WARPED_RND_PATH)/Uniform.cc
+   $(WARPED_RND_PATH)/Uniform.cc \
+   $(PCCTS_PATH)/ast.cc \
+   $(PCCTS_PATH)/charptr.cc
 
 OBJECTS = $(CPP_SOURCES:%.cpp=$(OBJDIR)/%.o)
 OBJECTS += $(CC_SOURCES:%.cc=$(OBJDIR)/%.o)

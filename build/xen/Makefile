@@ -66,7 +66,7 @@ all:
 	@$(MAKE) -f apps/testMPI-llamaMPI.mk
 	@$(MAKE) -f apps/testMPIF-llamaMPI.mk
 	@$(MAKE) -f apps/tinyxml.mk
-#	@$(MAKE) -f apps/warped-llamaMPI.mk
+	@$(MAKE) -f apps/warped-llamaMPI.mk
 	@$(MAKE) -f net/i82574.mk
 	@$(MAKE) -f net/lspci.mk
 	@$(MAKE) -f tests/empty.mk
