@@ -34,7 +34,7 @@
 include common-vars.mk
 include common-flags.mk
 
-MAKEFILE_SOURCES += apps/warped-llamaMPI.mk
+MAKEFILE_SOURCES += apps/llamaWARPED.mk
 
 WARPED_PATH = /home/gideonjn/pdes/warped/src
 WARPED_RND_PATH = /home/gideonjn/pdes/warped/simulationmodels/rnd
@@ -211,11 +211,16 @@ OBJECTS = $(CPP_SOURCES:%.cpp=$(OBJDIR)/%.o)
 OBJECTS += $(CC_SOURCES:%.cc=$(OBJDIR)/%.o)
 DEPENDS = $(OBJECTS:%.o=%.d)
 
-$(BINDIR)/warped-llamaMPI: $(OBJECTS) $(LIBDIR)/llamaMPI.a $(LIBDIR)/llamaOS.a $(LIBDIR)/stdc++.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
+.PHONY: all
+all : $(LIBDIR)/llamaWARPED.a headers
+
+.PHONY: headers
+headers : $(HEADERS)
+
+$(LIBDIR)/llamaWARPED.a: $(OBJECTS)
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
-	@$(LD) $(LDFLAGS) -T llamaOS.lds -o $@ $^
-	@gzip -c -f --best $@ >$@.gz
+	@$(AR) r $@ $^
 	@echo successfully built: $@
 	@echo
 
