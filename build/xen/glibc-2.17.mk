@@ -1386,6 +1386,7 @@ C_SOURCES = \
 #  glibc-$(GLIBC_VERSION)/time/time.c
 
 HEADERS = \
+  $(INCDIR)/arpa/inet.h \
   $(INCDIR)/bits/byteswap.h \
   $(INCDIR)/bits/byteswap-16.h \
   $(INCDIR)/bits/cmathcalls.h \
@@ -1398,6 +1399,7 @@ HEADERS = \
   $(INCDIR)/bits/huge_val.h \
   $(INCDIR)/bits/huge_valf.h \
   $(INCDIR)/bits/huge_vall.h \
+  $(INCDIR)/bits/in.h \
   $(INCDIR)/bits/inf.h \
   $(INCDIR)/bits/ioctl-types.h \
   $(INCDIR)/bits/ioctls.h \
@@ -1424,6 +1426,8 @@ HEADERS = \
   $(INCDIR)/bits/sigset.h \
   $(INCDIR)/bits/sigstack.h \
   $(INCDIR)/bits/sigthread.h \
+  $(INCDIR)/bits/sockaddr.h \
+  $(INCDIR)/bits/socket.h \
   $(INCDIR)/bits/stat.h \
   $(INCDIR)/bits/stdio.h \
   $(INCDIR)/bits/stdio2.h \
@@ -1446,6 +1450,8 @@ HEADERS = \
   $(INCDIR)/bits/wchar2.h \
   $(INCDIR)/bits/wordsize.h \
   $(INCDIR)/gnu/stubs.h \
+  $(INCDIR)/netinet/in.h \
+  $(INCDIR)/netinet/tcp.h \
   $(INCDIR)/sys/cdefs.h \
   $(INCDIR)/sys/ioctl.h \
   $(INCDIR)/sys/mman.h \
@@ -1453,6 +1459,7 @@ HEADERS = \
   $(INCDIR)/sys/poll.h \
   $(INCDIR)/sys/resource.h \
   $(INCDIR)/sys/select.h \
+  $(INCDIR)/sys/socket.h \
   $(INCDIR)/sys/stat.h \
   $(INCDIR)/sys/syscall.h \
   $(INCDIR)/sys/sysinfo.h \
@@ -1487,6 +1494,7 @@ HEADERS = \
   $(INCDIR)/locale.h \
   $(INCDIR)/malloc.h \
   $(INCDIR)/math.h \
+  $(INCDIR)/netdb.h \
   $(INCDIR)/nl_types.h \
   $(INCDIR)/poll.h \
   $(INCDIR)/pthread.h \
@@ -1592,6 +1600,11 @@ $(INCDIR)/% : $(SRCDIR)/glibc-$(GLIBC_VERSION)/ctype/%
 	@echo copying: $@ from $<
 	cp $< $@
 
+$(INCDIR)/% : $(SRCDIR)/glibc-$(GLIBC_VERSION)/inet/%
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo copying: $@ from $<
+	cp $< $@
+
 $(INCDIR)/% : $(SRCDIR)/glibc-$(GLIBC_VERSION)/intl/%
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo copying: $@ from $<
@@ -1643,6 +1656,11 @@ $(INCDIR)/% : $(SRCDIR)/glibc-$(GLIBC_VERSION)/resource/%
 	cp $< $@
 
 $(INCDIR)/% : $(SRCDIR)/glibc-$(GLIBC_VERSION)/signal/%
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo copying: $@ from $<
+	cp $< $@
+
+$(INCDIR)/% : $(SRCDIR)/glibc-$(GLIBC_VERSION)/socket/%
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo copying: $@ from $<
 	cp $< $@
