@@ -1500,6 +1500,7 @@ HEADERS = \
   $(INCDIR)/pthread.h \
   $(INCDIR)/pwd.h \
   $(INCDIR)/sched.h \
+  $(INCDIR)/setjmp.h \
   $(INCDIR)/signal.h \
   $(INCDIR)/stdalign.h \
   $(INCDIR)/stdarg.h \
@@ -1651,6 +1652,11 @@ $(INCDIR)/% : $(SRCDIR)/glibc-$(GLIBC_VERSION)/pwd/%
 	cp $< $@
 
 $(INCDIR)/% : $(SRCDIR)/glibc-$(GLIBC_VERSION)/resource/%
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo copying: $@ from $<
+	cp $< $@
+
+$(INCDIR)/% : $(SRCDIR)/glibc-$(GLIBC_VERSION)/setjmp/%
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo copying: $@ from $<
 	cp $< $@

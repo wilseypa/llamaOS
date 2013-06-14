@@ -20,7 +20,7 @@
 #define HAVE_MEMORY_H 1
 
 /* Defines whether sched_getcpu function exists */
-#define HAVE_SCHED_GETCPU 1
+/* #define HAVE_SCHED_GETCPU 1 */
 
 /* Define to 1 if you have the <stdint.h> header file. */
 #define HAVE_STDINT_H 1
@@ -41,7 +41,7 @@
 #define HAVE_SYS_TYPES_H 1
 
 /* Define to 1 if you have the <tr1/unordered_map> header file. */
-#define HAVE_TR1_UNORDERED_MAP 1
+/* #define HAVE_TR1_UNORDERED_MAP 1 */
 
 /* Define to 1 if you have the <unistd.h> header file. */
 #define HAVE_UNISTD_H 1
