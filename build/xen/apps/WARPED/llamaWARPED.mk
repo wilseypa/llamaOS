@@ -34,7 +34,7 @@
 include common-vars.mk
 include common-flags.mk
 
-MAKEFILE_SOURCES += apps/llamaWARPED.mk
+MAKEFILE_SOURCES += apps/WARPED/llamaWARPED.mk
 
 WARPED_PATH = $(PDES_ROOT_PATH)/warped/src
 WARPED_RND_PATH = $(PDES_ROOT_PATH)/warped/simulationmodels/rnd

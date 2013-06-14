@@ -67,7 +67,7 @@ CPP_SOURCES = \
 OBJECTS = $(CPP_SOURCES:%.cpp=$(OBJDIR)/%.o)
 DEPENDS = $(OBJECTS:%.o=%.d)
 
-$(BINDIR)/phold-llamaWARPED: $(OBJECTS) $(LIBDIR)/llamaWARPED.a $(LIBDIR)/llamaMPI.a $(LIBDIR)/llamaOS.a $(LIBDIR)/stdc++.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
+$(BINDIR)/WARPED/phold-llamaWARPED: $(OBJECTS) $(LIBDIR)/llamaWARPED.a $(LIBDIR)/llamaMPI.a $(LIBDIR)/llamaOS.a $(LIBDIR)/stdc++.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
 	@$(LD) $(LDFLAGS) -T llamaOS.lds -o $@ $^
