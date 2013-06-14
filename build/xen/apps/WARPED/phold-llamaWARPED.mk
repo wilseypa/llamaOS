@@ -36,9 +36,9 @@ include common-flags.mk
 
 MAKEFILE_SOURCES += apps/WARPED/phold-llamaWARPED.mk
 
-WARPED_PATH = /home/gideonjn/pdes/warped/src
-WARPED_UTILS_PATH = /home/gideonjn/pdes/utils/src
-PHOLD_PATH = /home/gideonjn/pdes/warped/simulationmodels/phold/factory/src
+WARPED_PATH = $(PDES_ROOT_PATH)/warped/src
+WARPED_UTILS_PATH = $(PDES_ROOT_PATH)/utils/src
+PHOLD_PATH = $(PDES_ROOT_PATH)/warped/simulationmodels/phold/factory/src
 
 CPPFLAGS += \
   -I $(INCDIR) \
@@ -67,7 +67,7 @@ CPP_SOURCES = \
 OBJECTS = $(CPP_SOURCES:%.cpp=$(OBJDIR)/%.o)
 DEPENDS = $(OBJECTS:%.o=%.d)
 
-$(BINDIR)/phold-llamaWARPED: $(OBJECTS) $(LIBDIR)/llamaWARPED.a $(LIBDIR)/llamaMPI.a $(LIBDIR)/llamaOS.a $(LIBDIR)/stdc++.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
+$(BINDIR)/WARPED/phold-llamaWARPED: $(OBJECTS) $(LIBDIR)/llamaWARPED.a $(LIBDIR)/llamaMPI.a $(LIBDIR)/llamaOS.a $(LIBDIR)/stdc++.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
 	@$(LD) $(LDFLAGS) -T llamaOS.lds -o $@ $^
