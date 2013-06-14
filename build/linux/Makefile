@@ -40,9 +40,9 @@ all:
 	@$(MAKE) -f apps/latency-TCPIP.mk
 	@$(MAKE) -f apps/netpipe-$(NETPIPE_VERSION)-memcpy.mk
 	@$(MAKE) -f apps/netpipe-$(NETPIPE_VERSION)-tcp.mk
-#	@-command -v $(MPICC) >/dev/null && ($(MAKE) -f apps/IMB.mk)
-#	@-command -v $(MPICC) >/dev/null && ($(MAKE) -f apps/latency-MPI.mk)
-#	@-command -v $(MPICC) >/dev/null && ($(MAKE) -f apps/netpipe-$(NETPIPE_VERSION)-mpi.mk)
+	@-command -v $(MPICC) >/dev/null && ($(MAKE) -f apps/IMB.mk)
+	@-command -v $(MPICC) >/dev/null && ($(MAKE) -f apps/latency-MPI.mk)
+	@-command -v $(MPICC) >/dev/null && ($(MAKE) -f apps/netpipe-$(NETPIPE_VERSION)-mpi.mk)
 
 .PHONY: install
 install:

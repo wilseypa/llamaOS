@@ -36,10 +36,10 @@ include common-flags.mk
 
 MAKEFILE_SOURCES += apps/llamaWARPED.mk
 
-WARPED_PATH = /home/gideonjn/pdes/warped/src
-WARPED_RND_PATH = /home/gideonjn/pdes/warped/simulationmodels/rnd
-WARPED_UTILS_PATH = /home/gideonjn/pdes/utils/src
-PCCTS_PATH = /home/gideonjn/pccts/h
+WARPED_PATH = $(PDES_ROOT_PATH)/warped/src
+WARPED_RND_PATH = $(PDES_ROOT_PATH)/warped/simulationmodels/rnd
+WARPED_UTILS_PATH = $(PDES_ROOT_PATH)/utils/src
+PCCTS_PATH = $(PCCTS_ROOT_PATH)/h
 
 CPPFLAGS += \
   -I $(INCDIR) \
