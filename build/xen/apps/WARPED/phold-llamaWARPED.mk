@@ -36,33 +36,49 @@ include common-flags.mk
 
 MAKEFILE_SOURCES += apps/WARPED/phold-llamaWARPED.mk
 
+# WARPED_PATH = $(PDES_ROOT_PATH)/warped/src
+# WARPED_UTILS_PATH = $(PDES_ROOT_PATH)/utils/src
+# PHOLD_PATH = $(PDES_ROOT_PATH)/warped/simulationmodels/phold/factory/src
+
+# CPPFLAGS += \
+#   -I $(INCDIR) \
+#   -I $(SRCDIR) \
+#   -I $(SRCDIR)/llamaos/mpi \
+#   -I ../src/apps \
+#   -I $(WARPED_PATH) \
+#   -I $(WARPED_PATH)/warped \
+#   -I $(WARPED_UTILS_PATH) \
+#   -I ../src/apps/WARPED \
+#   -I $(PHOLD_PATH) \
+#   -D__XEN_INTERFACE_VERSION__=0x00030205 \
+#   -include $(SRCDIR)/llamaos/__thread.h
+
 WARPED_PATH = $(PDES_ROOT_PATH)/warped/src
 WARPED_UTILS_PATH = $(PDES_ROOT_PATH)/utils/src
 PHOLD_PATH = $(PDES_ROOT_PATH)/warped/simulationmodels/phold/factory/src
 
 CPPFLAGS += \
   -I $(INCDIR) \
-  -I $(SRCDIR) \
-  -I $(SRCDIR)/llamaos/mpi \
-  -I ../src/apps \
+  -I $(INCDIR)/llamaos/mpi \
   -I $(WARPED_PATH) \
   -I $(WARPED_PATH)/warped \
   -I $(WARPED_UTILS_PATH) \
-  -I ../src/apps/WARPED \
+  -I $(PCCTS_ROOT_PATH)/h \
   -I $(PHOLD_PATH) \
   -D__XEN_INTERFACE_VERSION__=0x00030205 \
-  -include $(SRCDIR)/llamaos/__thread.h
+  -include $(SRCDIR)/llamaos/__thread.h \
+  -Wno-reorder
 
-VPATH = $(SRCDIR)
+VPATH = $(PDES_ROOT_PATH)
 
 CPP_SOURCES = \
-   $(PHOLD_PATH)/PHOLDApplication.cpp \
-   $(PHOLD_PATH)/PHOLDEvent.cpp \
-   $(PHOLD_PATH)/PHOLDFactoryManager.cpp \
-   $(PHOLD_PATH)/PHOLDMain.cpp \
-   $(PHOLD_PATH)/Process.cpp \
-   $(PHOLD_PATH)/ProcessState.cpp \
-   $(PHOLD_PATH)/ProcessStub.cpp
+   warped/simulationmodels/phold/factory/src/PHOLDApplication.cpp \
+   warped/simulationmodels/phold/factory/src/PHOLDEvent.cpp \
+   warped/simulationmodels/phold/factory/src/PHOLDFactoryManager.cpp \
+   warped/simulationmodels/phold/factory/src/PHOLDMain.cpp \
+   warped/simulationmodels/phold/factory/src/Process.cpp \
+   warped/simulationmodels/phold/factory/src/ProcessState.cpp \
+   warped/simulationmodels/phold/factory/src/ProcessStub.cpp
 
 OBJECTS = $(CPP_SOURCES:%.cpp=$(OBJDIR)/%.o)
 DEPENDS = $(OBJECTS:%.o=%.d)

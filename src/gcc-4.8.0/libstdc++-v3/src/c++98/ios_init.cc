@@ -93,10 +93,12 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
 	new (&cerr) ostream(&buf_cerr_sync);
 	new (&clog) ostream(&buf_cerr_sync);
 	cin.tie(&cout);
-	cerr.setf(ios_base::unitbuf);
+
+// !BAM
+//        cerr.setf(ios_base::unitbuf);
 	// _GLIBCXX_RESOLVE_LIB_DEFECTS
 	// 455. cerr::tie() and wcerr::tie() are overspecified.
-	cerr.tie(&cout);
+//	cerr.tie(&cout);
 
 #ifdef _GLIBCXX_USE_WCHAR_T
 	new (&buf_wcout_sync) stdio_sync_filebuf<wchar_t>(stdout);

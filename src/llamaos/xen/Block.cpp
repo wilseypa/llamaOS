@@ -101,6 +101,9 @@ Block::Block (const string &key)
    unsigned int sectors = xenstore.read<unsigned int>(backend_key + "/sectors");
    blkif_vdev_t vdev = xenstore.read<blkif_vdev_t>(frontend_key + "/virtual-device");
 
+   cout << "sector size: " << sector_size << endl;
+   cout << "sectors: " << sectors << endl;
+
    // files less than sector_size have zero sectors?
    size = sectors * sector_size;
 
@@ -111,51 +114,59 @@ Block::Block (const string &key)
    ref = Hypervisor::get_instance ()->grant_table.grant_access (backend_id, buffer);
 //   cout << "grant ref: " << ref << endl;
 
-   blkif_request_t *request = RING_GET_REQUEST(&_private, _private.req_prod_pvt++);
-   request->operation = BLKIF_OP_READ;
-   request->handle = vdev;
-   request->id = 0;
-   request->nr_segments = sectors;
-   request->sector_number = 0;
-   request->seg [0].gref = ref;
-   request->seg [0].first_sect = 0;
-   request->seg [0].last_sect = 0;
-
-   RING_PUSH_REQUESTS(&_private);
-   Hypercall::event_channel_send (port);
-
-   api::sleep (2);
-
-   blkif_response_t *response = RING_GET_RESPONSE(&_private, _private.rsp_cons++);
-//   cout << "response->id: " << response->id << endl;
-//   cout << "response->status: " << response->status << endl;
-
    stringstream ss;
 
-   if (response->status == BLKIF_RSP_OKAY)
+   // read them 1 sector at a time for now?
+   for (unsigned int i = 0; i < sectors; i++)
    {
-      for (unsigned int i = 0; i < PAGE_SIZE; i++)
+      blkif_request_t *request = RING_GET_REQUEST(&_private, _private.req_prod_pvt++);
+      request->operation = BLKIF_OP_READ;
+      request->handle = vdev;
+      request->id = 0;
+      request->nr_segments = 1;//sectors;
+      request->sector_number = i;//0;
+      request->seg [0].gref = ref;
+      request->seg [0].first_sect = 0;
+      request->seg [0].last_sect = 0;
+
+      RING_PUSH_REQUESTS(&_private);
+      Hypercall::event_channel_send (port);
+
+      api::sleep (2);
+
+      blkif_response_t *response = RING_GET_RESPONSE(&_private, _private.rsp_cons++);
+   //   cout << "response->id: " << response->id << endl;
+   //   cout << "response->status: " << response->status << endl;
+
+   //   stringstream ss;
+
+      if (response->status == BLKIF_RSP_OKAY)
       {
-         if (   (   (buffer [i] < ' ')
-                 || (buffer [i] > '~'))
-             && (buffer [i] != 9)
-             && (buffer [i] != 10)
-             && (buffer [i] != 13))
+         for (unsigned int i = 0; i < PAGE_SIZE; i++)
          {
-            break;
+            if (   (   (buffer [i] < ' ')
+                  || (buffer [i] > '~'))
+               && (buffer [i] != 9)
+               && (buffer [i] != 10)
+               && (buffer [i] != 13))
+            {
+//               cout << "break on this char: " << (unsigned int)buffer [i] << " at " << i << endl;
+               break;
+            }
+
+            ss << buffer [i];
          }
-
-         ss << buffer [i];
+   //      cout << "data: " << data << endl;
+//         cout << "found and read block device " << name << endl;
       }
+      else
+      {
+         cout << "error reading block device " << name << endl;
+      }
+   }
 
-      data = ss.str ();
-//      cout << "data: " << data << endl;
-      cout << "found and read block device " << name << endl;
-   }
-   else
-   {
-      cout << "error reading block device " << name << endl;
-   }
+   data = ss.str ();
+
 }
 
 Block::~Block ()
@@ -165,10 +176,16 @@ Block::~Block ()
 
 ssize_t Block::read (void *buf, size_t nbytes)
 {
+//      cout << "reading " << nbytes << " of " << (data.size () - position) << endl;
    nbytes = min(nbytes, (data.size () - position));
 
-   memcpy (buf, data.c_str(), nbytes);
-   position += nbytes;
+   if (nbytes > 0)
+   {
+      memcpy (buf, &data.c_str()[position], nbytes);
+      position += nbytes;
+
+//      cout << "reading " << nbytes << ": " << *(char *)buf << endl;
+   }
 
    return nbytes;
 }

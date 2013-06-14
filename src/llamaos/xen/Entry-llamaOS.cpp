@@ -83,6 +83,14 @@ static inline uint64_t tsc_to_ns (const vcpu_time_info_t *time_info, uint64_t ts
    return time_ns;
 }
 
+static void glibc_abort (void)
+{
+   cout << "!!! ALERT: glibc calling abort()." << endl;
+   cout.flush();
+   fflush(stdout);
+   for(;;);
+}
+
 static int glibc_gethostname (char *name, size_t len)
 {
    stringstream ss;
@@ -269,6 +277,7 @@ static off_t glibc_lseek (int fd, off_t offset, int whence)
       return offset;
    }
 
+   cout << "lseek " << fd << endl;
    trace("!!! ALERT: glibc calling lseek() before file system support is enabled.\n");
    trace ("   fd: %d, offset: %d, whence: %d\n", fd, offset, whence);
    return -1;
@@ -293,6 +302,7 @@ static off64_t glibc_lseek64 (int fd, off64_t offset, int whence)
 
 static void register_glibc_exports (void)
 {
+   register_llamaos_abort (glibc_abort);
    register_llamaos_gethostname (glibc_gethostname);
    register_llamaos_getpid (glibc_getpid);
    register_llamaos_gettimeofday (glibc_gettimeofday);

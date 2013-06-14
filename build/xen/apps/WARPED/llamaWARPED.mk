@@ -36,33 +36,27 @@ include common-flags.mk
 
 MAKEFILE_SOURCES += apps/WARPED/llamaWARPED.mk
 
-# move to custom-vars.mk
-# WARPED_PATH = /home/gideonjn/pdes/warped/src
-# WARPED_RND_PATH = /home/gideonjn/pdes/warped/simulationmodels/rnd
-# WARPED_UTILS_PATH = /home/gideonjn/pdes/utils/src
-# PCCTS_PATH = /home/gideonjn/pccts/h
-
-# WARPED_PATH = $(PDES_ROOT_PATH)/warped/src
-# WARPED_RND_PATH = $(PDES_ROOT_PATH)/warped/simulationmodels/rnd
-# WARPED_UTILS_PATH = $(PDES_ROOT_PATH)/utils/src
-# PCCTS_PATH = $(PCCTS_ROOT_PATH)/h
+WARPED_PATH = $(PDES_ROOT_PATH)/warped/src
+WARPED_UTILS_PATH = $(PDES_ROOT_PATH)/utils/src
 
 CPPFLAGS += \
   -I $(INCDIR) \
-  -I $(SRCDIR) \
-  -I $(SRCDIR)/llamaos/mpi \
-  -I ../src/apps \
+  -I $(INCDIR)/llamaos/mpi \
   -I $(WARPED_PATH) \
-  -I $(WARPED_RND_PATH) \
-  -I $(WARPED_UTILS_PATH) \
   -I $(WARPED_PATH)/warped \
-  -I $(PCCTS_PATH) \
-  -I ../src/apps/WARPED \
+  -I $(WARPED_UTILS_PATH) \
+  -I $(PCCTS_ROOT_PATH)/h \
   -D__XEN_INTERFACE_VERSION__=0x00030205 \
   -include $(SRCDIR)/llamaos/__thread.h \
   -Wno-reorder
 
-VPATH = $(WARPED_PATH)
+#  -I $(SRCDIR) \
+#  -I ../src/apps \
+#  -I ../src/apps/WARPED \
+#  -I $(WARPED_PATH)/warped \
+#  -I $(PCCTS_PATH) \
+
+VPATH = $(PDES_ROOT_PATH):$(WARPED_PATH):$(WARPED_UTILS_PATH):$(PCCTS_ROOT_PATH)
 
 CPP_SOURCES = \
    warped/AdaptiveOutputManager.cpp \
@@ -183,35 +177,35 @@ CPP_SOURCES = \
    warped/VTime.cpp \
    warped/warped.cpp \
    warped/WarpedMain.cpp \
-   $(PCCTS_PATH)/AParser.cpp \
-   $(PCCTS_PATH)/ASTBase.cpp \
-   $(PCCTS_PATH)/ATokenBuffer.cpp \
-   $(PCCTS_PATH)/BufFileInput.cpp \
-   $(PCCTS_PATH)/DLexerBase.cpp \
-   $(PCCTS_PATH)/PCCTSAST.cpp \
-   $(PCCTS_PATH)/slist.cpp \
-   $(WARPED_UTILS_PATH)/utils/ArgumentParser.cpp \
-   $(WARPED_UTILS_PATH)/utils/ConfigurationChoice.cpp \
-   $(WARPED_UTILS_PATH)/utils/ConfigurationScope.cpp \
-   $(WARPED_UTILS_PATH)/utils/ConfigurationValue.cpp \
-   $(WARPED_UTILS_PATH)/utils/Debug.cpp \
-   $(WARPED_UTILS_PATH)/utils/ConfigurationParserHandle.cpp \
-   $(WARPED_UTILS_PATH)/utils/ConfigurationParser.cpp \
-   $(WARPED_UTILS_PATH)/utils/StringUtilities.cpp \
-   $(WARPED_UTILS_PATH)/utils/ConfigurationLexer.cpp
-   
+   h/AParser.cpp \
+   h/ASTBase.cpp \
+   h/ATokenBuffer.cpp \
+   h/BufFileInput.cpp \
+   h/DLexerBase.cpp \
+   h/PCCTSAST.cpp \
+   h/slist.cpp \
+   utils/ArgumentParser.cpp \
+   utils/ConfigurationChoice.cpp \
+   utils/ConfigurationScope.cpp \
+   utils/ConfigurationValue.cpp \
+   utils/Debug.cpp \
+   utils/ConfigurationParserHandle.cpp \
+   utils/ConfigurationParser.cpp \
+   utils/StringUtilities.cpp \
+   utils/ConfigurationLexer.cpp
+
 CC_SOURCES = \
-   $(WARPED_RND_PATH)/Binomial.cc \
-   $(WARPED_RND_PATH)/builtin.cc \
-   $(WARPED_RND_PATH)/DiscUnif.cc \
-   $(WARPED_RND_PATH)/gcd.cc \
-   $(WARPED_RND_PATH)/MLCG.cc \
-   $(WARPED_RND_PATH)/NegExp.cc \
-   $(WARPED_RND_PATH)/Normal.cc \
-   $(WARPED_RND_PATH)/Poisson.cc \
-   $(WARPED_RND_PATH)/Random.cc \
-   $(WARPED_RND_PATH)/RNG.cc \
-   $(WARPED_RND_PATH)/Uniform.cc
+   warped/simulationmodels/rnd/Binomial.cc \
+   warped/simulationmodels/rnd/builtin.cc \
+   warped/simulationmodels/rnd/DiscUnif.cc \
+   warped/simulationmodels/rnd/gcd.cc \
+   warped/simulationmodels/rnd/MLCG.cc \
+   warped/simulationmodels/rnd/NegExp.cc \
+   warped/simulationmodels/rnd/Normal.cc \
+   warped/simulationmodels/rnd/Poisson.cc \
+   warped/simulationmodels/rnd/Random.cc \
+   warped/simulationmodels/rnd/RNG.cc \
+   warped/simulationmodels/rnd/Uniform.cc
 
 OBJECTS = $(CPP_SOURCES:%.cpp=$(OBJDIR)/%.o)
 OBJECTS += $(CC_SOURCES:%.cc=$(OBJDIR)/%.o)
