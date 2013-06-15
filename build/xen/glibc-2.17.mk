@@ -1419,6 +1419,7 @@ HEADERS = \
   $(INCDIR)/bits/select.h \
   $(INCDIR)/bits/select2.h \
   $(INCDIR)/bits/setjmp.h \
+  $(INCDIR)/bits/setjmp2.h \
   $(INCDIR)/bits/sigaction.h \
   $(INCDIR)/bits/sigcontext.h \
   $(INCDIR)/bits/siginfo.h \
