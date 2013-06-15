@@ -31,7 +31,6 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <setjmp.h>
 
 void ____longjmp_chk (__jmp_buf __env, int __val)
-     __attribute__ ((__noreturn__))
 {
-   longjump(__env, __val);
+   longjmp(__env, __val);
 }

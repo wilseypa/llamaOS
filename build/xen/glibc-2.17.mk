@@ -1171,7 +1171,7 @@ C_SOURCES = \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/writev.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/xstat.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/xstat64.c \
-  glibc-$(GLIBC_VERSION)/sysdeps/llamaos/x86_64/longjump_chk.c \
+  glibc-$(GLIBC_VERSION)/sysdeps/llamaos/x86_64/longjmp_chk.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/dlerror.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/gcc_personality_v0.c \
   glibc-$(GLIBC_VERSION)/sysdeps/llamaos/mremap.c \
