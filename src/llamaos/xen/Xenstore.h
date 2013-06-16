@@ -92,6 +92,7 @@ public:
          // !BAM
          // don't throw for now 
          // throw std::runtime_error ("failed to convert xenstore string to type");
+         std::cout << "reading xenstore key: " << key << " and got value: " << sstream.str () << std::endl;; 
          std::cout << "failed to convert xenstore string to type: " << sstream.str () << std::endl;
          std::cout.flush();
          for (;;);
@@ -119,6 +120,7 @@ public:
          // !BAM
          // don't throw for now 
          // throw std::runtime_error ("failed to convert xenstore type to string");
+         std::cout << "writing xenstore key: " << key << " and value: " << value << std::endl;; 
          std::cout << "failed to convert xenstore string to type: " << sstream.str () << std::endl;
          std::cout.flush();
          for (;;);
