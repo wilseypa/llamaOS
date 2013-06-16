@@ -321,36 +321,33 @@ static vector<string> split (const string &input)
 {
    vector<string> tokens;
 
-   if (input != "ENOENT")
+   string::const_iterator first = input.begin ();
+   string::const_iterator mark = input.begin ();
+   string::const_iterator last = input.end ();
+
+   while (first != last)
    {
-      string::const_iterator first = input.begin ();
-      string::const_iterator mark = input.begin ();
-      string::const_iterator last = input.end ();
-
-      while (first != last)
+      if ('\0' == *first)
       {
-   //      if (isspace (*first))
-         if ('\0' == *first)
+         string token = string (mark, first);
+
+         if (   (token.length () > 0)
+             && (token != "ENOENT"))
          {
-            string token = string (mark, first);
-
-            if (token.length () > 0)
-            {
-               tokens.push_back (token);
-            }
-
-            mark = first + 1;
+            tokens.push_back (token);
          }
 
-         first++;
+         mark = first + 1;
       }
 
-      string token = string (mark, first);
+      first++;
+   }
 
-      if (token.length () > 0)
-      {
-         tokens.push_back (token);
-      }
+   string token = string (mark, first);
+
+   if (token.length () > 0)
+   {
+      tokens.push_back (token);
    }
 
    return tokens;
