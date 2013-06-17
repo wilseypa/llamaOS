@@ -36,6 +36,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <llamaos/api/sleep.h>
 #include <iostream>
 #include <string.h>
+#include <fstream>
 
 using namespace std;
 using namespace llamaos;
@@ -90,58 +91,105 @@ int MPI_Init (int *argc, char ***argv) {
    //Check if host table is not present - running alone
    int hostTableIndex = iGetArgIndex(*argc, *argv, "--hostTable");
    if (hostTableIndex <= 0) {
-      cout << "WARNING: Host table not present: running alone" << endl;
-      mpiData.rank = 0;
-      mpiData.totNodes = 1;
-      (*argc) = rankIndex-1;
-      return MPI_SUCCESS; //No sync necessary
-   }
-
-   //Get host table size
-   int hostTableSize = atoi((*argv)[hostTableIndex++]);
-   #ifdef MPI_COUT_INITIALIZATION
-   cout << "Host Table Arguments: " << hostTableSize << endl;
-   #endif
-
-   //Check for partial host table - running alone
-   if (hostTableIndex + (hostTableSize*2) > *argc) {
-      cout << "WARNING: Partial host table: running alone" << endl;
-      mpiData.rank = 0;
-      mpiData.totNodes = 1;
-      (*argc) = rankIndex-1;
-      return MPI_SUCCESS; //No sync necessary
-   }
-
-   //Construct the host table
-   mpiData.totNodes = 0;
-   for (; hostTableSize > 0; hostTableSize--) {
-      //Get the MAC address
-      int macPart;
-      int8_t macBuff[6];
-      for (macPart = 0; macPart < 6; macPart++) {
-         char macSecBuff[3];
-         macSecBuff[0] = (*argv)[hostTableIndex][(macPart*3)+0];
-         macSecBuff[1] = (*argv)[hostTableIndex][(macPart*3)+1];
-         macSecBuff[2] = '\0';
-         macBuff[macPart] = strtoul(macSecBuff, NULL, 16);
+      hostTableIndex = iGetArgIndex(*argc, *argv, "--hostFile");
+      if (hostTableIndex <= 0) {
+         cout << "WARNING: Host table not present: running alone" << endl;
+         mpiData.rank = 0;
+         mpiData.totNodes = 1;
+         (*argc) = rankIndex-1;
+         return MPI_SUCCESS; //No sync necessary
       }
-      hostTableIndex++;
+      
+      // Using alternative host file method
+      ifstream readFile((*argv)[hostTableIndex]);
+      char readBuf[32];
+      
+      //Get host table size
+      int hostTableSize;
+      readFile.getline(readBuf,32);
+      hostTableSize = atoi(readBuf);
+      #ifdef MPI_COUT_INITIALIZATION
+      cout << "Host Table Arguments: " << hostTableSize << endl;
+      #endif
+      
+      //Construct the host table
+      mpiData.totNodes = 0;
+      for (; hostTableSize > 0; hostTableSize--) {
+         //Get the MAC address
+         readFile.getline(readBuf,32);
+         int macPart;
+         int8_t macBuff[6];
+         for (macPart = 0; macPart < 6; macPart++) {
+            char macSecBuff[3];
+            macSecBuff[0] = readBuf[(macPart*3)+0];
+            macSecBuff[1] = readBuf[(macPart*3)+1];
+            macSecBuff[2] = '\0';
+            macBuff[macPart] = strtoul(macSecBuff, NULL, 16);
+         }
 
-      //Get the number of processes
-      int numProcesses = atoi((*argv)[hostTableIndex++]);
+         //Get the number of processes
+         readFile.getline(readBuf,32);
+         int numProcesses = atoi(readBuf);
 
-      //Create the table entries
-      int pidOn;
-      for (pidOn = 0; pidOn < numProcesses; pidOn++) {
-         MpiHostTable_T newEntry;
-         memcpy(&newEntry.address, macBuff, 6);
-         newEntry.pid = pidOn;
-         mpiData.hostTable.push_back(newEntry);
-         mpiData.totNodes++;
+         //Create the table entries
+         int pidOn;
+         for (pidOn = 0; pidOn < numProcesses; pidOn++) {
+            MpiHostTable_T newEntry;
+            memcpy(&newEntry.address, macBuff, 6);
+            newEntry.pid = pidOn;
+            mpiData.hostTable.push_back(newEntry);
+            mpiData.totNodes++;
+         }
       }
+      memcpy(mpiData.address, mpiData.hostTable[mpiData.rank].address, 6);
+      mpiData.pid = mpiData.hostTable[mpiData.rank].pid;
+   } else { // Using command line method
+      //Get host table size
+      int hostTableSize = atoi((*argv)[hostTableIndex++]);
+      #ifdef MPI_COUT_INITIALIZATION
+      cout << "Host Table Arguments: " << hostTableSize << endl;
+      #endif
+
+      //Check for partial host table - running alone
+      if (hostTableIndex + (hostTableSize*2) > *argc) {
+         cout << "WARNING: Partial host table: running alone" << endl;
+         mpiData.rank = 0;
+         mpiData.totNodes = 1;
+         (*argc) = rankIndex-1;
+         return MPI_SUCCESS; //No sync necessary
+      }
+
+      //Construct the host table
+      mpiData.totNodes = 0;
+      for (; hostTableSize > 0; hostTableSize--) {
+         //Get the MAC address
+         int macPart;
+         int8_t macBuff[6];
+         for (macPart = 0; macPart < 6; macPart++) {
+            char macSecBuff[3];
+            macSecBuff[0] = (*argv)[hostTableIndex][(macPart*3)+0];
+            macSecBuff[1] = (*argv)[hostTableIndex][(macPart*3)+1];
+            macSecBuff[2] = '\0';
+            macBuff[macPart] = strtoul(macSecBuff, NULL, 16);
+         }
+         hostTableIndex++;
+
+         //Get the number of processes
+         int numProcesses = atoi((*argv)[hostTableIndex++]);
+
+         //Create the table entries
+         int pidOn;
+         for (pidOn = 0; pidOn < numProcesses; pidOn++) {
+            MpiHostTable_T newEntry;
+            memcpy(&newEntry.address, macBuff, 6);
+            newEntry.pid = pidOn;
+            mpiData.hostTable.push_back(newEntry);
+            mpiData.totNodes++;
+         }
+      }
+      memcpy(mpiData.address, mpiData.hostTable[mpiData.rank].address, 6);
+      mpiData.pid = mpiData.hostTable[mpiData.rank].pid;
    }
-   memcpy(mpiData.address, mpiData.hostTable[mpiData.rank].address, 6);
-   mpiData.pid = mpiData.hostTable[mpiData.rank].pid;
 
    //Display the constructed host table
    #ifdef MPI_COUT_INITIALIZATION
