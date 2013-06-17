@@ -65,6 +65,7 @@ all:
 	@$(MAKE) -f apps/netpipe-3.7.2-mpi.mk
 	@$(MAKE) -f apps/testMPI-llamaMPI.mk
 	@$(MAKE) -f apps/testMPIF-llamaMPI.mk
+	@$(MAKE) -f apps/pingPongNB-llamaMPI.mk
 	@$(MAKE) -f apps/tinyxml.mk
 	@$(MAKE) -f apps/WARPED/WARPED.mk
 	@$(MAKE) -f net/i82574.mk
