@@ -29,8 +29,50 @@ either expressed or implied, of the copyright holder(s) or contributors.
 */
 
 #include <iGlobals.h>
+#include <llamaConn.h>
+#include <iostream>
 
-int MPI_Send(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm) {
-   iSend(buf, count, datatype, dest, tag, comm, MPI_CONTEXT_PT2PT);
+using namespace std;
+
+int MPI_Gsend(void *buf, int count, MPI_Datatype datatype, int dest) {
+   static uint32_t seq = 1;
+   net::llamaNET::Protocol_header *header;
+   unsigned int sizeInBytes = count*iSizeof(datatype);
+   int src = mpiData.rank;
+   
+   if (src == dest) {
+      cout << "ERROR: Gsend with destination same as self" << endl;
+      while (1);
+   }
+   
+   if (sizeInBytes > MAX_MESS_SIZE) {
+      cout << "ERROR: Gsend with message size larger than max packet" << endl;
+      while (1);
+   }
+   
+   // Set up eth header
+   header = llamaNetInterface->get_send_buffer(static_cast<uint32_t>(src));
+   header->dest = static_cast<uint32_t>(dest);
+   header->src = static_cast<uint32_t>(src);
+   header->type = 1;
+   header->seq = seq++; 
+   header->len = sizeInBytes + 16;
+   memcpy(header->eth_dest, mpiData.hostTable[dest].address, 6);
+   memcpy(header->eth_src, mpiData.address, 6);
+
+   // get pointer to data section of buffer
+   int commContext = MPI_COMM_WORLD | MPI_CONTEXT_PT2PT;
+   int tag = 12321;
+   int partOn = 0;
+   int *data = reinterpret_cast<int *>(header + 1);
+   memcpy(data++, &commContext, 4);
+   memcpy(data++, &tag, 4);
+   memcpy(data++, &sizeInBytes, 4);
+   memcpy(data++, &partOn, 4);
+   memcpy(data, buf, sizeInBytes);
+   
+   // send the message
+   llamaNetInterface->send(header);
+   
    return MPI_SUCCESS;
 }

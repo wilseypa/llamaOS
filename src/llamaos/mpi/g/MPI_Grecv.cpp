@@ -29,8 +29,39 @@ either expressed or implied, of the copyright holder(s) or contributors.
 */
 
 #include <iGlobals.h>
+#include <llamaConn.h>
+#include <iostream>
 
-int MPI_Send(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm) {
-   iSend(buf, count, datatype, dest, tag, comm, MPI_CONTEXT_PT2PT);
+using namespace std;
+
+int MPI_Grecv(void **buf, int *count, MPI_Datatype datatype, int *flag) {
+   net::llamaNET::Protocol_header *header;
+   header = llamaNetInterface->recvNB(mpiData.rank);
+   if (header == NULL) { // Exit if no message in queue
+      (*flag) = false;
+      return MPI_SUCCESS;
+   } 
+   (*flag) = true;
+   
+   int rxCommContext, rxTag, rxSource, rxTotSize, rxPart;
+   int *data = reinterpret_cast<int *>(header + 1);
+   memcpy(&rxCommContext, data++, 4);
+   memcpy(&rxTag, data++, 4);
+   memcpy(&rxTotSize, data++, 4);
+   memcpy(&rxPart, data++, 4);
+   rxSource = static_cast<int>(header->src);
+   
+   if (rxTotSize > MAX_MESS_SIZE) {
+      cout << "ERROR: Grecv with message size larger than max packet" << endl;
+      while (1);
+   }
+   
+   // Allocate buffer and copy message
+   (*buf) = new char[rxTotSize];
+   memcpy((*buf), data, rxTotSize);
+   
+   (*count) = rxTotSize / iSizeof(datatype);
+   llamaNetInterface->release_recv_buffer(header); // Release llama rx message buffer
+   
    return MPI_SUCCESS;
 }
