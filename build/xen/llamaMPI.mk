@@ -65,6 +65,7 @@ CPP_SOURCES += \
   llamaos/mpi/op/iPerformOp.cpp \
   llamaos/mpi/api/pt2pt/MPI_Recv.cpp \
   llamaos/mpi/api/pt2pt/MPI_Send.cpp \
+  llamaos/mpi/api/pt2pt/MPI_Ssend.cpp \
   llamaos/mpi/api/pt2pt/MPI_Sendrecv.cpp \
   llamaos/mpi/api/pt2pt/MPI_Probe.cpp \
   llamaos/mpi/api/pt2pt/MPI_Iprobe.cpp \
@@ -114,7 +115,9 @@ CPP_SOURCES += \
   llamaos/mpi/api/time/MPI_Wtime.cpp \
   llamaos/mpi/api/time/MPI_Wtick.cpp \
   llamaos/mpi/api/error/MPI_Error_string.cpp \
-  llamaos/mpi/api/type/MPI_Type_size.cpp 
+  llamaos/mpi/api/type/MPI_Type_size.cpp \
+  llamaos/mpi/g/MPI_Gsend.cpp \
+  llamaos/mpi/g/MPI_Grecv.cpp
 
 HEADERS = \
   $(INCDIR)/llamaos/mpi/mpi.h

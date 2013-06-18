@@ -34,11 +34,11 @@
 include common-vars.mk
 include common-flags.mk
 
-MAKEFILE_SOURCES += apps/WARPED/phold-llamaWARPED.mk
+MAKEFILE_SOURCES += apps/WARPED/smmp-llamaWARPED.mk
 
 WARPED_PATH = $(PDES_ROOT_PATH)/warped/src
 WARPED_UTILS_PATH = $(PDES_ROOT_PATH)/utils/src
-PHOLD_PATH = $(PDES_ROOT_PATH)/warped/simulationmodels/phold/factory/src
+SMMP_PATH = $(PDES_ROOT_PATH)/warped/simulationmodels/smmp
 
 CPPFLAGS += \
   -I $(INCDIR) \
@@ -47,7 +47,7 @@ CPPFLAGS += \
   -I $(WARPED_PATH)/warped \
   -I $(WARPED_UTILS_PATH) \
   -I $(PCCTS_ROOT_PATH)/h \
-  -I $(PHOLD_PATH) \
+  -I $(SMMP_PATH) \
   -D__XEN_INTERFACE_VERSION__=0x00030205 \
   -include $(SRCDIR)/llamaos/__thread.h \
   -Wno-reorder
@@ -55,18 +55,20 @@ CPPFLAGS += \
 VPATH = $(PDES_ROOT_PATH)
 
 CPP_SOURCES = \
-   $(PHOLD_PATH)/PHOLDApplication.cpp \
-   $(PHOLD_PATH)/PHOLDEvent.cpp \
-   $(PHOLD_PATH)/PHOLDFactoryManager.cpp \
-   $(PHOLD_PATH)/PHOLDMain.cpp \
-   $(PHOLD_PATH)/Process.cpp \
-   $(PHOLD_PATH)/ProcessState.cpp \
-   $(PHOLD_PATH)/ProcessStub.cpp
+   $(SMMP_PATH)/MemRouterObject.cpp \
+   $(SMMP_PATH)/MemSourceObject.cpp \
+   $(SMMP_PATH)/SMMPApplication.cpp \
+   $(SMMP_PATH)/SMMPForkObject.cpp \
+   $(SMMP_PATH)/SMMPJoinObject.cpp \
+   $(SMMP_PATH)/SMMPMain.cpp \
+   $(SMMP_PATH)/SMMPPartitioner.cpp \
+   $(SMMP_PATH)/SMMPQueueObject.cpp \
+   $(SMMP_PATH)/SMMPServerObject.cpp
 
 OBJECTS = $(CPP_SOURCES:%.cpp=$(OBJDIR)/%.o)
 DEPENDS = $(OBJECTS:%.o=%.d)
 
-$(BINDIR)/WARPED/phold-llamaWARPED: $(OBJECTS) $(LIBDIR)/llamaWARPED.a $(LIBDIR)/llamaMPI.a $(LIBDIR)/llamaOS.a $(LIBDIR)/stdc++.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
+$(BINDIR)/WARPED/smmp-llamaWARPED: $(OBJECTS) $(LIBDIR)/llamaWARPED.a $(LIBDIR)/llamaMPI.a $(LIBDIR)/llamaOS.a $(LIBDIR)/stdc++.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
 	@$(LD) $(LDFLAGS) -T llamaOS.lds -o $@ $^

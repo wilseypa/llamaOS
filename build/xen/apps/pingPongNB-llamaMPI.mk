@@ -34,39 +34,25 @@
 include common-vars.mk
 include common-flags.mk
 
-MAKEFILE_SOURCES += apps/WARPED/phold-llamaWARPED.mk
-
-WARPED_PATH = $(PDES_ROOT_PATH)/warped/src
-WARPED_UTILS_PATH = $(PDES_ROOT_PATH)/utils/src
-PHOLD_PATH = $(PDES_ROOT_PATH)/warped/simulationmodels/phold/factory/src
+MAKEFILE_SOURCES += apps/pingPongNB-llamaMPI.mk
 
 CPPFLAGS += \
   -I $(INCDIR) \
-  -I $(INCDIR)/llamaos/mpi \
-  -I $(WARPED_PATH) \
-  -I $(WARPED_PATH)/warped \
-  -I $(WARPED_UTILS_PATH) \
-  -I $(PCCTS_ROOT_PATH)/h \
-  -I $(PHOLD_PATH) \
+  -I $(SRCDIR) \
+  -I $(SRCDIR)/llamaos/mpi \
+  -I ../src/apps \
   -D__XEN_INTERFACE_VERSION__=0x00030205 \
-  -include $(SRCDIR)/llamaos/__thread.h \
-  -Wno-reorder
+  -include $(SRCDIR)/llamaos/__thread.h
 
-VPATH = $(PDES_ROOT_PATH)
+VPATH = $(SRCDIR)
 
-CPP_SOURCES = \
-   $(PHOLD_PATH)/PHOLDApplication.cpp \
-   $(PHOLD_PATH)/PHOLDEvent.cpp \
-   $(PHOLD_PATH)/PHOLDFactoryManager.cpp \
-   $(PHOLD_PATH)/PHOLDMain.cpp \
-   $(PHOLD_PATH)/Process.cpp \
-   $(PHOLD_PATH)/ProcessState.cpp \
-   $(PHOLD_PATH)/ProcessStub.cpp
+SOURCES = \
+  apps/pingPongNB/main.cpp
 
-OBJECTS = $(CPP_SOURCES:%.cpp=$(OBJDIR)/%.o)
+OBJECTS = $(SOURCES:%.cpp=$(OBJDIR)/%.o)
 DEPENDS = $(OBJECTS:%.o=%.d)
 
-$(BINDIR)/WARPED/phold-llamaWARPED: $(OBJECTS) $(LIBDIR)/llamaWARPED.a $(LIBDIR)/llamaMPI.a $(LIBDIR)/llamaOS.a $(LIBDIR)/stdc++.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
+$(BINDIR)/pingPongNB-llamaMPI: $(OBJECTS) $(LIBDIR)/llamaMPI.a $(LIBDIR)/llamaOS.a $(LIBDIR)/stdc++.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
 	@$(LD) $(LDFLAGS) -T llamaOS.lds -o $@ $^

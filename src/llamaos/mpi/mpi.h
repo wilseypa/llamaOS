@@ -236,6 +236,10 @@ int MPI_Error_string(int errorcode, char *string, int *resultlen);
 int MPI_Get_version(int *version, int *subversion);
 int MPI_Type_size(MPI_Datatype datatype, int *size);
 
+// Custom for WARPED - global single message packets
+int MPI_Gsend(void *buf, int count, MPI_Datatype datatype, int dest);
+int MPI_Grecv(void **buf, int *count, MPI_Datatype datatype, int *flag);
+
 #ifdef __cplusplus
 } //extern "C"
 #endif
