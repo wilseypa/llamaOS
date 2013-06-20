@@ -231,6 +231,11 @@ int MPI_Init (int *argc, char ***argv) {
    #ifdef MPI_COUT_INITIALIZATION
    cout << "DONE" << endl;
    #endif
+   
+   //Save the time since last success
+   #ifdef MPI_WATCHDOG_TIME
+   mpiData.prevWatchdogTime = MPI_Wtime();
+   #endif
 
    //The process waits for the sync to start
    #ifdef MPI_COUT_INITIALIZATION
