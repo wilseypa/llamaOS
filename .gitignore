@@ -21,6 +21,18 @@ build/linux/custom-vars.mk
 build/xen/custom-flags.mk
 build/xen/custom-vars.mk
 
+# NAS generated files #
+###################
+build/xen/util/NAS/cg/npbparams.h
+build/xen/util/NAS/dt/npbparams.h
+build/xen/util/NAS/ep/npbparams.h
+build/xen/util/NAS/ft/npbparams.h
+build/xen/util/NAS/is/npbparams.h
+build/xen/util/NAS/lu/npbparams.h
+build/xen/util/NAS/mg/npbparams.h
+build/xen/util/NAS/sp/npbparams.h
+build/xen/util/NAS/setparams
+
 # KDevelop files #
 # ############## #
 .kdev4/

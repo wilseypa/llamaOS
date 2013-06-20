@@ -429,6 +429,7 @@ static void fpu_init(void)
 static char cmd_line [MAX_GUEST_CMDLINE];
 static int argc;
 static char *argv [64];
+static char *pargv;
 static char *name = "llamaOS";
 
 int __libc_start_main (int (*main) (int, char **, char **),
@@ -494,15 +495,22 @@ void entry_glibc (start_info_t *start_info)
          {
             break;
          }
-         else if (   (cmd_line [i] != ' ')
-                  && (space))
+         else if (cmd_line [i] != ' ')
          {
-            argv [argc++] = &cmd_line [i];
-            space = 0;
+            if (space)
+            {
+               argv [argc++] = pargv;
+               cmd_line [i] = '\0';
+               space = 0;
+            }
          }
          else
          {
-            space = 1;
+            if (!space)
+            {
+               pargv = &cmd_line [i];
+               space = 1;
+            }
          }
       }
 
