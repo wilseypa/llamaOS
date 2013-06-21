@@ -99,7 +99,7 @@ void Events::alloc (domid_t /* domid */, evtchn_port_t & /* port */)
 
 }
 
-void Events::bind (unsigned int port, event_handler_t handler, void *data)
+void Events::bind (unsigned int /* port */, event_handler_t /* handler */, void * /* data */)
 {
 //   handlers [port] = std::pair<event_handler_t, void *> (handler, data);
 }
@@ -109,7 +109,7 @@ void Events::unbind (unsigned int /* port */)
 
 }
 
-void Events::bind_virq (unsigned int virq, event_handler_t handler, void *data)
+void Events::bind_virq (unsigned int /* virq */, event_handler_t /* handler */, void * /* data */)
 {
 #if 0
    evtchn_port_t port = 0;

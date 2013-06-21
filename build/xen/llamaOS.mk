@@ -49,6 +49,8 @@ CFLAGS += \
   -D__XEN_INTERFACE_VERSION__=0x00030205
 
 CPPFLAGS += \
+  -Wextra \
+  -Weffc++ \
   -I $(INCDIR) \
   -I $(SRCDIR) \
   -include $(SRCDIR)/llamaos/__thread.h \
@@ -108,15 +110,17 @@ DEPENDS += $(OBJECTS:%.o=%.d)
 
 .PHONY: all
 all : $(LIBDIR)/llamaOS.a headers
-# all : $(OBJDIR)/llamaos/xen/Entry.o $(LIBDIR)/xen/llamaOS.a $(HEADERS)
 
 .PHONY: headers
 headers : $(HEADERS)
 
+.PHONY: check
+check :
+	@echo running cppcheck on llamaos namespace...
+	cppcheck $(SRCDIR)/llamaos
+
 $(LIBDIR)/llamaOS.a: $(OBJECTS)
 	@[ -d $(@D) ] || (mkdir -p $(@D))
-#	@echo copying Entry object...
-#	@cp $(OBJDIR)/llamaos/xen/Entry.o $(LIBDIR)/xen/Entry.o
 	@echo linking: $@
 	@$(AR) r $@ $^
 	@echo successfully built: $@

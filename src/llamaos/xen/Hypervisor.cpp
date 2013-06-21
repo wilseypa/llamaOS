@@ -113,7 +113,8 @@ Hypervisor::Hypervisor (const start_info_t *start_info)
       xenstore(machine_page_to_virtual_pointer<xenstore_domain_interface>(start_info->store_mfn), start_info->store_evtchn),
       name(xenstore.read_string ("name")),
       domid(xenstore.read<domid_t>("domid")),
-      argc(0)
+      argc(0),
+      blocks()
 {
    instance = this;
    trace ("Hypervisor created.\n");

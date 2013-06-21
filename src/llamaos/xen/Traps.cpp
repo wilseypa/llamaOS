@@ -77,7 +77,7 @@ struct pt_regs {
 #define setmxcsr(x)    asm ("ldmxcsr %0" : "=m" (x));
 
 extern "C"
-void do_simd_coprocessor_error(struct pt_regs *regs)
+void do_simd_coprocessor_error(struct pt_regs * /* regs */)
 {
 
 }

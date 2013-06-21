@@ -111,7 +111,7 @@ static int glibc_getpid ()
    return Hypervisor::get_instance ()->domid;
 }
 
-static int glibc_gettimeofday (struct timeval *tv, struct timezone *tz)
+static int glibc_gettimeofday (struct timeval *tv, struct timezone * /* tz */)
 {
    uint32_t wc_version = 0;
    uint32_t wc_sec = 0;
@@ -354,7 +354,7 @@ extern "C"
 int main (int argc, char *argv []);
 
 extern "C"
-int __main (int argc, char *argv [], char *env[])
+int __main (int argc, char *argv [], char * /* env[] */)
 {
    return main (argc, argv);
 }

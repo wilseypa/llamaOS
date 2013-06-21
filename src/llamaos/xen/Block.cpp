@@ -44,7 +44,13 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <xen/io/xenbus.h>
 #include <llamaos/llamaOS.h>
 
-using namespace std;
+// using namespace std;
+using std::string;
+using std::min;
+using std::cout;
+using std::endl;
+using std::stringstream;
+
 using namespace llamaos::xen;
 
 Block::Block (const string &key)
@@ -54,7 +60,8 @@ Block::Block (const string &key)
       name(""),
       dev(""),
       size(0),
-      position(0)
+      position(0),
+      data("")
 {
 //   cout << "frontend: " << frontend_key << endl;
    Xenstore &xenstore = Hypervisor::get_instance ()->xenstore;
