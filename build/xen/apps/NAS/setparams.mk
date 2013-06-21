@@ -49,40 +49,76 @@ SOURCES = \
 OBJECTS = $(SOURCES:%.c=$(OBJDIR)/%.o)
 DEPENDS = $(OBJECTS:%.o=%.d)
 
-util/NAS/*/npbparams.h: apps/NAS/params.def util/NAS/setparams
-	echo Creating benchmark headers
-	util/NAS/setparams `grep CG apps/NAS/params.def`
-	mkdir -p util/NAS/cg
-	mv util/NAS/npbparams.h util/NAS/cg/npbparams.h
-	util/NAS/setparams `grep DT apps/NAS/params.def`
-	mkdir -p util/NAS/dt
-	mv util/NAS/npbparams.h util/NAS/dt/npbparams.h
-	util/NAS/setparams `grep EP apps/NAS/params.def`
-	mkdir -p util/NAS/ep
-	mv util/NAS/npbparams.h util/NAS/ep/npbparams.h
-	util/NAS/setparams `grep FT apps/NAS/params.def`
-	mkdir -p util/NAS/ft
-	mv util/NAS/npbparams.h util/NAS/ft/npbparams.h
-	util/NAS/setparams `grep IS apps/NAS/params.def`
-	mkdir -p util/NAS/is
-	mv util/NAS/npbparams.h util/NAS/is/npbparams.h
-	util/NAS/setparams `grep LU apps/NAS/params.def`
-	mkdir -p util/NAS/lu
-	mv util/NAS/npbparams.h util/NAS/lu/npbparams.h
-	util/NAS/setparams `grep MG apps/NAS/params.def`
-	mkdir -p util/NAS/mg
-	mv util/NAS/npbparams.h util/NAS/mg/npbparams.h
-	util/NAS/setparams `grep SP apps/NAS/params.def`
-	mkdir -p util/NAS/sp
-	mv util/NAS/npbparams.h util/NAS/sp/npbparams.h
+SETPARAMS = util/NAS/setparams
 
-util/NAS/setparams: $(OBJECTS)
+HEADERS = \
+  util/NAS/cg/npbparams.h \
+  util/NAS/dt/npbparams.h \
+  util/NAS/ep/npbparams.h \
+  util/NAS/ft/npbparams.h \
+  util/NAS/is/npbparams.h \
+  util/NAS/lu/npbparams.h \
+  util/NAS/mg/npbparams.h \
+  util/NAS/sp/npbparams.h
+
+.PHONY: all
+all: $(SETPARAMS) $(HEADERS)
+
+$(SETPARAMS): $(OBJECTS)
 	echo $(OBJECTS)
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
 	@$(CC) -o $@ $^
 	@echo successfully built: $@
 	@echo
+
+util/NAS/cg/npbparams.h: apps/NAS/params.def
+	echo Creating cg benchmark header
+	$(SETPARAMS) `grep CG apps/NAS/params.def`
+	mkdir -p util/NAS/cg
+	mv util/NAS/npbparams.h util/NAS/cg/npbparams.h
+
+util/NAS/dt/npbparams.h: apps/NAS/params.def
+	echo Creating dt benchmark header
+	$(SETPARAMS) `grep DT apps/NAS/params.def`
+	mkdir -p util/NAS/dt
+	mv util/NAS/npbparams.h util/NAS/dt/npbparams.h
+
+util/NAS/ep/npbparams.h: apps/NAS/params.def
+	echo Creating ep benchmark header
+	$(SETPARAMS) `grep EP apps/NAS/params.def`
+	mkdir -p util/NAS/ep
+	mv util/NAS/npbparams.h util/NAS/ep/npbparams.h
+
+util/NAS/ft/npbparams.h: apps/NAS/params.def
+	echo Creating ft benchmark header
+	$(SETPARAMS) `grep FT apps/NAS/params.def`
+	mkdir -p util/NAS/ft
+	mv util/NAS/npbparams.h util/NAS/ft/npbparams.h
+
+util/NAS/is/npbparams.h: apps/NAS/params.def
+	echo Creating is benchmark header
+	$(SETPARAMS) `grep IS apps/NAS/params.def`
+	mkdir -p util/NAS/is
+	mv util/NAS/npbparams.h util/NAS/is/npbparams.h
+
+util/NAS/lu/npbparams.h: apps/NAS/params.def
+	echo Creating lu benchmark header
+	$(SETPARAMS) `grep LU apps/NAS/params.def`
+	mkdir -p util/NAS/lu
+	mv util/NAS/npbparams.h util/NAS/lu/npbparams.h
+
+util/NAS/mg/npbparams.h: apps/NAS/params.def
+	echo Creating mg benchmark header
+	$(SETPARAMS) `grep MG apps/NAS/params.def`
+	mkdir -p util/NAS/mg
+	mv util/NAS/npbparams.h util/NAS/mg/npbparams.h
+
+util/NAS/sp/npbparams.h: apps/NAS/params.def
+	echo Creating sp benchmark header
+	$(SETPARAMS) `grep SP apps/NAS/params.def`
+	mkdir -p util/NAS/sp
+	mv util/NAS/npbparams.h util/NAS/sp/npbparams.h
 
 include rules.mk
 
