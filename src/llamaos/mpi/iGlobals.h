@@ -57,6 +57,7 @@ class iRequest;
 //#define MPI_BARRIER_ALL_COLLECTIVE
 //#define MPI_RX_BEFORE_TX
 //#define MPI_USE_BCAST_HARDWARE
+#define MPI_WATCHDOG_TIME 5
 
 #define MAX_MESS_SIZE 3950
 
@@ -134,6 +135,9 @@ typedef struct MpiData_T {
    MAP_TYPE<MPI_Group,iGroup*> group; // Map of integer handles to groups
    MAP_TYPE<MPI_Request,iRequest*> request; // Map of integer handles to requests
    bool isPerformingOp;
+   #ifdef MPI_WATCHDOG_TIME
+   double prevWatchdogTime;
+   #endif
 } MpiData_T;
 
 

@@ -171,6 +171,13 @@ void iGetMessage(void *buf, int count, MPI_Datatype datatype, int source, int ta
    MPI_Comm rxComm;
    MPI_Context rxContext;
    for (;;) {
+      #ifdef MPI_WATCHDOG_TIME
+      double timeDiff = MPI_Wtime() - mpiData.prevWatchdogTime;
+      if (timeDiff > MPI_WATCHDOG_TIME) {
+         mpiData.prevWatchdogTime = MPI_Wtime();
+         cout << "Five seconds since last receive." << endl;
+      }
+      #endif
       // Receive most recent packet and extract needed information
       if (isNB) {
          header = llamaNetInterface->recvNB(mpiData.rank);
@@ -178,6 +185,9 @@ void iGetMessage(void *buf, int count, MPI_Datatype datatype, int source, int ta
       } else {
          header = llamaNetInterface->recv(mpiData.rank);
       }
+      #ifdef MPI_WATCHDOG_TIME
+      mpiData.prevWatchdogTime = MPI_Wtime();
+      #endif
       int *data = reinterpret_cast<int *>(header + 1);
       memcpy(&rxCommContext, data++, 4);
       rxComm = rxCommContext & MPI_COMM_MASK;

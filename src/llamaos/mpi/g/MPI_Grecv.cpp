@@ -35,6 +35,13 @@ either expressed or implied, of the copyright holder(s) or contributors.
 using namespace std;
 
 int MPI_Grecv(void **buf, int *count, MPI_Datatype datatype, int *flag) {
+   #ifdef MPI_WATCHDOG_TIME
+   double timeDiff = MPI_Wtime() - mpiData.prevWatchdogTime;
+   if (timeDiff > MPI_WATCHDOG_TIME) {
+      mpiData.prevWatchdogTime = MPI_Wtime();
+      cout << "Five seconds since last receive." << endl;
+   }
+   #endif
    net::llamaNET::Protocol_header *header;
    header = llamaNetInterface->recvNB(mpiData.rank);
    if (header == NULL) { // Exit if no message in queue
@@ -42,6 +49,9 @@ int MPI_Grecv(void **buf, int *count, MPI_Datatype datatype, int *flag) {
       return MPI_SUCCESS;
    } 
    (*flag) = true;
+   #ifdef MPI_WATCHDOG_TIME
+   mpiData.prevWatchdogTime = MPI_Wtime();
+   #endif
    
    int rxCommContext, rxTag, rxSource, rxTotSize, rxPart;
    int *data = reinterpret_cast<int *>(header + 1);
