@@ -121,10 +121,11 @@ public:
    Protocol_header *get_send_buffer (uint32_t node);
    void send (Protocol_header *header);
 
-   Protocol_header **get_send_bufferv (unsigned int tx_count);
+   Protocol_header **get_send_bufferv (uint32_t node, unsigned int tx_count);
    void sendv (Protocol_header **header, unsigned int tx_count);
 
    void purge_buffers (uint32_t node);
+   void wait_for_send_complete ();
 
    const int domd_id;
    const int index;

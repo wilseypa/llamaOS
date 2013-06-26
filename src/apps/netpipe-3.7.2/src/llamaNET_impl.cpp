@@ -75,7 +75,7 @@ void llamaNET_sync ()
 //      if (node == 3)
       {
 cout << "3 is get_send_buffer..." << endl;         
-         header = interface->get_send_buffer ();
+         header = interface->get_send_buffer (node);
          header->dest = (node % 2) ? (node - 1) : (node + 1);
 //         header->dest = (node == 1) ? 3 : 1;
          header->src = node;
@@ -130,7 +130,7 @@ cout << "1 is recv..." << endl;
          }
 
 cout << "1 is get_send_buffer..." << endl;         
-         header = interface->get_send_buffer ();
+         header = interface->get_send_buffer (node);
          header->dest = (node % 2) ? (node - 1) : (node + 1);
 //         header->dest = (node == 1) ? 3 : 1;
          header->src = node;
@@ -149,7 +149,7 @@ cout << "1 is send..." << endl;
    }
    else
    {
-      header = interface->get_send_buffer ();
+      header = interface->get_send_buffer (node);
       header->dest = (node % 2) ? (node - 1) : (node + 1);
 //      header->dest = (node == 1) ? 3 : 1;
       header->src = node;
@@ -197,10 +197,17 @@ extern "C"
 void llamaNET_send_data (const char *_data, unsigned int length)
 {
    char *data;
+//   unsigned int _length = length;
+
+//   cout << "start sending " << length << " message" << endl;
 
    if (length < MAX_MESSAGE_LENGTH)
    {
-      llamaNET::Protocol_header *header = interface->get_send_buffer ();
+      // purge out unneeded messages to move the shared tail pointers forward,
+      // otherwise, send can fill the buffer and deadlock with itself
+      interface->purge_buffers (node);
+
+      llamaNET::Protocol_header *header = interface->get_send_buffer (node);
 
       header->dest = (node % 2) ? (node - 1) : (node + 1);
 //      header->dest = (node == 1) ? 3 : 1;
@@ -230,9 +237,11 @@ void llamaNET_send_data (const char *_data, unsigned int length)
       tx_count = ((length + MAX_MESSAGE_LENGTH) / MAX_MESSAGE_LENGTH);
       tx_count = min(32U, tx_count);
 
-      // clear buffer
-      interface->recvNB (node);
-      headerv = interface->get_send_bufferv (tx_count);
+      // purge out unneeded messages to move the shared tail pointers forward,
+      // otherwise, send can fill the buffer and deadlock with itself
+      interface->purge_buffers (node);
+
+      headerv = interface->get_send_bufferv (node, tx_count);
 
       for (i = 0; i < tx_count; i++)
       {
@@ -257,12 +266,24 @@ void llamaNET_send_data (const char *_data, unsigned int length)
 
       interface->sendv (headerv, tx_count);
    }
+
+//   if (_length > 1572860)
+//   {
+//      cout << "done sending " << _length << " message" << endl;
+//      interface->wait_for_send_complete ();
+//      cout << "done waiting for send " << _length << " message" << endl;
+//   }
+
+//   cout << "done sending " << length << " message" << endl;
 }
 
 extern "C"
 void llamaNET_recv_data (char *_data, unsigned int length)
 {
    char *data;
+//   unsigned int _length = length;
+
+//   cout << "start recving " << length << " message" << endl;
 
    if (length < MAX_MESSAGE_LENGTH)
    {
@@ -285,6 +306,10 @@ void llamaNET_recv_data (char *_data, unsigned int length)
 
    while (length > 0)
    {
+//      if (_length > 1572860)
+//      {
+//         cout << "start recving " << length << " message" << endl;
+//      }
       rx_count = min(256U, ((length + MAX_MESSAGE_LENGTH) / MAX_MESSAGE_LENGTH));
 
       headerv = interface->recvv(node, rx_count);
@@ -292,7 +317,7 @@ void llamaNET_recv_data (char *_data, unsigned int length)
       for (uint32_t i = 0; i < rx_count; i++)
       {
          current_length = headerv [i]->len;
-
+//cout << "   recv'ed " << current_length << endl;
          // get pointer to data section of buffer
          data = reinterpret_cast<char *>(headerv [i] + 1);
 
@@ -305,6 +330,13 @@ void llamaNET_recv_data (char *_data, unsigned int length)
 
       interface->release_recv_bufferv(rx_count);
    }
+
+//   if (_length > 1572860)
+//   {
+//      cout << "done recving " << _length << " message" << endl;
+//   }
+
+//   cout << "done recving " << length << " message" << endl;
 }
 
 extern "C"
@@ -317,7 +349,7 @@ void llamaNET_send_time (double t)
     */
 
    llamaNET::Protocol_header *header;
-   header = interface->get_send_buffer ();
+   header = interface->get_send_buffer (node);
    header->dest = (node % 2) ? (node - 1) : (node + 1);
 //   header->dest = (node == 1) ? 3 : 1;
    header->src = node;
@@ -360,7 +392,7 @@ void llamaNET_send_repeat (int rpt)
 //   cout << "calling llamaNET_send_repeat..." << endl;
 
    llamaNET::Protocol_header *header;
-   header = interface->get_send_buffer ();
+   header = interface->get_send_buffer (node);
    header->dest = (node % 2) ? (node - 1) : (node + 1);
 //   header->dest = (node == 1) ? 3 : 1;
    header->src = node;
@@ -408,7 +440,7 @@ void llamaNET_cleanup (int client)
 
    if (client)
    {
-      header = interface->get_send_buffer ();
+      header = interface->get_send_buffer (node);
       header->dest = (node % 2) ? (node - 1) : (node + 1);
 //      header->dest = (node == 1) ? 3 : 1;
       header->src = node;
@@ -455,7 +487,7 @@ void llamaNET_cleanup (int client)
          }
       }
 
-      header = interface->get_send_buffer ();
+      header = interface->get_send_buffer (node);
       header->dest = (node % 2) ? (node - 1) : (node + 1);
 //      header->dest = (node == 1) ? 3 : 1;
       header->src = node;

@@ -494,7 +494,7 @@ int main (int /* argc */, char ** /* argv [] */)
       rx_buffers [i].address = virtual_pointer_to_machine_address(rx_buffers [i].pointer);
       Hypercall::update_va_mapping_nocache (pointer_to_address (rx_buffers [i].pointer), rx_buffers [i].address);
 
-      if (i < (rx_desc_max - 2))  // !BAM WHY? WHY DOES THIS HAVE TO BE 2 OFF INSTEAD OF 1? WHY?
+      if (i < (rx_desc_max - 2))  // !BAM HARDWARE CONSIDERS FULL TO BE 2 OFF INSTEAD OF 1. SUPPORT FOR EXTENDED FRAMES DESCS.
       {
          rx_desc [rx_desc_index(rx_tail)].buffer = rx_buffers [i].address;
          rx_desc [rx_desc_index(rx_tail)].status = 0;
@@ -658,12 +658,12 @@ int main (int /* argc */, char ** /* argv [] */)
                   llamaos::net::llamaNET::Protocol_header *header =
                      reinterpret_cast<llamaos::net::llamaNET::Protocol_header *> (tx_buffers [(tx_last_index + tx_count) % TX_BUFFERS].pointer);
 
-                  if (   (header->eth_dest [0] != mac_addr [0])
-                      || (header->eth_dest [1] != mac_addr [1])
-                      || (header->eth_dest [2] != mac_addr [2])
-                      || (header->eth_dest [3] != mac_addr [3])
-                      || (header->eth_dest [4] != mac_addr [4])
-                      || (header->eth_dest [5] != mac_addr [5]))
+//                  if (   (header->eth_dest [0] != mac_addr [0])
+//                      || (header->eth_dest [1] != mac_addr [1])
+//                      || (header->eth_dest [2] != mac_addr [2])
+//                      || (header->eth_dest [3] != mac_addr [3])
+//                      || (header->eth_dest [4] != mac_addr [4])
+//                      || (header->eth_dest [5] != mac_addr [5]))
                   {
                      tx_desc [tx_desc_index(tx_tail)].buffer = tx_buffers [(tx_last_index + tx_count) % TX_BUFFERS].address;
                      tx_desc [tx_desc_index(tx_tail)].length = llamaos::net::llamaNET::HEADER_LENGTH + header->len;

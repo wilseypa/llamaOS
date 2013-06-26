@@ -43,9 +43,9 @@ using namespace llamaos::memory;
 using namespace llamaos::net;
 using namespace llamaos::xen;
 
-//#define HARD_CODED_MACS
-#define DALAI_REDPJ
-//#define BEOWULF1
+// #define HARD_CODED_MACS
+// #define DALAI_REDPJ
+// #define BEOWULF1
 
 const unsigned int llamaNET::HEADER_LENGTH = sizeof(llamaNET::Protocol_header);
 
@@ -287,9 +287,9 @@ llamaNET::Protocol_header **llamaNET::recvv (uint32_t node, uint32_t &count)
          }
          else
          {
-            // break;
-            rx_head = control->driver.rx_head;
-            tx_head = control->driver.tx_head;
+            break;
+            // rx_head = control->driver.rx_head;
+            // tx_head = control->driver.tx_head;
          }
       }
    }
@@ -372,7 +372,7 @@ llamaNET::Protocol_header *llamaNET::get_send_buffer ()
 
    control->app [index].tx_index = tx_next_index % TX_BUFFERS;
 
-   cout << "*** llamaNET::get_send_buffer tx_index: " << control->app [index].tx_index << endl;
+//   cout << "*** llamaNET::get_send_buffer tx_index: " << control->app [index].tx_index << endl;
    return tx_buffers [control->app [index].tx_index]->get_pointer ();
 }
 
@@ -384,6 +384,10 @@ llamaNET::Protocol_header *llamaNET::get_send_buffer (uint32_t node)
    // wait to use if other indexes are behind
    while ((tx_next_index - control->driver.tx_done_index) > (TX_BUFFERS - 64))
    {
+      // purge out unneeded messages to move the shared tail pointers forward,
+      // otherwise, send can fill the buffer and deadlock with itself
+      purge_buffers (node);
+
       if (control->app [index].tx_tail == control->driver.tx_done_index)
       {
          cout << "stuck on self..." << endl;
@@ -395,13 +399,6 @@ llamaNET::Protocol_header *llamaNET::get_send_buffer (uint32_t node)
          cout << "control->app [0].tx_tail " << control->app [0].tx_tail << endl;
          cout << "control->app [1].tx_tail " << control->app [1].tx_tail << endl;
          cout << "control->app [2].tx_tail " << control->app [2].tx_tail << endl;
-
-         // purge out unneeded messages to move the shared tail pointers forward,
-         // otherwise, send can fill the buffer and deadlock with itself
-         purge_buffers (node);
-//         for (;;);
-//         control->app [index].tx_tail++;
-//         control->app [index].tx_tail %= TX_BUFFERS;
       }
    }
 
@@ -513,15 +510,17 @@ static void hardcoded_macs (llamaNET::Protocol_header *header)
 #ifdef BEOWULF1
    // n021 = even = 00:1e:8c:7e:d4:1b
    // n022 = odd  = 00:1e:8c:91:a4:45
+   // n026 = 00:1d:60:b1:a0:4b
+   // n027 = 00:1e:8c:91:a4:47
    if ((header->dest % 2) == 0)
    {
       // sending to n021
       header->eth_dest [0] = 0x00;
       header->eth_dest [1] = 0x1e;
       header->eth_dest [2] = 0x8c;
-      header->eth_dest [3] = 0x7e;
-      header->eth_dest [4] = 0xd4;
-      header->eth_dest [5] = 0x1b;
+      header->eth_dest [3] = 0x91;  // 0x7e;
+      header->eth_dest [4] = 0xa4;  // 0xd4;
+      header->eth_dest [5] = 0x47;  // 0x1b;
    }
    else
    {
@@ -529,9 +528,9 @@ static void hardcoded_macs (llamaNET::Protocol_header *header)
       header->eth_dest [0] = 0x00;
       header->eth_dest [1] = 0x1e;
       header->eth_dest [2] = 0x8c;
-      header->eth_dest [3] = 0x91;
-      header->eth_dest [4] = 0xa4;
-      header->eth_dest [5] = 0x45;
+      header->eth_dest [3] = 0xb1;  // 0x91;
+      header->eth_dest [4] = 0xa0;  // 0xa4;
+      header->eth_dest [5] = 0x4b;  // 0x45;
    }
 
    if ((header->src % 2) == 0)
@@ -540,9 +539,9 @@ static void hardcoded_macs (llamaNET::Protocol_header *header)
       header->eth_src [0] = 0x00;
       header->eth_src [1] = 0x1e;
       header->eth_src [2] = 0x8c;
-      header->eth_src [3] = 0x7e;
-      header->eth_src [4] = 0xd4;
-      header->eth_src [5] = 0x1b;
+      header->eth_src [3] = 0x91;  // 0x7e;
+      header->eth_src [4] = 0xa4;  // 0xd4;
+      header->eth_src [5] = 0x47;  // 0x1b;
    }
    else
    {
@@ -550,9 +549,9 @@ static void hardcoded_macs (llamaNET::Protocol_header *header)
       header->eth_src [0] = 0x00;
       header->eth_src [1] = 0x1e;
       header->eth_src [2] = 0x8c;
-      header->eth_src [3] = 0x91;
-      header->eth_src [4] = 0xa4;
-      header->eth_src [5] = 0x45;
+      header->eth_src [3] = 0xb1;  // 0x91;
+      header->eth_src [4] = 0xa0;  // 0xa4;
+      header->eth_src [5] = 0x4b;  // 0x45;
    }
 #endif
 }
@@ -574,7 +573,7 @@ void llamaNET::send (Protocol_header *header)
 
 static llamaNET::Protocol_header *headerv [32];
 
-llamaNET::Protocol_header **llamaNET::get_send_bufferv (unsigned int tx_count)
+llamaNET::Protocol_header **llamaNET::get_send_bufferv (uint32_t node, unsigned int tx_count)
 {
    // get next index
    unsigned long tx_next_index = __sync_fetch_and_add (&control->driver.tx_next_index, tx_count);
@@ -582,7 +581,11 @@ llamaNET::Protocol_header **llamaNET::get_send_bufferv (unsigned int tx_count)
    // wait to use if other indexes are behind
    while (((tx_next_index + tx_count) - control->driver.tx_done_index) > (TX_BUFFERS - 64))
    {
-      if (control->app [index].tx_tail == control->driver.tx_done_index)
+      // purge out unneeded messages to move the shared tail pointers forward,
+      // otherwise, send can fill the buffer and deadlock with itself
+      purge_buffers (node);
+
+//      if (control->app [index].tx_tail == control->driver.tx_done_index)
       {
 //         cout << "stuck on self..." << endl;
 //         control->app [index].tx_tail++;
@@ -675,7 +678,7 @@ void llamaNET::purge_buffers (uint32_t node)
 
    while (tx_head != tx_tail)
    {
-      header = tx_buffers [control->app [index].tx_tail]->get_pointer ();
+      header = tx_buffers [tx_tail]->get_pointer ();
 
       if (   (header->eth_type == 0x0C09)
           && (header->dest == node))
@@ -683,10 +686,17 @@ void llamaNET::purge_buffers (uint32_t node)
          break;
       }
 
+      // cout << "purging tx_tail " << tx_tail << endl;
       tx_tail++;
       tx_tail %= TX_BUFFERS;
    }
 
    // update shared tx_tail with (possibly) new value
    control->app [index].tx_tail = tx_tail;
+   mb();
+}
+
+void llamaNET::wait_for_send_complete ()
+{
+   while (control->driver.tx_last_index != control->driver.tx_next_index);
 }

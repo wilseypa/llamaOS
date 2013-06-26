@@ -53,7 +53,6 @@ SOURCES = \
   llamaos/net/i82574/GCR.cpp \
   llamaos/net/i82574/IMC.cpp \
   llamaos/net/i82574/IMS.cpp \
-  llamaos/net/i82574/main.cpp \
   llamaos/net/i82574/RCTL.cpp \
   llamaos/net/i82574/RXDCTL.cpp \
   llamaos/net/i82574/STATUS.cpp \
@@ -64,7 +63,26 @@ SOURCES = \
 OBJECTS = $(SOURCES:%.cpp=$(OBJDIR)/%.o)
 DEPENDS = $(OBJECTS:%.o=%.d)
 
-$(BINDIR)/i82574: $(OBJECTS) $(LIBDIR)/llamaOS.a $(LIBDIR)/stdc++.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
+.PHONY: all
+all: $(BINDIR)/i82574_buffered $(BINDIR)/i82574_lo $(BINDIR)/i82574_rdma
+
+$(BINDIR)/i82574_buffered: $(SRCDIR)/llamaos/net/i82574/main_buffered.o $(OBJECTS) $(LIBDIR)/llamaOS.a $(LIBDIR)/stdc++.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo linking: $@
+	@$(LD) $(LDFLAGS) -T llamaOS.lds -o $@ $^
+	@gzip -c -f --best $@ >$@.gz
+	@echo successfully built: $@
+	@echo
+
+$(BINDIR)/i82574_lo: $(SRCDIR)/llamaos/net/i82574/main_lo.o $(OBJECTS) $(LIBDIR)/llamaOS.a $(LIBDIR)/stdc++.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo linking: $@
+	@$(LD) $(LDFLAGS) -T llamaOS.lds -o $@ $^
+	@gzip -c -f --best $@ >$@.gz
+	@echo successfully built: $@
+	@echo
+
+$(BINDIR)/i82574_rdma: $(SRCDIR)/llamaos/net/i82574/main_rdma.o $(OBJECTS) $(LIBDIR)/llamaOS.a $(LIBDIR)/stdc++.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
 	@$(LD) $(LDFLAGS) -T llamaOS.lds -o $@ $^
