@@ -44,6 +44,7 @@ all:
 	@-command -v $(MPICC) >/dev/null && ($(MAKE) -f apps/IMB.mk)
 	@-command -v $(MPICC) >/dev/null && ($(MAKE) -f apps/latency-MPI.mk)
 	@-command -v $(MPICC) >/dev/null && ($(MAKE) -f apps/netpipe-$(NETPIPE_VERSION)-mpi.mk)
+#	@$(MAKE) -f test/memory.mk
 
 .PHONY: install
 install:

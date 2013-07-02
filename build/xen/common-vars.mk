@@ -50,6 +50,7 @@ OBJDIR = obj
 
 INCDIR = include
 SRCDIR = ../../src
+TESTDIR = ../../test
 
 GLIBC_VERSION = 2.17
 GCC_VERSION = 4.8.0

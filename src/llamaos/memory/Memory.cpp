@@ -262,6 +262,11 @@ uint64_t get_reserved_size ()
    return memory::reserved_pages * PAGE_SIZE;
 }
 
+void *get_program_break ()
+{
+   return program_break;
+}
+
 void *set_program_break (void *address)
 {
    if (   (pointer_to_address (address) >= start_virtual_address)

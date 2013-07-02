@@ -54,6 +54,7 @@ OBJDIR = obj
 
 INCDIR = include
 SRCDIR = ../../src
+TESTDIR = ../../test
 
 NETPIPE_VERSION = 3.7.2
 
