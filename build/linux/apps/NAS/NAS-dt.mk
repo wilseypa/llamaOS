@@ -30,35 +30,38 @@
 # contributors.
 #
 
-# make parameters
-MAKEFLAGS = --silent
+# include common variables
+include common-vars.mk
+include common-flags.mk
 
-MAKEFILE_SOURCES = common-vars.mk
+MAKEFILE_SOURCES += apps/NAS/NAS-dt.mk
 
-# compiler tools
-CC = gcc
-CXX = g++
-F77 = gfortran
-F90 = gfortran
-AS = as
-LD = ld
-MPICC = mpicc
-MPICXX = mpicxx
-MPIF77 = mpif77
-MPIF90 = mpif90
+# override this for MPI
+CC = $(MPICC)
 
-# shared common paths
-BINDIR = bin
-LIBDIR = lib
-OBJDIR = obj
+CFLAGS += \
+  -I $(INCDIR)/NAS/dt
 
-INCDIR = include
-SRCDIR = ../../src
+VPATH = $(SRCDIR)
 
-NETPIPE_VERSION = 3.7.2
+SOURCES = \
+  apps/NPB3.2-MPI/common/c_print_results.c \
+  apps/NPB3.2-MPI/common/c_timers.c \
+  apps/NPB3.2-MPI/common/randdp.c \
+  apps/NPB3.2-MPI/DT/dt.c \
+  apps/NPB3.2-MPI/DT/DGraph.c
 
-# auto dependency generation
-DEPENDS = 
+OBJECTS = $(SOURCES:%.c=$(OBJDIR)/%.o)
+DEPENDS = $(OBJECTS:%.o=%.d)
 
-# if present, include custom variables
--include custom-vars.mk
+$(BINDIR)/NAS/dt: $(OBJECTS)
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo linking: $@
+	@$(CC) -o $@ $^
+	@echo successfully built: $@
+	@echo
+
+include rules.mk
+
+# include auto-generated dependencies
+-include $(DEPENDS)

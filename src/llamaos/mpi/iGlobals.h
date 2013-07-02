@@ -59,13 +59,13 @@ class iRequest;
 //#define MPI_USE_BCAST_HARDWARE
 #define MPI_WATCHDOG_TIME 5
 
-#define MAX_MESS_SIZE 3950
+// #define MAX_MESS_SIZE 3950
 
 // 1500 - 64
 // #define MAX_MESS_SIZE 1436
 
 // 4096 - 64
-// #define MAX_MESS_SIZE 4032
+#define MAX_MESS_SIZE 4032
 
 typedef char MPI_CHAR_T;
 typedef unsigned char MPI_BYTE_T;		

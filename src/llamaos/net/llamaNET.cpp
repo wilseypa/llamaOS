@@ -418,16 +418,6 @@ static void hardcoded_macs (llamaNET::Protocol_header *header)
 #ifdef DALAI_REDPJ
    if ((header->dest % 2) == 0)
    {
-      // sending to dalai
-      header->eth_dest [0] = 0x00;
-      header->eth_dest [1] = 0x1b;
-      header->eth_dest [2] = 0x21;
-      header->eth_dest [3] = 0xd5;
-      header->eth_dest [4] = 0x66;
-      header->eth_dest [5] = 0xef;
-   }
-   else
-   {
       // sending to redpj
       header->eth_dest [0] = 0x68;
       header->eth_dest [1] = 0x05;
@@ -436,18 +426,18 @@ static void hardcoded_macs (llamaNET::Protocol_header *header)
       header->eth_dest [4] = 0xf7;
       header->eth_dest [5] = 0xdb;
    }
+   else
+   {
+      // sending to dalai
+      header->eth_dest [0] = 0x00;
+      header->eth_dest [1] = 0x1b;
+      header->eth_dest [2] = 0x21;
+      header->eth_dest [3] = 0xd5;
+      header->eth_dest [4] = 0x66;
+      header->eth_dest [5] = 0xef;
+   }
 
    if ((header->src % 2) == 0)
-   {
-      // sending from dalai
-      header->eth_src [0] = 0x00;
-      header->eth_src [1] = 0x1b;
-      header->eth_src [2] = 0x21;
-      header->eth_src [3] = 0xd5;
-      header->eth_src [4] = 0x66;
-      header->eth_src [5] = 0xef;
-   }
-   else
    {
       // sending from redpj
       header->eth_src [0] = 0x68;
@@ -456,6 +446,16 @@ static void hardcoded_macs (llamaNET::Protocol_header *header)
       header->eth_src [3] = 0x01;
       header->eth_src [4] = 0xf7;
       header->eth_src [5] = 0xdb;
+   }
+   else
+   {
+      // sending from dalai
+      header->eth_src [0] = 0x00;
+      header->eth_src [1] = 0x1b;
+      header->eth_src [2] = 0x21;
+      header->eth_src [3] = 0xd5;
+      header->eth_src [4] = 0x66;
+      header->eth_src [5] = 0xef;
    }
 #endif
 

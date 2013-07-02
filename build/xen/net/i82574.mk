@@ -66,7 +66,7 @@ DEPENDS = $(OBJECTS:%.o=%.d)
 .PHONY: all
 all: $(BINDIR)/i82574_buffered $(BINDIR)/i82574_lo $(BINDIR)/i82574_rdma
 
-$(BINDIR)/i82574_buffered: $(SRCDIR)/llamaos/net/i82574/main_buffered.o $(OBJECTS) $(LIBDIR)/llamaOS.a $(LIBDIR)/stdc++.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
+$(BINDIR)/i82574_buffered: $(OBJDIR)/llamaos/net/i82574/main_buffered.o $(OBJECTS) $(LIBDIR)/llamaOS.a $(LIBDIR)/stdc++.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
 	@$(LD) $(LDFLAGS) -T llamaOS.lds -o $@ $^
@@ -74,7 +74,7 @@ $(BINDIR)/i82574_buffered: $(SRCDIR)/llamaos/net/i82574/main_buffered.o $(OBJECT
 	@echo successfully built: $@
 	@echo
 
-$(BINDIR)/i82574_lo: $(SRCDIR)/llamaos/net/i82574/main_lo.o $(OBJECTS) $(LIBDIR)/llamaOS.a $(LIBDIR)/stdc++.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
+$(BINDIR)/i82574_lo: $(OBJDIR)/llamaos/net/i82574/main_lo.o $(OBJECTS) $(LIBDIR)/llamaOS.a $(LIBDIR)/stdc++.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
 	@$(LD) $(LDFLAGS) -T llamaOS.lds -o $@ $^
@@ -82,7 +82,7 @@ $(BINDIR)/i82574_lo: $(SRCDIR)/llamaos/net/i82574/main_lo.o $(OBJECTS) $(LIBDIR)
 	@echo successfully built: $@
 	@echo
 
-$(BINDIR)/i82574_rdma: $(SRCDIR)/llamaos/net/i82574/main_rdma.o $(OBJECTS) $(LIBDIR)/llamaOS.a $(LIBDIR)/stdc++.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
+$(BINDIR)/i82574_rdma: $(OBJDIR)/llamaos/net/i82574/main_rdma.o $(OBJECTS) $(LIBDIR)/llamaOS.a $(LIBDIR)/stdc++.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
 	@$(LD) $(LDFLAGS) -T llamaOS.lds -o $@ $^

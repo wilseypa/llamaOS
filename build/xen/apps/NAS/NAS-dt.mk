@@ -38,9 +38,7 @@ MAKEFILE_SOURCES += apps/NAS/NAS-dt.mk
 
 CFLAGS += \
   -I $(INCDIR) \
-  -I $(SRCDIR) \
-  -I $(SRCDIR)/llamaos/mpi \
-  -I ../src/apps \
+  -I $(INCDIR)/llamaos/mpi \
   -I util/NAS/dt \
   -D__XEN_INTERFACE_VERSION__=0x00030205 \
   -include $(SRCDIR)/llamaos/__thread.h

@@ -36,8 +36,12 @@ include common-flags.mk
 
 MAKEFILE_SOURCES += apps/NAS/NAS-sp.mk
 
-F90FLAGS += -I $(SRCDIR)/llamaos/mpi \
-  -I util/NAS/sp
+F77FLAGS += \
+  -I $(INCDIR) \
+  -I $(INCDIR)/llamaos/mpi \
+  -I util/NAS/sp \
+  -D__XEN_INTERFACE_VERSION__=0x00030205 \
+  -include $(SRCDIR)/llamaos/__thread.h
 
 VPATH = $(SRCDIR)
 
@@ -69,14 +73,13 @@ SOURCES = \
   apps/NPB3.2-MPI/common/timers.f \
   apps/NPB3.2-MPI/common/randi8.f \
   apps/NPB3.2-MPI/common/print_results.f
-  
+
 OBJECTS = $(SOURCES:%.f=$(OBJDIR)/%.o)
 DEPENDS = $(OBJECTS:%.o=%.d)
 
 $(BINDIR)/NAS/sp: $(OBJECTS) $(LIBDIR)/llamaMPIF.a $(LIBDIR)/llamaMPI.a $(LIBDIR)/llamaOS.a $(LIBDIR)/stdc++.a $(LIBDIR)/gfortran.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
-	@echo $(LDFLAGS)
 	@$(LD) $(LDFLAGS) -T llamaOS.lds -o $@ $^
 	@gzip -c -f --best $@ >$@.gz
 	@echo successfully built: $@

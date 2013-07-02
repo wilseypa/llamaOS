@@ -30,35 +30,60 @@
 # contributors.
 #
 
-# make parameters
-MAKEFLAGS = --silent
+# include common variables
+include common-vars.mk
+include common-flags.mk
 
-MAKEFILE_SOURCES = common-vars.mk
+MAKEFILE_SOURCES += apps/NAS/NAS-sp.mk
 
-# compiler tools
-CC = gcc
-CXX = g++
-F77 = gfortran
-F90 = gfortran
-AS = as
-LD = ld
-MPICC = mpicc
-MPICXX = mpicxx
-MPIF77 = mpif77
-MPIF90 = mpif90
+# override this for MPI
+F77 = $(MPIF77)
 
-# shared common paths
-BINDIR = bin
-LIBDIR = lib
-OBJDIR = obj
+F77FLAGS += \
+  -I $(INCDIR)/NAS/sp
 
-INCDIR = include
-SRCDIR = ../../src
+VPATH = $(SRCDIR)
 
-NETPIPE_VERSION = 3.7.2
+SOURCES = \
+  apps/NPB3.2-MPI/SP/add.f \
+  apps/NPB3.2-MPI/SP/adi.f \
+  apps/NPB3.2-MPI/SP/copy_faces.f \
+  apps/NPB3.2-MPI/SP/define.f \
+  apps/NPB3.2-MPI/SP/error.f \
+  apps/NPB3.2-MPI/SP/exact_rhs.f \
+  apps/NPB3.2-MPI/SP/exact_solution.f \
+  apps/NPB3.2-MPI/SP/initialize.f \
+  apps/NPB3.2-MPI/SP/lhsx.f \
+  apps/NPB3.2-MPI/SP/lhsy.f \
+  apps/NPB3.2-MPI/SP/lhsz.f \
+  apps/NPB3.2-MPI/SP/make_set.f \
+  apps/NPB3.2-MPI/SP/ninvr.f \
+  apps/NPB3.2-MPI/SP/pinvr.f \
+  apps/NPB3.2-MPI/SP/rhs.f \
+  apps/NPB3.2-MPI/SP/set_constants.f \
+  apps/NPB3.2-MPI/SP/setup_mpi.f \
+  apps/NPB3.2-MPI/SP/sp.f \
+  apps/NPB3.2-MPI/SP/txinvr.f \
+  apps/NPB3.2-MPI/SP/tzetar.f \
+  apps/NPB3.2-MPI/SP/verify.f \
+  apps/NPB3.2-MPI/SP/x_solve.f \
+  apps/NPB3.2-MPI/SP/y_solve.f \
+  apps/NPB3.2-MPI/SP/z_solve.f \
+  apps/NPB3.2-MPI/common/timers.f \
+  apps/NPB3.2-MPI/common/randi8.f \
+  apps/NPB3.2-MPI/common/print_results.f
+  
+OBJECTS = $(SOURCES:%.f=$(OBJDIR)/%.o)
+DEPENDS = $(OBJECTS:%.o=%.d)
 
-# auto dependency generation
-DEPENDS = 
+$(BINDIR)/NAS/sp: $(OBJECTS)
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo linking: $@
+	@$(F77) -o $@ $^
+	@echo successfully built: $@
+	@echo
 
-# if present, include custom variables
--include custom-vars.mk
+include rules.mk
+
+# include auto-generated dependencies
+-include $(DEPENDS)

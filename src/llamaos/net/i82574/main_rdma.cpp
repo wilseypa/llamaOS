@@ -351,7 +351,7 @@ int main (int /* argc */, char ** /* argv [] */)
    csr.write (0x5f40, 50);
 
    // high threshold out of 20KB or 0x5000
-   csr.write(0x2160, 0x2500|0x80000000);  // 0x4800|0x80000000);
+   csr.write(0x2160, 0x4000|0x80000000);  // 0x4800|0x80000000);
    csr.write(0x2168, 0x2000);
 //   sleep (1);
 
@@ -724,7 +724,7 @@ int main (int /* argc */, char ** /* argv [] */)
             for (int i = 0; i < 6; i++)
             {
                if (   (llamaNET_control->app [i].online)
-                  && (llamaNET_control->driver.tx_done_index == llamaNET_control->app [i].tx_tail))
+                  && ((llamaNET_control->driver.tx_done_index % TX_BUFFERS) == llamaNET_control->app [i].tx_tail))
                {
                   update = false;
                   break;

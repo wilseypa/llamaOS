@@ -35,6 +35,7 @@ include common-vars.mk
 
 .PHONY: all
 all:
+	@$(MAKE) -f apps/NAS/NAS.mk
 	@$(MAKE) -f apps/hello-f77.mk
 	@$(MAKE) -f apps/hello-f90.mk
 	@$(MAKE) -f apps/latency-TCPIP.mk

@@ -84,7 +84,7 @@ struct buffer_entry
    uint64_t address;
 };
 
-static const unsigned int rx_desc_pages = 16;
+static const unsigned int rx_desc_pages = 32;
 static const unsigned int rx_desc_size = rx_desc_pages * PAGE_SIZE;
 static const unsigned int rx_desc_max = rx_desc_size / sizeof(rx_desc_t);
 static unsigned int rx_desc_xref [rx_desc_max];
@@ -335,11 +335,11 @@ int main (int /* argc */, char ** /* argv [] */)
    csr.write (0x30, 0x8808);
 
    // transmit timer value in 512 nanoseconds units
-   csr.write (0x170, 100);
+   csr.write (0x170, 50);
    csr.write (0x5f40, 50);
 
    // high threshold out of 20KB or 0x5000
-   csr.write(0x2160, 0x4800|0x80000000);
+   csr.write(0x2160, 0x4000|0x80000000);
    csr.write(0x2168, 0x2000);
 //   sleep (1);
 
@@ -655,31 +655,42 @@ int main (int /* argc */, char ** /* argv [] */)
 
    bool move_rx_tail = false;
 
+   unsigned int rx_head = 0;
    unsigned int rx_next_head = 0;
    unsigned int rx_index = 0;
    unsigned int tx_tail = 0;
    unsigned int tx_tail2 = 0;
    unsigned int head = 0;
 
+   uint64_t tx_next_index = 0;
+   uint64_t tx_last_index = 0;
+   uint32_t tx_count = 0;
+   uint32_t rx_count = 0;
+
+   int rx_limit = 0;
+   int tx_limit = 0;
+
    // endlessly process messages (or until quit signal)
    for (;;)
    {
+      rx_head = llamaNET_control->driver.rx_head;
+      rx_count = 0;
+      rx_limit = 0;
+
       // check for newly arriving messages on the hardware
       while (rx_desc [rx_desc_xref [rx_desc_head]].status != 0)
       {
-//         llamaos::net::llamaNET::Protocol_header *header =
-//            reinterpret_cast<llamaos::net::llamaNET::Protocol_header *> (
-//            rx_hardware_buffers [rx_desc_head].pointer);
-//cout << "hardware recving " << header->seq << " with length " << header->len
-//     << " , " << rx_desc [rx_desc_xref [rx_desc_head]].length << endl;
-
          // queue address to be later copied into shared buffer
          hardware_rx_data.push (rx_desc_head);
 
          // increment head pointer of hardware receive buffer
-// cout << "recv hardware " << rx_desc_head << endl;
          rx_desc_head++;
          rx_desc_head %= rx_desc_max;
+
+         if (++rx_limit > 64)
+         {
+            break;
+         }
       }
 
       // check for entries in the shared receive buffer no longer in use
@@ -706,18 +717,20 @@ int main (int /* argc */, char ** /* argv [] */)
          rx_tail_global %= RX_BUFFERS;
       }
 
+      rx_head = llamaNET_control->driver.rx_head;
+      rx_count = 0;
+
       // attempt to copy data from the hardware receive buffer
       // to the shared receive buffer
       while (!hardware_rx_data.empty ())
       {
          // check is buffer is full?
-         rx_next_head = llamaNET_control->driver.rx_head;
+         rx_next_head = rx_head;
          rx_next_head++;
          rx_next_head %= RX_BUFFERS;
 
          if (rx_tail_global == rx_next_head)
          {
-// cout << "rx_buffer full..." << endl;
             break;
          }
 
@@ -725,28 +738,9 @@ int main (int /* argc */, char ** /* argv [] */)
          rx_index = hardware_rx_data.front ();
          hardware_rx_data.pop ();
 
-//         llamaos::net::llamaNET::Protocol_header *header =
-//            reinterpret_cast<llamaos::net::llamaNET::Protocol_header *> (
-//            rx_hardware_buffers [rx_index].pointer);
-//cout << "recving " << header->seq << " with length " << header->len
-//     << " , " << rx_desc [rx_desc_xref [rx_index]].length << endl;
-
-//         if ((header->len + 40)
-//             != rx_desc [rx_desc_xref [rx_index]].length)
-//         {
-//            cout << "recv length " << rx_desc [rx_desc_xref [rx_index]].length
-//                 << endl;
-//            cout << "header length " << header->len << endl;
-//            cout << "header seq " << header->seq << endl;
-//         }
-
-         memcpy (rx_shared_buffers [llamaNET_control->driver.rx_head],
+         memcpy (rx_shared_buffers [rx_head],
                  rx_hardware_buffers [rx_index].pointer,
                  rx_desc [rx_desc_xref [rx_index]].length);
-
-         // move shared head pointer
-         wmb();
-         llamaNET_control->driver.rx_head = rx_next_head;
 
          // signal hardware to reuse buffer
          rx_desc [rx_desc_xref [rx_index]].checksum = 0;
@@ -755,13 +749,26 @@ int main (int /* argc */, char ** /* argv [] */)
          rx_desc [rx_desc_xref [rx_index]].status = 0;
          rx_desc [rx_desc_xref [rx_index]].vlan = 0;
 
-         rx_tail++;
+         rx_head = rx_next_head;
+         rx_count++;
+      }
+
+      if (rx_count > 0)
+      {
+         wmb();
+
+         rx_tail += rx_count;
          rx_tail %= rx_desc_max;
          csr.write_RDT (rx_tail);
+
+         // move shared head pointer
+         rx_next_head = llamaNET_control->driver.rx_head;
+         rx_next_head += rx_count;
+         rx_next_head %= RX_BUFFERS;
+         llamaNET_control->driver.rx_head = rx_next_head;
       }
 
       // check for requests to send data to the hardware
-
 // !BAM this still does not work properly
 // The complications comes from the fact that the masks will not be set in
 //      order. The various guest are requesting buffers and sending them
@@ -857,9 +864,10 @@ int main (int /* argc */, char ** /* argv [] */)
          }
       }
 #else
-      uint64_t tx_next_index = llamaNET_control->driver.tx_next_index;
-      uint64_t tx_last_index = llamaNET_control->driver.tx_last_index;
-      uint32_t tx_count = 0;
+      tx_next_index = llamaNET_control->driver.tx_next_index;
+      tx_last_index = llamaNET_control->driver.tx_last_index;
+      tx_count = 0;
+      tx_limit = 0;
 
       while (tx_next_index != tx_last_index)
       {
@@ -889,7 +897,7 @@ int main (int /* argc */, char ** /* argv [] */)
                tx_desc [tx_desc_xref [tx_tail]].STA = 0;
                tx_desc [tx_desc_xref [tx_tail]].CSS = 0;
                tx_desc [tx_desc_xref [tx_tail]].VLAN = 0;
-//cout << "sending " << header->seq << " with length " << header->len << endl;
+
                tx_tail++;
                tx_tail %= tx_desc_max;
 
@@ -913,13 +921,17 @@ int main (int /* argc */, char ** /* argv [] */)
             // this bit is not set yet so stop processing sends
             break;
          }
+
+         if (++tx_limit > 64)
+         {
+            break;
+         }
       }
 
       if (tx_count > 0)
       {
          wmb();
          csr.write_TDT (tx_tail);
-//cout << "send hardware " << tx_tail << endl;
 
          head = llamaNET_control->driver.tx_head;
          head += tx_count;
@@ -959,11 +971,6 @@ int main (int /* argc */, char ** /* argv [] */)
          {
             break;
          }
-
-//         llamaos::net::llamaNET::Protocol_header *header =
-//            reinterpret_cast<llamaos::net::llamaNET::Protocol_header *> (
-//            tx_buffers [llamaNET_control->driver.tx_done_index % TX_BUFFERS].pointer);
-//cout << "    moving tx_done " << header->seq << endl;
 
          llamaNET_control->driver.tx_done_index++;
       }

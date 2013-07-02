@@ -30,35 +30,37 @@
 # contributors.
 #
 
-# make parameters
-MAKEFLAGS = --silent
+# include common variables
+include common-vars.mk
+include common-flags.mk
 
-MAKEFILE_SOURCES = common-vars.mk
+MAKEFILE_SOURCES += apps/NAS/NAS-cg.mk
 
-# compiler tools
-CC = gcc
-CXX = g++
-F77 = gfortran
-F90 = gfortran
-AS = as
-LD = ld
-MPICC = mpicc
-MPICXX = mpicxx
-MPIF77 = mpif77
-MPIF90 = mpif90
+# override this for MPI
+F77 = $(MPIF77)
 
-# shared common paths
-BINDIR = bin
-LIBDIR = lib
-OBJDIR = obj
+F77FLAGS += \
+  -I $(INCDIR)/NAS/cg
 
-INCDIR = include
-SRCDIR = ../../src
+VPATH = $(SRCDIR)
 
-NETPIPE_VERSION = 3.7.2
+SOURCES = \
+  apps/NPB3.2-MPI/CG/cg.f \
+  apps/NPB3.2-MPI/common/timers.f \
+  apps/NPB3.2-MPI/common/randi8.f \
+  apps/NPB3.2-MPI/common/print_results.f
 
-# auto dependency generation
-DEPENDS = 
+OBJECTS = $(SOURCES:%.f=$(OBJDIR)/%.o)
+DEPENDS = $(OBJECTS:%.o=%.d)
 
-# if present, include custom variables
--include custom-vars.mk
+$(BINDIR)/NAS/cg: $(OBJECTS)
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo linking: $@
+	@$(F77) -o $@ $^
+	@echo successfully built: $@
+	@echo
+
+include rules.mk
+
+# include auto-generated dependencies
+-include $(DEPENDS)

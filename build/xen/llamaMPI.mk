@@ -120,8 +120,9 @@ CPP_SOURCES += \
   llamaos/mpi/g/MPI_Grecv.cpp
 
 HEADERS = \
-  $(INCDIR)/llamaos/mpi/mpi.h
- 
+  $(INCDIR)/llamaos/mpi/mpi.h \
+  $(INCDIR)/llamaos/mpi/mpif.h
+
 # generate object list
 OBJECTS = $(CPP_SOURCES:%.cpp=$(OBJDIR)/%.o)
 DEPENDS = $(OBJECTS:%.o=%.d)

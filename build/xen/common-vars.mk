@@ -38,6 +38,7 @@ MAKEFILE_SOURCES = common-vars.mk
 # compiler tools
 CC = gcc
 CXX = g++
+F77 = gfortran
 F90 = gfortran
 AS = as
 LD = ld

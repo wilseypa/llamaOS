@@ -2,6 +2,7 @@
 # Generated binaries and dependency files #
 ###########################################
 build/linux/bin/
+build/linux/include/
 build/linux/lib/
 build/linux/obj/
 build/linux/test/

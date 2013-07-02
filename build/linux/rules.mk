@@ -67,7 +67,7 @@ $(OBJDIR)/%.o : %.f90 $(MAKEFILE_SOURCES)
 $(OBJDIR)/%.o : %.f $(MAKEFILE_SOURCES)
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo compiling: $<
-	@$(F90) -c $(F90FLAGS) -o $@ $<
+	@$(F77) -c $(F77FLAGS) -o $@ $<
 
 # The $(MAKEFILE_SOURCES) dependency is not needed here since it would take a 
 # source file change to cause the auto-generated lists to change.
@@ -100,4 +100,4 @@ $(OBJDIR)/%.d : %.f90
 $(OBJDIR)/%.d : %.f
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo creating: $@ from $<
-	@$(F90) $(F90FLAGS) -cpp -MM -MP -MT '$(OBJDIR)/$*.o $(OBJDIR)/$*.d' -MF $@ $<
+	@$(F77) $(F77FLAGS) -cpp -MM -MP -MT '$(OBJDIR)/$*.o $(OBJDIR)/$*.d' -MF $@ $<
