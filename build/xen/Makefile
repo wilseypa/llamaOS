@@ -53,6 +53,7 @@ all:
 	@$(MAKE) -f llamaMPI.mk
 	@$(MAKE) -f llamaMPIF.mk
 	@$(MAKE) -f apps/NAS/NAS.mk
+	@$(MAKE) -f apps/net/intel.mk
 	@$(MAKE) -f apps/hello-c.mk
 	@$(MAKE) -f apps/hello-cpp.mk
 	@$(MAKE) -f apps/hello-f77-llamaOS.mk
