@@ -28,8 +28,8 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#ifndef llamaos_net_intel_regs_ctrl_h_
-#define llamaos_net_intel_regs_ctrl_h_
+#ifndef llamaos_net_intel_regs_ctrl_ext_h_
+#define llamaos_net_intel_regs_ctrl_ext_h_
 
 #include <cstdint>
 
@@ -42,10 +42,10 @@ namespace intel {
 namespace regs {
 
 /**
- * @brief Device Control register.
+ * @brief Extended Device Control register.
  * 
  */
-class CTRL
+class CTRL_EXT
 {
 public:
    /**
@@ -54,7 +54,7 @@ public:
     * @param value Initial value (usually read from hardware).
     * 
     */
-   CTRL (uint32_t value);
+   CTRL_EXT (uint32_t value);
 
    /**
     * @breif Convert to 32-bit integer.
@@ -63,166 +63,159 @@ public:
    operator uint32_t () const;
 
    /**
-    * @brief Full Duplex bit.
+    * @brief Auto Speed Detection Check bit.
     * 
     */
-   bool FD () const;
+   bool ASDCHK () const;
 
    /**
-    * @brief Full Duplex bit.
+    * @brief Auto Speed Detection Check bit.
     * 
     */
-   void FD (bool flag);
+   void ASDCHK (bool flag);
 
    /**
-    * @brief GIO master disable bit.
+    * @brief EEPROM Reset bit.
     * 
     */
-   bool GIO_master_disable () const;
+   bool EE_RST () const;
 
    /**
-    * @brief GIO master disable bit.
+    * @brief EEPROM Reset bit.
     * 
     */
-   void GIO_master_disable (bool flag);
+   void EE_RST (bool flag);
 
    /**
-    * @brief Auto-Speed Detect Enable bit.
+    * @brief Speed Select Bypass bit.
     * 
     */
-   bool ASDE () const;
+   bool SPD_BYPS () const;
 
    /**
-    * @brief Auto-Speed Detect Enable bit.
+    * @brief Speed Select Bypass bit.
     * 
     */
-   void ASDE (bool flag);
+   void SPD_BYPS (bool flag);
 
    /**
-    * @brief Set Link Up bit.
+    * @brief Relaxed Ordering Disable bit.
     * 
     */
-   bool SLU () const;
+   bool RO_DIS () const;
 
    /**
-    * @brief Set Link Up bit.
+    * @brief Relaxed Ordering Disable bit.
     * 
     */
-   void SLU (bool flag);
+   void RO_DIS (bool flag);
 
    /**
-    * @brief Speed Selection options.
-    * 
-    */
-   enum Speed_enum { Speed_10Mbs, Speed_100Mbs, Speed_1000Mbs };
+    * @brief DMA Dynamic Gating Enable bit.
+    *
+    */ 
+   bool DMA_dynamic_gating_enable () const;
 
    /**
-    * @brief Speed Selection bits.
-    * 
-    */
-   Speed_enum SPEED () const;
+    * @brief DMA Dynamic Gating Enable bit.
+    *
+    */ 
+   void DMA_dynamic_gating_enable (bool flag);
 
    /**
-    * @brief Speed Selection bits.
+    * @brief PHY Power Down Enable bit.
     * 
     */
-   void SPEED (Speed_enum speed);
+   bool PHY_power_down_enable () const;
 
    /**
-    * @brief Force Speed bit.
+    * @brief PHY Power Down Enable bit.
     * 
     */
-   bool FRCSPD () const;
+   void PHY_power_down_enable (bool flag);
 
    /**
-    * @brief Force Speed bit.
+    * @brief TX LS Flow bit.
     * 
     */
-   void FRCSPD (bool flag);
+   bool TX_LS_FLOW () const;
 
    /**
-    * @brief Force Duplex bit.
+    * @brief TX LS Flow bit.
     * 
     */
-   bool FRCDPLX () const;
+   void TX_LS_FLOW (bool flag);
 
    /**
-    * @brief Force Duplex bit.
+    * @brief TX LS bit.
     * 
     */
-   void FRCDPLX (bool flag);
+   bool TX_LS () const;
 
    /**
-    * @brief D3Cold WakeUp Capability Advertisement Enable bit.
+    * @brief TX LS bit.
     * 
     */
-   bool ADVD3WUC () const;
+   void TX_LS (bool flag);
 
    /**
-    * @brief D3Cold WakeUp Capability Advertisement Enable bit.
+    * @brief Extended Interrupt Auto Mask Enable bit.
     * 
     */
-   void ADVD3WUC (bool flag);
+   bool EIAME () const;
 
    /**
-    * @brief Device Reset bit.
+    * @brief Extended Interrupt Auto Mask Enable bit.
     * 
     */
-   bool RST () const;
+   void EIAME (bool flag);
+   /**
+    * @brief Interrupt Acknowledge Auto Mask Enable bit.
+    * 
+    */
+   bool IAME () const;
 
    /**
-    * @brief Device Reset bit.
+    * @brief Interrupt Acknowledge Auto Mask Enable bit.
     * 
     */
-   void RST (bool flag);
+   void IAME (bool flag);
 
    /**
-    * @brief Receive Flow Control Enable bit.
+    * @brief Driver Loaded bit.
     * 
     */
-   bool RFCE () const;
+   bool DRV_LOAD () const;
 
    /**
-    * @brief Receive Flow Control Enable bit.
+    * @brief Driver Loaded bit.
     * 
     */
-   void RFCE (bool flag);
+   void DRV_LOAD (bool flag);
 
    /**
-    * @brief Transmit Flow Control Enable bit.
+    * @brief Interrupt Timers Clear Enable bit.
     * 
     */
-   bool TFCE () const;
+   bool INT_TIMERS_CLEAR_ENA () const;
 
    /**
-    * @brief Transmit Flow Control Enable bit.
+    * @brief Interrupt Timers Clear Enable bit.
     * 
     */
-   void TFCE (bool flag);
+   void INT_TIMERS_CLEAR_ENA (bool flag);
 
    /**
-    * @brief VLAN Mode Enable.
+    * @brief PBA Support bit.
     * 
     */
-   bool VME () const;
+   bool PBA_SUPPORT () const;
 
    /**
-    * @brief VLAN Mode Enable.
+    * @brief PBA Support bit.
     * 
     */
-   void VME (bool flag);
-
-   /**
-    * @brief PHY Reset bit.
-    * 
-    */
-   bool PHY_RST () const;
-
-   /**
-    * @brief PHY Reset bit.
-    * 
-    */
-   void PHY_RST (bool flag);
+   void PBA_SUPPORT (bool flag);
 
 private:
    std::bitset<32> value;
@@ -233,8 +226,8 @@ private:
  * @brief Stream insertion operator.
  * 
  */
-std::ostream &operator<< (std::ostream &, const CTRL &);
+std::ostream &operator<< (std::ostream &, const CTRL_EXT &);
 
 } } } }
 
-#endif // apps_net_intel_regs_ctrl_h_
+#endif // llamaos_net_intel_regs_ctrl_ext_h_

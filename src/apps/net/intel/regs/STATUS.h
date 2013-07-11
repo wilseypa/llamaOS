@@ -28,8 +28,8 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#ifndef llamaos_net_intel_regs_ctrl_h_
-#define llamaos_net_intel_regs_ctrl_h_
+#ifndef llamaos_net_intel_regs_status_h_
+#define llamaos_net_intel_regs_status_h_
 
 #include <cstdint>
 
@@ -42,19 +42,19 @@ namespace intel {
 namespace regs {
 
 /**
- * @brief Device Control register.
+ * @brief Device Status register.
  * 
  */
-class CTRL
+class STATUS
 {
 public:
    /**
     * @breif Construct from value.
     * 
-    * @param value Initial value (usually read from hardware).
+    * @param value Value (usually read from hardware).
     * 
     */
-   CTRL (uint32_t value);
+   STATUS (uint32_t value);
 
    /**
     * @breif Convert to 32-bit integer.
@@ -69,46 +69,16 @@ public:
    bool FD () const;
 
    /**
-    * @brief Full Duplex bit.
+    * @brief Link Up bit.
     * 
     */
-   void FD (bool flag);
+   bool LU () const;
 
    /**
-    * @brief GIO master disable bit.
+    * @brief Transmission Paused bit.
     * 
     */
-   bool GIO_master_disable () const;
-
-   /**
-    * @brief GIO master disable bit.
-    * 
-    */
-   void GIO_master_disable (bool flag);
-
-   /**
-    * @brief Auto-Speed Detect Enable bit.
-    * 
-    */
-   bool ASDE () const;
-
-   /**
-    * @brief Auto-Speed Detect Enable bit.
-    * 
-    */
-   void ASDE (bool flag);
-
-   /**
-    * @brief Set Link Up bit.
-    * 
-    */
-   bool SLU () const;
-
-   /**
-    * @brief Set Link Up bit.
-    * 
-    */
-   void SLU (bool flag);
+   bool TXOFF () const;
 
    /**
     * @brief Speed Selection options.
@@ -123,106 +93,22 @@ public:
    Speed_enum SPEED () const;
 
    /**
-    * @brief Speed Selection bits.
+    * @brief Auto-Speed Detection Value bit.
     * 
     */
-   void SPEED (Speed_enum speed);
+   Speed_enum ASDV () const;
 
    /**
-    * @brief Force Speed bit.
+    * @brief PHY Reset Asserted bit.
     * 
     */
-   bool FRCSPD () const;
+   bool PHYRA () const;
 
    /**
-    * @brief Force Speed bit.
+    * @brief GIO Master Enable Status bit.
     * 
     */
-   void FRCSPD (bool flag);
-
-   /**
-    * @brief Force Duplex bit.
-    * 
-    */
-   bool FRCDPLX () const;
-
-   /**
-    * @brief Force Duplex bit.
-    * 
-    */
-   void FRCDPLX (bool flag);
-
-   /**
-    * @brief D3Cold WakeUp Capability Advertisement Enable bit.
-    * 
-    */
-   bool ADVD3WUC () const;
-
-   /**
-    * @brief D3Cold WakeUp Capability Advertisement Enable bit.
-    * 
-    */
-   void ADVD3WUC (bool flag);
-
-   /**
-    * @brief Device Reset bit.
-    * 
-    */
-   bool RST () const;
-
-   /**
-    * @brief Device Reset bit.
-    * 
-    */
-   void RST (bool flag);
-
-   /**
-    * @brief Receive Flow Control Enable bit.
-    * 
-    */
-   bool RFCE () const;
-
-   /**
-    * @brief Receive Flow Control Enable bit.
-    * 
-    */
-   void RFCE (bool flag);
-
-   /**
-    * @brief Transmit Flow Control Enable bit.
-    * 
-    */
-   bool TFCE () const;
-
-   /**
-    * @brief Transmit Flow Control Enable bit.
-    * 
-    */
-   void TFCE (bool flag);
-
-   /**
-    * @brief VLAN Mode Enable.
-    * 
-    */
-   bool VME () const;
-
-   /**
-    * @brief VLAN Mode Enable.
-    * 
-    */
-   void VME (bool flag);
-
-   /**
-    * @brief PHY Reset bit.
-    * 
-    */
-   bool PHY_RST () const;
-
-   /**
-    * @brief PHY Reset bit.
-    * 
-    */
-   void PHY_RST (bool flag);
+   bool GIO_master_enable_status () const;
 
 private:
    std::bitset<32> value;
@@ -233,8 +119,8 @@ private:
  * @brief Stream insertion operator.
  * 
  */
-std::ostream &operator<< (std::ostream &, const CTRL &);
+std::ostream &operator<< (std::ostream &, const STATUS &);
 
 } } } }
 
-#endif // apps_net_intel_regs_ctrl_h_
+#endif // llamaos_net_intel_regs_status_h_

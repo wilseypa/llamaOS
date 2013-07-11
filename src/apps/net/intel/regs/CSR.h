@@ -33,15 +33,79 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 #include <cstdint>
 
+#include <apps/net/intel/regs/CTRL.h>
+#include <apps/net/intel/regs/CTRL_EXT.h>
+#include <apps/net/intel/regs/STATUS.h>
+
 namespace apps {
 namespace net {
 namespace intel {
 namespace regs {
 
+/**
+ * @brief CSR (Configuration and Status Registers).
+ * 
+ */
 class CSR
 {
 public:
+   /**
+    * @brief Construct the CSR class from machine address.
+    * 
+    */
    CSR (uint64_t address);
+   ~CSR ();
+
+   /**
+    * @brief Generic 32-bit read function.
+    * 
+    * @param offset offset from CSR base address.
+    * 
+    */
+   uint32_t read (unsigned int offset) const;
+
+   /**
+    * @brief Generic 32-bit write function.
+    * 
+    * @param offset offset from CSR base address.
+    * @param value value to write to register.
+    * 
+    */
+   void write (unsigned int offset, uint32_t value) const;
+
+   /**
+    * @brief Read the CTRL (Device Control) register.
+    * 
+    */
+   CTRL read_CTRL () const;
+
+   /**
+    * @brief Write to the CTRL (Device Control) register.
+    * 
+    * @param ctrl CTRL register object.
+    * 
+    */
+   void write_CTRL (const CTRL &ctrl) const;
+
+   /**
+    * @brief Read the CTRL_EXT (Extended Device Control) register.
+    * 
+    */
+   CTRL_EXT read_CTRL_EXT () const;
+
+   /**
+    * @brief Write to the CTRL_EXT (Extended Device Control) register.
+    * 
+    * @param ctrl CTRL_EXT register object.
+    * 
+    */
+   void write_CTRL_EXT (const CTRL_EXT &ctrl) const;
+
+   /**
+    * @brief Read the STATUS (Device Status) register.
+    * 
+    */
+   STATUS read_STATUS () const;
 
 private:
    uint8_t *const pointer;

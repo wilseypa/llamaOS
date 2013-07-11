@@ -45,7 +45,9 @@ VPATH = $(SRCDIR)
 
 SOURCES = \
   apps/net/intel/regs/CSR.cpp \
-  apps/net/intel/regs/CTRL.cpp
+  apps/net/intel/regs/CTRL.cpp \
+  apps/net/intel/regs/CTRL_EXT.cpp \
+  apps/net/intel/regs/STATUS.cpp
 
 OBJECTS = $(SOURCES:%.cpp=$(OBJDIR)/%.o)
 DEPENDS = $(OBJECTS:%.o=%.d)
