@@ -36,7 +36,7 @@ using std::ostream;
 using apps::net::intel::regs::STATUS;
 
 STATUS::STATUS (uint32_t value)
-   :  value(value)
+   :  value(value & 0x807D3)    // mask reserved bits
 {
 
 }

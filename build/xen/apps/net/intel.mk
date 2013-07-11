@@ -47,7 +47,15 @@ SOURCES = \
   apps/net/intel/regs/CSR.cpp \
   apps/net/intel/regs/CTRL.cpp \
   apps/net/intel/regs/CTRL_EXT.cpp \
-  apps/net/intel/regs/STATUS.cpp
+  apps/net/intel/regs/EXTCNF_CTRL.cpp \
+  apps/net/intel/regs/FCAH.cpp \
+  apps/net/intel/regs/FCAL.cpp \
+  apps/net/intel/regs/FCRTV.cpp \
+  apps/net/intel/regs/FCT.cpp \
+  apps/net/intel/regs/FCTTV.cpp \
+  apps/net/intel/regs/PBA.cpp \
+  apps/net/intel/regs/STATUS.cpp \
+  apps/net/intel/regs/VET.cpp
 
 OBJECTS = $(SOURCES:%.cpp=$(OBJDIR)/%.o)
 DEPENDS = $(OBJECTS:%.o=%.d)

@@ -36,7 +36,7 @@ using std::ostream;
 using apps::net::intel::regs::CTRL_EXT;
 
 CTRL_EXT::CTRL_EXT (uint32_t value)
-   :  value(value)
+   :  value(value & 0xB9DAB000)    // mask reserved bits
 {
 
 }

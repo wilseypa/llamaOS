@@ -36,9 +36,10 @@ using std::ostream;
 using apps::net::intel::regs::CTRL;
 
 CTRL::CTRL (uint32_t value)
-   :  value(value)
+   :  value((value & 0xDC101BE5) | 0x8)    // mask reserved bits
+                                           // set 3rd bit per intel manual
 {
-
+   
 }
 
 CTRL::operator uint32_t () const

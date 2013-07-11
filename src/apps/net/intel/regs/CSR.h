@@ -35,7 +35,15 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 #include <apps/net/intel/regs/CTRL.h>
 #include <apps/net/intel/regs/CTRL_EXT.h>
+#include <apps/net/intel/regs/EXTCNF_CTRL.h>
+#include <apps/net/intel/regs/FCAH.h>
+#include <apps/net/intel/regs/FCAL.h>
+#include <apps/net/intel/regs/FCRTV.h>
+#include <apps/net/intel/regs/FCT.h>
+#include <apps/net/intel/regs/FCTTV.h>
+#include <apps/net/intel/regs/PBA.h>
 #include <apps/net/intel/regs/STATUS.h>
+#include <apps/net/intel/regs/VET.h>
 
 namespace apps {
 namespace net {
@@ -88,6 +96,12 @@ public:
    void write_CTRL (const CTRL &ctrl) const;
 
    /**
+    * @brief Read the STATUS (Device Status) register.
+    * 
+    */
+   STATUS read_STATUS () const;
+
+   /**
     * @brief Read the CTRL_EXT (Extended Device Control) register.
     * 
     */
@@ -102,10 +116,116 @@ public:
    void write_CTRL_EXT (const CTRL_EXT &ctrl) const;
 
    /**
-    * @brief Read the STATUS (Device Status) register.
+    * @brief Read the FCAL (Flow Control Address Low) register.
     * 
     */
-   STATUS read_STATUS () const;
+   FCAL read_FCAL () const;
+
+   /**
+    * @brief Write to the FCAL (Flow Control Address Low) register.
+    * 
+    * @param fcal FCAL register object.
+    * 
+    */
+   void write_FCAL (const FCAL &fcal) const;
+
+   /**
+    * @brief Read the FCAH (Flow Control Address High) register.
+    * 
+    */
+   FCAH read_FCAH () const;
+
+   /**
+    * @brief Write to the FCAH (Flow Control Address High) register.
+    * 
+    * @param fcah FCAH register object.
+    * 
+    */
+   void write_FCAH (const FCAH &fcah) const;
+
+   /**
+    * @brief Read the FCT (Flow Control Type) register.
+    * 
+    */
+   FCT read_FCT () const;
+
+   /**
+    * @brief Write to the FCT (Flow Control Type) register.
+    * 
+    * @param fct FCT register object.
+    * 
+    */
+   void write_FCT (const FCT &fct) const;
+
+   /**
+    * @brief Read the VET (VLAN Ether Type) register.
+    * 
+    */
+   VET read_VET () const;
+
+   /**
+    * @brief Write to the VET (VLAN Ether Type) register.
+    * 
+    * @param vet VET register object.
+    * 
+    */
+   void write_VET (const VET &vet) const;
+
+   /**
+    * @brief Read the FCTTV (Flow Control Transmit Timer Value) register.
+    * 
+    */
+   FCTTV read_FCTTV () const;
+
+   /**
+    * @brief Write to the FCTTV (Flow Control Transmit Timer Value) register.
+    * 
+    * @param fcttv FCTTV register object.
+    * 
+    */
+   void write_FCTTV (const FCTTV &fcttv) const;
+
+   /**
+    * @brief Read the FCRTV (Flow Control Refresh Threshold Value) register.
+    * 
+    */
+   FCRTV read_FCRTV () const;
+
+   /**
+    * @brief Write to the FCRTV (Flow Control Refresh Threshold Value) register.
+    * 
+    * @param fcrtv FCRTV register object.
+    * 
+    */
+   void write_FCRTV (const FCRTV &fcrtv) const;
+
+   /**
+    * @brief Read the EXTCNF_CTRL (Extended Configuration Control) register.
+    * 
+    */
+   EXTCNF_CTRL read_EXTCNF_CTRL () const;
+
+   /**
+    * @brief Write to the EXTCNF_CTRL (Extended Configuration Control) register.
+    * 
+    * @param extcnf_ctrl EXTCNF_CTRL register object.
+    * 
+    */
+   void write_EXTCNF_CTRL (const EXTCNF_CTRL &extcnf_ctrl) const;
+
+   /**
+    * @brief Read the PBA (Packet Buffer Allocation) register.
+    * 
+    */
+   PBA read_PBA () const;
+
+   /**
+    * @brief Write to the PBA (Packet Buffer Allocation) register.
+    * 
+    * @param pba PBA register object.
+    * 
+    */
+   void write_PBA (const PBA &pba) const;
 
 private:
    uint8_t *const pointer;
