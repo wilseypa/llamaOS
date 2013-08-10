@@ -28,13 +28,100 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <errno.h>
-#include <dlfcn.h>
+#include <apps/net/intel/regs/IMC.h>
 
-void
-__libc_register_dlfcn_hook (struct link_map *map)
+using std::endl;
+using std::ostream;
+
+using apps::net::intel::regs::IMC;
+
+IMC::IMC (uint32_t value)
+   :  value(value & 0x1F782D7)    // mask reserved bits
 {
-   __set_errno (ENOSYS);
+   
 }
 
-// stub_warning (__libc_register_dlfcn_hook)
+IMC::operator uint32_t () const
+{
+   return value.to_ulong ();
+}
+
+void IMC::TXDW (bool flag)
+{
+   value [0] = flag;
+}
+
+void IMC::TXQE (bool flag)
+{
+   value [1] = flag;
+}
+
+void IMC::LSC (bool flag)
+{
+   value [2] = flag;
+}
+
+void IMC::RXDMT0 (bool flag)
+{
+   value [4] = flag;
+}
+
+void IMC::RXO (bool flag)
+{
+   value [6] = flag;
+}
+
+void IMC::RXT0 (bool flag)
+{
+   value [7] = flag;
+}
+
+void IMC::MDAC (bool flag)
+{
+   value [9] = flag;
+}
+
+void IMC::TXD_LOW (bool flag)
+{
+   value [15] = flag;
+}
+
+void IMC::SRPD (bool flag)
+{
+   value [16] = flag;
+}
+
+void IMC::ACK (bool flag)
+{
+   value [17] = flag;
+}
+
+void IMC::MNG (bool flag)
+{
+   value [18] = flag;
+}
+
+void IMC::RxQ0 (bool flag)
+{
+   value [20] = flag;
+}
+
+void IMC::RxQ1 (bool flag)
+{
+   value [21] = flag;
+}
+
+void IMC::TxQ0 (bool flag)
+{
+   value [22] = flag;
+}
+
+void IMC::TxQ1 (bool flag)
+{
+   value [23] = flag;
+}
+
+void IMC::Other (bool flag)
+{
+   value [24] = flag;
+}

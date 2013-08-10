@@ -28,13 +28,40 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <errno.h>
-#include <dlfcn.h>
+#include <apps/net/intel/regs/FCRTH.h>
 
-void
-__libc_register_dlfcn_hook (struct link_map *map)
+using std::endl;
+using std::hex;
+using std::ostream;
+
+using apps::net::intel::regs::FCRTH;
+
+FCRTH::FCRTH (uint32_t value)
+   :  value(value & 0xFFF8)    // mask reserved bits
 {
-   __set_errno (ENOSYS);
+   
 }
 
-// stub_warning (__libc_register_dlfcn_hook)
+FCRTH::operator uint32_t () const
+{
+   return value;
+}
+
+uint16_t FCRTH::RTH () const
+{
+   return (value & 0xFFF8);
+}
+
+void FCRTH::RTH (uint16_t size)
+{
+   value &= ~(0xFFF8);
+   value |= (0xFFF8 | size);
+}
+
+ostream &operator<< (ostream &out, const FCRTH &fcrth)
+{
+   out << "Flow Control Receive Threshold High" << endl;
+   out << "  RTH: 0x" << hex << fcrth.RTH () << endl;
+
+   return out;
+}

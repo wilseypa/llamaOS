@@ -28,13 +28,98 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <errno.h>
-#include <dlfcn.h>
+#ifndef llamaos_net_intel_regs_rxdctl_h_
+#define llamaos_net_intel_regs_rxdctl_h_
 
-void
-__libc_register_dlfcn_hook (struct link_map *map)
+#include <cstdint>
+
+#include <ostream>
+
+namespace apps {
+namespace net {
+namespace intel {
+namespace regs {
+
+/**
+ * @brief Receive Descriptor Control register.
+ * 
+ */
+class RXDCTL
 {
-   __set_errno (ENOSYS);
-}
+public:
+   /**
+    * @breif Construct from value.
+    * 
+    * @param value Initial value (usually read from hardware).
+    * 
+    */
+   RXDCTL (uint32_t value);
 
-// stub_warning (__libc_register_dlfcn_hook)
+   /**
+    * @breif Convert to 32-bit integer.
+    * 
+    */
+   operator uint32_t () const;
+
+   /**
+    * @brief Prefetch Threshold value.
+    * 
+    */
+   uint8_t PTHRESH () const;
+
+   /**
+    * @brief Prefetch Threshold value.
+    * 
+    */
+   void PTHRESH (uint8_t threshold);
+
+   /**
+    * @brief Host Threshold value.
+    * 
+    */
+   uint8_t HTHRESH () const;
+
+   /**
+    * @brief Host Threshold value.
+    * 
+    */
+   void HTHRESH (uint8_t threshold);
+
+   /**
+    * @brief Write-back Threshold value.
+    * 
+    */
+   uint8_t WTHRESH () const;
+
+   /**
+    * @brief Write-back Threshold value.
+    * 
+    */
+   void WTHRESH (uint8_t threshold);
+
+   /**
+    * @brief Ganularity bit.
+    * 
+    */
+   bool GRAN () const;
+
+   /**
+    * @brief Ganularity bit.
+    * 
+    */
+   void GRAN (bool flag);
+
+private:
+   uint32_t value;
+
+};
+
+/**
+ * @brief Stream insertion operator.
+ * 
+ */
+std::ostream &operator<< (std::ostream &, const RXDCTL &);
+
+} } } }
+
+#endif // llamaos_net_intel_regs_rxdctl_h_

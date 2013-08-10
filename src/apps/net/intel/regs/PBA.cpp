@@ -52,9 +52,9 @@ uint16_t PBA::RXA () const
    return value & 0xFFFF;
 }
 
-void PBA::RXA (uint16_t value)
+void PBA::RXA (uint16_t size)
 {
-   value &= (0xFFFF0000 | value);
+   value &= (0xFFFF0000 | size);
 }
 
 uint16_t PBA::TXA () const
@@ -62,9 +62,9 @@ uint16_t PBA::TXA () const
    return ((value >> 16) & 0xFFFF);
 }
 
-void PBA::TXA (uint16_t value)
+void PBA::TXA (uint16_t size)
 {
-   value &= (0x0000FFFF | (value << 16));
+   value &= (0x0000FFFF | (size << 16));
 }
 
 ostream &operator<< (ostream &out, const PBA &pba)

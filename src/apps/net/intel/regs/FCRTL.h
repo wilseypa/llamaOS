@@ -28,13 +28,75 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <errno.h>
-#include <dlfcn.h>
+#ifndef llamaos_net_intel_regs_fcrtl_h_
+#define llamaos_net_intel_regs_fcrtl_h_
 
-void
-__libc_register_dlfcn_hook (struct link_map *map)
+#include <cstdint>
+
+#include <bitset>
+#include <ostream>
+
+namespace apps {
+namespace net {
+namespace intel {
+namespace regs {
+
+/**
+ * @brief Flow Control Receive Threshold Low register.
+ * 
+ */
+class FCRTL
 {
-   __set_errno (ENOSYS);
-}
+public:
+   /**
+    * @breif Construct from value.
+    * 
+    * @param value Initial value (usually read from hardware).
+    * 
+    */
+   FCRTL (uint32_t value);
 
-// stub_warning (__libc_register_dlfcn_hook)
+   /**
+    * @breif Convert to 32-bit integer.
+    * 
+    */
+   operator uint32_t () const;
+
+   /**
+    * @brief Receive Threshold Low.
+    * 
+    */
+   uint16_t RTL () const;
+
+   /**
+    * @brief Receive Threshold Low.
+    * 
+    */
+   void RTL (uint16_t size);
+
+   /**
+    * @brief XON Enable.
+    * 
+    */
+   bool XONE () const;
+
+   /**
+    * @brief XON Enable.
+    * 
+    */
+   void XONE (bool flag);
+
+private:
+   std::bitset<32> value;
+
+};
+
+/**
+ * @brief Stream insertion operator.
+ * 
+ */
+std::ostream &operator<< (std::ostream &, const FCRTL &);
+
+} } } }
+
+#endif // llamaos_net_intel_regs_fcrtl_h_

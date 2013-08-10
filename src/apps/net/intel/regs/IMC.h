@@ -28,11 +28,12 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#ifndef llamaos_net_intel_regs_pba_h_
-#define llamaos_net_intel_regs_pba_h_
+#ifndef llamaos_net_intel_regs_imc_h_
+#define llamaos_net_intel_regs_imc_h_
 
 #include <cstdint>
 
+#include <bitset>
 #include <ostream>
 
 namespace apps {
@@ -41,10 +42,10 @@ namespace intel {
 namespace regs {
 
 /**
- * @brief Packet Buffer Allocation register.
+ * @brief Interrupt Mask Clear register.
  * 
  */
-class PBA
+class IMC
 {
 public:
    /**
@@ -53,7 +54,7 @@ public:
     * @param value Initial value (usually read from hardware).
     * 
     */
-   PBA (uint32_t value);
+   IMC (uint32_t value);
 
    /**
     * @breif Convert to 32-bit integer.
@@ -62,40 +63,106 @@ public:
    operator uint32_t () const;
 
    /**
-    * @brief Receive Packet Buffer Allocation.
+    * @brief Transmit Descriptor Writeback bit.
     * 
     */
-   uint16_t RXA () const;
+   void TXDW (bool flag);
 
    /**
-    * @brief Receive Packet Buffer Allocation.
+    * @brief Transmit Queue Empty bit.
     * 
     */
-   void RXA (uint16_t size);
+   void TXQE (bool flag);
 
    /**
-    * @brief Transmit Packet Buffer Allocation.
+    * @brief Link Status Change bit.
     * 
     */
-   uint16_t TXA () const;
+   void LSC (bool flag);
 
    /**
-    * @brief Transmit Packet Buffer Allocation.
+    * @brief Receive Descriptor Minimum Threshold bit.
     * 
     */
-   void TXA (uint16_t size);
+   void RXDMT0 (bool flag);
+
+   /**
+    * @brief Receive Overrun bit.
+    * 
+    */
+   void RXO (bool flag);
+
+   /**
+    * @brief Receive Timer bit.
+    * 
+    */
+   void RXT0 (bool flag);
+
+   /**
+    * @brief MDIO Access Complete bit.
+    * 
+    */
+   void MDAC (bool flag);
+
+   /**
+    * @brief Transmit Descriptor Low threshold bit.
+    * 
+    */
+   void TXD_LOW (bool flag);
+
+   /**
+    * @brief Small Receive Packet Detect bit.
+    * 
+    */
+   void SRPD (bool flag);
+
+   /**
+    * @brief Receive ACK frame detect bit.
+    * 
+    */
+   void ACK (bool flag);
+
+   /**
+    * @brief Manageabiltity bit.
+    * 
+    */
+   void MNG (bool flag);
+
+   /**
+    * @brief Receive Queue 0 bit.
+    * 
+    */
+   void RxQ0 (bool flag);
+
+   /**
+    * @brief Receive Queue 1 bit.
+    * 
+    */
+   void RxQ1 (bool flag);
+
+   /**
+    * @brief Transmit Queue 0 bit.
+    * 
+    */
+   void TxQ0 (bool flag);
+
+   /**
+    * @brief Transmit Queue 1 bit.
+    * 
+    */
+   void TxQ1 (bool flag);
+
+   /**
+    * @brief Other bit.
+    * 
+    */
+   void Other (bool flag);
 
 private:
-   uint32_t value;
+   std::bitset<32> value;
 
 };
 
-/**
- * @brief Stream insertion operator.
- * 
- */
-std::ostream &operator<< (std::ostream &, const PBA &);
-
 } } } }
 
-#endif // llamaos_net_intel_regs_pba_h_
+#endif // llamaos_net_intel_regs_imc_h_

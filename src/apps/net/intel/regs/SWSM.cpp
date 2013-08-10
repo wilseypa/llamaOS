@@ -28,13 +28,49 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <errno.h>
-#include <dlfcn.h>
+#include <apps/net/intel/regs/SWSM.h>
 
-void
-__libc_register_dlfcn_hook (struct link_map *map)
+using std::endl;
+using std::ostream;
+
+using apps::net::intel::regs::SWSM;
+
+SWSM::SWSM (uint32_t value)
+   :  value(value & 0x3)    // mask reserved bits
 {
-   __set_errno (ENOSYS);
+   
 }
 
-// stub_warning (__libc_register_dlfcn_hook)
+SWSM::operator uint32_t () const
+{
+   return value.to_ulong ();
+}
+
+bool SWSM::SMBI () const
+{
+   return value [0];
+}
+
+void SWSM::SMBI (bool flag)
+{
+   value [0] = flag;
+}
+
+bool SWSM::SWESMBI () const
+{
+   return value [1];
+}
+
+void SWSM::SWESMBI (bool flag)
+{
+   value [1] = flag;
+}
+
+ostream &operator<< (ostream &out, const SWSM &swsm)
+{
+   out << "Software Semaphore" << endl;
+   out << "  SMBI: " << swsm.SMBI() << endl;
+   out << "  SWESMBI: " << swsm.SWESMBI () << endl;
+
+   return out;
+}

@@ -28,13 +28,81 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <errno.h>
-#include <dlfcn.h>
+#include <apps/net/intel/regs/RXDCTL.h>
 
-void
-__libc_register_dlfcn_hook (struct link_map *map)
+using std::endl;
+using std::ostream;
+
+using apps::net::intel::regs::RXDCTL;
+
+RXDCTL::RXDCTL (uint32_t value)
+   :  value(value & 0x13F3F3F)    // mask reserved bits
 {
-   __set_errno (ENOSYS);
+   
 }
 
-// stub_warning (__libc_register_dlfcn_hook)
+RXDCTL::operator uint32_t () const
+{
+   return value;
+}
+
+uint8_t RXDCTL::PTHRESH () const
+{
+   return (value & 0x3F);
+}
+
+void RXDCTL::PTHRESH (uint8_t threshold)
+{
+   value &= ~(0x3F);
+   value |= (threshold & 0x3F);
+}
+
+uint8_t RXDCTL::HTHRESH () const
+{
+   return ((value >> 8) & 0x3F);
+}
+
+void RXDCTL::HTHRESH (uint8_t threshold)
+{
+   value &= ~(0x3F00);
+   value |= ((threshold << 8) & 0x3F00);
+}
+
+uint8_t RXDCTL::WTHRESH () const
+{
+   return ((value >> 16) & 0x3F);
+}
+
+void RXDCTL::WTHRESH (uint8_t threshold)
+{
+   value &= ~(0x3F0000);
+   value |= ((threshold << 16) & 0x3F0000);
+}
+
+bool RXDCTL::GRAN () const
+{
+   return ((value & 0x1000000) != 0);
+}
+
+void RXDCTL::GRAN (bool flag)
+{
+   if (flag)
+   {
+      value |= 0x1000000;
+   }
+   else
+   {
+      value &= ~0x1000000;
+   }
+}
+
+ostream &operator<< (ostream &out, const RXDCTL &rxdctl)
+{
+   out << "Receive Descriptor Control" << endl;
+   out << "  PTHRESH: " << rxdctl.PTHRESH () << endl;
+   out << "  HTHRESH: " << rxdctl.HTHRESH () << endl;
+   out << "  WTHRESH: " << rxdctl.WTHRESH () << endl;
+   out << "     GRAN: " << rxdctl.GRAN () << endl;
+
+   return out;
+}

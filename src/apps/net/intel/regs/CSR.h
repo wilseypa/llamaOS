@@ -38,11 +38,30 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <apps/net/intel/regs/EXTCNF_CTRL.h>
 #include <apps/net/intel/regs/FCAH.h>
 #include <apps/net/intel/regs/FCAL.h>
+#include <apps/net/intel/regs/FCRTH.h>
+#include <apps/net/intel/regs/FCRTL.h>
 #include <apps/net/intel/regs/FCRTV.h>
 #include <apps/net/intel/regs/FCT.h>
 #include <apps/net/intel/regs/FCTTV.h>
+#include <apps/net/intel/regs/IMC.h>
+#include <apps/net/intel/regs/IMS.h>
 #include <apps/net/intel/regs/PBA.h>
+#include <apps/net/intel/regs/PSRCTL.h>
+#include <apps/net/intel/regs/RCTL.h>
+#include <apps/net/intel/regs/RDBAH.h>
+#include <apps/net/intel/regs/RDBAL.h>
+#include <apps/net/intel/regs/RDH.h>
+#include <apps/net/intel/regs/RDLEN.h>
+#include <apps/net/intel/regs/RDT.h>
+#include <apps/net/intel/regs/RXDCTL.h>
 #include <apps/net/intel/regs/STATUS.h>
+#include <apps/net/intel/regs/SWSM.h>
+#include <apps/net/intel/regs/TCTL.h>
+#include <apps/net/intel/regs/TDBAH.h>
+#include <apps/net/intel/regs/TDBAL.h>
+#include <apps/net/intel/regs/TDH.h>
+#include <apps/net/intel/regs/TDLEN.h>
+#include <apps/net/intel/regs/TDT.h>
 #include <apps/net/intel/regs/VET.h>
 
 namespace apps {
@@ -226,6 +245,253 @@ public:
     * 
     */
    void write_PBA (const PBA &pba) const;
+
+   /**
+    * @brief Read the SWSM (Software Semaphore) register.
+    * 
+    */
+   SWSM read_SWSM () const;
+
+   /**
+    * @brief Write to the SWSM (Software Semaphore) register.
+    * 
+    * @param swsm SWSM register object.
+    * 
+    */
+   void write_SWSM (const SWSM &swsm) const;
+
+   /**
+    * @brief Read the IMS (Interrupt Mask Set/Read) register.
+    * 
+    */
+   IMS read_IMS () const;
+
+   /**
+    * @brief Write to the IMS (Interrupt Mask Set/Read) register.
+    * 
+    * @param ims IMS register object.
+    * 
+    */
+   void write_IMS (const IMS &ims) const;
+
+   /**
+    * @brief Write to the IMC (Interrupt Mask Clear) register.
+    * 
+    * @param imc IMC register object.
+    * 
+    */
+   void write_IMC (const IMC &imc) const;
+
+   /**
+    * @brief Read the RCTL (Receive Control) register.
+    * 
+    */
+   RCTL read_RCTL () const;
+
+   /**
+    * @brief Write to the RCTL (Receive Control) register.
+    * 
+    * @param rctl RCTL register object.
+    * 
+    */
+   void write_RCTL (const RCTL &rctl) const;
+
+   /**
+    * @brief Read the PSRCTL (Packet Split Receive Control) register.
+    * 
+    */
+   PSRCTL read_PSRCTL () const;
+
+   /**
+    * @brief Write to the PSRCTL (Packet Split Receive Control) register.
+    * 
+    * @param psrctl PSRCTL register object.
+    * 
+    */
+   void write_PSRCTL (const PSRCTL &psrctl) const;
+
+   /**
+    * @brief Read the FCRTL (Flow Control Receive Threshold Low) register.
+    * 
+    */
+   FCRTL read_FCRTL () const;
+
+   /**
+    * @brief Write to the FCRTL (Flow Control Receive Threshold Low) register.
+    * 
+    * @param fcrtl FCRTL register object.
+    * 
+    */
+   void write_FCRTL (const FCRTL &fcrtl) const;
+
+   /**
+    * @brief Read the FCRTH (Flow Control Receive Threshold High) register.
+    * 
+    */
+   FCRTH read_FCRTH () const;
+
+   /**
+    * @brief Write to the FCRTH (Flow Control Receive Threshold High) register.
+    * 
+    * @param fcrth FCRTH register object.
+    * 
+    */
+   void write_FCRTH (const FCRTH &fcrth) const;
+
+   /**
+    * @brief Read the RDBAL (Receive Descriptor Base Address Low) register.
+    * 
+    */
+   RDBAL read_RDBAL () const;
+
+   /**
+    * @brief Write to the RDBAL (Receive Descriptor Base Address Low) register.
+    * 
+    * @param rdbal RDBAL register object.
+    * 
+    */
+   void write_RDBAL (const RDBAL &rdbal) const;
+
+   /**
+    * @brief Read the RDBAH (Receive Descriptor Base Address High) register.
+    * 
+    */
+   RDBAH read_RDBAH () const;
+
+   /**
+    * @brief Write to the RDBAH (Receive Descriptor Base Address High) register.
+    * 
+    * @param rdbah RDBAH register object.
+    * 
+    */
+   void write_RDBAH (const RDBAH &rdbah) const;
+
+   /**
+    * @brief Read the RDLEN (Receive Descriptor Length) register.
+    * 
+    */
+   RDLEN read_RDLEN () const;
+
+   /**
+    * @brief Write to the RDLEN (Receive Descriptor Length) register.
+    * 
+    * @param rdlen RDLEN register object.
+    * 
+    */
+   void write_RDLEN (const RDLEN &rdlen) const;
+
+   /**
+    * @brief Read the RDH (Receive Descriptor Head) register.
+    * 
+    */
+   RDH read_RDH () const;
+
+   /**
+    * @brief Write to the RDH (Receive Descriptor Head) register.
+    * 
+    * @param rdh RDH register object.
+    * 
+    */
+   void write_RDH (const RDH &rdh) const;
+
+   /**
+    * @brief Read the RDT (Receive Descriptor Tail) register.
+    * 
+    */
+   RDT read_RDT () const;
+
+   /**
+    * @brief Write to the RDT (Receive Descriptor Tail) register.
+    * 
+    * @param rdt RDT register object.
+    * 
+    */
+   void write_RDT (const RDT &rdt) const;
+
+   /**
+    * @brief Read the TCTL (Transmit Control) register.
+    * 
+    */
+   TCTL read_TCTL () const;
+
+   /**
+    * @brief Write to the TCTL (Transmit Control) register.
+    * 
+    * @param tctl TCTL register object.
+    * 
+    */
+   void write_TCTL (const TCTL &tctl) const;
+
+   /**
+    * @brief Read the TDBAL (Transmit Descriptor Base Address Low) register.
+    * 
+    */
+   TDBAL read_TDBAL () const;
+
+   /**
+    * @brief Write to the TDBAL (Transmit Descriptor Base Address Low) register.
+    * 
+    * @param tdbal TDBAL register object.
+    * 
+    */
+   void write_TDBAL (const TDBAL &tdbal) const;
+
+   /**
+    * @brief Read the TDBAH (Transmit Descriptor Base Address High) register.
+    * 
+    */
+   TDBAH read_TDBAH () const;
+
+   /**
+    * @brief Write to the TDBAH (Transmit Descriptor Base Address High)
+    *        register.
+    * 
+    * @param tdbah TDBAH register object.
+    * 
+    */
+   void write_TDBAH (const TDBAH &tdbah) const;
+
+   /**
+    * @brief Read the TDLEN (Transmit Descriptor Length) register.
+    * 
+    */
+   TDLEN read_TDLEN () const;
+
+   /**
+    * @brief Write to the TDLEN (Transmit Descriptor Length) register.
+    * 
+    * @param tdlen TDLEN register object.
+    * 
+    */
+   void write_TDLEN (const TDLEN &tdlen) const;
+
+   /**
+    * @brief Read the TDH (Transmit Descriptor Head) register.
+    * 
+    */
+   TDH read_TDH () const;
+
+   /**
+    * @brief Write to the TDH (Transmit Descriptor Head) register.
+    * 
+    * @param tdh TDH register object.
+    * 
+    */
+   void write_TDH (const TDH &tdh) const;
+
+   /**
+    * @brief Read the TDT (Transmit Descriptor Tail) register.
+    * 
+    */
+   TDT read_TDT () const;
+
+   /**
+    * @brief Write to the TDT (Transmit Descriptor Tail) register.
+    * 
+    * @param tdt TDT register object.
+    * 
+    */
+   void write_TDT (const TDT &tdt) const;
 
 private:
    uint8_t *const pointer;
