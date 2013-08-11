@@ -28,13 +28,51 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <apps/net/intel/regs/CSR.h>
+#ifndef llamaos_net_intel_regs_xoffrxc_h_
+#define llamaos_net_intel_regs_xoffrxc_h_
 
-using apps::net::intel::regs::CSR;
+#include <cstdint>
 
-int main (int argc, char *argv [])
+#include <ostream>
+
+namespace apps {
+namespace net {
+namespace intel {
+namespace regs {
+
+/**
+ * @brief XOFF Received Count register.
+ * 
+ */
+class XOFFRXC
 {
-   CSR csr (0);
+public:
 
-   return 0;
-}
+   /**
+    * @breif Construct from value.
+    * 
+    * @param value Initial value (usually read from hardware).
+    * 
+    */
+   XOFFRXC (uint32_t value);
+
+   /**
+    * @breif Convert to 32-bit integer.
+    * 
+    */
+   operator uint32_t () const;
+
+private:
+   uint32_t value;
+
+};
+
+/**
+ * @brief Stream insertion operator.
+ * 
+ */
+std::ostream &operator<< (std::ostream &, const XOFFRXC &);
+
+} } } }
+
+#endif // llamaos_net_intel_regs_xoffrxc_h_

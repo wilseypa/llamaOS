@@ -28,13 +28,29 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <apps/net/intel/regs/CSR.h>
+#include <apps/net/intel/regs/XONTXC.h>
 
-using apps::net::intel::regs::CSR;
+using std::endl;
+using std::hex;
+using std::ostream;
 
-int main (int argc, char *argv [])
+using apps::net::intel::regs::XONTXC;
+
+XONTXC::XONTXC (uint32_t value)
+   :  value(value)
 {
-   CSR csr (0);
 
-   return 0;
+}
+
+XONTXC::operator uint32_t () const
+{
+   return value;
+}
+
+ostream &operator<< (ostream &out, const XONTXC &xontxc)
+{
+   out << "XON Transmitted Count" << endl;
+   out << " 0x" << hex << static_cast<uint32_t>(xontxc)  << endl;
+
+   return out;
 }

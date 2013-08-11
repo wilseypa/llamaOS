@@ -61,10 +61,12 @@ using apps::net::intel::regs::FCAL;
 using apps::net::intel::regs::FCRTH;
 using apps::net::intel::regs::FCRTL;
 using apps::net::intel::regs::FCRTV;
+using apps::net::intel::regs::FCRUC;
 using apps::net::intel::regs::FCT;
 using apps::net::intel::regs::FCTTV;
 using apps::net::intel::regs::IMC;
 using apps::net::intel::regs::IMS;
+using apps::net::intel::regs::MPC;
 using apps::net::intel::regs::PBA;
 using apps::net::intel::regs::PSRCTL;
 using apps::net::intel::regs::RCTL;
@@ -81,7 +83,14 @@ using apps::net::intel::regs::TDBAL;
 using apps::net::intel::regs::TDH;
 using apps::net::intel::regs::TDLEN;
 using apps::net::intel::regs::TDT;
+using apps::net::intel::regs::TPR;
+using apps::net::intel::regs::TPT;
+using apps::net::intel::regs::TXDCTL;
 using apps::net::intel::regs::VET;
+using apps::net::intel::regs::XOFFRXC;
+using apps::net::intel::regs::XOFFTXC;
+using apps::net::intel::regs::XONRXC;
+using apps::net::intel::regs::XONTXC;
 
 CSR::CSR (uint64_t address)
    :  pointer(llamaos::memory::address_to_pointer<uint8_t>(address))
@@ -382,4 +391,54 @@ TDT CSR::read_TDT () const
 void CSR::write_TDT (const TDT &tdt) const
 {
    reg_write32 (tdt, pointer + 0x03818);
+}
+
+TXDCTL CSR::read_TXDCTL () const
+{
+   return TXDCTL (reg_read32 (pointer + 0x03828));
+}
+
+void CSR::write_TXDCTL (const TXDCTL &txdctl) const
+{
+   reg_write32 (txdctl, pointer + 0x03828);
+}
+
+MPC CSR::read_MPC () const
+{
+   return MPC (reg_read32 (pointer + 0x04010));
+}
+
+XONRXC CSR::read_XONRXC () const
+{
+   return XONRXC (reg_read32 (pointer + 0x04048));
+}
+
+XONTXC CSR::read_XONTXC () const
+{
+   return XONTXC (reg_read32 (pointer + 0x0404C));
+}
+
+XOFFRXC CSR::read_XOFFRXC () const
+{
+   return XOFFRXC (reg_read32 (pointer + 0x04050));
+}
+
+XOFFTXC CSR::read_XOFFTXC () const
+{
+   return XOFFTXC (reg_read32 (pointer + 0x04054));
+}
+
+FCRUC CSR::read_FCRUC () const
+{
+   return FCRUC (reg_read32 (pointer + 0x04058));
+}
+
+TPR CSR::read_TPR () const
+{
+   return TPR (reg_read32 (pointer + 0x040D0));
+}
+
+TPT CSR::read_TPT () const
+{
+   return TPT (reg_read32 (pointer + 0x040D4));
 }

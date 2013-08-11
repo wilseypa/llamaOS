@@ -53,10 +53,12 @@ SOURCES = \
   apps/net/intel/regs/FCRTH.cpp \
   apps/net/intel/regs/FCRTL.cpp \
   apps/net/intel/regs/FCRTV.cpp \
+  apps/net/intel/regs/FCRUC.cpp \
   apps/net/intel/regs/FCT.cpp \
   apps/net/intel/regs/FCTTV.cpp \
   apps/net/intel/regs/IMC.cpp \
   apps/net/intel/regs/IMS.cpp \
+  apps/net/intel/regs/MPC.cpp \
   apps/net/intel/regs/PBA.cpp \
   apps/net/intel/regs/PSRCTL.cpp \
   apps/net/intel/regs/RCTL.cpp \
@@ -74,7 +76,15 @@ SOURCES = \
   apps/net/intel/regs/TDH.cpp \
   apps/net/intel/regs/TDLEN.cpp \
   apps/net/intel/regs/TDT.cpp \
-  apps/net/intel/regs/VET.cpp
+  apps/net/intel/regs/TPR.cpp \
+  apps/net/intel/regs/TPT.cpp \
+  apps/net/intel/regs/TXDCTL.cpp \
+  apps/net/intel/regs/VET.cpp \
+  apps/net/intel/regs/XOFFRXC.cpp \
+  apps/net/intel/regs/XOFFTXC.cpp \
+  apps/net/intel/regs/XONRXC.cpp \
+  apps/net/intel/regs/XONTXC.cpp \
+  apps/net/intel/RDMA.cpp
 
 OBJECTS = $(SOURCES:%.cpp=$(OBJDIR)/%.o)
 DEPENDS = $(OBJECTS:%.o=%.d)

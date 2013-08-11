@@ -28,13 +28,29 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <apps/net/intel/regs/CSR.h>
+#include <apps/net/intel/regs/MPC.h>
 
-using apps::net::intel::regs::CSR;
+using std::endl;
+using std::hex;
+using std::ostream;
 
-int main (int argc, char *argv [])
+using apps::net::intel::regs::MPC;
+
+MPC::MPC (uint32_t value)
+   :  value(value)
 {
-   CSR csr (0);
 
-   return 0;
+}
+
+MPC::operator uint32_t () const
+{
+   return value;
+}
+
+ostream &operator<< (ostream &out, const MPC &mpc)
+{
+   out << "Missed Packet Count" << endl;
+   out << " 0x" << hex << static_cast<uint32_t>(mpc)  << endl;
+
+   return out;
 }

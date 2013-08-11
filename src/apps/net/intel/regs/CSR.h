@@ -41,10 +41,12 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <apps/net/intel/regs/FCRTH.h>
 #include <apps/net/intel/regs/FCRTL.h>
 #include <apps/net/intel/regs/FCRTV.h>
+#include <apps/net/intel/regs/FCRUC.h>
 #include <apps/net/intel/regs/FCT.h>
 #include <apps/net/intel/regs/FCTTV.h>
 #include <apps/net/intel/regs/IMC.h>
 #include <apps/net/intel/regs/IMS.h>
+#include <apps/net/intel/regs/MPC.h>
 #include <apps/net/intel/regs/PBA.h>
 #include <apps/net/intel/regs/PSRCTL.h>
 #include <apps/net/intel/regs/RCTL.h>
@@ -62,7 +64,14 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <apps/net/intel/regs/TDH.h>
 #include <apps/net/intel/regs/TDLEN.h>
 #include <apps/net/intel/regs/TDT.h>
+#include <apps/net/intel/regs/TPR.h>
+#include <apps/net/intel/regs/TPT.h>
+#include <apps/net/intel/regs/TXDCTL.h>
 #include <apps/net/intel/regs/VET.h>
+#include <apps/net/intel/regs/XOFFRXC.h>
+#include <apps/net/intel/regs/XOFFTXC.h>
+#include <apps/net/intel/regs/XONRXC.h>
+#include <apps/net/intel/regs/XONTXC.h>
 
 namespace apps {
 namespace net {
@@ -492,6 +501,68 @@ public:
     * 
     */
    void write_TDT (const TDT &tdt) const;
+
+   /**
+    * @brief Read the TXDCTL (Transmit Descriptor Control) register.
+    * 
+    */
+   TXDCTL read_TXDCTL () const;
+
+   /**
+    * @brief Write to the TXDCTL (Transmit Descriptor Control) register.
+    * 
+    * @param txdctl TXDCTL register object.
+    * 
+    */
+   void write_TXDCTL (const TXDCTL &txdctl) const;
+
+   /**
+    * @brief Read the MPC (Missed Packets Count) register.
+    * 
+    */
+   MPC read_MPC () const;
+
+   /**
+    * @brief Read the XONRXC (XON Received Count) register.
+    * 
+    */
+   XONRXC read_XONRXC () const;
+
+   /**
+    * @brief Read the XONTXC (XON Transmitted Count) register.
+    * 
+    */
+   XONTXC read_XONTXC () const;
+
+   /**
+    * @brief Read the XOFFRXC (XOFF Received Count) register.
+    * 
+    */
+   XOFFRXC read_XOFFRXC () const;
+
+   /**
+    * @brief Read the XOFFTXC (XOFF Transmitted Count) register.
+    * 
+    */
+   XOFFTXC read_XOFFTXC () const;
+
+   /**
+    * @brief Read the FCRUC (FC Received Unsupported Count) register.
+    * 
+    */
+   FCRUC read_FCRUC () const;
+
+   /**
+    * @brief Read the TPR (Total Packets Received) register.
+    * 
+    */
+   TPR read_TPR () const;
+
+   /**
+    * @brief Read the TPT (Total Packets Transmitted) register.
+    * 
+    */
+   TPT read_TPT () const;
 
 private:
    uint8_t *const pointer;
