@@ -670,6 +670,8 @@ int main (int /* argc */, char ** /* argv [] */)
    int rx_limit = 0;
    int tx_limit = 0;
 
+   cout << "program break: " << (pointer_to_address(get_program_break ()) / 1024.0) / 1024.0 << endl;
+
    // endlessly process messages (or until quit signal)
    for (;;)
    {

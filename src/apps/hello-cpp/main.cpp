@@ -30,15 +30,22 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 #include <iostream>
 
+#include <llamaos/memory/Memory.h>
+
 using namespace std;
+using namespace llamaos::memory;
 
 // simple guest instance should just output text to console
 int main (int argc, char *argv [])
 {
    cout << endl << "hello llamaOS" << endl;
    cout.flush ();
-
    cout << endl;
+
+
+   cout << "program break: " << (pointer_to_address(get_program_break ()) / 1024.0) / 1024.0 << endl;
+
+
    cout << "argc: " << argc << endl;
 
    for (int i = 0; i < argc; i++)
