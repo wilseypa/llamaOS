@@ -38,17 +38,14 @@ export LLAMAOS_VERSION = 1.1
 .PHONY: all
 all:
 	@$(MAKE) -C build $@
+	@$(MAKE) -C doc $@
 
 .PHONY: install
 install:
 	@$(MAKE) -C build $@
+	@$(MAKE) -C doc $@
 
 .PHONY: clean
 clean:
 	@$(MAKE) -C build $@
 	@$(MAKE) -C doc $@
-
-.PHONY: doc
-doc:
-	@$(MAKE) -C doc all
-

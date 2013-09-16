@@ -36,10 +36,20 @@
 
 \begin{document}
 
-\title{llamaOS - User Guide}
-\author{William A. Magato}
-\date{September 16, 2013}
+\title{{\bf llamaOS - Installation Guide}\\
+  Version %LLAMAOS_VERSION%
+  \\[2.0ex]
+  Experimental Computing Laboratory\\
+  University of Cincinnati}
+
+\author{
+William A. Magato\\[3.0ex]
+Past Contributors:\\[1.0ex]
+John Gideon
+}
+
 \maketitle
+\clearpage
 
 \tableofcontents
 \clearpage
@@ -47,10 +57,10 @@
 \section{Introduction}
 This is our first document.
 
-\section{Building Application Instances}
+\section{Binary Distribution}
 
-\section{Instance Configuration}
+\section{Building from Source}
 
-\section{Launching Instances}
+\section{Launching Test Instances}
 
 \end{document}

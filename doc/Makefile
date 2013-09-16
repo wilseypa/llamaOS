@@ -30,24 +30,29 @@
 # contributors.
 #
 
+MAKEFILE_SOURCES += Makefile
+
+JOBS = \
+  developer_guide.pdf \
+  install_guide.pdf \
+  user_guide.pdf
+
 .PHONY: all
-all: developer_guide install_guide user_guide
-
-.PHONY: developer_guide
-developer_guide: developer_guide.tex
-	@echo building developer_guide...
-
-.PHONY: install_guide
-install_guide: install_guide.tex
-	@echo building install_guide...
-
-.PHONY: user_guide
-user_guide: user_guide.tex
-	@echo building user_guide...
+all: $(JOBS) 
 
 .PHONY: clean
 clean:
-	@rm *.log
-	@rm *.aux
-	@rm *.toc
+	@rm -f *.log *.aux *.toc *.pdf
+
+%.pdf : %.tex
+	@echo compiling: $<
+	@pdflatex -file-line-error $<
+	@pdflatex -file-line-error $<
+	@echo
+	@echo successfully built: $@
+	@echo
+
+%.tex : %.tex.in $(MAKEFILE_SOURCES)
+	@echo updating: $<
+	sed -e "s/%LLAMAOS_VERSION%/${LLAMAOS_VERSION}/g" $< > $@
 

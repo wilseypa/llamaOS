@@ -36,10 +36,20 @@
 
 \begin{document}
 
-\title{llamaOS - Installation Guide}
-\author{William A. Magato}
-\date{September 16, 2013}
+\title{{\bf llamaOS - Developer Guide}\\
+  Version %LLAMAOS_VERSION%
+  \\[2.0ex]
+  Experimental Computing Laboratory\\
+  University of Cincinnati}
+
+\author{
+William A. Magato\\[3.0ex]
+Past Contributors:\\[1.0ex]
+John Gideon
+}
+
 \maketitle
+\clearpage
 
 \tableofcontents
 \clearpage
@@ -47,10 +57,18 @@
 \section{Introduction}
 This is our first document.
 
-\section{Binary Distribution}
+\section{Source Repository}
 
-\section{Building from Source}
+\section{Build System}
 
-\section{Launching Test Instances}
+\section{System Libraries}
+
+\section{llamaOS API}
+
+\section{Network/Device Drivers}
+
+\section{Communication Libraries}
+
+\section{Benchmark/Test Applications}
 
 \end{document}
