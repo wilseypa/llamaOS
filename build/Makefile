@@ -35,6 +35,7 @@ MAKEFLAGS = --silent
 
 .PHONY: all
 all:
+	@echo version is $(LLAMAOS_VERSION)
 	@$(MAKE) -C linux $@
 	@$(MAKE) -C xen $@
 

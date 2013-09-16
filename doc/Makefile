@@ -30,25 +30,24 @@
 # contributors.
 #
 
-# make parameters
-MAKEFLAGS = --silent
-
-export LLAMAOS_VERSION = 1.1
-
 .PHONY: all
-all:
-	@$(MAKE) -C build $@
+all: developer_guide install_guide user_guide
 
-.PHONY: install
-install:
-	@$(MAKE) -C build $@
+.PHONY: developer_guide
+developer_guide: developer_guide.tex
+	@echo building developer_guide...
+
+.PHONY: install_guide
+install_guide: install_guide.tex
+	@echo building install_guide...
+
+.PHONY: user_guide
+user_guide: user_guide.tex
+	@echo building user_guide...
 
 .PHONY: clean
 clean:
-	@$(MAKE) -C build $@
-	@$(MAKE) -C doc $@
-
-.PHONY: doc
-doc:
-	@$(MAKE) -C doc all
+	@rm *.log
+	@rm *.aux
+	@rm *.toc
 
