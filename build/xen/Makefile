@@ -70,8 +70,9 @@ all:
 	@$(MAKE) -f apps/WARPED/WARPED.mk
 	@$(MAKE) -f net/i82574.mk
 	@$(MAKE) -f net/lspci.mk
-	@$(MAKE) -f test/memory.mk
 	@$(MAKE) -f tests/empty.mk
+
+#	@$(MAKE) -f test/memory.mk
 
 .PHONY: install
 install:
