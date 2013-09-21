@@ -39,7 +39,7 @@ include common-vars.mk
 MAKEFILE_SOURCES += Makefile
 
 INSTALL_DIR = ~
-INSTALL_FOLDER = $(INSTALL_DIR)/llamaOS-1.0
+INSTALL_FOLDER = $(INSTALL_DIR)/llamaOS-$(LLAMAOS_VERSION)
 
 .PHONY: all
 all:

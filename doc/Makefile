@@ -42,9 +42,9 @@ all: $(JOBS)
 
 .PHONY: clean
 clean:
-	@rm -f *.log *.aux *.toc *.pdf
+	@rm -f *.log *.aux *.toc *.out *.pdf
 
-%.pdf : %.tex
+%.pdf : %.tex version.tex
 	@echo compiling: $<
 	@pdflatex -file-line-error $<
 	@pdflatex -file-line-error $<
@@ -53,6 +53,9 @@ clean:
 	@echo
 
 %.tex : %.tex.in $(MAKEFILE_SOURCES)
+	@echo updating: $<
+
+version.tex : version.tex.in $(MAKEFILE_SOURCES)
 	@echo updating: $<
 	sed -e "s/%LLAMAOS_VERSION%/${LLAMAOS_VERSION}/g" $< > $@
 

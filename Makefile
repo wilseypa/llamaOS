@@ -33,6 +33,7 @@
 # make parameters
 MAKEFLAGS = --silent
 
+# governs the version displayed in all binaries built under here
 export LLAMAOS_VERSION = 1.1
 
 .PHONY: all
