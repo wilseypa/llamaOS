@@ -41,7 +41,7 @@
 
 \begin{titlepage}
 \raggedleft
-{\huge{Developer's Guide}\\[1.0in]}
+{\huge{Developer Guide}\\[1.0in]}
 {\Huge{\textbf{llamaOS}}\\[0.125in]}
 {\Large{\input{version}}}
 \vfill
@@ -60,15 +60,113 @@ University of Cincinnati\\[0.125in]
 
 \section{Introduction}
 
-Requirements for development:
+When working with llamaOS, computer resources need to be thought of as either 
+\emph{development} or \emph{runtime} systems.  A development system is used for 
+developing the llamaOS source code and building binary images to be executed on 
+a runtime system.  A single system can be used for both development and runtime 
+execution provided it fulfills the requirements for both use cases.  This can 
+be a convenient way to develop new features and quickly test applications.  A 
+cluster of capable runtime systems is necessary for true performance 
+benchmarking though.
+
+\subsection{Development System}
+
+The requirements for a development system are:
 
 \begin{itemize}
-  \item git
-  \item gcc
-  \item xen
+  \item Version Control
+    \subitem GitHub compatible Git client
+    \subitem GitHub compatible web browser
+    \subitem SSH client
+  \item Compiler/Build Tools
+    \subitem GNU GCC 4.7.1 or greater (languages: C, C++, Fortran)
+    \subitem GNU Binutils
+    \subitem GNU gzip
+  \item Code Analysis (optional)
+    \subitem Cppcheck
+  \item Documentation (optional)
+    \subitem Doxygen
+    \subitem \LaTeX
 \end{itemize}
 
+\subsubsection{Version Control}
+
+The source code for the llamaOS project is maintained with the 
+\href{http://git-scm.com/}{Git}\footnote{\url{http://git-scm.com/}} 
+distributed version control system.  The repository is hosted on 
+\href{https://github.com/wilseypa/llamaOS}{GutHub}\footnote{\url{
+https://github.com/wilseypa/llamaOS}}, a web-based service with some basic 
+project management features.  Refer to the GitHub documentation for details on 
+minimum Git client and we browser requirements.
+
+An SSH client is needed to clone and remotely administer the llamaOS Git 
+repository.  Most modern Linux distributions arrive with an SSH client 
+pre-installed.  If not, refer to the distribution's package management for 
+instructions on installing a client.
+
+\subsubsection{Compiler/Build Tools}
+
+The llamaOS build system is currently designed to compile source code using 
+the \href{http://gcc.gnu.org/}{GNU Compiler 
+Collection}\footnote{\url{http://gcc.gnu.org/}} and 
+\href{http://www.gnu.org/software/binutils/}{binary 
+tools}\footnote{\url{http://www.gnu.org/software/binutils/}}.  Similar to the 
+SSH client, GNU GCC is usually pre-installed for most modern Linux 
+distributions.  However, the distribution may not have the necessary versions 
+available.  llamaOS takes advantage of recent features of GCC and C++x11 that 
+required version 4.7.1 or greater.  If the desired development platform does not 
+support recent versions of GCC, it can be downloaded and installed along side 
+the systems native build system.
+
+GNU gzip is a compression tool used to build the final binary llamaOS 
+executable image. The binary is compressed to save space and time transmitting 
+the file to the runtime system for execution.
+
+\subsubsection{Code Analysis}
+
+To adhere to software engineering best practices, code analysis and automated 
+testing is integrated into the llamaOS build system.  At this time, 
+\href{http://cppcheck.sourceforge.net/}{ccpcheck}\footnote{\url{
+http://cppcheck.sourceforge.net/}} is used for static analysis of all C/C++ 
+files written by the llamaOS team.  Additional tools will be evaluated and 
+incorporated into the llamaOS build system when warranted.  The 
+\href{https://code.google.com/p/googletest/}{Google C++ Testing 
+Framework}\footnote{\url{https://code.google.com/p/googletest/}} provides unit 
+testing capabilities to the project.  Both code analysis and automated testing 
+procedures are still under heavy construction and at this time.
+
+\subsubsection{Documentation}
+
+In-line source code documentation of llamaOS is produced and distributed using 
+\href{http://www.stack.nl/~dimitri/doxygen/}{Doxygen}\footnote{\url{
+http://www.stack.nl/~dimitri/doxygen/}}.  The general rule is to document all 
+aspects of llamaOS that are publicly accessible from application logic.  System 
+level documentation files, such as this manual, are typeset and distributed as 
+PDF files using \LaTeX.
+
+\subsection{Runtime System}
+
+The requirements for a development system are:
+
+\begin{itemize}
+  \item Hypervisor
+    \subitem Xen 4.2.0 or greater
+  \item Network Hardware (optional, but required for llamaNET)
+    \subitem Intel PCI/PCIe NIC (82574 or 80003es2lan chipset)
+\end{itemize}
+
+\subsubsection{Hypervisor}
+
+\subsubsection{Network Hardware}
+
 \section{Source Repository}
+
+
+
+
+
+\url{https://help.github.com/articles/generating-ssh-keys}
+
 
 \section{Build System}
 
