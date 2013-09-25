@@ -39,6 +39,8 @@ build/xen/util/NAS/setparams
 doc/*.log
 doc/*.aux
 doc/*.toc
+doc/*.out
+doc/*.pdf
 
 # KDevelop files #
 # ############## #
