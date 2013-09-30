@@ -237,11 +237,26 @@ project's root directory.
 \texttt{llamaOS \$ make}
 \end{quote}
 
+All of the llamaOS makefiles reside in the \emph{build} folder/subfolders.  
+Typing \emph{make} from the project root launches a series of recursive make 
+processes that systematically build all of the project binaries and generates a 
+distrubition package.  
+
+\begin{quote}
+level 0 \hspace{0.5in}build root\\
+host platforms\\
+libraries \& applications
+\end{quote}
+
+
+
 The system of llamaOS makefiles in the \emph{build} folder attempt to determine 
 what tools are available on the development system and avoid building 
 components that can not be supported.  The development system must provide 
 support for building the core libraries though.  A common source of error is 
-when the system's native compiler does not meet the minimum requirements.
+when the system's native compiler does not meet the poject's minimum 
+requirements.  For example, the following compiler error message may appear on 
+some systems.
 
 \begin{quote}
 \texttt{error: unrecognized command line option '-std=gnu++11'}

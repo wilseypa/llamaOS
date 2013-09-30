@@ -41,6 +41,7 @@ doc/*.aux
 doc/*.toc
 doc/*.out
 doc/*.pdf
+doc/*.backup
 
 # KDevelop files #
 # ############## #
