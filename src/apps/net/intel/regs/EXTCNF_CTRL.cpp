@@ -28,13 +28,61 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <errno.h>
-#include <dlfcn.h>
+#include <apps/net/intel/regs/EXTCNF_CTRL.h>
 
-void
-__libc_register_dlfcn_hook (struct link_map *map)
+using std::endl;
+using std::ostream;
+
+using apps::net::intel::regs::EXTCNF_CTRL;
+
+EXTCNF_CTRL::EXTCNF_CTRL (uint32_t value)
+   :  value(value & 0xE0)    // mask reserved bits
+                             // set 3rd bit per intel manual
 {
-   __set_errno (ENOSYS);
+   
 }
 
-// stub_warning (__libc_register_dlfcn_hook)
+EXTCNF_CTRL::operator uint32_t () const
+{
+   return value.to_ulong ();
+}
+
+bool EXTCNF_CTRL::MDIO_mng_ownership () const
+{
+   return value [7];
+}
+
+void EXTCNF_CTRL::MDIO_mng_ownership (bool flag)
+{
+   value [7] = flag;
+}
+
+bool EXTCNF_CTRL::MDIO_hw_ownership () const
+{
+   return value [6];
+}
+
+void EXTCNF_CTRL::MDIO_hw_ownership (bool flag)
+{
+   value [6] = flag;
+}
+
+bool EXTCNF_CTRL::MDIO_sw_ownership () const
+{
+   return value [5];
+}
+
+void EXTCNF_CTRL::MDIO_sw_ownership (bool flag)
+{
+   value [5] = flag;
+}
+
+ostream &operator<< (ostream &out, const EXTCNF_CTRL &extcnf_ctrl)
+{
+   out << "Extended Configuration Control" << endl;
+   out << "  MDIO mng ownership: " << extcnf_ctrl.MDIO_mng_ownership () << endl;
+   out << "  MDIO hw ownership: " << extcnf_ctrl.MDIO_hw_ownership () << endl;
+   out << "  MDIO sw ownership: " << extcnf_ctrl.MDIO_sw_ownership () << endl;
+
+   return out;
+}

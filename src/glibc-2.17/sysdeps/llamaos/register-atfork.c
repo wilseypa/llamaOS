@@ -36,4 +36,4 @@ void __linkin_atfork (struct fork_handler *newp) attribute_hidden
    __set_errno (ENOSYS);
 }
 
-stub_warning (__linkin_atfork)
+// stub_warning (__linkin_atfork)

@@ -28,13 +28,38 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <errno.h>
-#include <dlfcn.h>
+#include <apps/net/intel/regs/FCAL.h>
 
-void
-__libc_register_dlfcn_hook (struct link_map *map)
+using std::endl;
+using std::hex;
+using std::ostream;
+
+using apps::net::intel::regs::FCAL;
+
+FCAL::FCAL ()
+   :  value(0x00C28001)
 {
-   __set_errno (ENOSYS);
+
 }
 
-// stub_warning (__libc_register_dlfcn_hook)
+FCAL::FCAL (uint32_t value)
+   :  value(value)
+{
+
+}
+
+FCAL::operator uint32_t () const
+{
+   return value;
+}
+
+ostream &operator<< (ostream &out, const FCAL &fcal)
+{
+   out << "Flow Control Address Low" << endl;
+   out << " " << hex << ((fcal >> 24) & 0xFF);
+   out << ":" << hex << ((fcal >> 16) & 0xFF);
+   out << ":" << hex << ((fcal >> 8) & 0xFF);
+   out << ":" << hex << ((fcal >> 0) & 0xFF) << endl;
+
+   return out;
+}

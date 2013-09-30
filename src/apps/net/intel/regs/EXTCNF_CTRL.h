@@ -28,13 +28,87 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <errno.h>
-#include <dlfcn.h>
+#ifndef llamaos_net_intel_regs_extcnf_ctrl_h_
+#define llamaos_net_intel_regs_extcnf_ctrl_h_
 
-void
-__libc_register_dlfcn_hook (struct link_map *map)
+#include <cstdint>
+
+#include <bitset>
+#include <ostream>
+
+namespace apps {
+namespace net {
+namespace intel {
+namespace regs {
+
+/**
+ * @brief Extended Configuration Control register.
+ * 
+ */
+class EXTCNF_CTRL
 {
-   __set_errno (ENOSYS);
-}
+public:
+   /**
+    * @breif Construct from value.
+    * 
+    * @param value Initial value (usually read from hardware).
+    * 
+    */
+   EXTCNF_CTRL (uint32_t value);
 
-// stub_warning (__libc_register_dlfcn_hook)
+   /**
+    * @breif Convert to 32-bit integer.
+    * 
+    */
+   operator uint32_t () const;
+
+   /**
+    * @brief MDIO Management Request bit.
+    * 
+    */
+   bool MDIO_mng_ownership () const;
+
+   /**
+    * @brief MDIO Management Request bit.
+    * 
+    */
+   void MDIO_mng_ownership (bool flag);
+
+   /**
+    * @brief MDIO Hardware Request bit.
+    * 
+    */
+   bool MDIO_hw_ownership () const;
+
+   /**
+    * @brief MDIO Hardware Request bit.
+    * 
+    */
+   void MDIO_hw_ownership (bool flag);
+
+   /**
+    * @brief MDIO Software Request bit.
+    * 
+    */
+   bool MDIO_sw_ownership () const;
+
+   /**
+    * @brief MDIO Software Request bit.
+    * 
+    */
+   void MDIO_sw_ownership (bool flag);
+
+private:
+   std::bitset<32> value;
+
+};
+
+/**
+ * @brief Stream insertion operator.
+ * 
+ */
+std::ostream &operator<< (std::ostream &, const EXTCNF_CTRL &);
+
+} } } }
+
+#endif // llamaos_net_intel_regs_extcnf_ctrl_h_

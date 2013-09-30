@@ -28,13 +28,29 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <errno.h>
-#include <dlfcn.h>
+#include <apps/net/intel/regs/XOFFTXC.h>
 
-void
-__libc_register_dlfcn_hook (struct link_map *map)
+using std::endl;
+using std::hex;
+using std::ostream;
+
+using apps::net::intel::regs::XOFFTXC;
+
+XOFFTXC::XOFFTXC (uint32_t value)
+   :  value(value)
 {
-   __set_errno (ENOSYS);
+
 }
 
-// stub_warning (__libc_register_dlfcn_hook)
+XOFFTXC::operator uint32_t () const
+{
+   return value;
+}
+
+ostream &operator<< (ostream &out, const XOFFTXC &xofftxc)
+{
+   out << "XOFF Transmitted Count" << endl;
+   out << " 0x" << hex << static_cast<uint32_t>(xofftxc)  << endl;
+
+   return out;
+}

@@ -28,13 +28,29 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <errno.h>
-#include <dlfcn.h>
+#include <apps/net/intel/regs/XONTXC.h>
 
-void
-__libc_register_dlfcn_hook (struct link_map *map)
+using std::endl;
+using std::hex;
+using std::ostream;
+
+using apps::net::intel::regs::XONTXC;
+
+XONTXC::XONTXC (uint32_t value)
+   :  value(value)
 {
-   __set_errno (ENOSYS);
+
 }
 
-// stub_warning (__libc_register_dlfcn_hook)
+XONTXC::operator uint32_t () const
+{
+   return value;
+}
+
+ostream &operator<< (ostream &out, const XONTXC &xontxc)
+{
+   out << "XON Transmitted Count" << endl;
+   out << " 0x" << hex << static_cast<uint32_t>(xontxc)  << endl;
+
+   return out;
+}

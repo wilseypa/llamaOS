@@ -28,13 +28,56 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <errno.h>
-#include <dlfcn.h>
+#ifndef llamaos_net_intel_regs_fcal_h_
+#define llamaos_net_intel_regs_fcal_h_
 
-void
-__libc_register_dlfcn_hook (struct link_map *map)
+#include <cstdint>
+
+#include <ostream>
+
+namespace apps {
+namespace net {
+namespace intel {
+namespace regs {
+
+/**
+ * @brief Flow Control Address Low register.
+ * 
+ */
+class FCAL
 {
-   __set_errno (ENOSYS);
-}
+public:
+   /**
+    * @breif Construct with default value.
+    * 
+    */
+   FCAL ();
 
-// stub_warning (__libc_register_dlfcn_hook)
+   /**
+    * @breif Construct from value.
+    * 
+    * @param value Initial value (usually read from hardware).
+    * 
+    */
+   FCAL (uint32_t value);
+
+   /**
+    * @breif Convert to 32-bit integer.
+    * 
+    */
+   operator uint32_t () const;
+
+private:
+   uint32_t value;
+
+};
+
+/**
+ * @brief Stream insertion operator.
+ * 
+ */
+std::ostream &operator<< (std::ostream &, const FCAL &);
+
+} } } }
+
+#endif // llamaos_net_intel_regs_fcal_h_

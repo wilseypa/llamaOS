@@ -39,7 +39,7 @@ include common-vars.mk
 MAKEFILE_SOURCES += Makefile
 
 INSTALL_DIR = ~
-INSTALL_FOLDER = $(INSTALL_DIR)/llamaOS-1.0
+INSTALL_FOLDER = $(INSTALL_DIR)/llamaOS-$(LLAMAOS_VERSION)
 
 .PHONY: all
 all:
@@ -53,6 +53,7 @@ all:
 	@$(MAKE) -f llamaMPI.mk
 	@$(MAKE) -f llamaMPIF.mk
 	@$(MAKE) -f apps/NAS/NAS.mk
+	@$(MAKE) -f apps/net/intel.mk
 	@$(MAKE) -f apps/hello-c.mk
 	@$(MAKE) -f apps/hello-cpp.mk
 	@$(MAKE) -f apps/hello-f77-llamaOS.mk
@@ -70,7 +71,7 @@ all:
 	@$(MAKE) -f apps/WARPED/WARPED.mk
 	@$(MAKE) -f net/i82574.mk
 	@$(MAKE) -f net/lspci.mk
-	@$(MAKE) -f test/memory.mk
+	@$(MAKE) -f tests/memory.mk
 	@$(MAKE) -f tests/empty.mk
 
 .PHONY: install

@@ -30,23 +30,32 @@
 # contributors.
 #
 
-# make parameters
-MAKEFLAGS = --silent
+MAKEFILE_SOURCES += Makefile
 
-# governs the version displayed in all binaries built under here
-export LLAMAOS_VERSION = 1.1
+JOBS = \
+  developer_guide.pdf \
+  install_guide.pdf \
+  user_guide.pdf
 
 .PHONY: all
-all:
-	@$(MAKE) -C build $@
-	@$(MAKE) -C doc $@
-
-.PHONY: install
-install:
-	@$(MAKE) -C build $@
-	@$(MAKE) -C doc $@
+all: $(JOBS) 
 
 .PHONY: clean
 clean:
-	@$(MAKE) -C build $@
-	@$(MAKE) -C doc $@
+	@rm -f *.log *.aux *.toc *.out *.pdf
+
+%.pdf : %.tex version.tex
+	@echo compiling: $<
+	@pdflatex -file-line-error $<
+	@pdflatex -file-line-error $<
+	@echo
+	@echo successfully built: $@
+	@echo
+
+%.tex : %.tex.in $(MAKEFILE_SOURCES)
+	@echo updating: $<
+
+version.tex : version.tex.in $(MAKEFILE_SOURCES)
+	@echo updating: $<
+	sed -e "s/%LLAMAOS_VERSION%/${LLAMAOS_VERSION}/g" $< > $@
+

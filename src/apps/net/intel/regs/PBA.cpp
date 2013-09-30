@@ -28,13 +28,50 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <errno.h>
-#include <dlfcn.h>
+#include <apps/net/intel/regs/PBA.h>
 
-void
-__libc_register_dlfcn_hook (struct link_map *map)
+using std::endl;
+using std::hex;
+using std::ostream;
+
+using apps::net::intel::regs::PBA;
+
+PBA::PBA (uint32_t value)
+   :  value(value)
 {
-   __set_errno (ENOSYS);
+
 }
 
-// stub_warning (__libc_register_dlfcn_hook)
+PBA::operator uint32_t () const
+{
+   return value;
+}
+
+uint16_t PBA::RXA () const
+{
+   return value & 0xFFFF;
+}
+
+void PBA::RXA (uint16_t size)
+{
+   value &= (0xFFFF0000 | size);
+}
+
+uint16_t PBA::TXA () const
+{
+   return ((value >> 16) & 0xFFFF);
+}
+
+void PBA::TXA (uint16_t size)
+{
+   value &= (0x0000FFFF | (size << 16));
+}
+
+ostream &operator<< (ostream &out, const PBA &pba)
+{
+   out << "Packet Buffer Allocation" << endl;
+   out << "  RXA: 0x" << hex << pba.RXA () << endl;
+   out << "  TXA: 0x" << hex << pba.TXA () << endl;
+
+   return out;
+}

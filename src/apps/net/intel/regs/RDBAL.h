@@ -28,13 +28,51 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <errno.h>
-#include <dlfcn.h>
+#ifndef llamaos_net_intel_regs_rdbal_h_
+#define llamaos_net_intel_regs_rdbal_h_
 
-void
-__libc_register_dlfcn_hook (struct link_map *map)
+#include <cstdint>
+
+#include <ostream>
+
+namespace apps {
+namespace net {
+namespace intel {
+namespace regs {
+
+/**
+ * @brief Receive Descriptor Base Address Low register.
+ * 
+ */
+class RDBAL
 {
-   __set_errno (ENOSYS);
-}
+public:
+   /**
+    * @breif Construct from value.
+    * 
+    * @param value Initial value (usually read from hardware).
+    * 
+    */
+   RDBAL (uint32_t value);
 
-// stub_warning (__libc_register_dlfcn_hook)
+   /**
+    * @breif Convert to 32-bit integer.
+    * 
+    */
+   operator uint32_t () const;
+
+
+private:
+   uint32_t value;
+
+};
+
+/**
+ * @brief Stream insertion operator.
+ * 
+ */
+std::ostream &operator<< (std::ostream &, const RDBAL &);
+
+} } } }
+
+#endif // llamaos_net_intel_regs_rdbal_h_

@@ -28,13 +28,35 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <errno.h>
-#include <dlfcn.h>
+#include <apps/net/intel/regs/FCT.h>
 
-void
-__libc_register_dlfcn_hook (struct link_map *map)
+using std::endl;
+using std::hex;
+using std::ostream;
+
+using apps::net::intel::regs::FCT;
+
+FCT::FCT ()
+   :  value(0x00008808)
 {
-   __set_errno (ENOSYS);
+
 }
 
-// stub_warning (__libc_register_dlfcn_hook)
+FCT::FCT (uint32_t value)
+   :  value(value & 0xFFFF)    // mask reserved bits
+{
+
+}
+
+FCT::operator uint32_t () const
+{
+   return value;
+}
+
+ostream &operator<< (ostream &out, const FCT &fct)
+{
+   out << "Flow Control Type" << endl;
+   out << " 0x" << hex << static_cast<uint32_t>(fct)  << endl;
+
+   return out;
+}

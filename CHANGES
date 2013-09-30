@@ -1,0 +1,21 @@
+
+===============================================================================
+				Changes in 1.1
+===============================================================================
+
+ * First official installable version.
+ * re-designed network driver structure.
+    - moved vender specific files to apps folder.
+    - combined intel hardware logic into single driver.
+
+===============================================================================
+				Changes in 1.0
+===============================================================================
+
+First official stable version used for initial performance benchmark testing.
+
+===============================================================================
+				Changes in 0.1
+===============================================================================
+
+Original concept design/development release.

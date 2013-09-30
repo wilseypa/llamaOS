@@ -28,13 +28,98 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <errno.h>
-#include <dlfcn.h>
+#ifndef llamaos_net_intel_regs_psrctl_h_
+#define llamaos_net_intel_regs_psrctl_h_
 
-void
-__libc_register_dlfcn_hook (struct link_map *map)
+#include <cstdint>
+
+#include <ostream>
+
+namespace apps {
+namespace net {
+namespace intel {
+namespace regs {
+
+/**
+ * @brief Packet Split Receive Control register.
+ * 
+ */
+class PSRCTL
 {
-   __set_errno (ENOSYS);
-}
+public:
+   /**
+    * @breif Construct from value.
+    * 
+    * @param value Initial value (usually read from hardware).
+    * 
+    */
+   PSRCTL (uint32_t value);
 
-// stub_warning (__libc_register_dlfcn_hook)
+   /**
+    * @breif Convert to 32-bit integer.
+    * 
+    */
+   operator uint32_t () const;
+
+   /**
+    * @brief Receive buffer size for buffer 0.
+    * 
+    */
+   uint8_t BSIZE0 () const;
+
+   /**
+    * @brief Receive buffer size for buffer 0.
+    * 
+    */
+   void BSIZE0 (uint8_t size);
+
+   /**
+    * @brief Receive buffer size for buffer 1.
+    * 
+    */
+   uint8_t BSIZE1 () const;
+
+   /**
+    * @brief Receive buffer size for buffer 1.
+    * 
+    */
+   void BSIZE1 (uint8_t size);
+
+   /**
+    * @brief Receive buffer size for buffer 2.
+    * 
+    */
+   uint8_t BSIZE2 () const;
+
+   /**
+    * @brief Receive buffer size for buffer 2.
+    * 
+    */
+   void BSIZE2 (uint8_t size);
+
+   /**
+    * @brief Receive buffer size for buffer 3.
+    * 
+    */
+   uint8_t BSIZE3 () const;
+
+   /**
+    * @brief Receive buffer size for buffer 3.
+    * 
+    */
+   void BSIZE3 (uint8_t size);
+
+private:
+   uint32_t value;
+
+};
+
+/**
+ * @brief Stream insertion operator.
+ * 
+ */
+std::ostream &operator<< (std::ostream &, const PSRCTL &);
+
+} } } }
+
+#endif // llamaos_net_intel_regs_psrctl_h_

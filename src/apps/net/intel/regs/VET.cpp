@@ -28,13 +28,35 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <errno.h>
-#include <dlfcn.h>
+#include <apps/net/intel/regs/VET.h>
 
-void
-__libc_register_dlfcn_hook (struct link_map *map)
+using std::endl;
+using std::hex;
+using std::ostream;
+
+using apps::net::intel::regs::VET;
+
+VET::VET ()
+   :  value(0x00008100)
 {
-   __set_errno (ENOSYS);
+
 }
 
-// stub_warning (__libc_register_dlfcn_hook)
+VET::VET (uint32_t value)
+   :  value(value & 0xFFFF)    // mask reserved bits
+{
+
+}
+
+VET::operator uint32_t () const
+{
+   return value;
+}
+
+ostream &operator<< (ostream &out, const VET &vet)
+{
+   out << "Flow Control Type" << endl;
+   out << " 0x" << hex << static_cast<uint32_t>(vet)  << endl;
+
+   return out;
+}

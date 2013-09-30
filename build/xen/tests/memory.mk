@@ -30,23 +30,33 @@
 # contributors.
 #
 
-# make parameters
-MAKEFLAGS = --silent
+# include common variables
+include common-vars.mk
+include common-flags.mk
 
-# governs the version displayed in all binaries built under here
-export LLAMAOS_VERSION = 1.1
+MAKEFILE_SOURCES += tests/memory.mk
 
-.PHONY: all
-all:
-	@$(MAKE) -C build $@
-	@$(MAKE) -C doc $@
+CPPFLAGS += \
+  -I $(INCDIR) \
+  -include $(SRCDIR)/llamaos/__thread.h
 
-.PHONY: install
-install:
-	@$(MAKE) -C build $@
-	@$(MAKE) -C doc $@
+VPATH = $(TESTDIR)
 
-.PHONY: clean
-clean:
-	@$(MAKE) -C build $@
-	@$(MAKE) -C doc $@
+SOURCES = \
+  llamaos/xen/memory.cpp
+
+OBJECTS  = $(SOURCES:%.cpp=$(OBJDIR)/%.o)
+DEPENDS += $(OBJECTS:%.o=%.d)
+
+$(BINDIR)/test/memory: $(OBJECTS) $(LIBDIR)/llamaOS.a $(LIBDIR)/stdc++.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo linking: $@
+	@$(LD) $(LDFLAGS) -T llamaOS.lds -o $@ $^
+	@gzip -c -f --best $@ >$@.gz
+	@echo successfully built: $@
+	@echo
+
+include rules.mk
+
+# include auto-generated dependencies
+-include $(DEPENDS)

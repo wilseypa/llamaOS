@@ -28,13 +28,29 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <errno.h>
-#include <dlfcn.h>
+#include <apps/net/intel/regs/XONRXC.h>
 
-void
-__libc_register_dlfcn_hook (struct link_map *map)
+using std::endl;
+using std::hex;
+using std::ostream;
+
+using apps::net::intel::regs::XONRXC;
+
+XONRXC::XONRXC (uint32_t value)
+   :  value(value)
 {
-   __set_errno (ENOSYS);
+
 }
 
-// stub_warning (__libc_register_dlfcn_hook)
+XONRXC::operator uint32_t () const
+{
+   return value;
+}
+
+ostream &operator<< (ostream &out, const XONRXC &xonrxc)
+{
+   out << "XON Received Count" << endl;
+   out << " 0x" << hex << static_cast<uint32_t>(xonrxc)  << endl;
+
+   return out;
+}

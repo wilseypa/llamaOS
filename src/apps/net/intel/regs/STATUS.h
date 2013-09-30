@@ -28,13 +28,99 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <errno.h>
-#include <dlfcn.h>
+#ifndef llamaos_net_intel_regs_status_h_
+#define llamaos_net_intel_regs_status_h_
 
-void
-__libc_register_dlfcn_hook (struct link_map *map)
+#include <cstdint>
+
+#include <bitset>
+#include <ostream>
+
+namespace apps {
+namespace net {
+namespace intel {
+namespace regs {
+
+/**
+ * @brief Device Status register.
+ * 
+ */
+class STATUS
 {
-   __set_errno (ENOSYS);
-}
+public:
+   /**
+    * @breif Construct from value.
+    * 
+    * @param value Value (usually read from hardware).
+    * 
+    */
+   STATUS (uint32_t value);
 
-// stub_warning (__libc_register_dlfcn_hook)
+   /**
+    * @breif Convert to 32-bit integer.
+    * 
+    */
+   operator uint32_t () const;
+
+   /**
+    * @brief Full Duplex bit.
+    * 
+    */
+   bool FD () const;
+
+   /**
+    * @brief Link Up bit.
+    * 
+    */
+   bool LU () const;
+
+   /**
+    * @brief Transmission Paused bit.
+    * 
+    */
+   bool TXOFF () const;
+
+   /**
+    * @brief Speed Selection options.
+    * 
+    */
+   enum Speed_enum { Speed_10Mbs, Speed_100Mbs, Speed_1000Mbs };
+
+   /**
+    * @brief Speed Selection bits.
+    * 
+    */
+   Speed_enum SPEED () const;
+
+   /**
+    * @brief Auto-Speed Detection Value bit.
+    * 
+    */
+   Speed_enum ASDV () const;
+
+   /**
+    * @brief PHY Reset Asserted bit.
+    * 
+    */
+   bool PHYRA () const;
+
+   /**
+    * @brief GIO Master Enable Status bit.
+    * 
+    */
+   bool GIO_master_enable_status () const;
+
+private:
+   std::bitset<32> value;
+
+};
+
+/**
+ * @brief Stream insertion operator.
+ * 
+ */
+std::ostream &operator<< (std::ostream &, const STATUS &);
+
+} } } }
+
+#endif // llamaos_net_intel_regs_status_h_

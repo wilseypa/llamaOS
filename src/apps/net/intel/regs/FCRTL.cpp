@@ -28,13 +28,51 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <errno.h>
-#include <dlfcn.h>
+#include <apps/net/intel/regs/FCRTL.h>
 
-void
-__libc_register_dlfcn_hook (struct link_map *map)
+using std::endl;
+using std::hex;
+using std::ostream;
+
+using apps::net::intel::regs::FCRTL;
+
+FCRTL::FCRTL (uint32_t value)
+   :  value(value & 0x8000FFF8)    // mask reserved bits
 {
-   __set_errno (ENOSYS);
+   
 }
 
-// stub_warning (__libc_register_dlfcn_hook)
+FCRTL::operator uint32_t () const
+{
+   return value.to_ulong ();
+}
+
+uint16_t FCRTL::RTL () const
+{
+   return (value.to_ulong () & 0xFFF8);
+}
+
+void FCRTL::RTL (uint16_t size)
+{
+   value &= ~(0xFFF8);
+   value |= (0xFFF8 | size);
+}
+
+bool FCRTL::XONE () const
+{
+   return value [31];
+}
+
+void FCRTL::XONE (bool flag)
+{
+   value [31] = flag;
+}
+
+ostream &operator<< (ostream &out, const FCRTL &fcrtl)
+{
+   out << "Flow Control Receive Threshold Low" << endl;
+   out << "  RTL: 0x" << hex << fcrtl.RTL () << endl;
+   out << "  XONE: " << fcrtl.XONE () << endl;
+
+   return out;
+}

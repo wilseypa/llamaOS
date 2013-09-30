@@ -28,13 +28,13 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <errno.h>
-#include <dlfcn.h>
+#include <apps/net/intel/regs/CSR.h>
 
-void
-__libc_register_dlfcn_hook (struct link_map *map)
+using apps::net::intel::regs::CSR;
+
+int main (int argc, char *argv [])
 {
-   __set_errno (ENOSYS);
-}
+   CSR csr (0);
 
-// stub_warning (__libc_register_dlfcn_hook)
+   return 0;
+}
