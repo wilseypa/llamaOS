@@ -49,6 +49,7 @@ doc/*.backup
 .kdev_include_paths
 .directory
 .*-swp
+*.kdev4
 
 
 
