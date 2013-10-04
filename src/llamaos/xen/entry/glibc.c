@@ -35,8 +35,8 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <xen/version.h>
 #include <xen/xen.h>
 
-#include <llamaos/xen/Entry-gcc.h>
-#include <llamaos/xen/Entry-glibc.h>
+#include <llamaos/xen/entry/gcc.h>
+#include <llamaos/xen/entry/glibc.h>
 #include <llamaos/xen/Export-glibc.h>
 #include <llamaos/xen/Hypercall-macros.h>
 #include <llamaos/llamaOS.h>

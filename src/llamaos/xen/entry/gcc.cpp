@@ -36,7 +36,8 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <xen/xen.h>
 
 #include <llamaos/memory/Memory.h>
-#include <llamaos/xen/Entry-llamaOS.h>
+#include <llamaos/xen/entry/gcc.h>
+#include <llamaos/xen/entry/llamaOS.h>
 #include <llamaos/xen/Export-glibc.h>
 #include <llamaos/llamaOS.h>
 #include <llamaos/Trace.h>

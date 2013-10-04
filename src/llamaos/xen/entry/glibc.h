@@ -28,9 +28,12 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#ifndef llamaos_xen_entry_gcc_h_
-#define llamaos_xen_entry_gcc_h_
+#ifndef SRC_LLAMAOS_XEN_ENTRY_GLIBC_H_
+#define SRC_LLAMAOS_XEN_ENTRY_GLIBC_H_
 
-void entry_gcc (start_info_t *start_info);
+#ifdef __cplusplus
+extern "C"
+#endif
+void entry_glibc(start_info_t *start_info);
 
-#endif	// llamaos_xen_entry_gcc_h_
+#endif  // SRC_LLAMAOS_XEN_ENTRY_GLIBC_H_
