@@ -72,7 +72,7 @@ all:
 	@$(MAKE) -f net/i82574.mk
 	@$(MAKE) -f net/lspci.mk
 	@$(MAKE) -f tests/memory.mk
-	@$(MAKE) -f tests/empty.mk
+#	@$(MAKE) -f tests/empty.mk
 
 .PHONY: install
 install:
