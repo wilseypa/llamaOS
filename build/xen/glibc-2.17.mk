@@ -1501,6 +1501,7 @@ HEADERS = \
   $(INCDIR)/poll.h \
   $(INCDIR)/pthread.h \
   $(INCDIR)/pwd.h \
+  $(INCDIR)/regex.h \
   $(INCDIR)/sched.h \
   $(INCDIR)/setjmp.h \
   $(INCDIR)/signal.h \

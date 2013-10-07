@@ -502,6 +502,7 @@ HEADERS = \
   $(INCDIR)/ctime \
   $(INCDIR)/cwchar \
   $(INCDIR)/cwctype \
+  $(INCDIR)/cxxabi.h \
   $(INCDIR)/cxxabi_forced.h \
   $(INCDIR)/deque \
   $(INCDIR)/exception \
