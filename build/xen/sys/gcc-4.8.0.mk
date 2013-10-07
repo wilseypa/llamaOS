@@ -34,7 +34,7 @@
 include common-vars.mk
 include common-flags.mk
 
-MAKEFILE_SOURCES += gcc-$(GCC_VERSION).mk
+MAKEFILE_SOURCES += sys/gcc-$(GCC_VERSION).mk
 
 # gcc-4.7.1 doesn't know this one
 #  -mlong-double-80
@@ -46,12 +46,12 @@ CFLAGS += \
   -fbuilding-libgcc \
   -fno-stack-protector \
   -fvisibility=hidden \
-  -I $(SRCDIR)/gcc-$(GCC_VERSION)/gcc \
-  -I $(SRCDIR)/gcc-$(GCC_VERSION)/libgcc \
-  -I $(SRCDIR)/gcc-$(GCC_VERSION)/include \
-  -I $(SRCDIR)/gcc-$(GCC_VERSION)/libgcc/config/libbid \
-  -I $(SRCDIR)/gcc-$(GCC_VERSION)/gcc/config/spu \
-  -I $(SRCDIR)/gcc-$(GCC_VERSION)/libcpp/include \
+  -I $(SRCDIR)/sys/gcc-$(GCC_VERSION)/gcc \
+  -I $(SRCDIR)/sys/gcc-$(GCC_VERSION)/libgcc \
+  -I $(SRCDIR)/sys/gcc-$(GCC_VERSION)/include \
+  -I $(SRCDIR)/sys/gcc-$(GCC_VERSION)/libgcc/config/libbid \
+  -I $(SRCDIR)/sys/gcc-$(GCC_VERSION)/gcc/config/spu \
+  -I $(SRCDIR)/sys/gcc-$(GCC_VERSION)/libcpp/include \
   -I $(INCDIR) \
   -include $(SRCDIR)/llamaos/__thread.h
 
@@ -60,92 +60,92 @@ CFLAGS += \
 VPATH = $(SRCDIR)
 
 SOURCES = \
-  gcc-$(GCC_VERSION)/libgcc/soft-fp/addtf3.c \
-  gcc-$(GCC_VERSION)/libgcc/soft-fp/divtf3.c \
-  gcc-$(GCC_VERSION)/libgcc/soft-fp/eqtf2.c \
-  gcc-$(GCC_VERSION)/libgcc/soft-fp/floatunditf.c \
-  gcc-$(GCC_VERSION)/libgcc/soft-fp/getf2.c \
-  gcc-$(GCC_VERSION)/libgcc/soft-fp/letf2.c \
-  gcc-$(GCC_VERSION)/libgcc/soft-fp/multf3.c \
-  gcc-$(GCC_VERSION)/libgcc/soft-fp/subtf3.c \
-  gcc-$(GCC_VERSION)/libgcc/soft-fp/trunctfdf2.c \
-  gcc-$(GCC_VERSION)/libgcc/soft-fp/unordtf2.c \
-  gcc-$(GCC_VERSION)/libgcc/config/i386/sfp-exceptions.c \
-  gcc-$(GCC_VERSION)/libgcc/config/spu/divmodti4.c \
-  gcc-$(GCC_VERSION)/libgcc/udivmodsi4.c \
-  gcc-$(GCC_VERSION)/libgcc/unwind-dw2-fde.c \
-  gcc-$(GCC_VERSION)/libgcc/unwind-dw2.c
+  sys/gcc-$(GCC_VERSION)/libgcc/soft-fp/addtf3.c \
+  sys/gcc-$(GCC_VERSION)/libgcc/soft-fp/divtf3.c \
+  sys/gcc-$(GCC_VERSION)/libgcc/soft-fp/eqtf2.c \
+  sys/gcc-$(GCC_VERSION)/libgcc/soft-fp/floatunditf.c \
+  sys/gcc-$(GCC_VERSION)/libgcc/soft-fp/getf2.c \
+  sys/gcc-$(GCC_VERSION)/libgcc/soft-fp/letf2.c \
+  sys/gcc-$(GCC_VERSION)/libgcc/soft-fp/multf3.c \
+  sys/gcc-$(GCC_VERSION)/libgcc/soft-fp/subtf3.c \
+  sys/gcc-$(GCC_VERSION)/libgcc/soft-fp/trunctfdf2.c \
+  sys/gcc-$(GCC_VERSION)/libgcc/soft-fp/unordtf2.c \
+  sys/gcc-$(GCC_VERSION)/libgcc/config/i386/sfp-exceptions.c \
+  sys/gcc-$(GCC_VERSION)/libgcc/config/spu/divmodti4.c \
+  sys/gcc-$(GCC_VERSION)/libgcc/udivmodsi4.c \
+  sys/gcc-$(GCC_VERSION)/libgcc/unwind-dw2-fde.c \
+  sys/gcc-$(GCC_VERSION)/libgcc/unwind-dw2.c
 
 HEADERS = 
 
 OBJECTS  = $(SOURCES:%.c=$(OBJDIR)/%.o)
 
 # add gcc functions embedded in libgcc2.c
-OBJECTS += $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/muldi3.o \
-           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/negdi2.o \
-           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/lshrdi3.o \
-           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/ashldi3.o \
-           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/ashrdi3.o \
-           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/cmpdi2.o \
-           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/ucmpdi2.o \
-           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/clear_cache.o \
-           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/trampoline.o \
-           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/absvsi2.o \
-           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/absvdi2.o \
-           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/addvsi3.o \
-           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/addvdi3.o \
-           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/subvsi3.o \
-           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/subvdi3.o \
-           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/mulvsi3.o \
-           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/mulvdi3.o \
-           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/negvsi2.o \
-           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/negvdi2.o \
-           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/ffssi2.o \
-           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/ffsdi2.o \
-           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/clzsi2.o \
-           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/clzdi2.o \
-           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/ctzsi2.o \
-           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/ctzdi2.o \
-           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/popcount_tab.o \
-           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/popcountsi2.o \
-           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/popcountdi2.o \
-           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/paritysi2.o \
-           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/paritydi2.o \
-           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/powisf2.o \
-           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/powidf2.o \
-           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/powixf2.o \
-           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/mulsc3.o \
-           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/muldc3.o \
-           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/mulxc3.o \
-           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/divsc3.o \
-           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/divdc3.o \
-           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/divxc3.o \
-           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/bswapsi2.o \
-           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/bswapdi2.o \
-           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/clrsbsi2.o \
-           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/clrsbdi2.o \
-           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/fixunssfsi.o \
-           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/fixunsdfsi.o \
-           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/fixunsxfsi.o \
-           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/fixsfdi.o \
-           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/fixdfdi.o \
-           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/fixxfdi.o \
-           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/fixunssfdi.o \
-           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/fixunsdfdi.o \
-           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/fixunsxfdi.o \
-           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/floatdisf.o \
-           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/floatdidf.o \
-           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/floatdixf.o \
-           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/floatundisf.o \
-           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/floatundidf.o \
-           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/floatundixf.o \
-           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/eprintf.o \
-           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/_gcc_bcmp.o \
-           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/divdi3.o \
-           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/moddi3.o \
-           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/udivdi3.o \
-           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/udiv_w_sdiv.o \
-           $(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/udivmoddi4.o
+OBJECTS += $(OBJDIR)/sys/gcc-$(GCC_VERSION)/libgcc/libgcc2/muldi3.o \
+           $(OBJDIR)/sys/gcc-$(GCC_VERSION)/libgcc/libgcc2/negdi2.o \
+           $(OBJDIR)/sys/gcc-$(GCC_VERSION)/libgcc/libgcc2/lshrdi3.o \
+           $(OBJDIR)/sys/gcc-$(GCC_VERSION)/libgcc/libgcc2/ashldi3.o \
+           $(OBJDIR)/sys/gcc-$(GCC_VERSION)/libgcc/libgcc2/ashrdi3.o \
+           $(OBJDIR)/sys/gcc-$(GCC_VERSION)/libgcc/libgcc2/cmpdi2.o \
+           $(OBJDIR)/sys/gcc-$(GCC_VERSION)/libgcc/libgcc2/ucmpdi2.o \
+           $(OBJDIR)/sys/gcc-$(GCC_VERSION)/libgcc/libgcc2/clear_cache.o \
+           $(OBJDIR)/sys/gcc-$(GCC_VERSION)/libgcc/libgcc2/trampoline.o \
+           $(OBJDIR)/sys/gcc-$(GCC_VERSION)/libgcc/libgcc2/absvsi2.o \
+           $(OBJDIR)/sys/gcc-$(GCC_VERSION)/libgcc/libgcc2/absvdi2.o \
+           $(OBJDIR)/sys/gcc-$(GCC_VERSION)/libgcc/libgcc2/addvsi3.o \
+           $(OBJDIR)/sys/gcc-$(GCC_VERSION)/libgcc/libgcc2/addvdi3.o \
+           $(OBJDIR)/sys/gcc-$(GCC_VERSION)/libgcc/libgcc2/subvsi3.o \
+           $(OBJDIR)/sys/gcc-$(GCC_VERSION)/libgcc/libgcc2/subvdi3.o \
+           $(OBJDIR)/sys/gcc-$(GCC_VERSION)/libgcc/libgcc2/mulvsi3.o \
+           $(OBJDIR)/sys/gcc-$(GCC_VERSION)/libgcc/libgcc2/mulvdi3.o \
+           $(OBJDIR)/sys/gcc-$(GCC_VERSION)/libgcc/libgcc2/negvsi2.o \
+           $(OBJDIR)/sys/gcc-$(GCC_VERSION)/libgcc/libgcc2/negvdi2.o \
+           $(OBJDIR)/sys/gcc-$(GCC_VERSION)/libgcc/libgcc2/ffssi2.o \
+           $(OBJDIR)/sys/gcc-$(GCC_VERSION)/libgcc/libgcc2/ffsdi2.o \
+           $(OBJDIR)/sys/gcc-$(GCC_VERSION)/libgcc/libgcc2/clzsi2.o \
+           $(OBJDIR)/sys/gcc-$(GCC_VERSION)/libgcc/libgcc2/clzdi2.o \
+           $(OBJDIR)/sys/gcc-$(GCC_VERSION)/libgcc/libgcc2/ctzsi2.o \
+           $(OBJDIR)/sys/gcc-$(GCC_VERSION)/libgcc/libgcc2/ctzdi2.o \
+           $(OBJDIR)/sys/gcc-$(GCC_VERSION)/libgcc/libgcc2/popcount_tab.o \
+           $(OBJDIR)/sys/gcc-$(GCC_VERSION)/libgcc/libgcc2/popcountsi2.o \
+           $(OBJDIR)/sys/gcc-$(GCC_VERSION)/libgcc/libgcc2/popcountdi2.o \
+           $(OBJDIR)/sys/gcc-$(GCC_VERSION)/libgcc/libgcc2/paritysi2.o \
+           $(OBJDIR)/sys/gcc-$(GCC_VERSION)/libgcc/libgcc2/paritydi2.o \
+           $(OBJDIR)/sys/gcc-$(GCC_VERSION)/libgcc/libgcc2/powisf2.o \
+           $(OBJDIR)/sys/gcc-$(GCC_VERSION)/libgcc/libgcc2/powidf2.o \
+           $(OBJDIR)/sys/gcc-$(GCC_VERSION)/libgcc/libgcc2/powixf2.o \
+           $(OBJDIR)/sys/gcc-$(GCC_VERSION)/libgcc/libgcc2/mulsc3.o \
+           $(OBJDIR)/sys/gcc-$(GCC_VERSION)/libgcc/libgcc2/muldc3.o \
+           $(OBJDIR)/sys/gcc-$(GCC_VERSION)/libgcc/libgcc2/mulxc3.o \
+           $(OBJDIR)/sys/gcc-$(GCC_VERSION)/libgcc/libgcc2/divsc3.o \
+           $(OBJDIR)/sys/gcc-$(GCC_VERSION)/libgcc/libgcc2/divdc3.o \
+           $(OBJDIR)/sys/gcc-$(GCC_VERSION)/libgcc/libgcc2/divxc3.o \
+           $(OBJDIR)/sys/gcc-$(GCC_VERSION)/libgcc/libgcc2/bswapsi2.o \
+           $(OBJDIR)/sys/gcc-$(GCC_VERSION)/libgcc/libgcc2/bswapdi2.o \
+           $(OBJDIR)/sys/gcc-$(GCC_VERSION)/libgcc/libgcc2/clrsbsi2.o \
+           $(OBJDIR)/sys/gcc-$(GCC_VERSION)/libgcc/libgcc2/clrsbdi2.o \
+           $(OBJDIR)/sys/gcc-$(GCC_VERSION)/libgcc/libgcc2/fixunssfsi.o \
+           $(OBJDIR)/sys/gcc-$(GCC_VERSION)/libgcc/libgcc2/fixunsdfsi.o \
+           $(OBJDIR)/sys/gcc-$(GCC_VERSION)/libgcc/libgcc2/fixunsxfsi.o \
+           $(OBJDIR)/sys/gcc-$(GCC_VERSION)/libgcc/libgcc2/fixsfdi.o \
+           $(OBJDIR)/sys/gcc-$(GCC_VERSION)/libgcc/libgcc2/fixdfdi.o \
+           $(OBJDIR)/sys/gcc-$(GCC_VERSION)/libgcc/libgcc2/fixxfdi.o \
+           $(OBJDIR)/sys/gcc-$(GCC_VERSION)/libgcc/libgcc2/fixunssfdi.o \
+           $(OBJDIR)/sys/gcc-$(GCC_VERSION)/libgcc/libgcc2/fixunsdfdi.o \
+           $(OBJDIR)/sys/gcc-$(GCC_VERSION)/libgcc/libgcc2/fixunsxfdi.o \
+           $(OBJDIR)/sys/gcc-$(GCC_VERSION)/libgcc/libgcc2/floatdisf.o \
+           $(OBJDIR)/sys/gcc-$(GCC_VERSION)/libgcc/libgcc2/floatdidf.o \
+           $(OBJDIR)/sys/gcc-$(GCC_VERSION)/libgcc/libgcc2/floatdixf.o \
+           $(OBJDIR)/sys/gcc-$(GCC_VERSION)/libgcc/libgcc2/floatundisf.o \
+           $(OBJDIR)/sys/gcc-$(GCC_VERSION)/libgcc/libgcc2/floatundidf.o \
+           $(OBJDIR)/sys/gcc-$(GCC_VERSION)/libgcc/libgcc2/floatundixf.o \
+           $(OBJDIR)/sys/gcc-$(GCC_VERSION)/libgcc/libgcc2/eprintf.o \
+           $(OBJDIR)/sys/gcc-$(GCC_VERSION)/libgcc/libgcc2/_gcc_bcmp.o \
+           $(OBJDIR)/sys/gcc-$(GCC_VERSION)/libgcc/libgcc2/divdi3.o \
+           $(OBJDIR)/sys/gcc-$(GCC_VERSION)/libgcc/libgcc2/moddi3.o \
+           $(OBJDIR)/sys/gcc-$(GCC_VERSION)/libgcc/libgcc2/udivdi3.o \
+           $(OBJDIR)/sys/gcc-$(GCC_VERSION)/libgcc/libgcc2/udiv_w_sdiv.o \
+           $(OBJDIR)/sys/gcc-$(GCC_VERSION)/libgcc/libgcc2/udivmoddi4.o
 
 DEPENDS += $(OBJECTS:%.o=%.d)
 
@@ -159,7 +159,7 @@ $(LIBDIR)/gcc.a: $(OBJECTS)
 	@echo successfully built: $@
 	@echo
 
-$(OBJDIR)/gcc-$(GCC_VERSION)/libgcc/libgcc2/%.o : gcc-$(GCC_VERSION)/libgcc/libgcc2.c $(MAKEFILE_SOURCES)
+$(OBJDIR)/sys/gcc-$(GCC_VERSION)/libgcc/libgcc2/%.o : sys/gcc-$(GCC_VERSION)/libgcc/libgcc2.c $(MAKEFILE_SOURCES)
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo compiling: $< $(*F)
 	@$(CC) -c $(CFLAGS) -o $@ -DL_$(*F) $<

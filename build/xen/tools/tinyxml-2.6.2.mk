@@ -34,7 +34,7 @@
 include common-vars.mk
 include common-flags.mk
 
-MAKEFILE_SOURCES += tinyxml-$(TINYXML_VERSION).mk
+MAKEFILE_SOURCES += tools/tinyxml-$(TINYXML_VERSION).mk
 
 CPPFLAGS += \
   -DTIXML_USE_STL \
@@ -46,9 +46,9 @@ CPPFLAGS += \
 VPATH = $(SRCDIR)
 
 CPP_SOURCES = \
-  tinyXML-$(TINYXML_VERSION)/tinyxml.cpp \
-  tinyXML-$(TINYXML_VERSION)/tinyxmlerror.cpp \
-  tinyXML-$(TINYXML_VERSION)/tinyxmlparser.cpp
+  tools/tinyXML-$(TINYXML_VERSION)/tinyxml.cpp \
+  tools/tinyXML-$(TINYXML_VERSION)/tinyxmlerror.cpp \
+  tools/tinyXML-$(TINYXML_VERSION)/tinyxmlparser.cpp
 
 HEADERS = \
   $(INCDIR)/tinyxml/tinyxml.h
@@ -69,7 +69,7 @@ $(LIBDIR)/tinyXML.a: $(OBJECTS)
 	@echo successfully built: $@
 	@echo
 
-$(INCDIR)/tinyxml/% : $(SRCDIR)/tinyXML-$(TINYXML_VERSION)/%
+$(INCDIR)/tinyxml/% : $(SRCDIR)/tools/tinyXML-$(TINYXML_VERSION)/%
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo copying: $@ from $<
 	cp $< $@

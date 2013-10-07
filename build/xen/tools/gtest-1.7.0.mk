@@ -34,20 +34,20 @@
 include common-vars.mk
 include common-flags.mk
 
-MAKEFILE_SOURCES += gtest-$(GTEST_VERSION).mk
+MAKEFILE_SOURCES += tools/gtest-$(GTEST_VERSION).mk
 
 CPPFLAGS += \
   -U__linux__ \
   -DPATH_MAX=255 \
   -I $(INCDIR) \
-  -I $(SRCDIR)/gtest-$(GTEST_VERSION) \
+  -I $(SRCDIR)/tools/gtest-$(GTEST_VERSION) \
   -include $(SRCDIR)/llamaos/__thread.h \
   -D__XEN_INTERFACE_VERSION__=0x00030205
 
 VPATH = $(SRCDIR)
 
 CPP_SOURCES = \
-  gtest-$(GTEST_VERSION)/src/gtest-all.cc
+  tools/gtest-$(GTEST_VERSION)/src/gtest-all.cc
 
 HEADERS = \
   $(INCDIR)/gtest/internal/gtest-death-test-internal.h \
@@ -87,7 +87,7 @@ $(LIBDIR)/gtest.a: $(OBJECTS)
 	@echo successfully built: $@
 	@echo
 
-$(INCDIR)/% : $(SRCDIR)/gtest-$(GTEST_VERSION)/include/%
+$(INCDIR)/% : $(SRCDIR)/tools/gtest-$(GTEST_VERSION)/include/%
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo copying: $@ from $<
 	cp $< $@

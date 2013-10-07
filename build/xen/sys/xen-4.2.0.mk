@@ -34,7 +34,7 @@
 include common-vars.mk
 include common-flags.mk
 
-MAKEFILE_SOURCES += xen-$(XEN_VERSION).mk
+MAKEFILE_SOURCES += sys/xen-$(XEN_VERSION).mk
 
 HEADERS = \
   $(INCDIR)/xen/arch-x86/xen-mca.h \
@@ -60,7 +60,7 @@ HEADERS = \
 .PHONY: all
 all : $(HEADERS)
 
-$(INCDIR)/xen/% : $(SRCDIR)/xen-$(XEN_VERSION)/xen/include/public/%
+$(INCDIR)/xen/% : $(SRCDIR)/sys/xen-$(XEN_VERSION)/xen/include/public/%
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo copying: $@ from $<
 	cp $< $@

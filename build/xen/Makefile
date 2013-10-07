@@ -43,13 +43,13 @@ INSTALL_FOLDER = $(INSTALL_DIR)/llamaOS-$(LLAMAOS_VERSION)
 
 .PHONY: all
 all:
-	@$(MAKE) -f glibc-$(GLIBC_VERSION).mk
-	@$(MAKE) -f stdc++-$(GCC_VERSION).mk
-	@$(MAKE) -f gfortran-$(GCC_VERSION).mk
-	@$(MAKE) -f gcc-$(GCC_VERSION).mk
-	@$(MAKE) -f xen-$(XEN_VERSION).mk
-	@$(MAKE) -f gtest-$(GTEST_VERSION).mk
-	@$(MAKE) -f tinyxml-$(TINYXML_VERSION).mk
+	@$(MAKE) -f sys/glibc-$(GLIBC_VERSION).mk
+	@$(MAKE) -f sys/stdc++-$(GCC_VERSION).mk
+	@$(MAKE) -f sys/gfortran-$(GCC_VERSION).mk
+	@$(MAKE) -f sys/gcc-$(GCC_VERSION).mk
+	@$(MAKE) -f sys/xen-$(XEN_VERSION).mk
+	@$(MAKE) -f tools/gtest-$(GTEST_VERSION).mk
+	@$(MAKE) -f tools/tinyxml-$(TINYXML_VERSION).mk
 	@$(MAKE) -f llamaOS.mk
 	@$(MAKE) -f llamaMPI.mk
 	@$(MAKE) -f llamaMPIF.mk
