@@ -1532,12 +1532,12 @@ OBJECTS += $(C_SOURCES:%.c=$(OBJDIR)/%.o)
 DEPENDS += $(OBJECTS:%.o=%.d)
 
 .PHONY: all
-all : $(LIBDIR)/glibc.a $(HEADERS)
+all : $(LIBDIR)/sys/glibc.a $(HEADERS)
 
 .PHONY: headers
 headers : $(HEADERS)
 
-$(LIBDIR)/glibc.a: $(OBJECTS)
+$(LIBDIR)/sys/glibc.a: $(OBJECTS)
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
 	@$(AR) r $@ $(OBJECTS)

@@ -34,39 +34,25 @@
 include common-vars.mk
 include common-flags.mk
 
-NETPIPE_VERSION = 3.7.2
+MAKEFILE_SOURCES += test/apps/hello-f77.mk
 
-MAKEFILE_SOURCES += apps/netpipe-$(NETPIPE_VERSION)-memcpy.mk
+F90FLAGS += 
 
-CFLAGS += \
-  -DMEMCPY \
-  -I $(INCDIR) \
-  -I $(SRCDIR) \
-  -include $(SRCDIR)/llamaos/__thread.h
-
-VPATH = $(SRCDIR)
+VPATH = $(TESTDIR)
 
 SOURCES = \
-  apps/netpipe-$(NETPIPE_VERSION)/src/memcpy.c
+  apps/hello-f77/main.f
 
-OBJECTS  = $(OBJDIR)/apps/netpipe-$(NETPIPE_VERSION)/src/netpipe-memcpy.o
-OBJECTS += $(SOURCES:%.c=$(OBJDIR)/%.o)
-DEPENDS += $(OBJECTS:%.o=%.d)
+OBJECTS = $(SOURCES:%.f=$(OBJDIR)/%.o)
+DEPENDS = $(OBJECTS:%.o=%.d)
 
-# the entry object must be the first object listed here or the guest will crash!
-# $(BINDIR)/netpipe-memcpy: $(LIBDIR)/xen/Entry.o $(OBJECTS) $(LIBDIR)/xen/llamaOS.a $(LIBDIR)/stdc++.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
-$(BINDIR)/apps/netpipe-memcpy: $(OBJECTS) $(LIBDIR)/llamaOS.a $(LIBDIR)/sys/stdc++.a $(LIBDIR)/sys/gcc.a $(LIBDIR)/sys/glibc.a
+$(BINDIR)/test/apps/hello-f77: $(OBJECTS) $(LIBDIR)/llamaOS.a $(LIBDIR)/sys/gfortran.a $(LIBDIR)/sys/stdc++.a $(LIBDIR)/sys/gcc.a $(LIBDIR)/sys/glibc.a
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
 	@$(LD) $(LDFLAGS) -T llamaOS.lds -o $@ $^
 	@gzip -c -f --best $@ >$@.gz
 	@echo successfully built: $@
 	@echo
-
-$(OBJDIR)/apps/netpipe-$(NETPIPE_VERSION)/src/netpipe-memcpy.o : $(SRCDIR)/apps/netpipe-$(NETPIPE_VERSION)/src/netpipe.c $(MAKEFILE_SOURCES)
-	@[ -d $(@D) ] || (mkdir -p $(@D))
-	@echo compiling: $<
-	@$(CC) -c $(CFLAGS) -o $@ $<
 
 include rules.mk
 

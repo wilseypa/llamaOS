@@ -37,10 +37,21 @@ include common-flags.mk
 MAKEFILE_SOURCES += sys/xen-$(XEN_VERSION).mk
 
 HEADERS = \
+  $(INCDIR)/xen/arch-arm/hvm/save.h \
+  $(INCDIR)/xen/arch-x86/hvm/save.h \
   $(INCDIR)/xen/arch-x86/cpuid.h \
   $(INCDIR)/xen/arch-x86/xen-mca.h \
+  $(INCDIR)/xen/arch-x86/xen-x86_32.h \
   $(INCDIR)/xen/arch-x86/xen-x86_64.h \
   $(INCDIR)/xen/arch-x86/xen.h \
+  $(INCDIR)/xen/hvm/e820.h \
+  $(INCDIR)/xen/hvm/hvm_info_table.h \
+  $(INCDIR)/xen/hvm/hvm_op.h \
+  $(INCDIR)/xen/hvm/hvm_xs_strings.h \
+  $(INCDIR)/xen/hvm/ioreq.h \
+  $(INCDIR)/xen/hvm/params.h \
+  $(INCDIR)/xen/hvm/pvdrivers.h \
+  $(INCDIR)/xen/hvm/save.h \
   $(INCDIR)/xen/io/blkif.h \
   $(INCDIR)/xen/io/console.h \
   $(INCDIR)/xen/io/fbif.h \
@@ -56,6 +67,9 @@ HEADERS = \
   $(INCDIR)/xen/io/vscsiif.h \
   $(INCDIR)/xen/io/xenbus.h \
   $(INCDIR)/xen/io/xs_wire.h \
+  $(INCDIR)/xen/xsm/flask_op.h \
+  $(INCDIR)/xen/arch-arm.h \
+  $(INCDIR)/xen/arch-x86_32.h \
   $(INCDIR)/xen/arch-x86_64.h \
   $(INCDIR)/xen/callback.h \
   $(INCDIR)/xen/dom0_ops.h \
@@ -63,6 +77,7 @@ HEADERS = \
   $(INCDIR)/xen/elfnote.h \
   $(INCDIR)/xen/event_channel.h \
   $(INCDIR)/xen/features.h \
+  $(INCDIR)/xen/gcov.h \
   $(INCDIR)/xen/grant_table.h \
   $(INCDIR)/xen/kexec.h \
   $(INCDIR)/xen/mem_event.h \
@@ -84,7 +99,7 @@ HEADERS = \
 .PHONY: all
 all : $(HEADERS)
 
-$(INCDIR)/xen/% : $(SRCDIR)/sys/xen-$(XEN_VERSION)/xen/include/public/%
+$(INCDIR)/xen/% : $(SRCDIR)/sys/xen-$(XEN_VERSION)/%
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo copying: $@ from $<
 	cp $< $@

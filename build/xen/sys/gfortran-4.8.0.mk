@@ -534,9 +534,9 @@ OBJECTS  = $(SOURCES:%.c=$(OBJDIR)/%.o)
 DEPENDS += $(OBJECTS:%.o=%.d)
 
 .PHONY: all
-all : $(LIBDIR)/gfortran.a
+all : $(LIBDIR)/sys/gfortran.a
 
-$(LIBDIR)/gfortran.a: $(OBJECTS)
+$(LIBDIR)/sys/gfortran.a: $(OBJECTS)
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
 	@$(AR) r $@ $(OBJECTS)

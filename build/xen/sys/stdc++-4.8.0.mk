@@ -557,9 +557,9 @@ OBJECTS += $(CC_SOURCES:%.cc=$(OBJDIR)/%.o)
 DEPENDS += $(OBJECTS:%.o=%.d)
 
 .PHONY: all
-all : $(LIBDIR)/stdc++.a $(HEADERS)
+all : $(LIBDIR)/sys/stdc++.a $(HEADERS)
 
-$(LIBDIR)/stdc++.a: $(OBJECTS)
+$(LIBDIR)/sys/stdc++.a: $(OBJECTS)
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
 	@$(AR) r $@ $(OBJECTS)

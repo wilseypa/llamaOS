@@ -57,12 +57,12 @@ OBJECTS  = $(CPP_SOURCES:%.cpp=$(OBJDIR)/%.o)
 DEPENDS += $(OBJECTS:%.o=%.d)
 
 .PHONY: all
-all : $(LIBDIR)/tinyXML.a headers
+all : $(LIBDIR)/tools/tinyXML.a headers
 
 .PHONY: headers
 headers : $(HEADERS)
 
-$(LIBDIR)/tinyXML.a: $(OBJECTS)
+$(LIBDIR)/tools/tinyXML.a: $(OBJECTS)
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
 	@$(AR) r $@ $^

@@ -150,9 +150,9 @@ OBJECTS += $(OBJDIR)/sys/gcc-$(GCC_VERSION)/libgcc/libgcc2/muldi3.o \
 DEPENDS += $(OBJECTS:%.o=%.d)
 
 .PHONY: all
-all : $(LIBDIR)/gcc.a $(HEADERS)
+all : $(LIBDIR)/sys/gcc.a $(HEADERS)
 
-$(LIBDIR)/gcc.a: $(OBJECTS)
+$(LIBDIR)/sys/gcc.a: $(OBJECTS)
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
 	@$(AR) r $@ $(OBJECTS)

@@ -97,14 +97,14 @@ DEPENDS += $(RDMA_OBJECTS:%.o=%.d)
 
 LINKS = \
   $(LIBDIR)/llamaOS.a \
-  $(LIBDIR)/stdc++.a \
-  $(LIBDIR)/gcc.a \
-  $(LIBDIR)/glibc.a
+  $(LIBDIR)/sys/stdc++.a \
+  $(LIBDIR)/sys/gcc.a \
+  $(LIBDIR)/sys/glibc.a
 
 .PHONY: all
-all: $(BINDIR)/net-intel-rdma
+all: $(BINDIR)/apps/net-intel-rdma
 
-$(BINDIR)/net-intel-rdma: $(RDMA_OBJECTS) $(OBJECTS) $(LINKS)
+$(BINDIR)/apps/net-intel-rdma: $(RDMA_OBJECTS) $(OBJECTS) $(LINKS)
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
 	@$(LD) $(LDFLAGS) -T llamaOS.lds -o $@ $^

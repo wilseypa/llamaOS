@@ -53,7 +53,7 @@ CPP_SOURCES += \
 OBJECTS = $(CPP_SOURCES:%.cpp=$(OBJDIR)/%.o)
 DEPENDS = $(OBJECTS:%.o=%.d)
 
-$(LIBDIR)/llamaMPIF.a: $(OBJECTS) $(LIBDIR)/gfortran.a
+$(LIBDIR)/llamaMPIF.a: $(OBJECTS)
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
 	@$(AR) r $@ $^

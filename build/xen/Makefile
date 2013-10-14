@@ -53,31 +53,32 @@ all:
 	@$(MAKE) -f llamaOS.mk
 	@$(MAKE) -f llamaMPI.mk
 	@$(MAKE) -f llamaMPIF.mk
-	@$(MAKE) -f apps/NAS/NAS.mk
 	@$(MAKE) -f apps/net/intel.mk
-	@$(MAKE) -f apps/hello-c.mk
-	@$(MAKE) -f apps/hello-cpp.mk
-	@$(MAKE) -f apps/hello-f77-llamaOS.mk
-	@$(MAKE) -f apps/hello-f90-llamaOS.mk
-	@$(MAKE) -f apps/IMB-llamaMPI.mk
-	@$(MAKE) -f apps/latency-llamaMPI.mk
+	@$(MAKE) -f apps/IMB.mk
+	@$(MAKE) -f apps/latency-MPI.mk
 	@$(MAKE) -f apps/latency-llamaNET.mk
 	@$(MAKE) -f apps/netpipe-3.7.2-llamaNET.mk
 	@$(MAKE) -f apps/netpipe-3.7.2-memcpy.mk
-	@$(MAKE) -f apps/netpipe-3.7.2-mpi.mk
-	@$(MAKE) -f apps/testMPI-llamaMPI.mk
-	@$(MAKE) -f apps/testMPIF-llamaMPI.mk
-	@$(MAKE) -f apps/pingPongNB-llamaMPI.mk
-	@$(MAKE) -f apps/tinyxml.mk
-	@$(MAKE) -f apps/WARPED/WARPED.mk
+	@$(MAKE) -f apps/netpipe-3.7.2-MPI.mk
+	@$(MAKE) -f apps/pingPongNB-MPI.mk
 	@$(MAKE) -f net/i82574.mk
 	@$(MAKE) -f net/lspci.mk
-	@$(MAKE) -f tests/memory.mk
-#	@$(MAKE) -f tests/empty.mk
+	@$(MAKE) -f test/apps/hello-c.mk
+	@$(MAKE) -f test/apps/hello-cpp.mk
+	@$(MAKE) -f test/apps/hello-f77.mk
+	@$(MAKE) -f test/apps/hello-f90.mk
+	@$(MAKE) -f test/apps/testMPI.mk
+	@$(MAKE) -f test/apps/testMPIF.mk
+	@$(MAKE) -f test/apps/tinyxml.mk
+	@$(MAKE) -f test/empty.mk
+	@$(MAKE) -f test/memory.mk
+
+#	@$(MAKE) -f apps/NAS/NAS.mk
+#	@$(MAKE) -f apps/WARPED/WARPED.mk
 
 .PHONY: install
 install:
-	@echo installing llamaOS into $(INSTALL_FOLDER) folder...
+	@echo installing llamaOS into $(INSTALL_FOLDER)...
 	@[ -d $(INSTALL_FOLDER) ] || (mkdir -p $(INSTALL_FOLDER))
 	@cp -r bin $(INSTALL_FOLDER)/bin
 	@cp -r lib $(INSTALL_FOLDER)/lib

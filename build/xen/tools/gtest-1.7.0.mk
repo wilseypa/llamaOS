@@ -40,6 +40,7 @@ CPPFLAGS += \
   -U__linux__ \
   -DPATH_MAX=255 \
   -I $(INCDIR) \
+  -I $(SRCDIR)/tools/gtest-$(GTEST_VERSION)/include \
   -I $(SRCDIR)/tools/gtest-$(GTEST_VERSION) \
   -include $(SRCDIR)/llamaos/__thread.h \
   -D__XEN_INTERFACE_VERSION__=0x00030205
@@ -75,12 +76,12 @@ OBJECTS  = $(CPP_SOURCES:%.cc=$(OBJDIR)/%.o)
 DEPENDS += $(OBJECTS:%.o=%.d)
 
 .PHONY: all
-all : $(LIBDIR)/gtest.a headers
+all : $(LIBDIR)/tools/gtest.a headers
 
 .PHONY: headers
 headers : $(HEADERS)
 
-$(LIBDIR)/gtest.a: $(OBJECTS)
+$(LIBDIR)/tools/gtest.a: $(OBJECTS)
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
 	@$(AR) r $@ $^
