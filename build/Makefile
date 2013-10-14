@@ -40,7 +40,6 @@ all:
 
 .PHONY: install
 install:
-	@$(MAKE) -C linux $@
 	@$(MAKE) -C xen $@
 
 .PHONY: clean
