@@ -240,6 +240,23 @@ int MPI_Type_size(MPI_Datatype datatype, int *size);
 int MPI_Gsend(void *buf, int count, MPI_Datatype datatype, int dest);
 int MPI_Grecv(void **buf, int *count, MPI_Datatype datatype, int *flag);
 
+// !BAM added for hpcc
+#define MPI_MAX_PROCESSOR_NAME (128)
+
+int MPI_Cancel(MPI_Request *request);
+
+int MPI_Get_processor_name( char *name, int *resultlen );
+
+typedef void (MPI_User_function) ( void *, void *, int *, MPI_Datatype * );
+int MPI_Op_create(MPI_User_function *function, int commute, MPI_Op *op);
+int MPI_Op_free(MPI_Op *op);
+
+int MPI_Type_commit(MPI_Datatype *datatype);
+int MPI_Type_contiguous(int count,
+                        MPI_Datatype old_type,
+                        MPI_Datatype *new_type_p);
+int MPI_Type_free(MPI_Datatype *datatype);
+
 #ifdef __cplusplus
 } //extern "C"
 #endif

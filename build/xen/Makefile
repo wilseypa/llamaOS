@@ -56,6 +56,7 @@ all:
 	@$(MAKE) -f llamaMPI.mk
 	@$(MAKE) -f llamaMPIF.mk
 	@$(MAKE) -f apps/net/intel.mk
+	@$(MAKE) -f apps/hpcc-$(HPCC_VERSION).mk
 	@$(MAKE) -f apps/IMB-$(IMB_VERSION).mk
 	@$(MAKE) -f apps/latency-MPI.mk
 	@$(MAKE) -f apps/latency-llamaNET.mk
