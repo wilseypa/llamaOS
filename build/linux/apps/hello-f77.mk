@@ -39,7 +39,7 @@ MAKEFILE_SOURCES += apps/hello-f77.mk
 F90FLAGS += 
 
 # source paths
-VPATH = $(SRCDIR)
+VPATH = $(TESTDIR)
 
 SOURCES = \
   apps/hello-f77/main.f

@@ -35,16 +35,17 @@ include common-vars.mk
 
 .PHONY: all
 all:
-	@$(MAKE) -f apps/NAS/NAS.mk
 	@$(MAKE) -f apps/hello-f77.mk
 	@$(MAKE) -f apps/hello-f90.mk
 	@$(MAKE) -f apps/latency-TCPIP.mk
 	@$(MAKE) -f apps/netpipe-$(NETPIPE_VERSION)-memcpy.mk
 	@$(MAKE) -f apps/netpipe-$(NETPIPE_VERSION)-tcp.mk
-	@-command -v $(MPICC) >/dev/null && ($(MAKE) -f apps/IMB.mk)
+	@-command -v $(MPICC) >/dev/null && ($(MAKE) -f apps/IMB-$(IMB_VERSION).mk)
 	@-command -v $(MPICC) >/dev/null && ($(MAKE) -f apps/latency-MPI.mk)
 	@-command -v $(MPICC) >/dev/null && ($(MAKE) -f apps/netpipe-$(NETPIPE_VERSION)-mpi.mk)
 #	@$(MAKE) -f test/memory.mk
+
+#	@$(MAKE) -f apps/NAS/NAS.mk
 
 .PHONY: install
 install:
