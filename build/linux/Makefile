@@ -35,6 +35,8 @@ include common-vars.mk
 
 .PHONY: all
 all:
+	@$(MAKE) -f tools/blas.mk
+	@$(MAKE) -f tools/cblas.mk
 	@$(MAKE) -f apps/hello-f77.mk
 	@$(MAKE) -f apps/hello-f90.mk
 	@$(MAKE) -f apps/latency-TCPIP.mk
