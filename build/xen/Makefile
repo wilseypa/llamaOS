@@ -54,12 +54,12 @@ all:
 	@$(MAKE) -f llamaMPI.mk
 	@$(MAKE) -f llamaMPIF.mk
 	@$(MAKE) -f apps/net/intel.mk
-	@$(MAKE) -f apps/IMB.mk
+	@$(MAKE) -f apps/IMB-$(IMB_VERSION).mk
 	@$(MAKE) -f apps/latency-MPI.mk
 	@$(MAKE) -f apps/latency-llamaNET.mk
-	@$(MAKE) -f apps/netpipe-3.7.2-llamaNET.mk
-	@$(MAKE) -f apps/netpipe-3.7.2-memcpy.mk
-	@$(MAKE) -f apps/netpipe-3.7.2-MPI.mk
+	@$(MAKE) -f apps/netpipe-$(NETPIPE_VERSION)-llamaNET.mk
+	@$(MAKE) -f apps/netpipe-$(NETPIPE_VERSION)-memcpy.mk
+	@$(MAKE) -f apps/netpipe-$(NETPIPE_VERSION)-MPI.mk
 	@$(MAKE) -f apps/pingPongNB-MPI.mk
 	@$(MAKE) -f net/i82574.mk
 	@$(MAKE) -f net/lspci.mk

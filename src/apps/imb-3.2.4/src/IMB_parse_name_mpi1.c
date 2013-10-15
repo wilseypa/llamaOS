@@ -216,6 +216,7 @@ In/out variables:
 	Bmark->scale_time = 1.0;
 	Bmark->scale_bw   = 2.0;
     }
+#if 0
     else if (!strcmp(Bmark->name,"exchange") )
     { 
 	strcpy(Bmark->name,"Exchange");
@@ -319,6 +320,7 @@ In/out variables:
 	type = Collective;
 	Bmark->bench_comments = &Alltoallv_cmt[0];
     }
+#endif
     else 
     {
 	type = BTYPE_INVALID;

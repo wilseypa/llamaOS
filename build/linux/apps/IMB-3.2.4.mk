@@ -30,42 +30,50 @@
 # contributors.
 #
 
-# make parameters
-MAKEFLAGS = --silent
+# include common variables
+include common-vars.mk
+include common-flags.mk
 
-MAKEFILE_SOURCES = common-vars.mk
+# override this
+CC = $(MPICC)
 
-# compiler tools
-CC = gcc
-CXX = g++
-F77 = gfortran
-F90 = gfortran
-AS = as
-LD = ld
+MAKEFILE_SOURCES += apps/IMB-$(IMB_VERSION).mk
 
-# shared common paths
-BINDIR = bin
-LIBDIR = lib
-OBJDIR = obj
+CFLAGS += \
+  -DMPI1
 
-INCDIR = include
-SRCDIR = ../../src
-TESTDIR = ../../test
+VPATH = $(SRCDIR)
 
-GLIBC_VERSION = 2.17
-GCC_VERSION = 4.8.0
-# XEN_VERSION = 4.2.0
-# XEN_VERSION = 4.2.1
-XEN_VERSION = 4.3.0
-# GTEST_VERSION = 1.6.0
-GTEST_VERSION = 1.7.0
-NETPIPE_VERSION = 3.7.2
-# IMB_VERSION = 3.2.3
-IMB_VERSION = 3.2.4
-TINYXML_VERSION = 2.6.2
+SOURCES = \
+  apps/imb-$(IMB_VERSION)/src/IMB.c \
+  apps/imb-$(IMB_VERSION)/src/IMB_benchlist.c \
+  apps/imb-$(IMB_VERSION)/src/IMB_chk_diff.c \
+  apps/imb-$(IMB_VERSION)/src/IMB_cpu_exploit.c \
+  apps/imb-$(IMB_VERSION)/src/IMB_declare.c \
+  apps/imb-$(IMB_VERSION)/src/IMB_err_handler.c \
+  apps/imb-$(IMB_VERSION)/src/IMB_g_info.c \
+  apps/imb-$(IMB_VERSION)/src/IMB_init.c \
+  apps/imb-$(IMB_VERSION)/src/IMB_init_transfer.c \
+  apps/imb-$(IMB_VERSION)/src/IMB_mem_manager.c \
+  apps/imb-$(IMB_VERSION)/src/IMB_output.c \
+  apps/imb-$(IMB_VERSION)/src/IMB_parse_name_mpi1.c \
+  apps/imb-$(IMB_VERSION)/src/IMB_pingping.c \
+  apps/imb-$(IMB_VERSION)/src/IMB_pingpong.c \
+  apps/imb-$(IMB_VERSION)/src/IMB_sendrecv.c \
+  apps/imb-$(IMB_VERSION)/src/IMB_strgs.c \
+  apps/imb-$(IMB_VERSION)/src/IMB_warm_up.c
 
-# auto dependency generation
-DEPENDS = 
+OBJECTS = $(SOURCES:%.c=$(OBJDIR)/%.o)
+DEPENDS = $(OBJECTS:%.o=%.d)
 
-# if present, include custom variables
--include custom-vars.mk
+$(BINDIR)/IMB: $(OBJECTS)
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo linking: $@
+	@$(MPICC) $(LDFLAGS) -o $@ $^
+	@echo successfully built: $@
+	@echo
+
+include rules.mk
+
+# include auto-generated dependencies
+-include $(DEPENDS)

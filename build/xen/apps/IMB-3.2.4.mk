@@ -34,55 +34,47 @@
 include common-vars.mk
 include common-flags.mk
 
-# override this
-CC = $(MPICC)
-
-MAKEFILE_SOURCES += apps/IMB.mk
+MAKEFILE_SOURCES += apps/IMB-$(IMB_VERSION).mk
 
 CFLAGS += \
+  -I $(INCDIR)/llamaos/mpi \
+  -I $(INCDIR) \
+  -I $(SRCDIR) \
+  -I ../src/apps \
+  -D__XEN_INTERFACE_VERSION__=0x00030205 \
+  -include $(SRCDIR)/llamaos/__thread.h \
   -DMPI1
 
 VPATH = $(SRCDIR)
 
 SOURCES = \
-  apps/imb-3.2.3/src/IMB.c \
-  apps/imb-3.2.3/src/IMB_allgather.c \
-  apps/imb-3.2.3/src/IMB_allgatherv.c \
-  apps/imb-3.2.3/src/IMB_allreduce.c \
-  apps/imb-3.2.3/src/IMB_alltoall.c \
-  apps/imb-3.2.3/src/IMB_alltoallv.c \
-  apps/imb-3.2.3/src/IMB_barrier.c \
-  apps/imb-3.2.3/src/IMB_bcast.c \
-  apps/imb-3.2.3/src/IMB_benchlist.c \
-  apps/imb-3.2.3/src/IMB_cpu_exploit.c \
-  apps/imb-3.2.3/src/IMB_declare.c \
-  apps/imb-3.2.3/src/IMB_err_handler.c \
-  apps/imb-3.2.3/src/IMB_exchange.c \
-  apps/imb-3.2.3/src/IMB_g_info.c \
-  apps/imb-3.2.3/src/IMB_gather.c \
-  apps/imb-3.2.3/src/IMB_gatherv.c \
-  apps/imb-3.2.3/src/IMB_init.c \
-  apps/imb-3.2.3/src/IMB_init_transfer.c \
-  apps/imb-3.2.3/src/IMB_mem_manager.c \
-  apps/imb-3.2.3/src/IMB_output.c \
-  apps/imb-3.2.3/src/IMB_parse_name_mpi1.c \
-  apps/imb-3.2.3/src/IMB_pingpong.c \
-  apps/imb-3.2.3/src/IMB_pingping.c \
-  apps/imb-3.2.3/src/IMB_reduce.c \
-  apps/imb-3.2.3/src/IMB_reduce_scatter.c \
-  apps/imb-3.2.3/src/IMB_scatter.c \
-  apps/imb-3.2.3/src/IMB_scatterv.c \
-  apps/imb-3.2.3/src/IMB_sendrecv.c \
-  apps/imb-3.2.3/src/IMB_strgs.c \
-  apps/imb-3.2.3/src/IMB_warm_up.c
+  apps/imb-$(IMB_VERSION)/src/IMB.c \
+  apps/imb-$(IMB_VERSION)/src/IMB_benchlist.c \
+  apps/imb-$(IMB_VERSION)/src/IMB_chk_diff.c \
+  apps/imb-$(IMB_VERSION)/src/IMB_cpu_exploit.c \
+  apps/imb-$(IMB_VERSION)/src/IMB_declare.c \
+  apps/imb-$(IMB_VERSION)/src/IMB_err_handler.c \
+  apps/imb-$(IMB_VERSION)/src/IMB_g_info.c \
+  apps/imb-$(IMB_VERSION)/src/IMB_init.c \
+  apps/imb-$(IMB_VERSION)/src/IMB_init_transfer.c \
+  apps/imb-$(IMB_VERSION)/src/IMB_mem_manager.c \
+  apps/imb-$(IMB_VERSION)/src/IMB_output.c \
+  apps/imb-$(IMB_VERSION)/src/IMB_parse_name_mpi1.c \
+  apps/imb-$(IMB_VERSION)/src/IMB_pingping.c \
+  apps/imb-$(IMB_VERSION)/src/IMB_pingpong.c \
+  apps/imb-$(IMB_VERSION)/src/IMB_sendrecv.c \
+  apps/imb-$(IMB_VERSION)/src/IMB_strgs.c \
+  apps/imb-$(IMB_VERSION)/src/IMB_warm_up.c
 
 OBJECTS = $(SOURCES:%.c=$(OBJDIR)/%.o)
 DEPENDS = $(OBJECTS:%.o=%.d)
 
-$(BINDIR)/IMB: $(OBJECTS)
+# the entry object must be the first object listed here or the guest will crash!
+$(BINDIR)/apps/IMB: $(OBJECTS) $(LIBDIR)/llamaMPI.a $(LIBDIR)/llamaOS.a $(LIBDIR)/sys/stdc++.a $(LIBDIR)/sys/gcc.a $(LIBDIR)/sys/glibc.a
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
-	@$(MPICC) $(LDFLAGS) -o $@ $^
+	@$(LD) $(LDFLAGS) -T llamaOS.lds -o $@ $^
+	@gzip -c -f --best $@ >$@.gz
 	@echo successfully built: $@
 	@echo
 
