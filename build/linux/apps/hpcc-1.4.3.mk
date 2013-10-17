@@ -92,7 +92,7 @@ DEPENDS = $(OBJECTS:%.o=%.d)
 $(BINDIR)/apps/hpcc: $(OBJECTS)
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
-	@$(MPICC) $(LDFLAGS) -o $@ $^
+	@$(MPICC) $(LDFLAGS) -o $@ $^ -lm
 	@echo successfully built: $@
 	@echo
 
