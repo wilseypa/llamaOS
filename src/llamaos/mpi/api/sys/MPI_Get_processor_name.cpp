@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012, William Magato
+Copyright (c) 2013, William Magato
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,48 +28,29 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <iostream>
+#include <string>
 
-#include <llamaos/memory/Memory.h>
+#include <llamaos/xen/Hypervisor.h>
 
-using namespace std;
-using namespace llamaos::memory;
+#include <iGlobals.h>
 
-// simple guest instance should just output text to console
-int main (int argc, char *argv [])
+using std::string;
+using llamaos::xen::Hypervisor;
+
+int MPI_Get_processor_name( char *name, int *resultlen )
 {
-   cout << endl << "hello llamaOS" << endl;
-   cout.flush ();
-   cout << endl;
+   string llamaos_name = Hypervisor::get_instance()->name;
 
-   cout << "sizeof long " << sizeof(long) << endl;
-
-   cout << "program break: " << (pointer_to_address(get_program_break ()) / 1024.0) / 1024.0 << endl;
-
-
-   cout << "argc: " << argc << endl;
-
-   for (int i = 0; i < argc; i++)
+   if (llamaos_name.size () >= MPI_MAX_PROCESSOR_NAME)
    {
-      cout << "argv[" << i << "]: " << argv [i] << endl;
+      strncpy(name, llamaos_name.c_str(), MPI_MAX_PROCESSOR_NAME);
+      *resultlen = MPI_MAX_PROCESSOR_NAME;
+   }
+   else
+   {
+      strcpy(name, llamaos_name.c_str());
+      *resultlen = llamaos_name.size();
    }
 
-   double third = (1.0 / 3.0);
-   cout << "print floats again: " << third << endl;
-#if 0
-      char data = 'a';
-      for (;;)
-      {
-         cout << data;
-         if (data == 'z')
-         {
-            data = 'a';
-         }
-         else
-         {
-            data++;
-         }
-      }
-#endif
-   return 0;
+   return MPI_SUCCESS;
 }

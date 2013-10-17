@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012, William Magato
+Copyright (c) 2013, William Magato
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,48 +28,9 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <iostream>
+#include <iGlobals.h>
 
-#include <llamaos/memory/Memory.h>
-
-using namespace std;
-using namespace llamaos::memory;
-
-// simple guest instance should just output text to console
-int main (int argc, char *argv [])
+int MPI_Cancel(MPI_Request *request)
 {
-   cout << endl << "hello llamaOS" << endl;
-   cout.flush ();
-   cout << endl;
-
-   cout << "sizeof long " << sizeof(long) << endl;
-
-   cout << "program break: " << (pointer_to_address(get_program_break ()) / 1024.0) / 1024.0 << endl;
-
-
-   cout << "argc: " << argc << endl;
-
-   for (int i = 0; i < argc; i++)
-   {
-      cout << "argv[" << i << "]: " << argv [i] << endl;
-   }
-
-   double third = (1.0 / 3.0);
-   cout << "print floats again: " << third << endl;
-#if 0
-      char data = 'a';
-      for (;;)
-      {
-         cout << data;
-         if (data == 'z')
-         {
-            data = 'a';
-         }
-         else
-         {
-            data++;
-         }
-      }
-#endif
-   return 0;
+   return MPI_SUCCESS;
 }

@@ -82,6 +82,8 @@ typedef int MPI_Datatype;
 #define MPI_2DOUBLE_PRECISION  ((MPI_Datatype)34)
 #define MPI_2INTEGER  ((MPI_Datatype)35)
 
+#define MPI_DATATYPE_CUSTOM1  ((MPI_Datatype)36)
+
 typedef int MPI_Op;
 #define MPI_MAX       ((MPI_Op)1)      //maximum
 #define MPI_MIN       ((MPI_Op)2)      //minimum
