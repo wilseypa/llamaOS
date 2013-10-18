@@ -57,7 +57,7 @@ class iRequest;
 //#define MPI_BARRIER_ALL_COLLECTIVE
 //#define MPI_RX_BEFORE_TX
 //#define MPI_USE_BCAST_HARDWARE
-#define MPI_WATCHDOG_TIME 5
+//#define MPI_WATCHDOG_TIME 5
 
 // #define MAX_MESS_SIZE 3950
 
