@@ -48,7 +48,7 @@ class iGroup;
 class iComm;
 class iRequest;
 
-#define MPI_COUT_EVERY_MESSAGE
+//#define MPI_COUT_EVERY_MESSAGE
 //#define MPI_COUT_NB_MESSAGES
 #define MPI_COUT_INITIALIZATION
 #define MPI_COUT_COLLECTIVE_FUNCTIONS
