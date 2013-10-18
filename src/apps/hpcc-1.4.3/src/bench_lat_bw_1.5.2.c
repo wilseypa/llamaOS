@@ -1391,7 +1391,7 @@ main_bench_lat_bw(HPCC_Params *params) {
                       &params->MinPingPongLatency, &params->AvgPingPongLatency,
                       &params->MaxPingPongBandwidth, &params->AvgPingPongBandwidth,
                       &params->NaturallyOrderedRingLatency );
-
+#if 0
   MPI_Bcast( &params->MaxPingPongLatency, 1, MPI_DOUBLE, 0, comm );
   MPI_Bcast( &params->RandomlyOrderedRingLatency, 1, MPI_DOUBLE, 0, comm );
   MPI_Bcast( &params->MinPingPongBandwidth, 1, MPI_DOUBLE, 0, comm );
@@ -1402,7 +1402,7 @@ main_bench_lat_bw(HPCC_Params *params) {
   MPI_Bcast( &params->MaxPingPongBandwidth, 1, MPI_DOUBLE, 0, comm );
   MPI_Bcast( &params->AvgPingPongBandwidth, 1, MPI_DOUBLE, 0, comm );
   MPI_Bcast( &params->NaturallyOrderedRingLatency, 1, MPI_DOUBLE, 0, comm );
-
+#endif
   fflush( OutFile );
   if (stderr != OutFile) fclose(OutFile);
 }
