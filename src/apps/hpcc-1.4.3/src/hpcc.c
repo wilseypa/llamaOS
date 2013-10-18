@@ -229,7 +229,7 @@ main(int argc, char *argv[]) {
   END_IO( myRank, outputFile );
 
 // !BAM
-#endif
+// #endif
 
   /* -------------------------------------------------- */
   /*                       MPIFFT                       */
@@ -250,7 +250,7 @@ main(int argc, char *argv[]) {
   END_IO( myRank, outputFile );
 
 // !BAM
-#if 0
+// #if 0
 
   /* -------------------------------------------------- */
   /*                      StarFFT                       */

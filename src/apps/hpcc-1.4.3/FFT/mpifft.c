@@ -235,8 +235,7 @@ HPCC_MPIFFT(HPCC_Params *params) {
   params->MPIFFT_Procs = procCnt;
   params->MPIFFT_maxErr = maxErr;
 
-// !BAM
-//  MPI_Bcast( &Gflops, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD );
+  MPI_Bcast( &Gflops, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD );
 
   params->MPIFFTGflops = Gflops;
 
