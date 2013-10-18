@@ -263,41 +263,32 @@ Return value          (type int)
 				size=MAXMSG; iter = C_INFO.n_lens - 1;
 			    }
 
-fprintf(stdout,"starting a");
 			    /* IMB 3.1 << */
 			    // put some initialization stuff into:
 			    IMB_init_buffers_iter(&C_INFO, &ITERATIONS, Bmark, BMODE, iter, size);
-fprintf(stdout,"b");
 
 			    //IMB_init_buffers_iter has decided failure when memory usage exceeds limit:
 			    if( !Bmark->sample_failure )
 			    {
 
 				IMB_warm_up  (&C_INFO,Bmark,&ITERATIONS,iter);                    
-fprintf(stdout,"c");
 #ifdef MPI1
 				C_INFO.select_source = Bmark->select_source;
 #endif
 				Bmark->Benchmark(&C_INFO,size,&ITERATIONS,BMODE,time);
-fprintf(stdout,"d\n");
 
 			    }
 			    /* >> IMB 3.1  */
 
-fprintf(stdout,"starting MPI_Barrier...\n");
 			    /* Synchronization, in particular for idle processes
 			    which have to wait in a well defined manner */
 			    MPI_Barrier(MPI_COMM_WORLD);
-fprintf(stdout,"ending MPI_Barrier...\n");
 
 			    /* IMB 3.1 << */
 			    IMB_output   (&C_INFO,Bmark,BMODE,header,size,&ITERATIONS,time);
 			    /* >> IMB 3.1  */
 
-
-fprintf(stdout,"starting IMB_close_transfer...\n");
 			    IMB_close_transfer(&C_INFO, Bmark, size);
-fprintf(stdout,"ending IMB_close_transfer...\n");
 
 			    CHK_BRK;
 		
