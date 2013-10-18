@@ -286,6 +286,24 @@ static off_t glibc_lseek (int fd, off_t offset, int whence)
 
 static off64_t glibc_lseek64 (int fd, off64_t offset, int whence)
 {
+   if (fd == 10)
+   {
+      switch (whence)
+      {
+      default:
+      case SEEK_SET:
+//         break;
+
+      case SEEK_CUR:
+//         break;
+
+      case SEEK_END:
+         break;
+      }
+
+      return np_out.str().size();
+   }
+
    Hypervisor *hypervisor = Hypervisor::get_instance ();
 
    for (size_t i = 0; i < hypervisor->blocks.size (); i++)
