@@ -107,6 +107,7 @@ CPP_SOURCES += \
   llamaos/mpi/api/sys/MPI_Abort.cpp \
   llamaos/mpi/api/sys/MPI_Get_processor_name.cpp \
   llamaos/mpi/api/sys/MPI_Get_version.cpp \
+  llamaos/mpi/api/sys/MPI_Initialized.cpp \
   llamaos/mpi/api/collective/MPI_Barrier.cpp \
   llamaos/mpi/api/collective/MPI_Bcast.cpp \
   llamaos/mpi/api/collective/MPI_Scatter.cpp \

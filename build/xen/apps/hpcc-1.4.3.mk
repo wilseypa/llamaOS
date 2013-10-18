@@ -73,6 +73,9 @@ SOURCES = \
   apps/hpcc-$(HPCC_VERSION)/hpl/src/HPL_fprintf.c \
   apps/hpcc-$(HPCC_VERSION)/hpl/src/HPL_warn.c \
   apps/hpcc-$(HPCC_VERSION)/hpl/testing/ptest/HPL_pdinfo.c \
+  apps/hpcc-$(HPCC_VERSION)/hpl/testing/ptimer/HPL_ptimer.c \
+  apps/hpcc-$(HPCC_VERSION)/hpl/testing/ptimer/HPL_ptimer_cputime.c \
+  apps/hpcc-$(HPCC_VERSION)/hpl/testing/ptimer/HPL_ptimer_walltime.c \
   apps/hpcc-$(HPCC_VERSION)/hpl/testing/timer/HPL_timer_cputime.c \
   apps/hpcc-$(HPCC_VERSION)/RandomAccess/buckets.c \
   apps/hpcc-$(HPCC_VERSION)/RandomAccess/heap.c \
@@ -88,6 +91,25 @@ SOURCES = \
   apps/hpcc-$(HPCC_VERSION)/src/HPL_slamch.c \
   apps/hpcc-$(HPCC_VERSION)/src/io.c \
   apps/hpcc-$(HPCC_VERSION)/src/noopt.c
+
+#  apps/hpcc-$(HPCC_VERSION)/hpl/src/blas/HPL_daxpy.c \
+#  apps/hpcc-$(HPCC_VERSION)/hpl/src/blas/HPL_dcopy.c \
+#  apps/hpcc-$(HPCC_VERSION)/hpl/src/blas/HPL_dgemm.c \
+#  apps/hpcc-$(HPCC_VERSION)/hpl/src/blas/HPL_dgemv.c \
+#  apps/hpcc-$(HPCC_VERSION)/hpl/src/blas/HPL_dger.c \
+#  apps/hpcc-$(HPCC_VERSION)/hpl/src/blas/HPL_dscal.c \
+#  apps/hpcc-$(HPCC_VERSION)/hpl/src/blas/HPL_dtrsm.c \
+#  apps/hpcc-$(HPCC_VERSION)/hpl/src/blas/HPL_dtrsv.c \
+#  apps/hpcc-$(HPCC_VERSION)/hpl/src/blas/HPL_idamax.c \
+
+#  apps/hpcc-$(HPCC_VERSION)/PTRANS/cblacslt.c \
+#  apps/hpcc-$(HPCC_VERSION)/PTRANS/mem.c \
+#  apps/hpcc-$(HPCC_VERSION)/PTRANS/pdmatcmp.c \
+#  apps/hpcc-$(HPCC_VERSION)/PTRANS/pdmatgen.c \
+#  apps/hpcc-$(HPCC_VERSION)/PTRANS/pdtrans.c \
+#  apps/hpcc-$(HPCC_VERSION)/PTRANS/pdtransdriver.c \
+#  apps/hpcc-$(HPCC_VERSION)/PTRANS/pmatgeninc.c \
+#  apps/hpcc-$(HPCC_VERSION)/PTRANS/sclapack.c \
 
 OBJECTS = $(SOURCES:%.c=$(OBJDIR)/%.o)
 DEPENDS = $(OBJECTS:%.o=%.d)

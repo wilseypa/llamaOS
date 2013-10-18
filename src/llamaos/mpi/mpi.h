@@ -83,6 +83,7 @@ typedef int MPI_Datatype;
 #define MPI_2INTEGER  ((MPI_Datatype)35)
 
 #define MPI_DATATYPE_CUSTOM1  ((MPI_Datatype)36)
+#define MPI_PROC_NULL             ((MPI_Datatype)37)
 
 typedef int MPI_Op;
 #define MPI_MAX       ((MPI_Op)1)      //maximum
@@ -258,6 +259,8 @@ int MPI_Type_contiguous(int count,
                         MPI_Datatype old_type,
                         MPI_Datatype *new_type_p);
 int MPI_Type_free(MPI_Datatype *datatype);
+
+int MPI_Initialized( int *flag );
 
 #ifdef __cplusplus
 } //extern "C"
