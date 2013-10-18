@@ -280,15 +280,20 @@ Return value          (type int)
 			    }
 			    /* >> IMB 3.1  */
 
+fprintf(stdout,"starting MPI_Barrier...\n");
 			    /* Synchronization, in particular for idle processes
 			    which have to wait in a well defined manner */
 			    MPI_Barrier(MPI_COMM_WORLD);
+fprintf(stdout,"ending MPI_Barrier...\n");
 
 			    /* IMB 3.1 << */
 			    IMB_output   (&C_INFO,Bmark,BMODE,header,size,&ITERATIONS,time);
 			    /* >> IMB 3.1  */
 
+
+fprintf(stdout,"starting IMB_close_transfer...\n");
 			    IMB_close_transfer(&C_INFO, Bmark, size);
+fprintf(stdout,"ending IMB_close_transfer...\n");
 
 			    CHK_BRK;
 		
