@@ -192,8 +192,7 @@ double wtick;
 #endif
 
 #ifndef DEBUG_LEVEL
-//#  define DEBUG_LEVEL 2
-#  define DEBUG_LEVEL 12
+#  define DEBUG_LEVEL 2
 #endif
 
 typedef struct {
