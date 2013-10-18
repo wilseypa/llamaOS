@@ -44,8 +44,7 @@ CFLAGS += \
   -D__XEN_INTERFACE_VERSION__=0x00030205 \
   -include $(SRCDIR)/llamaos/__thread.h \
   -D LONG_IS_64BITS \
-  -D HPL_USE_CLOCK \
-  -D DEBUG_LEVEL=12
+  -D HPL_USE_CLOCK
 
 VPATH = $(SRCDIR)
 
