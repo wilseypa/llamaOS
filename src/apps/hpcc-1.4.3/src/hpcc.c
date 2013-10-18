@@ -28,6 +28,8 @@ main(int argc, char *argv[]) {
 
   outFname = params.outFname;
 
+// !BAM
+#if 0
   /* -------------------------------------------------- */
   /*                 MPI RandomAccess                   */
   /* -------------------------------------------------- */
@@ -46,8 +48,6 @@ main(int argc, char *argv[]) {
   fprintf( outputFile, "End of MPIRandomAccess section.\n" );
   END_IO( myRank, outputFile );
 
-// !BAM
-#if 0
   /* -------------------------------------------------- */
   /*                  StarRandomAccess                  */
   /* -------------------------------------------------- */
