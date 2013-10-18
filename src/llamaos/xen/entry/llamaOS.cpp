@@ -180,7 +180,8 @@ static int glibc_libc_open (const char *file, int oflag)
    {
       return 6;
    }
-   else if (strcmp (file, "np.out") == 0)
+   else if (   (strcmp (file, "np.out") == 0)
+            || (strcmp (file, "hpccoutf.txt") == 0))
    {
       return 10;
    }
