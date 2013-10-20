@@ -63,6 +63,9 @@ CPP_SOURCES += \
   llamaos/mpi/tools.cpp \
   llamaos/mpi/iReceiveNB.cpp \
   llamaos/mpi/op/iPerformOp.cpp \
+  llamaos/mpi/op/MPI_Op_create.cpp \
+  llamaos/mpi/op/MPI_Op_free.cpp \
+  llamaos/mpi/api/pt2pt/MPI_Cancel.cpp \
   llamaos/mpi/api/pt2pt/MPI_Recv.cpp \
   llamaos/mpi/api/pt2pt/MPI_Send.cpp \
   llamaos/mpi/api/pt2pt/MPI_Ssend.cpp \
@@ -102,7 +105,9 @@ CPP_SOURCES += \
   llamaos/mpi/api/sys/MPI_Init.cpp \
   llamaos/mpi/api/sys/MPI_Finalize.cpp \
   llamaos/mpi/api/sys/MPI_Abort.cpp \
+  llamaos/mpi/api/sys/MPI_Get_processor_name.cpp \
   llamaos/mpi/api/sys/MPI_Get_version.cpp \
+  llamaos/mpi/api/sys/MPI_Initialized.cpp \
   llamaos/mpi/api/collective/MPI_Barrier.cpp \
   llamaos/mpi/api/collective/MPI_Bcast.cpp \
   llamaos/mpi/api/collective/MPI_Scatter.cpp \
@@ -115,6 +120,9 @@ CPP_SOURCES += \
   llamaos/mpi/api/time/MPI_Wtime.cpp \
   llamaos/mpi/api/time/MPI_Wtick.cpp \
   llamaos/mpi/api/error/MPI_Error_string.cpp \
+  llamaos/mpi/api/type/MPI_Type_commit.cpp \
+  llamaos/mpi/api/type/MPI_Type_contiguous.cpp \
+  llamaos/mpi/api/type/MPI_Type_free.cpp \
   llamaos/mpi/api/type/MPI_Type_size.cpp \
   llamaos/mpi/g/MPI_Gsend.cpp \
   llamaos/mpi/g/MPI_Grecv.cpp

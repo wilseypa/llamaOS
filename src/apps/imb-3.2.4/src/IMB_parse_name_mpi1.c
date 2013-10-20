@@ -216,7 +216,6 @@ In/out variables:
 	Bmark->scale_time = 1.0;
 	Bmark->scale_bw   = 2.0;
     }
-#if 0
     else if (!strcmp(Bmark->name,"exchange") )
     { 
 	strcpy(Bmark->name,"Exchange");
@@ -242,6 +241,7 @@ In/out variables:
 	Bmark->bench_comments = &Reduce_cmt[0];
 	Bmark->reduction = 1;
     }
+#if 0
     else if (!strcmp(Bmark->name,"reduce_scatter"))
     { 
 	strcpy(Bmark->name,"Reduce_scatter");
@@ -250,6 +250,7 @@ In/out variables:
 	Bmark->bench_comments = &Reduce_scatter_cmt[0];
 	Bmark->reduction = 1;
     }
+#endif
     else if (!strcmp(Bmark->name,"bcast"))
     { 
 	strcpy(Bmark->name,"Bcast");
@@ -271,6 +272,7 @@ In/out variables:
 	type = Collective;
 	Bmark->bench_comments = &Allgather_cmt[0];
     }
+#if 0
     else if (!strcmp(Bmark->name,"allgatherv"))
     { 
 	strcpy(Bmark->name,"Allgatherv");
@@ -278,6 +280,7 @@ In/out variables:
 	type = Collective;
 	Bmark->bench_comments = &Allgatherv_cmt[0];
     }
+#endif
     else if (!strcmp(Bmark->name,"gather"))
     { 
 	strcpy(Bmark->name,"Gather");
@@ -285,6 +288,7 @@ In/out variables:
 	type = Collective;
 	Bmark->bench_comments = &Gather_cmt[0];
     }
+#if 0
     else if (!strcmp(Bmark->name,"gatherv"))
     { 
 	strcpy(Bmark->name,"Gatherv");
@@ -292,6 +296,7 @@ In/out variables:
 	type = Collective;
 	Bmark->bench_comments = &Gatherv_cmt[0];
     }
+#endif
     else if (!strcmp(Bmark->name,"scatter"))
     { 
 	strcpy(Bmark->name,"Scatter");
@@ -299,6 +304,7 @@ In/out variables:
 	type = Collective;
 	Bmark->bench_comments = &Scatter_cmt[0];
     }
+#if 0
     else if (!strcmp(Bmark->name,"scatterv"))
     { 
 	strcpy(Bmark->name,"Scatterv");
@@ -306,6 +312,7 @@ In/out variables:
 	type = Collective;
 	Bmark->bench_comments = &Scatterv_cmt[0];
     }
+#endif
     else if (!strcmp(Bmark->name,"alltoall"))
     { 
 	strcpy(Bmark->name,"Alltoall");
@@ -320,7 +327,6 @@ In/out variables:
 	type = Collective;
 	Bmark->bench_comments = &Alltoallv_cmt[0];
     }
-#endif
     else 
     {
 	type = BTYPE_INVALID;

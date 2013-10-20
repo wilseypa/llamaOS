@@ -42,6 +42,7 @@ int main (int argc, char *argv [])
    cout.flush ();
    cout << endl;
 
+   cout << "sizeof long " << sizeof(long) << endl;
 
    cout << "program break: " << (pointer_to_address(get_program_break ()) / 1024.0) / 1024.0 << endl;
 

@@ -82,6 +82,9 @@ typedef int MPI_Datatype;
 #define MPI_2DOUBLE_PRECISION  ((MPI_Datatype)34)
 #define MPI_2INTEGER  ((MPI_Datatype)35)
 
+#define MPI_DATATYPE_CUSTOM1  ((MPI_Datatype)36)
+#define MPI_PROC_NULL             ((MPI_Datatype)37)
+
 typedef int MPI_Op;
 #define MPI_MAX       ((MPI_Op)1)      //maximum
 #define MPI_MIN       ((MPI_Op)2)      //minimum
@@ -239,6 +242,25 @@ int MPI_Type_size(MPI_Datatype datatype, int *size);
 // Custom for WARPED - global single message packets
 int MPI_Gsend(void *buf, int count, MPI_Datatype datatype, int dest);
 int MPI_Grecv(void **buf, int *count, MPI_Datatype datatype, int *flag);
+
+// !BAM added for hpcc
+#define MPI_MAX_PROCESSOR_NAME (128)
+
+int MPI_Cancel(MPI_Request *request);
+
+int MPI_Get_processor_name( char *name, int *resultlen );
+
+typedef void (MPI_User_function) ( void *, void *, int *, MPI_Datatype * );
+int MPI_Op_create(MPI_User_function *function, int commute, MPI_Op *op);
+int MPI_Op_free(MPI_Op *op);
+
+int MPI_Type_commit(MPI_Datatype *datatype);
+int MPI_Type_contiguous(int count,
+                        MPI_Datatype old_type,
+                        MPI_Datatype *new_type_p);
+int MPI_Type_free(MPI_Datatype *datatype);
+
+int MPI_Initialized( int *flag );
 
 #ifdef __cplusplus
 } //extern "C"

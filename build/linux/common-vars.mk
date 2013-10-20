@@ -59,6 +59,7 @@ TESTDIR = ../../test
 NETPIPE_VERSION = 3.7.2
 # IMB_VERSION = 3.2.3
 IMB_VERSION = 3.2.4
+HPCC_VERSION = 1.4.3
 
 # auto dependency generation
 DEPENDS = 

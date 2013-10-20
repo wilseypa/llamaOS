@@ -63,6 +63,8 @@ int iSizeof(MPI_Datatype type) {
       case MPI_COMPLEX:	return sizeof(MPI_COMPLEX_T);
       case MPI_DOUBLE_COMPLEX:	return sizeof(MPI_DOUBLE_COMPLEX_T);
       case MPI_LOGICAL:	return sizeof(MPI_LOGICAL_T);
+
+      case MPI_DATATYPE_CUSTOM1: return 2*sizeof(MPI_DOUBLE_T);
 	
       default:			return 0;
    }
