@@ -1454,6 +1454,7 @@ HEADERS = \
   $(INCDIR)/gnu/stubs.h \
   $(INCDIR)/netinet/in.h \
   $(INCDIR)/netinet/tcp.h \
+  $(INCDIR)/sys/bitypes.h \
   $(INCDIR)/sys/cdefs.h \
   $(INCDIR)/sys/ioctl.h \
   $(INCDIR)/sys/mman.h \
@@ -1650,6 +1651,11 @@ $(INCDIR)/% : $(SRCDIR)/sys/glibc-$(GLIBC_VERSION)/posix/%
 	cp $< $@
 
 $(INCDIR)/% : $(SRCDIR)/sys/glibc-$(GLIBC_VERSION)/pwd/%
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo copying: $@ from $<
+	cp $< $@
+
+$(INCDIR)/% : $(SRCDIR)/sys/glibc-$(GLIBC_VERSION)/resolv/%
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo copying: $@ from $<
 	cp $< $@
