@@ -760,6 +760,7 @@ C_SOURCES = \
   sys/glibc-$(GLIBC_VERSION)/posix/getgid.c \
   sys/glibc-$(GLIBC_VERSION)/posix/getopt.c \
   sys/glibc-$(GLIBC_VERSION)/posix/getuid.c \
+  sys/glibc-$(GLIBC_VERSION)/posix/regex.c \
   sys/glibc-$(GLIBC_VERSION)/posix/wait.c \
   sys/glibc-$(GLIBC_VERSION)/setjmp/longjmp.c \
   sys/glibc-$(GLIBC_VERSION)/setjmp/sigjmp.c \

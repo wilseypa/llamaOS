@@ -54,25 +54,26 @@ all:
 	@$(MAKE) -f tools/tinyxml-$(TINYXML_VERSION).mk
 	@$(MAKE) -f tools/mpich-$(MPICH_VERSION).mk
 	@$(MAKE) -f llamaOS.mk
-	@$(MAKE) -f llamaMPI.mk
-	@$(MAKE) -f llamaMPIF.mk
-	@$(MAKE) -f apps/net/intel.mk
-	@$(MAKE) -f apps/hpcc-$(HPCC_VERSION).mk
-	@$(MAKE) -f apps/IMB-$(IMB_VERSION).mk
-	@$(MAKE) -f apps/latency-MPI.mk
-	@$(MAKE) -f apps/latency-llamaNET.mk
-	@$(MAKE) -f apps/netpipe-$(NETPIPE_VERSION)-llamaNET.mk
-	@$(MAKE) -f apps/netpipe-$(NETPIPE_VERSION)-memcpy.mk
-	@$(MAKE) -f apps/netpipe-$(NETPIPE_VERSION)-MPI.mk
-	@$(MAKE) -f apps/pingPongNB-MPI.mk
-	@$(MAKE) -f net/i82574.mk
-	@$(MAKE) -f net/lspci.mk
+#	@$(MAKE) -f llamaMPI.mk
+#	@$(MAKE) -f llamaMPIF.mk
+#	@$(MAKE) -f apps/net/intel.mk
+#	@$(MAKE) -f apps/hpcc-$(HPCC_VERSION).mk
+#	@$(MAKE) -f apps/IMB-$(IMB_VERSION).mk
+#	@$(MAKE) -f apps/latency-MPI.mk
+#	@$(MAKE) -f apps/latency-llamaNET.mk
+#	@$(MAKE) -f apps/netpipe-$(NETPIPE_VERSION)-llamaNET.mk
+#	@$(MAKE) -f apps/netpipe-$(NETPIPE_VERSION)-memcpy.mk
+#	@$(MAKE) -f apps/netpipe-$(NETPIPE_VERSION)-MPI.mk
+#	@$(MAKE) -f apps/pingPongNB-MPI.mk
+#	@$(MAKE) -f net/i82574.mk
+#	@$(MAKE) -f net/lspci.mk
 	@$(MAKE) -f test/apps/hello-c.mk
 	@$(MAKE) -f test/apps/hello-cpp.mk
 	@$(MAKE) -f test/apps/hello-f77.mk
 	@$(MAKE) -f test/apps/hello-f90.mk
-	@$(MAKE) -f test/apps/testMPI.mk
-	@$(MAKE) -f test/apps/testMPIF.mk
+	@$(MAKE) -f test/apps/mpich.mk
+#	@$(MAKE) -f test/apps/testMPI.mk
+#	@$(MAKE) -f test/apps/testMPIF.mk
 	@$(MAKE) -f test/apps/tinyxml.mk
 	@$(MAKE) -f test/empty.mk
 	@$(MAKE) -f test/memory.mk

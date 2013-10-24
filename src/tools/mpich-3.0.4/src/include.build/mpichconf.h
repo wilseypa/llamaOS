@@ -525,10 +525,12 @@
 /* #undef HAVE_SIGACTION */
 
 /* Define to 1 if you have the `signal' function. */
-#define HAVE_SIGNAL 1
+// !BAM
+// #define HAVE_SIGNAL 1
 
 /* Define to 1 if you have the <signal.h> header file. */
-#define HAVE_SIGNAL_H 1
+// !BAM
+// #define HAVE_SIGNAL_H 1
 
 /* Define to 1 if you have the `sigset' function. */
 /* #undef HAVE_SIGSET */
@@ -690,7 +692,8 @@
 /* #undef HAVE_UNSETENV */
 
 /* Define to 1 if you have the `usleep' function. */
-#define HAVE_USLEEP 1
+// !BAM
+// #define HAVE_USLEEP 1
 
 /* Define to 1 if you have the `uuid_generate' function. */
 /* #undef HAVE_UUID_GENERATE */
