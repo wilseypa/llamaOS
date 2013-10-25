@@ -243,6 +243,7 @@ C_SOURCES = \
   tools/mpich-$(MPICH_VERSION)/src/mpid/ch3/channels/nemesis/src/ch3_istartmsg.c \
   tools/mpich-$(MPICH_VERSION)/src/mpid/ch3/channels/nemesis/src/ch3_istartmsgv.c \
   tools/mpich-$(MPICH_VERSION)/src/mpid/ch3/channels/nemesis/src/ch3_progress.c \
+  tools/mpich-$(MPICH_VERSION)/src/mpid/ch3/channels/nemesis/src/ch3_rma_shm.c \
   tools/mpich-$(MPICH_VERSION)/src/mpid/ch3/channels/nemesis/src/ch3_win_fns.c \
   tools/mpich-$(MPICH_VERSION)/src/mpid/ch3/channels/nemesis/src/ch3i_comm.c \
   tools/mpich-$(MPICH_VERSION)/src/mpid/ch3/channels/nemesis/src/ch3i_eagernoncontig.c \

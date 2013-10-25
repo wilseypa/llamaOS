@@ -31,6 +31,45 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #ifndef glibc_nptl_sysdeps_llamaos_internaltypes_h
 #define glibc_nptl_sysdeps_llamaos_internaltypes_h
 
+#include <stdint.h>
+
+struct pthread_attr
+{
+  /* Scheduler parameters and priority.  */
+  struct sched_param schedparam;
+  int schedpolicy;
+  /* Various flags like detachstate, scope, etc.  */
+  int flags;
+  /* Size of guard area.  */
+  size_t guardsize;
+  /* Stack handling.  */
+  void *stackaddr;
+  size_t stacksize;
+  /* Affinity map.  */
+  cpu_set_t *cpuset;
+  size_t cpusetsize;
+};
+
+#define ATTR_FLAG_DETACHSTATE		0x0001
+#define ATTR_FLAG_NOTINHERITSCHED	0x0002
+#define ATTR_FLAG_SCOPEPROCESS		0x0004
+#define ATTR_FLAG_STACKADDR		0x0008
+#define ATTR_FLAG_OLDATTR		0x0010
+#define ATTR_FLAG_SCHED_SET		0x0020
+#define ATTR_FLAG_POLICY_SET		0x0040
+
+/* Mutex attribute data structure.  */
+struct pthread_mutexattr
+{
+  /* Identifier for the kind of mutex.
+
+     Bit 31 is set if the mutex is to be shared between processes.
+
+     Bit 0 to 30 contain one of the PTHREAD_MUTEX_ values to identify
+     the type of the mutex.  */
+  int mutexkind;
+};
+
 /* Compatibility type for old conditional variable interfaces.  */
 typedef struct
 {

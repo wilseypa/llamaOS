@@ -54,6 +54,7 @@ all:
 	@$(MAKE) -f tools/tinyxml-$(TINYXML_VERSION).mk
 	@$(MAKE) -f tools/mpich-$(MPICH_VERSION).mk
 	@$(MAKE) -f llamaOS.mk
+	@$(MAKE) -f llamaMPICH_PMI.mk
 #	@$(MAKE) -f llamaMPI.mk
 #	@$(MAKE) -f llamaMPIF.mk
 #	@$(MAKE) -f apps/net/intel.mk

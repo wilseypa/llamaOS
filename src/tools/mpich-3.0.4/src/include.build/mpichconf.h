@@ -1140,7 +1140,8 @@
 
 /* Define if access to PMI information through a port rather than just an fd
    is allowed */
-#define USE_PMI_PORT 1
+// !BAM
+// #define USE_PMI_PORT 1
 
 /* define if the file descriptor for stdin cannot be passed to poll */
 /* #undef USE_PTHREAD_STDIN_REDIRECTION */

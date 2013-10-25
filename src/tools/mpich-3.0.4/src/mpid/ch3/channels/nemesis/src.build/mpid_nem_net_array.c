@@ -7,8 +7,12 @@
 #include "mpid_nem_impl.h"
 
 /* forward declaration of funcs structs defined in network modules */
-extern MPID_nem_netmod_funcs_t MPIDI_nem_tcp_funcs;
+// extern MPID_nem_netmod_funcs_t MPIDI_nem_tcp_funcs;
 
-int MPID_nem_num_netmods = 1;
-MPID_nem_netmod_funcs_t *MPID_nem_netmod_funcs[1] = { &MPIDI_nem_tcp_funcs };
-char MPID_nem_netmod_strings[1][MPID_NEM_MAX_NETMOD_STRING_LEN] = { "tcp" };
+// int MPID_nem_num_netmods = 1;
+// MPID_nem_netmod_funcs_t *MPID_nem_netmod_funcs[1] = { &MPIDI_nem_tcp_funcs };
+// char MPID_nem_netmod_strings[1][MPID_NEM_MAX_NETMOD_STRING_LEN] = { "tcp" };
+
+int MPID_nem_num_netmods = 0;
+MPID_nem_netmod_funcs_t *MPID_nem_netmod_funcs[0] = { };
+char MPID_nem_netmod_strings[0][MPID_NEM_MAX_NETMOD_STRING_LEN] = { };

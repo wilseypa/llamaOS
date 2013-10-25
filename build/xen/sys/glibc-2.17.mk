@@ -124,7 +124,9 @@ CFLAGS += \
   -D_IO_MTSAFE_IO \
   -DMORECORE_CLEARS=2 \
   -DEXEC_PAGESIZE=4096 \
-  -D HAVE_MREMAP=0 \
+  -DHAVE_MREMAP=0 \
+  -D__ASSUME_FUTEX_LOCK_PI \
+  -D__ASSUME_SET_ROBUST_LIST \
   $(INCLUDES_DIRS) \
   -include  $(SRCDIR)/sys/glibc-$(GLIBC_VERSION)/include/libc-symbols.h \
   -include $(SRCDIR)/llamaos/__thread.h
@@ -751,6 +753,14 @@ C_SOURCES = \
   sys/glibc-$(GLIBC_VERSION)/nptl/sysdeps/pthread/ftrylockfile.c \
   sys/glibc-$(GLIBC_VERSION)/nptl/sysdeps/pthread/funlockfile.c \
   sys/glibc-$(GLIBC_VERSION)/nptl/alloca_cutoff.c \
+  sys/glibc-$(GLIBC_VERSION)/nptl/pthread_attr_destroy.c \
+  sys/glibc-$(GLIBC_VERSION)/nptl/pthread_attr_init.c \
+  sys/glibc-$(GLIBC_VERSION)/nptl/pthread_mutex_destroy.c \
+  sys/glibc-$(GLIBC_VERSION)/nptl/pthread_mutex_init.c \
+  sys/glibc-$(GLIBC_VERSION)/nptl/pthread_mutexattr_destroy.c \
+  sys/glibc-$(GLIBC_VERSION)/nptl/pthread_mutexattr_init.c \
+  sys/glibc-$(GLIBC_VERSION)/nptl/pthread_mutexattr_setpshared.c \
+  sys/glibc-$(GLIBC_VERSION)/nptl/tpp.c \
   sys/glibc-$(GLIBC_VERSION)/posix/environ.c \
   sys/glibc-$(GLIBC_VERSION)/posix/execve.c \
   sys/glibc-$(GLIBC_VERSION)/posix/fork.c \
@@ -761,6 +771,9 @@ C_SOURCES = \
   sys/glibc-$(GLIBC_VERSION)/posix/getopt.c \
   sys/glibc-$(GLIBC_VERSION)/posix/getuid.c \
   sys/glibc-$(GLIBC_VERSION)/posix/regex.c \
+  sys/glibc-$(GLIBC_VERSION)/posix/sched_getp.c \
+  sys/glibc-$(GLIBC_VERSION)/posix/sched_gets.c \
+  sys/glibc-$(GLIBC_VERSION)/posix/sched_sets.c \
   sys/glibc-$(GLIBC_VERSION)/posix/wait.c \
   sys/glibc-$(GLIBC_VERSION)/setjmp/longjmp.c \
   sys/glibc-$(GLIBC_VERSION)/setjmp/sigjmp.c \
