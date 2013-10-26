@@ -28,6 +28,8 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
+#include <cstring>
+
 #include <pmi.h>
 
 #include <iostream>
@@ -64,7 +66,7 @@ extern "C"
 int PMI_Get_size( int *size )
 {
    cout << "calling PMI_Get_size..." << endl;
-   *size = 1;
+   *size = 2;
 
    return PMI_SUCCESS;
 }
@@ -121,7 +123,8 @@ extern "C"
 int PMI_Barrier( void )
 {
    cout << "calling PMI_Barrier..." << endl;
-   return 0;
+
+   return PMI_SUCCESS;
 }
 
 extern "C"
@@ -135,49 +138,72 @@ extern "C"
 int PMI_KVS_Get_my_name( char kvsname[], int length )
 {
    cout << "calling PMI_KVS_Get_my_name..." << endl;
-   return 0;
+   strncpy(kvsname, "llamaOS", length);
+
+   return PMI_SUCCESS;
 }
 
 extern "C"
 int PMI_KVS_Get_name_length_max( int *length )
 {
    cout << "calling PMI_KVS_Get_name_length_max..." << endl;
-   return 0;
+   *length = 256;
+
+   return PMI_SUCCESS;
 }
 
 extern "C"
 int PMI_KVS_Get_key_length_max( int *length )
 {
    cout << "calling PMI_KVS_Get_key_length_max..." << endl;
-   return 0;
+   *length = 256;
+
+   return PMI_SUCCESS;
 }
 
 extern "C"
 int PMI_KVS_Get_value_length_max( int *length )
 {
    cout << "calling PMI_KVS_Get_value_length_max..." << endl;
-   return 0;
+   *length = 256;
+
+   return PMI_SUCCESS;
 }
 
 extern "C"
 int PMI_KVS_Put( const char kvsname[], const char key[], const char value[])
 {
    cout << "calling PMI_KVS_Put..." << endl;
-   return 0;
+   cout << "  kvsname: " << kvsname << endl;
+   cout << "  key: " << key << endl;
+   cout << "  value: " << value << endl;
+
+   return PMI_SUCCESS;
 }
 
 extern "C"
 int PMI_KVS_Commit( const char kvsname[] )
 {
    cout << "calling PMI_KVS_Commit..." << endl;
-   return 0;
+   cout << "  kvsname: " << kvsname << endl;
+
+   return PMI_SUCCESS;
 }
 
 extern "C"
 int PMI_KVS_Get( const char kvsname[], const char key[], char value[], int length)
 {
    cout << "calling PMI_KVS_Get..." << endl;
-   return 0;
+   cout << "  kvsname: " << kvsname << endl;
+   cout << "  key: " << key << endl;
+
+   if (0 == strcmp (key, "PMI_process_mapping"))
+   {
+      strncpy(value, "(vector,(0,2,2))", length);
+      return PMI_SUCCESS;
+   }
+
+   return PMI_ERR_INVALID_KEY;
 }
 
 extern "C"

@@ -37,33 +37,50 @@ either expressed or implied, of the copyright holder(s) or contributors.
 using std::cout;
 using std::endl;
 
+static int _argc;
+static char **_argv;
+
+TEST(MPI_Init, init)
+{
+   EXPECT_EQ(MPI_SUCCESS, MPI_Init (&_argc, &_argv));
+}
+
 TEST(MPI_Comm, size)
 {
    int np = -1;
 
-   MPI_Comm_size(MPI_COMM_WORLD, &np);
+   EXPECT_EQ(MPI_SUCCESS, MPI_Comm_size(MPI_COMM_WORLD, &np));
 
-   EXPECT_EQ(1, np);
+   EXPECT_EQ(2, np);
 }
 
 TEST(MPI_Comm, rank)
 {
    int id = -1;
 
-   MPI_Comm_rank(MPI_COMM_WORLD, &id);
+   EXPECT_EQ(MPI_SUCCESS, MPI_Comm_rank(MPI_COMM_WORLD, &id));
 
    EXPECT_EQ(0, id);
+}
+
+//TEST(MPI_Send, send)
+//{
+//   char buffer [256] = "hello";
+//
+//   EXPECT_EQ(MPI_SUCCESS, MPI_Send(buffer, strlen(buffer), MPI_CHAR, 1, 0, MPI_COMM_WORLD));
+//}
+
+TEST(MPI_Finalize, finalize)
+{
+   EXPECT_EQ(MPI_SUCCESS, MPI_Finalize());
 }
 
 int main (int argc, char *argv[])
 {
    testing::InitGoogleTest (&argc, argv);
 
-   MPI_Init (&argc, &argv);
+   _argc = argc;
+   _argv = argv;
 
-   int result = RUN_ALL_TESTS ();
-
-   MPI_Finalize();
-
-   return result;
+   return RUN_ALL_TESTS ();
 }

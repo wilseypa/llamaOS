@@ -124,12 +124,31 @@ C_SOURCES = \
   tools/mpich-$(MPICH_VERSION)/src/mpi/coll/scan.c \
   tools/mpich-$(MPICH_VERSION)/src/mpi/coll/scatter.c \
   tools/mpich-$(MPICH_VERSION)/src/mpi/coll/scatterv.c \
+  tools/mpich-$(MPICH_VERSION)/src/mpi/comm/comm_compare.c \
+  tools/mpich-$(MPICH_VERSION)/src/mpi/comm/comm_create.c \
+  tools/mpich-$(MPICH_VERSION)/src/mpi/comm/comm_create_group.c \
+  tools/mpich-$(MPICH_VERSION)/src/mpi/comm/comm_dup.c \
+  tools/mpich-$(MPICH_VERSION)/src/mpi/comm/comm_dup_with_info.c \
   tools/mpich-$(MPICH_VERSION)/src/mpi/comm/comm_free.c \
+  tools/mpich-$(MPICH_VERSION)/src/mpi/comm/comm_get_info.c \
+  tools/mpich-$(MPICH_VERSION)/src/mpi/comm/comm_get_name.c \
   tools/mpich-$(MPICH_VERSION)/src/mpi/comm/comm_group.c \
+  tools/mpich-$(MPICH_VERSION)/src/mpi/comm/comm_group_failed.c \
+  tools/mpich-$(MPICH_VERSION)/src/mpi/comm/comm_idup.c \
   tools/mpich-$(MPICH_VERSION)/src/mpi/comm/comm_rank.c \
+  tools/mpich-$(MPICH_VERSION)/src/mpi/comm/comm_reenable_anysource.c \
+  tools/mpich-$(MPICH_VERSION)/src/mpi/comm/comm_remote_group.c \
+  tools/mpich-$(MPICH_VERSION)/src/mpi/comm/comm_remote_group_failed.c \
+  tools/mpich-$(MPICH_VERSION)/src/mpi/comm/comm_remote_size.c \
+  tools/mpich-$(MPICH_VERSION)/src/mpi/comm/comm_set_info.c \
+  tools/mpich-$(MPICH_VERSION)/src/mpi/comm/comm_set_name.c \
   tools/mpich-$(MPICH_VERSION)/src/mpi/comm/comm_size.c \
   tools/mpich-$(MPICH_VERSION)/src/mpi/comm/comm_split.c \
+  tools/mpich-$(MPICH_VERSION)/src/mpi/comm/comm_split_type.c \
+  tools/mpich-$(MPICH_VERSION)/src/mpi/comm/comm_test_inter.c \
   tools/mpich-$(MPICH_VERSION)/src/mpi/comm/commutil.c \
+  tools/mpich-$(MPICH_VERSION)/src/mpi/comm/intercomm_create.c \
+  tools/mpich-$(MPICH_VERSION)/src/mpi/comm/intercomm_merge.c \
   tools/mpich-$(MPICH_VERSION)/src/mpi/datatype/get_count.c \
   tools/mpich-$(MPICH_VERSION)/src/mpi/datatype/pack.c \
   tools/mpich-$(MPICH_VERSION)/src/mpi/datatype/pack_size.c \
