@@ -37,6 +37,24 @@ either expressed or implied, of the copyright holder(s) or contributors.
 using std::cout;
 using std::endl;
 
+TEST(MPI_Comm, size)
+{
+   int np = -1;
+
+   MPI_Comm_size(MPI_COMM_WORLD, &np);
+
+   EXPECT_EQ(1, np);
+}
+
+TEST(MPI_Comm, rank)
+{
+   int id = -1;
+
+   MPI_Comm_rank(MPI_COMM_WORLD, &id);
+
+   EXPECT_EQ(0, id);
+}
+
 int main (int argc, char *argv[])
 {
    testing::InitGoogleTest (&argc, argv);

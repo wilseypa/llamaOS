@@ -91,6 +91,18 @@ static void glibc_abort (void)
    for(;;);
 }
 
+static void glibc_exit (int status)
+{
+   cout << "!!! ALERT: glibc calling exit(" << status << ")." << endl;
+   cout.flush();
+   fflush(stdout);
+   for(;;);
+
+//   sched_shutdown_t arg;
+//   arg.reason = SHUTDOWN_poweroff;
+//   HYPERVISOR_sched_op(SCHEDOP_shutdown, &arg);
+}
+
 static int glibc_gethostname (char *name, size_t len)
 {
    stringstream ss;
@@ -322,6 +334,7 @@ static off64_t glibc_lseek64 (int fd, off64_t offset, int whence)
 static void register_glibc_exports (void)
 {
    register_llamaos_abort (glibc_abort);
+   register_llamaos_exit (glibc_exit);
    register_llamaos_gethostname (glibc_gethostname);
    register_llamaos_getpid (glibc_getpid);
    register_llamaos_gettimeofday (glibc_gettimeofday);

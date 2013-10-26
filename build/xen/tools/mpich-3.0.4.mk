@@ -54,6 +54,7 @@ CFLAGS += \
   -I $(SRCDIR)/tools/mpich-$(MPICH_VERSION)/src/openpa/src.build \
   -I $(SRCDIR)/tools/mpich-$(MPICH_VERSION)/src/util/wrappers \
   -I $(INCDIR) \
+  -DUSE_DBG_LOGGING \
   -include $(SRCDIR)/llamaos/__thread.h
 
 VPATH = $(SRCDIR)
@@ -125,6 +126,8 @@ C_SOURCES = \
   tools/mpich-$(MPICH_VERSION)/src/mpi/coll/scatterv.c \
   tools/mpich-$(MPICH_VERSION)/src/mpi/comm/comm_free.c \
   tools/mpich-$(MPICH_VERSION)/src/mpi/comm/comm_group.c \
+  tools/mpich-$(MPICH_VERSION)/src/mpi/comm/comm_rank.c \
+  tools/mpich-$(MPICH_VERSION)/src/mpi/comm/comm_size.c \
   tools/mpich-$(MPICH_VERSION)/src/mpi/comm/comm_split.c \
   tools/mpich-$(MPICH_VERSION)/src/mpi/comm/commutil.c \
   tools/mpich-$(MPICH_VERSION)/src/mpi/datatype/get_count.c \
@@ -235,6 +238,7 @@ C_SOURCES = \
   tools/mpich-$(MPICH_VERSION)/src/mpi/topo/topoutil.c \
   tools/mpich-$(MPICH_VERSION)/src/mpi_t/mpi_t_util.c \
   tools/mpich-$(MPICH_VERSION)/src/mpi_t/mpit_init_thread.c \
+  tools/mpich-$(MPICH_VERSION)/src/mpid/ch3/channels/nemesis/netmod/none/none.c \
   tools/mpich-$(MPICH_VERSION)/src/mpid/ch3/channels/nemesis/src/ch3_abort.c \
   tools/mpich-$(MPICH_VERSION)/src/mpid/ch3/channels/nemesis/src/ch3_finalize.c \
   tools/mpich-$(MPICH_VERSION)/src/mpid/ch3/channels/nemesis/src/ch3_init.c \
@@ -249,6 +253,8 @@ C_SOURCES = \
   tools/mpich-$(MPICH_VERSION)/src/mpid/ch3/channels/nemesis/src/ch3i_eagernoncontig.c \
   tools/mpich-$(MPICH_VERSION)/src/mpid/ch3/channels/nemesis/src/mpid_nem_alloc.c \
   tools/mpich-$(MPICH_VERSION)/src/mpid/ch3/channels/nemesis/src/mpid_nem_barrier.c \
+  tools/mpich-$(MPICH_VERSION)/src/mpid/ch3/channels/nemesis/src/mpid_nem_ckpt.c \
+  tools/mpich-$(MPICH_VERSION)/src/mpid/ch3/channels/nemesis/src/mpid_nem_debug.c \
   tools/mpich-$(MPICH_VERSION)/src/mpid/ch3/channels/nemesis/src/mpid_nem_finalize.c \
   tools/mpich-$(MPICH_VERSION)/src/mpid/ch3/channels/nemesis/src/mpid_nem_init.c \
   tools/mpich-$(MPICH_VERSION)/src/mpid/ch3/channels/nemesis/src/mpid_nem_lmt.c \
