@@ -161,6 +161,9 @@ EXTERN void register_llamaos_madvise (llamaos_madvise_t madvise);
 typedef int (*llamaos_mkdir_t) (const char *, mode_t);
 EXTERN void register_llamaos_mkdir (llamaos_mkdir_t func);
 
+typedef __ptr_t (*llamaos_mmap_t) (__ptr_t, size_t, int, int, int, off_t);
+EXTERN void register_llamaos_mmap (llamaos_mmap_t func);
+
 // long int pathconf (const char *path, int name)
 typedef long int (*llamaos_pathconf_t) (const char *, int);
 EXTERN void register_llamaos_pathconf (llamaos_pathconf_t madvise);

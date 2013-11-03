@@ -188,6 +188,7 @@ static stringstream np_out;
 
 static int glibc_libc_open (const char *file, int oflag)
 {
+   cout << "glibc_libc_open: " << file << ", " << oflag << endl;
    if (strcmp (file, "fort.6") == 0)
    {
       return 6;
@@ -196,6 +197,10 @@ static int glibc_libc_open (const char *file, int oflag)
             || (strcmp (file, "hpccoutf.txt") == 0))
    {
       return 10;
+   }
+   else if (strncmp(file, "/dev/shm/mpich_shar_", 20) == 0)
+   {
+      return 12;
    }
    else
    {
@@ -289,6 +294,11 @@ static off_t glibc_lseek (int fd, off_t offset, int whence)
    {
       return offset;
    }
+   else if (fd == 12)
+   {
+      cout << "glibc_lseek: " << offset << ", " << whence << endl;
+      return offset;
+   }
 
    cout << "lseek " << fd << endl;
    trace("!!! ALERT: glibc calling lseek() before file system support is enabled.\n");
@@ -331,6 +341,16 @@ static off64_t glibc_lseek64 (int fd, off64_t offset, int whence)
    return -1;
 }
 
+static __ptr_t glibc_mmap (__ptr_t addr, size_t len, int prot, int flags, int fd, off_t offset)
+{
+   if (fd == 12)
+   {
+      return static_cast<__ptr_t>(new char [len]);
+   }
+
+   return reinterpret_cast<__ptr_t>(-1);
+}
+
 static void register_glibc_exports (void)
 {
    register_llamaos_abort (glibc_abort);
@@ -345,6 +365,7 @@ static void register_glibc_exports (void)
    register_llamaos_write (glibc_write);
    register_llamaos_lseek (glibc_lseek);
    register_llamaos_lseek64 (glibc_lseek64);
+   register_llamaos_mmap (glibc_mmap);
 }
 
 static vector<string> split (const string &input)

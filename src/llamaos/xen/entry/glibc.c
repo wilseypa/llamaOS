@@ -277,6 +277,12 @@ static int glibc_mkdir (const char *path, mode_t mode)
    return -1;
 }
 
+static __ptr_t glibc_mmap (__ptr_t addr, size_t len, int prot, int flags, int fd, off_t offset)
+{
+   trace("!!! ALERT: glibc calling mmap() before file system support is enabled.\n");
+   return -1;
+}
+
 static long int glibc_pathconf (const char *path, int name)
 {
    trace("!!! ALERT: glibc calling pathconf() before file system support is enabled.\n");
@@ -401,6 +407,7 @@ static void register_glibc_exports (void)
 //   register_llamaos_lxstat64 (glibc_lxstat64);
    register_llamaos_madvise (glibc_madvise);
    register_llamaos_mkdir (glibc_mkdir);
+   register_llamaos_mmap (glibc_mmap);
    register_llamaos_pathconf (glibc_pathconf);
    register_llamaos_poll (glibc_poll);
    register_llamaos_raise (glibc_raise);

@@ -739,7 +739,6 @@ C_SOURCES = \
   sys/glibc-$(GLIBC_VERSION)/math/w_tgammal.c \
   sys/glibc-$(GLIBC_VERSION)/misc/init-misc.c \
   sys/glibc-$(GLIBC_VERSION)/misc/mkstemp.c \
-  sys/glibc-$(GLIBC_VERSION)/misc/mmap.c \
   sys/glibc-$(GLIBC_VERSION)/misc/mmap64.c \
   sys/glibc-$(GLIBC_VERSION)/misc/mprotect.c \
   sys/glibc-$(GLIBC_VERSION)/misc/munmap.c \
@@ -1167,6 +1166,7 @@ C_SOURCES = \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/lxstat64.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/madvise.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/mkdir.c \
+  sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/mmap.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/pathconf.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/poll.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/raise.c \
@@ -1390,6 +1390,7 @@ C_SOURCES = \
 #  sys/glibc-$(GLIBC_VERSION)/misc/getpagesize.c
 #  sys/glibc-$(GLIBC_VERSION)/misc/getsysstats.c
 #  sys/glibc-$(GLIBC_VERSION)/misc/madvise.c
+#  sys/glibc-$(GLIBC_VERSION)/misc/mmap.c
 #  sys/glibc-$(GLIBC_VERSION)/misc/writev.c
 #  sys/glibc-$(GLIBC_VERSION)/posix/_exit.c
 #  sys/glibc-$(GLIBC_VERSION)/posix/getpid.c
