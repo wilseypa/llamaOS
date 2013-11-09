@@ -57,6 +57,12 @@ CFLAGS += \
   -DUSE_DBG_LOGGING \
   -include $(SRCDIR)/llamaos/__thread.h
 
+CPPFLAGS += \
+  -I $(SRCDIR)/tools/mpich-$(MPICH_VERSION)/src/include \
+  -I $(INCDIR) \
+  -DUSE_DBG_LOGGING \
+  -include $(SRCDIR)/llamaos/__thread.h
+
 VPATH = $(SRCDIR)
 
 C_SOURCES = \
@@ -366,6 +372,9 @@ C_SOURCES = \
   tools/mpich-$(MPICH_VERSION)/src/util/param/param_vals.c \
   tools/mpich-$(MPICH_VERSION)/src/util/procmap/local_proc.c
 
+CPP_SOURCES = \
+  llamaos/mpich/pmi/pmi.cpp
+
 F77_SOURCES = \
   tools/mpich-$(MPICH_VERSION)/src/binding/f77.build/setbotf.f
 
@@ -376,6 +385,7 @@ HEADERS = \
   $(INCDIR)/mpio.h
 
 OBJECTS  = $(C_SOURCES:%.c=$(OBJDIR)/%.o)
+OBJECTS += $(CPP_SOURCES:%.cpp=$(OBJDIR)/%.o)
 OBJECTS += $(F77_SOURCES:%.f=$(OBJDIR)/%.o)
 DEPENDS += $(OBJECTS:%.o=%.d)
 
