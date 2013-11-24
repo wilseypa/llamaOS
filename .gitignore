@@ -5,12 +5,10 @@ build/linux/bin/
 build/linux/include/
 build/linux/lib/
 build/linux/obj/
-build/linux/test/
 build/xen/bin/
 build/xen/include/
 build/xen/lib/
 build/xen/obj/
-build/xen/test/
 bin/
 lib/
 obj/
