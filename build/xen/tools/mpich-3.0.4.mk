@@ -370,7 +370,8 @@ C_SOURCES = \
   tools/mpich-$(MPICH_VERSION)/src/util/msgs/msgprint.c \
   tools/mpich-$(MPICH_VERSION)/src/util/other/assert.c \
   tools/mpich-$(MPICH_VERSION)/src/util/param/param_vals.c \
-  tools/mpich-$(MPICH_VERSION)/src/util/procmap/local_proc.c
+  tools/mpich-$(MPICH_VERSION)/src/util/procmap/local_proc.c \
+  llamaos/mpich/netmod/netmod.c
 
 CPP_SOURCES = \
   llamaos/mpich/pmi/pmi.cpp

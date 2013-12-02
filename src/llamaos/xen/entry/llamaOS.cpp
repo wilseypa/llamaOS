@@ -260,7 +260,8 @@ static ssize_t glibc_read (int fd, void *buf, size_t nbytes)
       }
    }
 
-   return -1;
+  cout << "Alert: reading from fileno " << fd << ", " << nbytes << " bytes" << endl;
+  return -1;
 }
 
 static ssize_t glibc_write (int fd, const void *buf, size_t nbytes)
@@ -270,7 +271,7 @@ static ssize_t glibc_write (int fd, const void *buf, size_t nbytes)
        && (6 != fd)                     // fortran uses 6 for alt std output
        && (10 != fd))                    // fortran uses 6 for alt std output
    {
-      cout << "Alert: writing to fileno " << fd << endl;
+      cout << "Alert: writing to fileno " << fd << ", " << nbytes << " bytes" << endl;
    }
 
    if (fd == 10)
