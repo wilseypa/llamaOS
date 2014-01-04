@@ -38,6 +38,7 @@ MAKEFILE_SOURCES += test/apps/mpich.mk
 
 CPPFLAGS += \
   -I $(INCDIR) \
+  -I $(SRCDIR) \
   -include $(SRCDIR)/llamaos/__thread.h
 
 VPATH = $(TESTDIR)

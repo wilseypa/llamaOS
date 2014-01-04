@@ -35,67 +35,67 @@ static int nm_llamaNET_init(MPIDI_PG_t *pg_p, int pg_rank,
                    char **bc_val_p, int *val_max_sz_p)
 {
    printf ("nm_llamaNET_init\n");
-    return MPI_SUCCESS;
+   return MPI_SUCCESS;
 }
 
 static int nm_llamaNET_get_business_card(int my_rank, char **bc_val_p, int *val_max_sz_p)
 {
    printf ("nm_llamaNET_get_business_card\n");
-    MPIU_Assertp(0);
-    return MPI_SUCCESS;
+   MPIU_Assertp(0);
+   return MPI_SUCCESS;
 }
 
 static int nm_llamaNET_connect_to_root(const char *business_card, MPIDI_VC_t *new_vc)
 {
    printf ("nm_llamaNET_connect_to_root\n");
-    MPIU_Assertp(0);
-    return MPI_SUCCESS;
+   MPIU_Assertp(0);
+   return MPI_SUCCESS;
 }
 
 static int nm_llamaNET_vc_init(MPIDI_VC_t *vc)
 {
    printf ("nm_llamaNET_vc_init\n");
-    return MPI_SUCCESS;
+   return MPI_SUCCESS;
 }
 
 static int nm_llamaNET_vc_destroy(MPIDI_VC_t *vc)
 {
    printf ("nm_llamaNET_vc_destroy\n");
-    return MPI_SUCCESS;
+   return MPI_SUCCESS;
 }
 
 static int nm_llamaNET_vc_terminate(MPIDI_VC_t *vc)
 {
    printf ("nm_llamaNET_vc_terminate\n");
-    return MPIDI_CH3U_Handle_connection(vc, MPIDI_VC_EVENT_TERMINATED);
+   return MPIDI_CH3U_Handle_connection(vc, MPIDI_VC_EVENT_TERMINATED);
 }
 
 static int nm_llamaNET_poll(int in_blocking_poll)
 {  
    printf ("nm_llamaNET_poll\n");
-    return MPI_SUCCESS;
+   return MPI_SUCCESS;
 }
 
 static int nm_llamaNET_ckpt_shutdown(void)
 {
    printf ("nm_llamaNET_ckpt_shutdown\n");
-  return MPI_SUCCESS;
+   return MPI_SUCCESS;
 }
 
 static int nm_llamaNET_finalize(void)
 {
    printf ("nm_llamaNET_finalize\n");
-  return nm_ckpt_shutdown();    
+   return nm_llamaNET_ckpt_shutdown();    
 }
 
 MPID_nem_netmod_funcs_t MPIDI_nem_llamaNET_funcs = {
-    nm_init,
-    nm_finalize,
-    nm_poll,
-    nm_get_business_card,
-    nm_connect_to_root,
-    nm_vc_init,
-    nm_vc_destroy,
-    nm_vc_terminate,
+    nm_llamaNET_init,
+    nm_llamaNET_finalize,
+    nm_llamaNET_poll,
+    nm_llamaNET_get_business_card,
+    nm_llamaNET_connect_to_root,
+    nm_llamaNET_vc_init,
+    nm_llamaNET_vc_destroy,
+    nm_llamaNET_vc_terminate,
     NULL /* anysource iprobe */
 };

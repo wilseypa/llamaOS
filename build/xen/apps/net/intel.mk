@@ -83,16 +83,15 @@ SOURCES = \
   apps/net/intel/regs/XOFFRXC.cpp \
   apps/net/intel/regs/XOFFTXC.cpp \
   apps/net/intel/regs/XONRXC.cpp \
-  apps/net/intel/regs/XONTXC.cpp \
-  apps/net/intel/RDMA.cpp
+  apps/net/intel/regs/XONTXC.cpp
 
 OBJECTS = $(SOURCES:%.cpp=$(OBJDIR)/%.o)
 DEPENDS = $(OBJECTS:%.o=%.d)
 
-RDMA_SOURCES = \
-  apps/net/intel/RDMA.cpp
+ZERO_COPY_SOURCES = \
+  apps/net/intel/Zero_copy.cpp
 
-RDMA_OBJECTS = $(RDMA_SOURCES:%.cpp=$(OBJDIR)/%.o)
+ZERO_COPY_OBJECTS = $(ZERO_COPY_SOURCES:%.cpp=$(OBJDIR)/%.o)
 DEPENDS += $(RDMA_OBJECTS:%.o=%.d)
 
 LINKS = \
@@ -102,9 +101,9 @@ LINKS = \
   $(LIBDIR)/sys/glibc.a
 
 .PHONY: all
-all: $(BINDIR)/apps/net-intel-rdma
+all: $(BINDIR)/apps/net/intel-zero-copy
 
-$(BINDIR)/apps/net-intel-rdma: $(RDMA_OBJECTS) $(OBJECTS) $(LINKS)
+$(BINDIR)/apps/net/intel-zero-copy: $(ZERO_COPY_OBJECTS) $(OBJECTS) $(LINKS)
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
 	@$(LD) $(LDFLAGS) -T llamaOS.lds -o $@ $^
