@@ -34,15 +34,10 @@
 include common-vars.mk
 include common-flags.mk
 
-NETPIPE_VERSION = 3.7.2
-
-MAKEFILE_SOURCES += apps/netpipe-$(NETPIPE_VERSION)-memcpy.mk
+MAKEFILE_SOURCES += apps/netpipe-$(NETPIPE_VERSION)/memcpy.mk
 
 CFLAGS += \
-  -DMEMCPY \
-  -I $(INCDIR) \
-  -I $(SRCDIR) \
-  -include $(SRCDIR)/llamaos/__thread.h
+  -DMEMCPY
 
 VPATH = $(SRCDIR)
 
@@ -51,15 +46,12 @@ SOURCES = \
 
 OBJECTS  = $(OBJDIR)/apps/netpipe-$(NETPIPE_VERSION)/src/netpipe-memcpy.o
 OBJECTS += $(SOURCES:%.c=$(OBJDIR)/%.o)
-DEPENDS += $(OBJECTS:%.o=%.d)
+DEPENDS  = $(OBJECTS:%.o=%.d)
 
-# the entry object must be the first object listed here or the guest will crash!
-# $(BINDIR)/netpipe-memcpy: $(LIBDIR)/xen/Entry.o $(OBJECTS) $(LIBDIR)/xen/llamaOS.a $(LIBDIR)/stdc++.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
-$(BINDIR)/apps/netpipe-memcpy: $(OBJECTS) $(LIBDIR)/llamaOS.a $(LIBDIR)/sys/stdc++.a $(LIBDIR)/sys/gcc.a $(LIBDIR)/sys/glibc.a
+$(BINDIR)/apps/netpipe-$(NETPIPE_VERSION)/memcpy: $(OBJECTS)
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
-	@$(LD) $(LDFLAGS) -T llamaOS.lds -o $@ $^
-	@gzip -c -f --best $@ >$@.gz
+	@$(CC) $(LDFLAGS) -o $@ $^
 	@echo successfully built: $@
 	@echo
 

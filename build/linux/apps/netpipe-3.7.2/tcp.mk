@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014, William Magato
+# Copyright (c) 2013, William Magato
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -34,28 +34,28 @@
 include common-vars.mk
 include common-flags.mk
 
-MAKEFILE_SOURCES += apps/netpipe-$(NETPIPE_VERSION)-nothing.mk
+MAKEFILE_SOURCES += apps/netpipe-$(NETPIPE_VERSION)/tcp.mk
 
 CFLAGS += \
-  -DMEMCPY
+  -DTCP
 
 VPATH = $(SRCDIR)
 
 SOURCES = \
-  apps/netpipe-$(NETPIPE_VERSION)/src/nothing.c
+  apps/netpipe-$(NETPIPE_VERSION)/src/tcp.c
 
-OBJECTS  = $(OBJDIR)/apps/netpipe-$(NETPIPE_VERSION)/src/netpipe-nothing.o
+OBJECTS  = $(OBJDIR)/apps/netpipe-$(NETPIPE_VERSION)/src/netpipe-tcp.o
 OBJECTS += $(SOURCES:%.c=$(OBJDIR)/%.o)
 DEPENDS  = $(OBJECTS:%.o=%.d)
 
-$(BINDIR)/netpipe-nothing: $(OBJECTS)
+$(BINDIR)/apps/netpipe-$(NETPIPE_VERSION)/tcp: $(OBJECTS)
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
 	@$(CC) $(LDFLAGS) -o $@ $^
 	@echo successfully built: $@
 	@echo
 
-$(OBJDIR)/apps/netpipe-$(NETPIPE_VERSION)/src/netpipe-nothing.o : $(SRCDIR)/apps/netpipe-$(NETPIPE_VERSION)/src/netpipe.c $(MAKEFILE_SOURCES)
+$(OBJDIR)/apps/netpipe-$(NETPIPE_VERSION)/src/netpipe-tcp.o : $(SRCDIR)/apps/netpipe-$(NETPIPE_VERSION)/src/netpipe.c $(MAKEFILE_SOURCES)
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo compiling: $<
 	@$(CC) -c $(CFLAGS) -o $@ $<

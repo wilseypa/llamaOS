@@ -34,28 +34,41 @@
 include common-vars.mk
 include common-flags.mk
 
-MAKEFILE_SOURCES += apps/netpipe-$(NETPIPE_VERSION)-memcpy.mk
+MAKEFILE_SOURCES += apps/netpipe-$(NETPIPE_VERSION)/llamaNET.mk
 
 CFLAGS += \
-  -DMEMCPY
+  -DLLAMANET \
+  -I $(INCDIR) \
+  -I $(SRCDIR) \
+  -include $(SRCDIR)/llamaos/__thread.h
+
+CPPFLAGS += \
+  -I $(INCDIR) \
+  -I $(SRCDIR) \
+  -include $(SRCDIR)/llamaos/__thread.h
 
 VPATH = $(SRCDIR)
 
-SOURCES = \
-  apps/netpipe-$(NETPIPE_VERSION)/src/memcpy.c
+C_SOURCES = \
+  apps/netpipe-$(NETPIPE_VERSION)/src/llamaNET.c
 
-OBJECTS  = $(OBJDIR)/apps/netpipe-$(NETPIPE_VERSION)/src/netpipe-memcpy.o
-OBJECTS += $(SOURCES:%.c=$(OBJDIR)/%.o)
+CPP_SOURCES = \
+  apps/netpipe-$(NETPIPE_VERSION)/src/llamaNET_impl.cpp
+
+OBJECTS  = $(OBJDIR)/apps/netpipe-$(NETPIPE_VERSION)/src/netpipe-llamaNET.o
+OBJECTS += $(C_SOURCES:%.c=$(OBJDIR)/%.o)
+OBJECTS += $(CPP_SOURCES:%.cpp=$(OBJDIR)/%.o)
 DEPENDS  = $(OBJECTS:%.o=%.d)
 
-$(BINDIR)/netpipe-memcpy: $(OBJECTS)
+$(BINDIR)/apps/netpipe-$(NETPIPE_VERSION)/llamaNET: $(OBJECTS) $(LIBDIR)/llamaOS.a $(LIBDIR)/sys/stdc++.a $(LIBDIR)/sys/gcc.a $(LIBDIR)/sys/glibc.a
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
-	@$(CC) $(LDFLAGS) -o $@ $^
+	@$(LD) $(LDFLAGS) -T llamaOS.lds -o $@ $^
+	@gzip -c -f --best $@ >$@.gz
 	@echo successfully built: $@
 	@echo
 
-$(OBJDIR)/apps/netpipe-$(NETPIPE_VERSION)/src/netpipe-memcpy.o : $(SRCDIR)/apps/netpipe-$(NETPIPE_VERSION)/src/netpipe.c $(MAKEFILE_SOURCES)
+$(OBJDIR)/apps/netpipe-$(NETPIPE_VERSION)/src/netpipe-llamaNET.o : $(SRCDIR)/apps/netpipe-$(NETPIPE_VERSION)/src/netpipe.c $(MAKEFILE_SOURCES)
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo compiling: $<
 	@$(CC) -c $(CFLAGS) -o $@ $<

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2013, William Magato
+# Copyright (c) 2014, William Magato
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -34,41 +34,28 @@
 include common-vars.mk
 include common-flags.mk
 
-MAKEFILE_SOURCES += apps/netpipe-$(NETPIPE_VERSION)-llamaNET.mk
+MAKEFILE_SOURCES += apps/netpipe-$(NETPIPE_VERSION)/nothing.mk
 
 CFLAGS += \
-  -DLLAMANET \
-  -I $(INCDIR) \
-  -I $(SRCDIR) \
-  -include $(SRCDIR)/llamaos/__thread.h
-
-CPPFLAGS += \
-  -I $(INCDIR) \
-  -I $(SRCDIR) \
-  -include $(SRCDIR)/llamaos/__thread.h
+  -DMEMCPY
 
 VPATH = $(SRCDIR)
 
-C_SOURCES = \
-  apps/netpipe-$(NETPIPE_VERSION)/src/llamaNET.c
+SOURCES = \
+  apps/netpipe-$(NETPIPE_VERSION)/src/nothing.c
 
-CPP_SOURCES = \
-  apps/netpipe-$(NETPIPE_VERSION)/src/llamaNET_impl.cpp
+OBJECTS  = $(OBJDIR)/apps/netpipe-$(NETPIPE_VERSION)/src/netpipe-nothing.o
+OBJECTS += $(SOURCES:%.c=$(OBJDIR)/%.o)
+DEPENDS  = $(OBJECTS:%.o=%.d)
 
-OBJECTS  = $(OBJDIR)/apps/netpipe-$(NETPIPE_VERSION)/src/netpipe-llamaNET.o
-OBJECTS += $(C_SOURCES:%.c=$(OBJDIR)/%.o)
-OBJECTS += $(CPP_SOURCES:%.cpp=$(OBJDIR)/%.o)
-DEPENDS += $(OBJECTS:%.o=%.d)
-
-$(BINDIR)/apps/netpipe-llamaNET: $(OBJECTS) $(LIBDIR)/llamaOS.a $(LIBDIR)/sys/stdc++.a $(LIBDIR)/sys/gcc.a $(LIBDIR)/sys/glibc.a
+$(BINDIR)/apps/netpipe-$(NETPIPE_VERSION)/nothing: $(OBJECTS)
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
-	@$(LD) $(LDFLAGS) -T llamaOS.lds -o $@ $^
-	@gzip -c -f --best $@ >$@.gz
+	@$(CC) $(LDFLAGS) -o $@ $^
 	@echo successfully built: $@
 	@echo
 
-$(OBJDIR)/apps/netpipe-$(NETPIPE_VERSION)/src/netpipe-llamaNET.o : $(SRCDIR)/apps/netpipe-$(NETPIPE_VERSION)/src/netpipe.c $(MAKEFILE_SOURCES)
+$(OBJDIR)/apps/netpipe-$(NETPIPE_VERSION)/src/netpipe-nothing.o : $(SRCDIR)/apps/netpipe-$(NETPIPE_VERSION)/src/netpipe.c $(MAKEFILE_SOURCES)
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo compiling: $<
 	@$(CC) -c $(CFLAGS) -o $@ $<

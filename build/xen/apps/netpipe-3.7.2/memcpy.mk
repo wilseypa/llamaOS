@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014, William Magato
+# Copyright (c) 2013, William Magato
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -36,7 +36,7 @@ include common-flags.mk
 
 NETPIPE_VERSION = 3.7.2
 
-MAKEFILE_SOURCES += apps/netpipe-$(NETPIPE_VERSION)-nothing.mk
+MAKEFILE_SOURCES += apps/netpipe-$(NETPIPE_VERSION)/memcpy.mk
 
 CFLAGS += \
   -DMEMCPY \
@@ -47,15 +47,13 @@ CFLAGS += \
 VPATH = $(SRCDIR)
 
 SOURCES = \
-  apps/netpipe-$(NETPIPE_VERSION)/src/nothing.c
+  apps/netpipe-$(NETPIPE_VERSION)/src/memcpy.c
 
-OBJECTS  = $(OBJDIR)/apps/netpipe-$(NETPIPE_VERSION)/src/netpipe-nothing.o
+OBJECTS  = $(OBJDIR)/apps/netpipe-$(NETPIPE_VERSION)/src/netpipe-memcpy.o
 OBJECTS += $(SOURCES:%.c=$(OBJDIR)/%.o)
-DEPENDS += $(OBJECTS:%.o=%.d)
+DEPENDS  = $(OBJECTS:%.o=%.d)
 
-# the entry object must be the first object listed here or the guest will crash!
-# $(BINDIR)/netpipe-memcpy: $(LIBDIR)/xen/Entry.o $(OBJECTS) $(LIBDIR)/xen/llamaOS.a $(LIBDIR)/stdc++.a $(LIBDIR)/gcc.a $(LIBDIR)/glibc.a
-$(BINDIR)/apps/netpipe-nothing: $(OBJECTS) $(LIBDIR)/llamaOS.a $(LIBDIR)/sys/stdc++.a $(LIBDIR)/sys/gcc.a $(LIBDIR)/sys/glibc.a
+$(BINDIR)/apps/netpipe-$(NETPIPE_VERSION)/memcpy: $(OBJECTS) $(LIBDIR)/llamaOS.a $(LIBDIR)/sys/stdc++.a $(LIBDIR)/sys/gcc.a $(LIBDIR)/sys/glibc.a
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
 	@$(LD) $(LDFLAGS) -T llamaOS.lds -o $@ $^
@@ -63,7 +61,7 @@ $(BINDIR)/apps/netpipe-nothing: $(OBJECTS) $(LIBDIR)/llamaOS.a $(LIBDIR)/sys/std
 	@echo successfully built: $@
 	@echo
 
-$(OBJDIR)/apps/netpipe-$(NETPIPE_VERSION)/src/netpipe-nothing.o : $(SRCDIR)/apps/netpipe-$(NETPIPE_VERSION)/src/netpipe.c $(MAKEFILE_SOURCES)
+$(OBJDIR)/apps/netpipe-$(NETPIPE_VERSION)/src/netpipe-memcpy.o : $(SRCDIR)/apps/netpipe-$(NETPIPE_VERSION)/src/netpipe.c $(MAKEFILE_SOURCES)
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo compiling: $<
 	@$(CC) -c $(CFLAGS) -o $@ $<

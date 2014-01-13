@@ -34,10 +34,16 @@
 include common-vars.mk
 include common-flags.mk
 
-MAKEFILE_SOURCES += apps/netpipe-$(NETPIPE_VERSION)-mpi.mk
+NETPIPE_VERSION = 3.7.2
+
+MAKEFILE_SOURCES += apps/netpipe-$(NETPIPE_VERSION)/mpi.mk
 
 CFLAGS += \
-  -DMPI
+  -DMPI \
+  -I $(INCDIR)/llamaos/mpi \
+  -I $(INCDIR) \
+  -I $(SRCDIR) \
+  -include $(SRCDIR)/llamaos/__thread.h
 
 VPATH = $(SRCDIR)
 
@@ -48,22 +54,18 @@ OBJECTS  = $(OBJDIR)/apps/netpipe-$(NETPIPE_VERSION)/src/netpipe-mpi.o
 OBJECTS += $(SOURCES:%.c=$(OBJDIR)/%.o)
 DEPENDS  = $(OBJECTS:%.o=%.d)
 
-$(BINDIR)/netpipe-mpi: $(OBJECTS)
+$(BINDIR)/apps/netpipe-$(NETPIPE_VERSION)/mpi: $(OBJECTS) $(LIBDIR)/llamaMPI.a $(LIBDIR)/llamaOS.a $(LIBDIR)/sys/stdc++.a $(LIBDIR)/sys/gcc.a $(LIBDIR)/sys/glibc.a
 	@[ -d $(@D) ] || (mkdir -p $(@D))
-	@echo linking: $@ with $(MPICC)
-	@$(MPICC) $(LDFLAGS) -o $@ $^
+	@echo linking: $@
+	@$(LD) $(LDFLAGS) -T llamaOS.lds -o $@ $^
+	@gzip -c -f --best $@ >$@.gz
 	@echo successfully built: $@
 	@echo
 
-$(OBJDIR)/apps/netpipe-$(NETPIPE_VERSION)/src/mpi.o : $(SRCDIR)/apps/netpipe-$(NETPIPE_VERSION)/src/mpi.c $(MAKEFILE_SOURCES)
-	@[ -d $(@D) ] || (mkdir -p $(@D))
-	@echo compiling: $< with $(MPICC)
-	@$(MPICC) -c $(CFLAGS) -o $@ $<
-
 $(OBJDIR)/apps/netpipe-$(NETPIPE_VERSION)/src/netpipe-mpi.o : $(SRCDIR)/apps/netpipe-$(NETPIPE_VERSION)/src/netpipe.c $(MAKEFILE_SOURCES)
 	@[ -d $(@D) ] || (mkdir -p $(@D))
-	@echo compiling: $< with $(MPICC)
-	@$(MPICC) -c $(CFLAGS) -o $@ $<
+	@echo compiling: $<
+	@$(CC) -c $(CFLAGS) -o $@ $<
 
 include rules.mk
 
