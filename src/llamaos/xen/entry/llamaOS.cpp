@@ -123,6 +123,11 @@ static int glibc_getpid ()
    return Hypervisor::get_instance ()->domid;
 }
 
+static uid_t glibc_getuid ()
+{
+   return 0;
+}
+
 static int glibc_gettimeofday (struct timeval *tv, struct timezone * /* tz */)
 {
    uint32_t wc_version = 0;
@@ -358,6 +363,7 @@ static void register_glibc_exports (void)
    register_llamaos_exit (glibc_exit);
    register_llamaos_gethostname (glibc_gethostname);
    register_llamaos_getpid (glibc_getpid);
+   register_llamaos_getuid (glibc_getuid);
    register_llamaos_gettimeofday (glibc_gettimeofday);
    register_llamaos_sleep (glibc_libc_sleep);
    register_llamaos_close (glibc_close);

@@ -125,6 +125,10 @@ EXTERN void register_llamaos_getpagesize (llamaos_getpagesize_t getpagesize);
 typedef int (*llamaos_getpid_t) (void);
 EXTERN void register_llamaos_getpid (llamaos_getpid_t getpid);
 
+// uid_t __getuid (void)
+typedef uid_t (*llamaos_getuid_t) (void);
+EXTERN void register_llamaos_getuid (llamaos_getuid_t getuid);
+
 // int __gettimeofday (struct timeval *tv, struct timezone *tz)
 typedef int (*llamaos_gettimeofday_t) (struct timeval *, struct timezone *);
 EXTERN void register_llamaos_gettimeofday (llamaos_gettimeofday_t func);

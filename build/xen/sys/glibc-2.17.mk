@@ -768,7 +768,6 @@ C_SOURCES = \
   sys/glibc-$(GLIBC_VERSION)/posix/geteuid.c \
   sys/glibc-$(GLIBC_VERSION)/posix/getgid.c \
   sys/glibc-$(GLIBC_VERSION)/posix/getopt.c \
-  sys/glibc-$(GLIBC_VERSION)/posix/getuid.c \
   sys/glibc-$(GLIBC_VERSION)/posix/regex.c \
   sys/glibc-$(GLIBC_VERSION)/posix/sched_getp.c \
   sys/glibc-$(GLIBC_VERSION)/posix/sched_gets.c \
@@ -1158,6 +1157,7 @@ C_SOURCES = \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/gethostname.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/getpagesize.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/getpid.c \
+  sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/getuid.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/isatty.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/libc_fatal.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/lseek.c \
@@ -1394,6 +1394,7 @@ C_SOURCES = \
 #  sys/glibc-$(GLIBC_VERSION)/misc/writev.c
 #  sys/glibc-$(GLIBC_VERSION)/posix/_exit.c
 #  sys/glibc-$(GLIBC_VERSION)/posix/getpid.c
+#  sys/glibc-$(GLIBC_VERSION)/posix/getuid.c
 #  sys/glibc-$(GLIBC_VERSION)/posix/sleep.c
 #  sys/glibc-$(GLIBC_VERSION)/posix/pathconf.c
 #  sys/glibc-$(GLIBC_VERSION)/signal/raise.c

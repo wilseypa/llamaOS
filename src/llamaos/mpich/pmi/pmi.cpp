@@ -75,7 +75,7 @@ extern "C"
 int PMI_Get_rank( int *rank )
 {
    cout << "calling PMI_Get_rank..." << endl;
-   *rank = 0;
+   *rank = 1;
 
    return PMI_SUCCESS;
 }
@@ -199,7 +199,7 @@ int PMI_KVS_Get( const char kvsname[], const char key[], char value[], int lengt
 
    if (0 == strcmp (key, "PMI_process_mapping"))
    {
-      strncpy(value, "(vector,(0,2,1))", length);
+      strncpy(value, "(vector,(0,1,2))", length);
       return PMI_SUCCESS;
    }
 

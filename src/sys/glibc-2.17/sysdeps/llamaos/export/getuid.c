@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2013, William Magato
+Copyright (c) 2014, William Magato
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,65 +28,32 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <iostream>
+#include <errno.h>
+#include <unistd.h>
+#include <sys/types.h>
 
-#include <gtest/gtest.h>
+// define function pointer
+typedef int (*llamaos_getuid_t) (void);
 
-#include <mpi.h>
+// function pointer variable
+static llamaos_getuid_t llamaos_getuid = 0;
 
-#include <llamaos/xen/Hypervisor.h>
-
-using std::cout;
-using std::endl;
-using llamaos::xen::Hypervisor;
-
-static int _argc;
-static char **_argv;
-
-TEST(MPI_Init, init)
+// function called by llamaOS to register pointer
+void register_llamaos_getuid (llamaos_getuid_t func)
 {
-   EXPECT_EQ(MPI_SUCCESS, MPI_Init (&_argc, &_argv));
+   llamaos_getuid = func;
 }
 
-TEST(MPI_Comm, size)
+/* Get the real user ID of the calling process.  */
+uid_t
+__getuid ()
 {
-   int np = -1;
+   if (0 != llamaos_getuid)
+   {
+      return llamaos_getuid ();
+   }
 
-   EXPECT_EQ(MPI_SUCCESS, MPI_Comm_size(MPI_COMM_WORLD, &np));
-
-   EXPECT_EQ(2, np);
+   __set_errno (ENOSYS);
+   return -1;
 }
-
-TEST(MPI_Comm, rank)
-{
-   int id = -1;
-
-   EXPECT_EQ(MPI_SUCCESS, MPI_Comm_rank(MPI_COMM_WORLD, &id));
-
-   EXPECT_EQ(0, id);
-}
-
-//TEST(MPI_Send, send)
-//{
-//   char buffer [256] = "hello";
-//
-//   EXPECT_EQ(MPI_SUCCESS, MPI_Send(buffer, strlen(buffer), MPI_CHAR, 1, 0, MPI_COMM_WORLD));
-//}
-
-TEST(MPI_Finalize, finalize)
-{
-   EXPECT_EQ(MPI_SUCCESS, MPI_Finalize());
-}
-
-int main (int argc, char *argv[])
-{
-   testing::InitGoogleTest (&argc, argv);
-
-   _argc = argc;
-   _argv = argv;
-
-   Hypervisor *hypervisor = Hypervisor::get_instance ();
-   hypervisor->xenstore.write_string("/example/f", "test_value");
-
-   return RUN_ALL_TESTS ();
-}
+weak_alias (__getuid, getuid)

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2013, William Magato
+# Copyright (c) 2014, William Magato
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -32,37 +32,35 @@
 
 # include common variables
 include common-vars.mk
+include common-flags.mk
 
-.PHONY: all
-all:
-	@$(MAKE) -f tools/blas.mk
-	@$(MAKE) -f tools/cblas.mk
-	@$(MAKE) -f apps/unixbench-5.1.3/whetstone.mk
-	@$(MAKE) -f apps/hello-f77.mk
-	@$(MAKE) -f apps/hello-f90.mk
-	@$(MAKE) -f apps/latency-TCPIP.mk
-	@$(MAKE) -f apps/netpipe-$(NETPIPE_VERSION)-memcpy.mk
-	@$(MAKE) -f apps/netpipe-$(NETPIPE_VERSION)-nothing.mk
-	@$(MAKE) -f apps/netpipe-$(NETPIPE_VERSION)-tcp.mk
-	@-command -v $(MPICC) >/dev/null && ($(MAKE) -f apps/hpcc-$(HPCC_VERSION).mk)
-	@-command -v $(MPICC) >/dev/null && ($(MAKE) -f apps/IMB-$(IMB_VERSION).mk)
-	@-command -v $(MPICC) >/dev/null && ($(MAKE) -f apps/latency-MPI.mk)
-	@-command -v $(MPICC) >/dev/null && ($(MAKE) -f apps/netpipe-$(NETPIPE_VERSION)-mpi.mk)
-#	@$(MAKE) -f test/memory.mk
+MAKEFILE_SOURCES += apps/netpipe-$(NETPIPE_VERSION)-nothing.mk
 
-#	@$(MAKE) -f apps/NAS/NAS.mk
+CFLAGS += \
+  -DMEMCPY
 
-.PHONY: install
-install:
+VPATH = $(SRCDIR)
 
-.PHONY: clean
-clean:
-	@echo cleaning build folder...
-	@echo removing: $(OBJDIR)
-	@rm -rf $(OBJDIR)
-	@echo removing: $(BINDIR)
-	@rm -rf $(BINDIR)
-	@echo removing: $(LIBDIR)
-	@rm -rf $(LIBDIR)
-	@echo removing: $(INCDIR)
-	@rm -rf $(INCDIR)
+SOURCES = \
+  apps/netpipe-$(NETPIPE_VERSION)/src/nothing.c
+
+OBJECTS  = $(OBJDIR)/apps/netpipe-$(NETPIPE_VERSION)/src/netpipe-nothing.o
+OBJECTS += $(SOURCES:%.c=$(OBJDIR)/%.o)
+DEPENDS  = $(OBJECTS:%.o=%.d)
+
+$(BINDIR)/netpipe-nothing: $(OBJECTS)
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo linking: $@
+	@$(CC) $(LDFLAGS) -o $@ $^
+	@echo successfully built: $@
+	@echo
+
+$(OBJDIR)/apps/netpipe-$(NETPIPE_VERSION)/src/netpipe-nothing.o : $(SRCDIR)/apps/netpipe-$(NETPIPE_VERSION)/src/netpipe.c $(MAKEFILE_SOURCES)
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo compiling: $<
+	@$(CC) -c $(CFLAGS) -o $@ $<
+
+include rules.mk
+
+# include auto-generated dependencies
+-include $(DEPENDS)

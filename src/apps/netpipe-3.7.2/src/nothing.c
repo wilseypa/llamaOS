@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2013, William Magato
+Copyright (c) 2014, William Magato
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,65 +28,99 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <iostream>
+#include    "netpipe.h"
 
-#include <gtest/gtest.h>
 
-#include <mpi.h>
-
-#include <llamaos/xen/Hypervisor.h>
-
-using std::cout;
-using std::endl;
-using llamaos::xen::Hypervisor;
-
-static int _argc;
-static char **_argv;
-
-TEST(MPI_Init, init)
+void Init(ArgStruct *p, int* argc, char*** argv)
 {
-   EXPECT_EQ(MPI_SUCCESS, MPI_Init (&_argc, &_argv));
+  printf("\n");
+  printf("  *** Note about memcpy module results ***  \n");
+  printf("\n");
+
+  p->tr = 1;
+  p->rcv = 0;
 }
 
-TEST(MPI_Comm, size)
+void Setup(ArgStruct *p)
 {
-   int np = -1;
 
-   EXPECT_EQ(MPI_SUCCESS, MPI_Comm_size(MPI_COMM_WORLD, &np));
-
-   EXPECT_EQ(2, np);
 }
 
-TEST(MPI_Comm, rank)
+void establish(ArgStruct *p)
 {
-   int id = -1;
-
-   EXPECT_EQ(MPI_SUCCESS, MPI_Comm_rank(MPI_COMM_WORLD, &id));
-
-   EXPECT_EQ(0, id);
+   
 }
 
-//TEST(MPI_Send, send)
-//{
-//   char buffer [256] = "hello";
-//
-//   EXPECT_EQ(MPI_SUCCESS, MPI_Send(buffer, strlen(buffer), MPI_CHAR, 1, 0, MPI_COMM_WORLD));
-//}
-
-TEST(MPI_Finalize, finalize)
+void Sync(ArgStruct *p)
 {
-   EXPECT_EQ(MPI_SUCCESS, MPI_Finalize());
+
 }
 
-int main (int argc, char *argv[])
+void PrepareToReceive(ArgStruct *p)
 {
-   testing::InitGoogleTest (&argc, argv);
+   
+}
 
-   _argc = argc;
-   _argv = argv;
+void SendData(ArgStruct *p)
+{
+//    int nbytes = p->bufflen, nleft;
+//    char *src = p->s_ptr, *dest = p->r_ptr;
 
-   Hypervisor *hypervisor = Hypervisor::get_instance ();
-   hypervisor->xenstore.write_string("/example/f", "test_value");
+//    memcpy(dest, src, nbytes);
+   volatile int x = 0;
+//   volatile int y = 0;
 
-   return RUN_ALL_TESTS ();
+   for(int i = 0; i < 100000; ++i)
+   {
+      x += x * 2 + 3;
+//      getpid();
+//      getuid();
+
+//      int *z = malloc(sizeof(int));
+//      y = x;//*z;
+//      free(z);
+   }
+}
+
+void RecvData(ArgStruct *p)
+{
+//    int nbytes = p->bufflen, nleft;
+//    char *src = p->s_ptr, *dest = p->r_ptr;
+
+//    memcpy(src, dest, nbytes);
+}
+
+void SendTime(ArgStruct *p, double *t)
+{
+
+}
+
+void RecvTime(ArgStruct *p, double *t)
+{
+
+}
+
+void SendRepeat(ArgStruct *p, int rpt)
+{
+
+}
+
+void RecvRepeat(ArgStruct *p, int *rpt)
+{
+
+}
+
+void CleanUp(ArgStruct *p)
+{
+
+}
+
+void Reset(ArgStruct *p)
+{
+
+}
+
+void AfterAlignmentInit(ArgStruct *p)
+{
+
 }
