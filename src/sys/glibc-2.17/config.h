@@ -95,11 +95,11 @@
 
 /* Define if gcc supports AVX.  */
 // !BAM uc cluster has no AVX?
-#define HAVE_AVX_SUPPORT 1
+#define HAVE_AVX_SUPPORT 0
 
 /* Define if gcc supports VEX encoding.  */
 // !BAM uc cluster has no AVX?
-#define HAVE_SSE2AVX_SUPPORT 1
+#define HAVE_SSE2AVX_SUPPORT 0
 
 /* Define if gcc supports FMA4.  */
 #define HAVE_FMA4_SUPPORT 1

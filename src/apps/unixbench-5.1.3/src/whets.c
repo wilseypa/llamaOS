@@ -691,8 +691,8 @@ char	*argv[];
 	      {
 		for(i=1; i<n5; i++)
 		  {
-		     x = t*atan(t2*sin(x)*cos(x)/(cos(x+y)+cos(x-y)-1.0));
-		     y = t*atan(t2*sin(y)*cos(y)/(cos(x+y)+cos(x-y)-1.0));
+		     x = t*atanf(t2*sinf(x)*cosf(x)/(cosf(x+y)+cosf(x-y)-1.0));
+		     y = t*atanf(t2*sinf(y)*cosf(y)/(cosf(x+y)+cosf(x-y)-1.0));
 		  }
 		t = 1.0 - t;
 	      }
