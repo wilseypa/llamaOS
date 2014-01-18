@@ -61,6 +61,7 @@ all:
 	@$(MAKE) -f apps/netpipe-$(NETPIPE_VERSION)/memcpy.mk
 	@$(MAKE) -f apps/netpipe-$(NETPIPE_VERSION)/nothing.mk
 #	@$(MAKE) -f apps/netpipe-$(NETPIPE_VERSION)/mpi.mk
+	@$(MAKE) -f apps/unixbench-5.1.3/syscall.mk
 	@$(MAKE) -f apps/unixbench-5.1.3/whetstone.mk
 #	@$(MAKE) -f apps/hpcc-$(HPCC_VERSION).mk
 #	@$(MAKE) -f apps/IMB-$(IMB_VERSION).mk
