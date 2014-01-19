@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
       return 1;
    }
 
-   n = atoi(argv[1]);
+   n = atol(argv[1]);
 
    t = dtime ();
 
