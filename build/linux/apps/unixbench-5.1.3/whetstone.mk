@@ -40,8 +40,7 @@ MAKEFILE_SOURCES += apps/unixbench-$(UNIXBENCH_VERSION)/whetstone.mk
 
 CFLAGS += \
  -DDP \
- -D GTODay \
- -DUNIXBENCH
+ -D GTODay
 
 VPATH = $(SRCDIR)
 
