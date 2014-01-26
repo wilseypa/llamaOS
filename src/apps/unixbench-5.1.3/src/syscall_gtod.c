@@ -59,9 +59,6 @@ int main(int argc, char *argv[])
    }
 
    n = atol(argv[1]);
-   printf ("syscall getuid %ld times in %f seconds\n", n, t);
-   return 0;
-
    t = dtime ();
 
    for (i = 0; i < n; i++)
