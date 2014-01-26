@@ -39,9 +39,6 @@ UNIXBENCH_VERSION = 5.1.3
 MAKEFILE_SOURCES += apps/unixbench-$(UNIXBENCH_VERSION)/syscall.mk
 
 CFLAGS += \
-  -DDP \
-  -D GTODay \
-  -DUNIXBENCH \
   -I $(INCDIR) \
   -I $(SRCDIR) \
   -include $(SRCDIR)/llamaos/__thread.h

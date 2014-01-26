@@ -39,7 +39,8 @@ UNIXBENCH_VERSION = 5.1.3
 MAKEFILE_SOURCES += apps/unixbench-$(UNIXBENCH_VERSION)/whetstone.mk
 
 CFLAGS += \
-  -DDP \
+  -D DP \
+  -D UNIXBENCH \
   -D GTODay \
   -I $(INCDIR) \
   -I $(SRCDIR) \

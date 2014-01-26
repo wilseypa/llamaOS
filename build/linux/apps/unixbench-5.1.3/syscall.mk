@@ -38,10 +38,7 @@ UNIXBENCH_VERSION = 5.1.3
 
 MAKEFILE_SOURCES += apps/unixbench-$(UNIXBENCH_VERSION)/syscall.mk
 
-CFLAGS += \
- -DDP \
- -D GTODay \
- -DUNIXBENCH
+CFLAGS += 
 
 VPATH = $(SRCDIR)
 
