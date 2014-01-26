@@ -566,7 +566,8 @@ char	*argv[];
 #else	/* Unixbench */
 	fprintf (stderr, "COUNT|%.3f|0|MWIPS\n", mwips);
         fprintf (stderr, "TIME|%.3f\n", TimeUsed);
-	exit(0);
+//	exit(0);
+        return 0;
 #endif
 }
 
