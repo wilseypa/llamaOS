@@ -70,6 +70,7 @@ int main(int argc, char **argv)
 
     int         integCheck=0;   /* Integrity check                           */
 
+    double tn;
     /* Initialize vars that may change from default due to arguments */
 
     strcpy(s, "np.out");   /* Default output file */
@@ -800,12 +801,15 @@ int main(int argc, char **argv)
                         }
 
                         if (integCheck) SetIntegrityData(&args);
-
+// !BAM
+tn = When();
                         SendData(&args);
 
                         if (!streamopt)
                         {
                             RecvData(&args);
+// !BAM
+printf("%d, %lf\n", j, When() - tn);
 
                             if (integCheck) VerifyIntegrity(&args);
 
