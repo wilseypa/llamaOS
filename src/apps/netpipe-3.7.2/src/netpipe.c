@@ -802,14 +802,14 @@ int main(int argc, char **argv)
 
                         if (integCheck) SetIntegrityData(&args);
 // !BAM
-tn = When();
+//tn = When();
                         SendData(&args);
 
                         if (!streamopt)
                         {
                             RecvData(&args);
 // !BAM
-printf("%d, %lf\n", j, When() - tn);
+//printf("%d, %lf\n", j, When() - tn);
 
                             if (integCheck) VerifyIntegrity(&args);
 

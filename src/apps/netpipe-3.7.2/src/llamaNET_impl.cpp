@@ -185,10 +185,10 @@ cout << "1 is send..." << endl;
 
 
 // 1500 - 64
-// #define MAX_MESSAGE_LENGTH 1436U
+#define MAX_MESSAGE_LENGTH 1436U
 
 // 4096 - 64
-#define MAX_MESSAGE_LENGTH 4032U
+// #define MAX_MESSAGE_LENGTH 4032U
 
 //#include <sys/time.h>
 //#include <stdlib.h>
