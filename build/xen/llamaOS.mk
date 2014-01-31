@@ -63,6 +63,9 @@ ASM_SOURCES = \
 
 C_SOURCES = \
   llamaos/xen/entry/glibc.c \
+  llamaos/xen/fs/ext2/vfs.c \
+  llamaos/xen/fs/ext2/ext2.c \
+  llamaos/xen/fs/ext2/fd.c \
   llamaos/xen/Trace.c
 
 CPP_SOURCES = \
