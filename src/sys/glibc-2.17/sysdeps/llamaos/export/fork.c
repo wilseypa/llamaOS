@@ -32,7 +32,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <unistd.h>
 
 // define function pointer
-typedef int (*llamaos_fork_t) ();
+typedef int (*llamaos_fork_t) (void);
 
 // function pointer variable
 static llamaos_fork_t llamaos_fork = 0;
