@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2013, William Magato
+Copyright (c) 2014, William Magato
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,58 +28,37 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <cstring>
+#include <errno.h>
+#include <unistd.h>
 
-#include <iostream>
+// define function pointer
+typedef ssize_t (*llamaos_readlink_t) (const char *path, char *buf, size_t);
 
-#include <llamaos/memory/Memory.h>
+// function pointer variable
+static llamaos_readlink_t llamaos_readlink = 0;
 
-using namespace std;
-using namespace llamaos::memory;
-
-volatile void *ptrs [1024];
-
-const bool should_leak = false;
-
-int main (int argc, char *argv [])
+// function called by llamaOS to register pointer
+void register_llamaos_readlink (llamaos_readlink_t func)
 {
-   cout << "running memory stress test for malloc..." << endl;
-
-   if (should_leak)
-   {
-      cout <<"   this test is leaking..." << endl;
-   }
-
-   for (int i = 0; i < 1024; i++)
-   {
-      ptrs [i] = (volatile void *)malloc (1024);
-
-      cout << "   program break: " << hex << get_program_break () << endl;
-
-      memset ((void *)ptrs [i], 0, 1024);
-
-      if (!should_leak)
-      {
-         free((void *)ptrs[i]);
-      }
-   }
-
-   cout << "running memory stress test for new..." << endl;
-
-   for (int i = 0; i < 1024; i++)
-   {
-      ptrs [i] = (volatile void *)new char [1024];
-
-      cout << "   program break: " << hex << get_program_break () << endl;
-
-      memset ((void *)ptrs [i], 0, 1024);
-
-      if (!should_leak)
-      {
-         delete (char *)ptrs[i];
-      }
-   }
-
-   cout << "done with memory stress test." << endl;
-   return 0;
+   llamaos_readlink = func;
 }
+
+/* Read the contents of the symbolic link PATH into no more than
+   LEN bytes of BUF.  The contents are not null-terminated.
+   Returns the number of characters read, or -1 for errors.  */
+ssize_t
+__readlink (path, buf, len)
+     const char *path;
+     char *buf;
+     size_t len;
+{
+   if (0 != llamaos_readlink)
+   {
+      return llamaos_readlink (path, buf, len);
+   }
+
+   __set_errno (ENOSYS);
+   return -1;
+}
+
+weak_alias (__readlink, readlink)

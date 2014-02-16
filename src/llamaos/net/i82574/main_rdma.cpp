@@ -585,7 +585,7 @@ int main (int /* argc */, char ** /* argv [] */)
    unsigned int rx_count = 0;
    unsigned int tx_tail2 = 0;
 
-   int stat_delay = 10000;
+//   int stat_delay = 10000;
 
    cout << "program break: " << (pointer_to_address(get_program_break ()) / 1024.0) / 1024.0 << endl;
    for (;;)

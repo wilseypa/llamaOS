@@ -52,6 +52,9 @@ __libc_message (int do_abort, const char *fmt, ...)
 /* Abort with an error message.  */
 void __libc_fatal (const char *message)
 {
+  /* The loop is added only to keep gcc happy.  */
+  while (1)
+
    /* This function should write MESSAGE out in the most reliable way.
       It is called in situations like internal stdio lossage.  */
    if (0 != llamaos_libc_fatal)

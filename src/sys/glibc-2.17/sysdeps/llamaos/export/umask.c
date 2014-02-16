@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2013, William Magato
+Copyright (c) 2014, William Magato
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,58 +28,34 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <cstring>
+#include <sys/stat.h>
+#include <errno.h>
+#include <sys/types.h>
 
-#include <iostream>
+// define function pointer
+typedef mode_t (*llamaos_umask_t) (mode_t);
 
-#include <llamaos/memory/Memory.h>
+// function pointer variable
+static llamaos_umask_t llamaos_umask = 0;
 
-using namespace std;
-using namespace llamaos::memory;
-
-volatile void *ptrs [1024];
-
-const bool should_leak = false;
-
-int main (int argc, char *argv [])
+// function called by llamaOS to register pointer
+void register_llamaos_umask (llamaos_umask_t func)
 {
-   cout << "running memory stress test for malloc..." << endl;
-
-   if (should_leak)
-   {
-      cout <<"   this test is leaking..." << endl;
-   }
-
-   for (int i = 0; i < 1024; i++)
-   {
-      ptrs [i] = (volatile void *)malloc (1024);
-
-      cout << "   program break: " << hex << get_program_break () << endl;
-
-      memset ((void *)ptrs [i], 0, 1024);
-
-      if (!should_leak)
-      {
-         free((void *)ptrs[i]);
-      }
-   }
-
-   cout << "running memory stress test for new..." << endl;
-
-   for (int i = 0; i < 1024; i++)
-   {
-      ptrs [i] = (volatile void *)new char [1024];
-
-      cout << "   program break: " << hex << get_program_break () << endl;
-
-      memset ((void *)ptrs [i], 0, 1024);
-
-      if (!should_leak)
-      {
-         delete (char *)ptrs[i];
-      }
-   }
-
-   cout << "done with memory stress test." << endl;
-   return 0;
+   llamaos_umask = func;
 }
+
+/* Set the file creation mask to MASK, returning the old mask.  */
+mode_t
+__umask (mask)
+     mode_t mask;
+{
+   if (0 != llamaos_umask)
+   {
+      return llamaos_umask (mask);
+   }
+
+   __set_errno (ENOSYS);
+   return -1;
+}
+
+weak_alias (__umask, umask)

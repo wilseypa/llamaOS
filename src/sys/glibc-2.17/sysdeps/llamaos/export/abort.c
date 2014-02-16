@@ -46,6 +46,14 @@ void register_llamaos_abort (llamaos_abort_t func)
 struct abort_msg_s *__abort_msg __attribute__ ((nocommon));
 libc_hidden_def (__abort_msg)
 
+/* Try to get a machine dependent instruction which will make the
+   program crash.  This is used in case everything else fails.  */
+#include <abort-instr.h>
+#ifndef ABORT_INSTRUCTION
+/* No such instruction is available.  */
+# define ABORT_INSTRUCTION
+#endif
+
 /* Cause an abnormal program termination with core-dump.  */
 void abort (void)
 {
@@ -53,10 +61,13 @@ void abort (void)
    {
       llamaos_abort ();
    }
-   else
-   {
-      __set_errno (ENOSYS);
-      for (;;);
-   }
+
+   __set_errno (ENOSYS);
+
+   /* If even this fails try to use the provided instruction to crash
+     or otherwise make sure we never return.  */
+   while (1)
+     /* Try for ever and ever.  */
+     ABORT_INSTRUCTION;
 }
 libc_hidden_def (abort)
