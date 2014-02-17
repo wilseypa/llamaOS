@@ -84,6 +84,12 @@ unpack_internal (gfc_array_char *ret, const gfc_array_char *vector,
   int empty;
   int mask_kind;
 
+  // !BAM
+  // init to rid compiler warning
+  rstride [0] = 0;
+  fstride [0] = 0;
+  mstride [0] = 0;
+
   empty = 0;
 
   mptr = mask->base_addr;

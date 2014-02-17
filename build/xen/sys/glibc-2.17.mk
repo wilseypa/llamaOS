@@ -1185,7 +1185,6 @@ C_SOURCES = \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/writev.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/xstat.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/xstat64.c \
-  sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/x86_64/longjmp_chk.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/dlerror.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/gcc_personality_v0.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/mremap.c \
@@ -1364,6 +1363,8 @@ C_SOURCES = \
   sys/glibc-$(GLIBC_VERSION)/wctype/wctrans_l.c \
   sys/glibc-$(GLIBC_VERSION)/wctype/wctype.c \
   sys/glibc-$(GLIBC_VERSION)/wctype/wctype_l.c
+
+#    sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/x86_64/longjmp_chk.c
 
 # replaced with llamaOS export
 #  sys/glibc-$(GLIBC_VERSION)/assert/assert-perr.c
