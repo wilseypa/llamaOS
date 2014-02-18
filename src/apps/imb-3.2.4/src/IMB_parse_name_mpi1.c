@@ -225,6 +225,7 @@ In/out variables:
 	Bmark->scale_time = 1.0;
 	Bmark->scale_bw   = 4.0;
     }
+#if 0
     else if (!strcmp(Bmark->name,"allreduce"))
     { 
 	strcpy(Bmark->name,"Allreduce");
@@ -233,6 +234,7 @@ In/out variables:
 	Bmark->bench_comments = &Allreduce_cmt[0];
 	Bmark->reduction = 1;
     }
+#endif
     else if (!strcmp(Bmark->name,"reduce"))
     { 
 	strcpy(Bmark->name,"Reduce");
@@ -250,7 +252,6 @@ In/out variables:
 	Bmark->bench_comments = &Reduce_scatter_cmt[0];
 	Bmark->reduction = 1;
     }
-#endif
     else if (!strcmp(Bmark->name,"bcast"))
     { 
 	strcpy(Bmark->name,"Bcast");
@@ -258,6 +259,7 @@ In/out variables:
 	type = Collective;
 	Bmark->bench_comments = &Bcast_cmt[0];
     }
+#endif
     else if (!strcmp(Bmark->name,"barrier"))
     { 
 	strcpy(Bmark->name,"Barrier");
@@ -265,6 +267,7 @@ In/out variables:
 	type = Sync;
 	Bmark->bench_comments = &Barrier_cmt[0];
     }
+#if 0
     else if (!strcmp(Bmark->name,"allgather"))
     { 
 	strcpy(Bmark->name,"Allgather");
@@ -272,7 +275,6 @@ In/out variables:
 	type = Collective;
 	Bmark->bench_comments = &Allgather_cmt[0];
     }
-#if 0
     else if (!strcmp(Bmark->name,"allgatherv"))
     { 
 	strcpy(Bmark->name,"Allgatherv");
@@ -320,6 +322,7 @@ In/out variables:
 	type = Collective;
 	Bmark->bench_comments = &Alltoall_cmt[0];
     }
+#if 0
     else if (!strcmp(Bmark->name,"alltoallv"))
     { 
 	strcpy(Bmark->name,"Alltoallv");
@@ -327,6 +330,7 @@ In/out variables:
 	type = Collective;
 	Bmark->bench_comments = &Alltoallv_cmt[0];
     }
+#endif
     else 
     {
 	type = BTYPE_INVALID;

@@ -37,6 +37,7 @@ include common-vars.mk
 all:
 	@$(MAKE) -f tools/blas.mk
 	@$(MAKE) -f tools/cblas.mk
+	@-command -v $(MPICC) >/dev/null && ($(MAKE) -f apps/imb-$(IMB_VERSION)/imb.mk)
 	@$(MAKE) -f apps/netpipe-$(NETPIPE_VERSION)/memcpy.mk
 	@-command -v $(MPICC) >/dev/null && ($(MAKE) -f apps/netpipe-$(NETPIPE_VERSION)/mpi.mk)
 	@$(MAKE) -f apps/netpipe-$(NETPIPE_VERSION)/nothing.mk
@@ -47,7 +48,6 @@ all:
 	@$(MAKE) -f apps/hello-f90.mk
 	@$(MAKE) -f apps/latency-TCPIP.mk
 	@-command -v $(MPICC) >/dev/null && ($(MAKE) -f apps/hpcc-$(HPCC_VERSION).mk)
-	@-command -v $(MPICC) >/dev/null && ($(MAKE) -f apps/IMB-$(IMB_VERSION).mk)
 	@-command -v $(MPICC) >/dev/null && ($(MAKE) -f apps/latency-MPI.mk)
 #	@$(MAKE) -f test/memory.mk
 
