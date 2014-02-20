@@ -170,10 +170,13 @@ C_SOURCES = \
   tools/mpich-$(MPICH_VERSION)/src/mpi/datatype/type_get_true_extent_x.c \
   tools/mpich-$(MPICH_VERSION)/src/mpi/datatype/type_hvector.c \
   tools/mpich-$(MPICH_VERSION)/src/mpi/datatype/type_indexed.c \
+  tools/mpich-$(MPICH_VERSION)/src/mpi/datatype/type_size.c \
+  tools/mpich-$(MPICH_VERSION)/src/mpi/datatype/type_size_x.c \
   tools/mpich-$(MPICH_VERSION)/src/mpi/datatype/type_struct.c \
   tools/mpich-$(MPICH_VERSION)/src/mpi/datatype/type_vector.c \
   tools/mpich-$(MPICH_VERSION)/src/mpi/datatype/typeutil.c \
   tools/mpich-$(MPICH_VERSION)/src/mpi/datatype/unpack.c \
+  tools/mpich-$(MPICH_VERSION)/src/mpi/errhan/error_string.c \
   tools/mpich-$(MPICH_VERSION)/src/mpi/errhan/errutil.c \
   tools/mpich-$(MPICH_VERSION)/src/mpi/group/group_compare.c \
   tools/mpich-$(MPICH_VERSION)/src/mpi/group/group_difference.c \
@@ -195,6 +198,10 @@ C_SOURCES = \
   tools/mpich-$(MPICH_VERSION)/src/mpi/init/finalize.c \
   tools/mpich-$(MPICH_VERSION)/src/mpi/init/init.c \
   tools/mpich-$(MPICH_VERSION)/src/mpi/init/initthread.c \
+  tools/mpich-$(MPICH_VERSION)/src/mpi/misc/getpname.c \
+  tools/mpich-$(MPICH_VERSION)/src/mpi/misc/library_version.c \
+  tools/mpich-$(MPICH_VERSION)/src/mpi/misc/pcontrol.c \
+  tools/mpich-$(MPICH_VERSION)/src/mpi/misc/version.c \
   tools/mpich-$(MPICH_VERSION)/src/mpi/pt2pt/bsend.c \
   tools/mpich-$(MPICH_VERSION)/src/mpi/pt2pt/bsend_init.c \
   tools/mpich-$(MPICH_VERSION)/src/mpi/pt2pt/bsendutil.c \

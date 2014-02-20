@@ -49,8 +49,8 @@ all:
 	@$(MAKE) -f apps/latency-TCPIP.mk
 	@-command -v $(MPICC) >/dev/null && ($(MAKE) -f apps/hpcc-$(HPCC_VERSION).mk)
 	@-command -v $(MPICC) >/dev/null && ($(MAKE) -f apps/latency-MPI.mk)
-#	@$(MAKE) -f test/memory.mk
 
+#	@$(MAKE) -f test/memory.mk
 #	@$(MAKE) -f apps/NAS/NAS.mk
 
 .PHONY: install
