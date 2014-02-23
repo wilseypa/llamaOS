@@ -9,12 +9,14 @@
 
 #include "config.h"
 #include "disk.h"
-#include "devices/linux.h"
+#include <sys/syscall.h>
 #include "panic.h"
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
+
+extern int syscall (int number, ...);
 
 unsigned char img [CONFIG_DISK_SIZE]; /* disk image (copied in memory) */
 
@@ -22,7 +24,7 @@ unsigned char img [CONFIG_DISK_SIZE]; /* disk image (copied in memory) */
 ({  kwarning (format, ##__VA_ARGS__); return false; })
 bool disk_initialize () {
     int img_fd; /* disk image file descriptor */
-    if ((img_fd = syscall (SYS_open, CONFIG_DISK_IMAGE, linux_O_RDWR)) < 0)
+    if ((img_fd = syscall (SYS_open, CONFIG_DISK_IMAGE, 02)) < 0)
         init_error ("can't open disk image file: " CONFIG_DISK_IMAGE);
     /* copy the file into memory */
     if (syscall (SYS_read, img_fd, img, CONFIG_DISK_SIZE) != CONFIG_DISK_SIZE)
