@@ -35,6 +35,8 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
 #include <fcntl.h>
 #include <assert.h>
 
+// !BAM
+#include <stdlib.h>
 #include <string.h>
 #include <errno.h>
 
@@ -1128,6 +1130,10 @@ tempfile_open (const char *tempdir, char **fname)
   return fd;
 }
 
+// !BAM
+extern char *secure_getenv (const char *__name)
+     __THROW __nonnull ((1)) __wur;
+
 
 /* tempfile()-- Generate a temporary filename for a scratch file and
  * open it.  mkstemp() opens the file for reading and writing, but the
@@ -1142,7 +1148,6 @@ tempfile (st_parameter_open *opp)
   const char *tempdir;
   char *fname;
   int fd = -1;
-
   tempdir = secure_getenv ("TMPDIR");
   fd = tempfile_open (tempdir, &fname);
 #ifdef __MINGW32__

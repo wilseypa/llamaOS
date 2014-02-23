@@ -35,12 +35,15 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <cstring>
 #include <sstream>
 #include <string>
+#include <vector>
 
 #include <xen/xen.h>
 #include <xen/event_channel.h>
 
 #include <xen/io/blkif.h>
 #include <xen/io/console.h>
+
+// #define SINGLE_FILE_HACK
 
 namespace llamaos {
 namespace xen {
@@ -75,7 +78,11 @@ private:
 
    unsigned int position;
 
+#if defined SINGLE_FILE_HACK
    std::string data;
+#else
+   std::vector<uint8_t> data;
+#endif
 
 };
 

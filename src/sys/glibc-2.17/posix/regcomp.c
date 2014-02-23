@@ -2777,6 +2777,10 @@ parse_bracket_exp (re_string_t *regexp, re_dfa_t *dfa, re_token_t *token,
   /* Local function for parse_bracket_exp used in _LIBC environement.
      Seek the collating symbol entry correspondings to NAME.
      Return the index of the symbol in the SYMB_TABLE.  */
+// !BAM
+  auto inline int32_t
+  __attribute ((always_inline))
+  seek_collating_symbol_entry (const unsigned char *name, size_t name_len);
 
   auto inline int32_t
   __attribute ((always_inline))
@@ -2815,6 +2819,10 @@ parse_bracket_exp (re_string_t *regexp, re_dfa_t *dfa, re_token_t *token,
   /* Local function for parse_bracket_exp used in _LIBC environment.
      Look up the collation sequence value of BR_ELEM.
      Return the value if succeeded, UINT_MAX otherwise.  */
+// !BAM
+  auto inline unsigned int
+  __attribute ((always_inline))
+  lookup_collation_sequence_value (bracket_elem_t *br_elem);
 
   auto inline unsigned int
   __attribute ((always_inline))
@@ -2884,6 +2892,10 @@ parse_bracket_exp (re_string_t *regexp, re_dfa_t *dfa, re_token_t *token,
      RANGE_ALLOC is the allocated size of mbcset->range_starts, and
      mbcset->range_ends, is a pointer argument sinse we may
      update it.  */
+// !BAM
+  auto inline reg_errcode_t
+  __attribute ((always_inline))
+  build_range_exp (bitset_t sbcset, re_charset_t *mbcset, int *range_alloc, bracket_elem_t *start_elem, bracket_elem_t *end_elem);
 
   auto inline reg_errcode_t
   __attribute ((always_inline))
@@ -2967,6 +2979,10 @@ parse_bracket_exp (re_string_t *regexp, re_dfa_t *dfa, re_token_t *token,
      The result are written to MBCSET and SBCSET.
      COLL_SYM_ALLOC is the allocated size of mbcset->coll_sym, is a
      pointer argument sinse we may update it.  */
+// !BAM
+  auto inline reg_errcode_t
+  __attribute ((always_inline))
+  build_collating_symbol (bitset_t sbcset, re_charset_t *mbcset, int *coll_sym_alloc, const unsigned char *name);
 
   auto inline reg_errcode_t
   __attribute ((always_inline))

@@ -400,10 +400,6 @@ C_SOURCES = \
   sys/glibc-$(GLIBC_VERSION)/io/fxstatat64.c \
   sys/glibc-$(GLIBC_VERSION)/io/have_o_cloexec.c \
   sys/glibc-$(GLIBC_VERSION)/io/open64.c \
-  sys/glibc-$(GLIBC_VERSION)/io/pipe.c \
-  sys/glibc-$(GLIBC_VERSION)/io/readlink.c \
-  sys/glibc-$(GLIBC_VERSION)/io/ttyname_r.c \
-  sys/glibc-$(GLIBC_VERSION)/io/umask.c \
   sys/glibc-$(GLIBC_VERSION)/libio/__fbufsize.c \
   sys/glibc-$(GLIBC_VERSION)/libio/__flbf.c \
   sys/glibc-$(GLIBC_VERSION)/libio/__fpending.c \
@@ -741,7 +737,6 @@ C_SOURCES = \
   sys/glibc-$(GLIBC_VERSION)/misc/mkstemp.c \
   sys/glibc-$(GLIBC_VERSION)/misc/mmap64.c \
   sys/glibc-$(GLIBC_VERSION)/misc/mprotect.c \
-  sys/glibc-$(GLIBC_VERSION)/misc/munmap.c \
   sys/glibc-$(GLIBC_VERSION)/misc/sbrk.c \
   sys/glibc-$(GLIBC_VERSION)/misc/tsearch.c \
   sys/glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaos/flockfile.c \
@@ -761,8 +756,6 @@ C_SOURCES = \
   sys/glibc-$(GLIBC_VERSION)/nptl/pthread_mutexattr_setpshared.c \
   sys/glibc-$(GLIBC_VERSION)/nptl/tpp.c \
   sys/glibc-$(GLIBC_VERSION)/posix/environ.c \
-  sys/glibc-$(GLIBC_VERSION)/posix/execve.c \
-  sys/glibc-$(GLIBC_VERSION)/posix/fork.c \
   sys/glibc-$(GLIBC_VERSION)/posix/fpathconf.c \
   sys/glibc-$(GLIBC_VERSION)/posix/getegid.c \
   sys/glibc-$(GLIBC_VERSION)/posix/geteuid.c \
@@ -772,12 +765,10 @@ C_SOURCES = \
   sys/glibc-$(GLIBC_VERSION)/posix/sched_getp.c \
   sys/glibc-$(GLIBC_VERSION)/posix/sched_gets.c \
   sys/glibc-$(GLIBC_VERSION)/posix/sched_sets.c \
-  sys/glibc-$(GLIBC_VERSION)/posix/wait.c \
   sys/glibc-$(GLIBC_VERSION)/setjmp/longjmp.c \
   sys/glibc-$(GLIBC_VERSION)/setjmp/sigjmp.c \
   sys/glibc-$(GLIBC_VERSION)/signal/sigaction.c \
   sys/glibc-$(GLIBC_VERSION)/signal/sigaddset.c \
-  sys/glibc-$(GLIBC_VERSION)/signal/signal.c \
   sys/glibc-$(GLIBC_VERSION)/signal/sigprocmask.c \
   sys/glibc-$(GLIBC_VERSION)/stdio-common/_itoa.c \
   sys/glibc-$(GLIBC_VERSION)/stdio-common/_itowa.c \
@@ -810,8 +801,6 @@ C_SOURCES = \
   sys/glibc-$(GLIBC_VERSION)/stdio-common/reg-modifier.c \
   sys/glibc-$(GLIBC_VERSION)/stdio-common/reg-printf.c \
   sys/glibc-$(GLIBC_VERSION)/stdio-common/reg-type.c \
-  sys/glibc-$(GLIBC_VERSION)/stdio-common/remove.c \
-  sys/glibc-$(GLIBC_VERSION)/stdio-common/rename.c \
   sys/glibc-$(GLIBC_VERSION)/stdio-common/renameat.c \
   sys/glibc-$(GLIBC_VERSION)/stdio-common/scanf.c \
   sys/glibc-$(GLIBC_VERSION)/stdio-common/snprintf.c \
@@ -1148,6 +1137,8 @@ C_SOURCES = \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/close.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/dup.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/dup2.c \
+  sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/execve.c \
+  sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/fork.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/ftruncate.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/get_avphys_pages.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/get_nprocs.c \
@@ -1157,6 +1148,7 @@ C_SOURCES = \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/gethostname.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/getpagesize.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/getpid.c \
+  sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/gettimeofday.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/getuid.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/isatty.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/libc_fatal.c \
@@ -1167,25 +1159,32 @@ C_SOURCES = \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/madvise.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/mkdir.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/mmap.c \
+  sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/munmap.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/pathconf.c \
+  sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/pipe.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/poll.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/raise.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/read.c \
+  sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/readlink.c \
+  sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/remove.c \
+  sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/rename.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/sched_primax.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/sched_primin.c \
+  sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/signal.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/sigsuspend.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/sigsuspend_nocancel.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/sleep.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/syscall.c \
-  sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/gettimeofday.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/time.c \
+  sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/ttyname_r.c \
+  sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/umask.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/uname.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/unlink.c \
+  sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/wait.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/write.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/writev.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/xstat.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/xstat64.c \
-  sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/x86_64/longjmp_chk.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/dlerror.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/gcc_personality_v0.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/mremap.c \
@@ -1365,6 +1364,8 @@ C_SOURCES = \
   sys/glibc-$(GLIBC_VERSION)/wctype/wctype.c \
   sys/glibc-$(GLIBC_VERSION)/wctype/wctype_l.c
 
+#    sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/x86_64/longjmp_chk.c
+
 # replaced with llamaOS export
 #  sys/glibc-$(GLIBC_VERSION)/assert/assert-perr.c
 #  sys/glibc-$(GLIBC_VERSION)/assert/assert.c
@@ -1379,7 +1380,11 @@ C_SOURCES = \
 #  sys/glibc-$(GLIBC_VERSION)/io/lseek64.c
 #  sys/glibc-$(GLIBC_VERSION)/io/lxstat64.c
 #  sys/glibc-$(GLIBC_VERSION)/io/open.c
+#  sys/glibc-$(GLIBC_VERSION)/io/pipe.c \
 #  sys/glibc-$(GLIBC_VERSION)/io/read.c
+#  sys/glibc-$(GLIBC_VERSION)/io/readlink.c \
+#  sys/glibc-$(GLIBC_VERSION)/io/ttyname_r.c \
+#  sys/glibc-$(GLIBC_VERSION)/io/umask.c \
 #  sys/glibc-$(GLIBC_VERSION)/io/unlink.c
 #  sys/glibc-$(GLIBC_VERSION)/io/write.c
 #  sys/glibc-$(GLIBC_VERSION)/io/xstat.c
@@ -1391,13 +1396,20 @@ C_SOURCES = \
 #  sys/glibc-$(GLIBC_VERSION)/misc/getsysstats.c
 #  sys/glibc-$(GLIBC_VERSION)/misc/madvise.c
 #  sys/glibc-$(GLIBC_VERSION)/misc/mmap.c
+#  sys/glibc-$(GLIBC_VERSION)/misc/munmap.c \
 #  sys/glibc-$(GLIBC_VERSION)/misc/writev.c
 #  sys/glibc-$(GLIBC_VERSION)/posix/_exit.c
+#  sys/glibc-$(GLIBC_VERSION)/posix/execve.c \
+#  sys/glibc-$(GLIBC_VERSION)/posix/fork.c \
 #  sys/glibc-$(GLIBC_VERSION)/posix/getpid.c
 #  sys/glibc-$(GLIBC_VERSION)/posix/getuid.c
 #  sys/glibc-$(GLIBC_VERSION)/posix/sleep.c
 #  sys/glibc-$(GLIBC_VERSION)/posix/pathconf.c
+#  sys/glibc-$(GLIBC_VERSION)/posix/wait.c \
 #  sys/glibc-$(GLIBC_VERSION)/signal/raise.c
+#  sys/glibc-$(GLIBC_VERSION)/signal/signal.c \
+#  sys/glibc-$(GLIBC_VERSION)/stdio-common/remove.c \
+#  sys/glibc-$(GLIBC_VERSION)/stdio-common/rename.c \
 #  sys/glibc-$(GLIBC_VERSION)/stdlib/abort.c
 #  sys/glibc-$(GLIBC_VERSION)/time/gettimeofday.c
 #  sys/glibc-$(GLIBC_VERSION)/time/time.c

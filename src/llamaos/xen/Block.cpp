@@ -50,6 +50,7 @@ using std::min;
 using std::cout;
 using std::endl;
 using std::stringstream;
+using std::vector;
 
 using namespace llamaos::xen;
 
@@ -61,7 +62,7 @@ Block::Block (const string &key)
       dev(""),
       size(0),
       position(0),
-      data("")
+      data()
 {
 //   cout << "frontend: " << frontend_key << endl;
    Xenstore &xenstore = Hypervisor::get_instance ()->xenstore;
@@ -121,7 +122,9 @@ Block::Block (const string &key)
    ref = Hypervisor::get_instance ()->grant_table.grant_access (backend_id, buffer);
 //   cout << "grant ref: " << ref << endl;
 
+#if defined SINGLE_FILE_HACK
    stringstream ss;
+#endif
 
    // read them 1 sector at a time for now?
    for (unsigned int i = 0; i < sectors; i++)
@@ -151,6 +154,7 @@ Block::Block (const string &key)
       {
          for (unsigned int i = 0; i < PAGE_SIZE; i++)
          {
+#if defined SINGLE_FILE_HACK
             if (   (   (buffer [i] < ' ')
                   || (buffer [i] > '~'))
                && (buffer [i] != 9)
@@ -162,6 +166,9 @@ Block::Block (const string &key)
             }
 
             ss << buffer [i];
+#else
+            data.push_back(buffer [i]);
+#endif
          }
    //      cout << "data: " << data << endl;
 //         cout << "found and read block device " << name << endl;
@@ -172,7 +179,9 @@ Block::Block (const string &key)
       }
    }
 
+#if defined SINGLE_FILE_HACK
    data = ss.str ();
+#endif
 
 }
 
@@ -188,7 +197,11 @@ ssize_t Block::read (void *buf, size_t nbytes)
 
    if (nbytes > 0)
    {
+#if defined SINGLE_FILE_HACK
       memcpy (buf, &data.c_str()[position], nbytes);
+#else
+      memcpy (buf, &data[position], nbytes);
+#endif
       position += nbytes;
 
 //      cout << "reading " << nbytes << ": " << *(char *)buf << endl;

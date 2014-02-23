@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2013, William Magato
+Copyright (c) 2014, William Magato
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,58 +28,35 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <cstring>
+#include <sys/types.h>
+#include <sys/mman.h>
+#include <errno.h>
 
-#include <iostream>
+// define function pointer
+typedef int (*llamaos_munmap_t) (__ptr_t, size_t);
 
-#include <llamaos/memory/Memory.h>
+// function pointer variable
+static llamaos_munmap_t llamaos_munmap = 0;
 
-using namespace std;
-using namespace llamaos::memory;
-
-volatile void *ptrs [1024];
-
-const bool should_leak = false;
-
-int main (int argc, char *argv [])
+// function called by llamaOS to register pointer
+void register_llamaos_munmap (llamaos_munmap_t func)
 {
-   cout << "running memory stress test for malloc..." << endl;
-
-   if (should_leak)
-   {
-      cout <<"   this test is leaking..." << endl;
-   }
-
-   for (int i = 0; i < 1024; i++)
-   {
-      ptrs [i] = (volatile void *)malloc (1024);
-
-      cout << "   program break: " << hex << get_program_break () << endl;
-
-      memset ((void *)ptrs [i], 0, 1024);
-
-      if (!should_leak)
-      {
-         free((void *)ptrs[i]);
-      }
-   }
-
-   cout << "running memory stress test for new..." << endl;
-
-   for (int i = 0; i < 1024; i++)
-   {
-      ptrs [i] = (volatile void *)new char [1024];
-
-      cout << "   program break: " << hex << get_program_break () << endl;
-
-      memset ((void *)ptrs [i], 0, 1024);
-
-      if (!should_leak)
-      {
-         delete (char *)ptrs[i];
-      }
-   }
-
-   cout << "done with memory stress test." << endl;
-   return 0;
+   llamaos_munmap = func;
 }
+
+/* Deallocate any mapping for the region starting at ADDR and extending LEN
+   bytes.  Returns 0 if successful, -1 for errors (and sets errno).  */
+
+int
+__munmap (__ptr_t addr, size_t len)
+{
+   if (0 != llamaos_munmap)
+   {
+      return llamaos_munmap (addr, len);
+   }
+
+   __set_errno (ENOSYS);
+   return -1;
+}
+
+weak_alias (__munmap, munmap)

@@ -30,6 +30,8 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 #include <stdint.h>
 #include <string.h>
+#include <sys/mman.h>
+#include <sys/wait.h>
 
 #include <xen/features.h>
 #include <xen/version.h>
@@ -133,6 +135,16 @@ static int glibc_dup2 (int fd, int fd2)
    return -1;
 }
 
+static int glibc_execve (const char *path,
+                         char *const argv[],
+                         char *const envp[])
+{
+   trace("!!! ALERT: glibc calling execve() before process management is enabled.\n");
+
+   errno = EBADF;
+   return -1;
+}
+
 static void glibc_exit (int status)
 {
    trace("!!! ALERT: glibc calling exit().\n");
@@ -140,6 +152,14 @@ static void glibc_exit (int status)
    sched_shutdown_t arg;
    arg.reason = SHUTDOWN_poweroff;
    HYPERVISOR_sched_op(SCHEDOP_shutdown, &arg);
+}
+
+static int glibc_fork ()
+{
+   trace("!!! ALERT: glibc calling fork() before process management is enabled.\n");
+
+   errno = EBADF;
+   return -1;
 }
 
 static int glibc_ftruncate (int fd, off_t length)
@@ -286,12 +306,24 @@ static int glibc_mkdir (const char *path, mode_t mode)
 static __ptr_t glibc_mmap (__ptr_t addr, size_t len, int prot, int flags, int fd, off_t offset)
 {
    trace("!!! ALERT: glibc calling mmap() before file system support is enabled.\n");
+   return MAP_FAILED;
+}
+
+static int glibc_munmap (__ptr_t addr, size_t len)
+{
+   trace("!!! ALERT: glibc calling munmap() before file system support is enabled.\n");
    return -1;
 }
 
 static long int glibc_pathconf (const char *path, int name)
 {
    trace("!!! ALERT: glibc calling pathconf() before file system support is enabled.\n");
+   return -1;
+}
+
+static int glibc_pipe (int __pipedes[2])
+{
+   trace("!!! ALERT: glibc calling pipe() before file system support is enabled.\n");
    return -1;
 }
 
@@ -310,6 +342,24 @@ static int glibc_raise (int sig)
 static ssize_t glibc_read (int fd, void *buf, size_t nbytes)
 {
    trace("!!! ALERT: glibc calling read() before file system support is enabled.\n");
+   return -1;
+}
+
+static ssize_t glibc_readlink (const char *path, char *buf, size_t len)
+{
+   trace("!!! ALERT: glibc calling readlink() before file system support is enabled.\n");
+   return -1;
+}
+
+static int glibc_remove (const char *file)
+{
+   trace("!!! ALERT: glibc calling remove() before file system support is enabled.\n");
+   return -1;
+}
+
+static int glibc_rename (const char *old, const char *new)
+{
+   trace("!!! ALERT: glibc calling rename() before file system support is enabled.\n");
    return -1;
 }
 
@@ -337,6 +387,14 @@ static int glibc_sigsuspend_nocancel (const sigset_t *set)
    return -1;
 }
 
+static __sighandler_t glibc_signal (int sig, __sighandler_t handler)
+{
+   trace("!!! ALERT: glibc calling signal() before process management is enabled.\n");
+
+   errno = EBADF;
+   return SIG_ERR;
+}
+
 static unsigned int glibc_sleep (unsigned int seconds)
 {
    trace("!!! ALERT: glibc calling sleep() before sleep support is enabled.\n");
@@ -349,12 +407,32 @@ static long int glibc_syscall (long int callno)
    return -1;
 }
 
+static int glibc_ttyname_r (int fd, char *buf, size_t buflen)
+{
+   trace("!!! ALERT: glibc calling ttyname_r() before file system support is enabled.\n");
+   return -1;
+}
+
+static mode_t glibc_umask (mode_t mask)
+{
+   trace("!!! ALERT: glibc calling umask() before file system support is enabled.\n");
+   return -1;
+}
+
 static int glibc_unlink (const char *name)
 {
    trace("!!! ALERT: glibc calling unlink() before file system support is enabled.\n");
    trace (" unlinking file %s\n", name);
 
    errno = ENOENT;
+   return -1;
+}
+
+static __pid_t glibc_wait (__WAIT_STATUS_DEFN stat_loc)
+{
+   trace("!!! ALERT: glibc calling wait() before process management is enabled.\n");
+
+   errno = EBADF;
    return -1;
 }
 
@@ -394,7 +472,9 @@ static void register_glibc_exports (void)
    register_llamaos_close (glibc_close);
    register_llamaos_dup (glibc_dup);
    register_llamaos_dup2 (glibc_dup2);
+   register_llamaos_execve (glibc_execve);
    register_llamaos_exit (glibc_exit);
+   register_llamaos_fork (glibc_fork);
    register_llamaos_ftruncate (glibc_ftruncate);
    register_llamaos_get_avphys_pages (glibc_get_avphys_pages);
    register_llamaos_get_nprocs (glibc_get_nprocs);
@@ -415,17 +495,26 @@ static void register_glibc_exports (void)
    register_llamaos_madvise (glibc_madvise);
    register_llamaos_mkdir (glibc_mkdir);
    register_llamaos_mmap (glibc_mmap);
+   register_llamaos_munmap (glibc_munmap);
    register_llamaos_pathconf (glibc_pathconf);
+   register_llamaos_pipe (glibc_pipe);
    register_llamaos_poll (glibc_poll);
    register_llamaos_raise (glibc_raise);
    register_llamaos_read (glibc_read);
+   register_llamaos_readlink (glibc_readlink);
+   register_llamaos_remove (glibc_remove);
+   register_llamaos_rename (glibc_rename);
    register_llamaos_sched_get_priority_max (glibc_sched_get_priority_max);
    register_llamaos_sched_get_priority_min (glibc_sched_get_priority_min);
    register_llamaos_sigsuspend (glibc_sigsuspend);
    register_llamaos_sigsuspend_nocancel (glibc_sigsuspend_nocancel);
+   register_llamaos_signal (glibc_signal);
    register_llamaos_sleep (glibc_sleep);
    register_llamaos_syscall (glibc_syscall);
+   register_llamaos_ttyname_r (glibc_ttyname_r);
+   register_llamaos_umask (glibc_umask);
    register_llamaos_unlink (glibc_unlink);
+   register_llamaos_wait (glibc_wait);
    register_llamaos_write (glibc_libc_write);
    register_llamaos_writev (glibc_writev);
    register_llamaos_xstat (glibc_xstat);

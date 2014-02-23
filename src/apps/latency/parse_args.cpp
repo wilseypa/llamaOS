@@ -47,6 +47,7 @@ static T convert (const std::string &s)
    std::stringstream err;
    err << "failed to convert string: " << s;
    // throw std::runtime_error (err.str ());
+   return t;
 }
 
 template <typename T>

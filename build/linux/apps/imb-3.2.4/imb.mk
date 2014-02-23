@@ -37,7 +37,7 @@ include common-flags.mk
 # override this
 CC = $(MPICC)
 
-MAKEFILE_SOURCES += apps/IMB-$(IMB_VERSION).mk
+MAKEFILE_SOURCES += apps/imb-$(IMB_VERSION)/imb.mk
 
 CFLAGS += \
   -DMPI1
@@ -54,6 +54,7 @@ SOURCES = \
   apps/imb-$(IMB_VERSION)/src/IMB_barrier.c \
   apps/imb-$(IMB_VERSION)/src/IMB_bcast.c \
   apps/imb-$(IMB_VERSION)/src/IMB_benchlist.c \
+  apps/imb-$(IMB_VERSION)/src/IMB_chk_diff.c \
   apps/imb-$(IMB_VERSION)/src/IMB_cpu_exploit.c \
   apps/imb-$(IMB_VERSION)/src/IMB_declare.c \
   apps/imb-$(IMB_VERSION)/src/IMB_err_handler.c \
@@ -66,8 +67,8 @@ SOURCES = \
   apps/imb-$(IMB_VERSION)/src/IMB_mem_manager.c \
   apps/imb-$(IMB_VERSION)/src/IMB_output.c \
   apps/imb-$(IMB_VERSION)/src/IMB_parse_name_mpi1.c \
-  apps/imb-$(IMB_VERSION)/src/IMB_pingpong.c \
   apps/imb-$(IMB_VERSION)/src/IMB_pingping.c \
+  apps/imb-$(IMB_VERSION)/src/IMB_pingpong.c \
   apps/imb-$(IMB_VERSION)/src/IMB_reduce.c \
   apps/imb-$(IMB_VERSION)/src/IMB_reduce_scatter.c \
   apps/imb-$(IMB_VERSION)/src/IMB_scatter.c \
@@ -79,7 +80,7 @@ SOURCES = \
 OBJECTS = $(SOURCES:%.c=$(OBJDIR)/%.o)
 DEPENDS = $(OBJECTS:%.o=%.d)
 
-$(BINDIR)/IMB: $(OBJECTS)
+$(BINDIR)/apps/imb-$(IMB_VERSION)/imb: $(OBJECTS)
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
 	@$(MPICC) $(LDFLAGS) -o $@ $^

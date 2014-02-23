@@ -64,7 +64,7 @@ all:
 	@$(MAKE) -f apps/unixbench-5.1.3/syscall.mk
 	@$(MAKE) -f apps/unixbench-5.1.3/whetstone.mk
 #	@$(MAKE) -f apps/hpcc-$(HPCC_VERSION).mk
-#	@$(MAKE) -f apps/IMB-$(IMB_VERSION).mk
+	@$(MAKE) -f apps/imb-$(IMB_VERSION)/imb.mk
 #	@$(MAKE) -f apps/latency-MPI.mk
 #	@$(MAKE) -f apps/latency-llamaNET.mk
 #	@$(MAKE) -f apps/pingPongNB-MPI.mk

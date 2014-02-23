@@ -347,7 +347,7 @@ static off64_t glibc_lseek64 (int fd, off64_t offset, int whence)
    return -1;
 }
 
-static __ptr_t glibc_mmap (__ptr_t addr, size_t len, int prot, int flags, int fd, off_t offset)
+static __ptr_t glibc_mmap (__ptr_t /* addr */, size_t len, int /* prot */, int /* flags */, int fd, off_t /* offset */)
 {
    if (fd == 12)
    {

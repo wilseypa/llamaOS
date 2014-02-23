@@ -85,9 +85,17 @@ EXTERN void register_llamaos_dup (llamaos_dup_t dup);
 typedef int (*llamaos_dup2_t) (int, int);
 EXTERN void register_llamaos_dup2 (llamaos_dup2_t dup2);
 
+typedef int (*llamaos_execve_t) (const char *path,
+                                 char *const argv[],
+                                 char *const envp[]);
+EXTERN void register_llamaos_execve (llamaos_execve_t func);
+
 // void _exit (int status)
 typedef void (*llamaos_exit_t) (int);
 EXTERN void register_llamaos_exit (llamaos_exit_t exit);
+
+typedef int (*llamaos_fork_t) ();
+EXTERN void register_llamaos_fork (llamaos_fork_t func);
 
 // int __ftruncate (int fd, off_t length)
 typedef int (*llamaos_ftruncate_t) (int, off_t);
@@ -168,9 +176,15 @@ EXTERN void register_llamaos_mkdir (llamaos_mkdir_t func);
 typedef __ptr_t (*llamaos_mmap_t) (__ptr_t, size_t, int, int, int, off_t);
 EXTERN void register_llamaos_mmap (llamaos_mmap_t func);
 
+typedef int (*llamaos_munmap_t) (__ptr_t, size_t);
+EXTERN void register_llamaos_munmap (llamaos_munmap_t func);
+
 // long int pathconf (const char *path, int name)
 typedef long int (*llamaos_pathconf_t) (const char *, int);
 EXTERN void register_llamaos_pathconf (llamaos_pathconf_t madvise);
+
+typedef int (*llamaos_pipe_t) (int[]);
+EXTERN void register_llamaos_pipe (llamaos_pipe_t func);
 
 // int poll (struct pollfd *fds, nfds_t nfds, int timeout)
 typedef int (*llamaos_poll_t) (struct pollfd *, nfds_t, int);
@@ -184,6 +198,15 @@ EXTERN void register_llamaos_raise (llamaos_raise_t raise);
 typedef ssize_t (*llamaos_read_t) (int, void *, size_t);
 EXTERN void register_llamaos_read (llamaos_read_t func);
 
+typedef ssize_t (*llamaos_readlink_t) (const char *path, char *buf, size_t);
+EXTERN void register_llamaos_readlink (llamaos_readlink_t func);
+
+typedef int (*llamaos_remove_t) (const char *);
+EXTERN void register_llamaos_remove (llamaos_remove_t func);
+
+typedef int (*llamaos_rename_t) (const char *, const char *);
+EXTERN void register_llamaos_rename (llamaos_rename_t func);
+
 // int sched_get_priority_max (int algorithm)
 typedef int (*llamaos_sched_get_priority_max_t) (int);
 EXTERN void register_llamaos_sched_get_priority_max (llamaos_sched_get_priority_max_t sched_get_priority_max);
@@ -191,6 +214,9 @@ EXTERN void register_llamaos_sched_get_priority_max (llamaos_sched_get_priority_
 // int sched_get_priority_min (int algorithm)
 typedef int (*llamaos_sched_get_priority_min_t) (int);
 EXTERN void register_llamaos_sched_get_priority_min (llamaos_sched_get_priority_min_t sched_get_priority_min);
+
+typedef __sighandler_t (*llamaos_signal_t) (int, __sighandler_t);
+EXTERN void register_llamaos_signal (llamaos_signal_t func);
 
 // int sigsuspend (const sigset_t *set)
 typedef int (*llamaos_sigsuspend_t) (const sigset_t *);
@@ -208,9 +234,18 @@ EXTERN void register_llamaos_sleep (llamaos_sleep_t sleep);
 typedef long int (*llamaos_syscall_t) (long int);
 EXTERN void register_llamaos_syscall (llamaos_syscall_t syscall);
 
+typedef int (*llamaos_ttyname_r_t) (int, char *, size_t);
+EXTERN void register_llamaos_ttyname_r (llamaos_ttyname_r_t func);
+
+typedef mode_t (*llamaos_umask_t) (mode_t);
+EXTERN void register_llamaos_umask (llamaos_umask_t func);
+
 // int unlink (const char *name)
 typedef int (*llamaos_unlink_t) (const char *);
 EXTERN void register_llamaos_unlink (llamaos_unlink_t unlink);
+
+typedef __pid_t (*llamaos_wait_t) (__WAIT_STATUS_DEFN);
+EXTERN void register_llamaos_wait (llamaos_wait_t func);
 
 // ssize_t libc_write (int fd, const void *buf, size_t nbytes)
 typedef ssize_t (*llamaos_write_t) (int, const void *, size_t);
