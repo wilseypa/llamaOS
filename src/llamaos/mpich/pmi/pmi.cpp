@@ -75,7 +75,7 @@ extern "C"
 int PMI_Get_rank( int *rank )
 {
    cout << "calling PMI_Get_rank..." << endl;
-   *rank = 1;
+   *rank = 0;
 
    return PMI_SUCCESS;
 }
@@ -84,7 +84,7 @@ extern "C"
 int PMI_Get_universe_size( int *size )
 {
    cout << "calling PMI_Get_universe_size..." << endl;
-   *size = 1;
+   *size = 2;
 
    return PMI_SUCCESS;
 }
@@ -123,7 +123,6 @@ extern "C"
 int PMI_Barrier( void )
 {
    cout << "calling PMI_Barrier..." << endl;
-
    return PMI_SUCCESS;
 }
 
@@ -199,7 +198,12 @@ int PMI_KVS_Get( const char kvsname[], const char key[], char value[], int lengt
 
    if (0 == strcmp (key, "PMI_process_mapping"))
    {
-      strncpy(value, "(vector,(0,1,2))", length);
+      strncpy(value, "(vector,(0,2,1),(1,2,1))", length);
+      return PMI_SUCCESS;
+   }
+   else if (0 == strcmp (key, "sharedFilename[0]"))
+   {
+      strncpy(value, "shmem-mpich-0", length);
       return PMI_SUCCESS;
    }
 

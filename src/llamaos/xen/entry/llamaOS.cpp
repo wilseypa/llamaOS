@@ -203,6 +203,10 @@ static int glibc_libc_open (const char *file, int oflag)
    {
       return 10;
    }
+   else if (strcmp (file, "shmem-mpich-0") == 0)
+   {
+      return 20;
+   }
    else if (strncmp(file, "/dev/shm/mpich_shar_", 20) == 0)
    {
       return 12;
@@ -286,6 +290,10 @@ static ssize_t glibc_write (int fd, const void *buf, size_t nbytes)
          np_out << static_cast<const char *>(buf) [i];
       }
    }
+   else if (fd == 20)
+   {
+      cout << "glibc_write: " << fd << ", " << nbytes << endl;
+   }
    else
    {
       Hypervisor::get_instance ()->console.write (static_cast<const char *>(buf), nbytes);
@@ -349,8 +357,14 @@ static off64_t glibc_lseek64 (int fd, off64_t offset, int whence)
 
 static __ptr_t glibc_mmap (__ptr_t /* addr */, size_t len, int /* prot */, int /* flags */, int fd, off_t /* offset */)
 {
-   if (fd == 12)
+   if (fd == 20) 
    {
+      cout << "glibc_mmap: " << fd << ", " << len << endl;
+      return static_cast<__ptr_t>(new char [len]);
+   }
+   else if (fd == 12)
+   {
+      cout << "glibc_mmap: " << fd << ", " << len << endl;
       return static_cast<__ptr_t>(new char [len]);
    }
 

@@ -66,12 +66,12 @@ TEST(MPI_Comm, rank)
    EXPECT_EQ(0, id);
 }
 
-//TEST(MPI_Send, send)
-//{
-//   char buffer [256] = "hello";
-//
-//   EXPECT_EQ(MPI_SUCCESS, MPI_Send(buffer, strlen(buffer), MPI_CHAR, 1, 0, MPI_COMM_WORLD));
-//}
+TEST(MPI_Send, send)
+{
+   char buffer [256] = "hello";
+
+   EXPECT_EQ(MPI_SUCCESS, MPI_Send(buffer, strlen(buffer), MPI_CHAR, 1, 0, MPI_COMM_WORLD));
+}
 
 TEST(MPI_Finalize, finalize)
 {
