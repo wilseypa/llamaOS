@@ -217,16 +217,6 @@ static int glibc_libc_open (const char *file, int oflag)
       int fd = fs_open (file, oflag);
 
       return (fd < 0) ? fd : fd+100;
-
-//      Hypervisor *hypervisor = Hypervisor::get_instance ();
-//
-//      for (size_t i = 0; i < hypervisor->blocks.size (); i++)
-//      {
-//         if (strcmp (file, hypervisor->blocks [i]->get_name ().c_str ()) == 0)
-//         {
-//            return 100 + i;
-//         }
-//      }
    }
 
 //   trace("!!! ALERT: glibc calling libc_open() before file system support is enabled.\n");
@@ -251,17 +241,6 @@ static int glibc_close (int fd)
       {
          return fs_close (fd-100);
       }
-
-//      Hypervisor *hypervisor = Hypervisor::get_instance ();
-//
-//      for (size_t i = 0; i < hypervisor->blocks.size (); i++)
-//      {
-//         if (fd == static_cast<int>(100 + i))
-//         {
-//            // special close?
-//            break;
-//         }
-//      }
    }
 
    return 0;
@@ -273,16 +252,6 @@ static ssize_t glibc_read (int fd, void *buf, size_t nbytes)
    {
       return fs_read (fd-100, buf, nbytes);
    }
-
-//   Hypervisor *hypervisor = Hypervisor::get_instance ();
-//
-//   for (size_t i = 0; i < hypervisor->blocks.size (); i++)
-//   {
-//      if (fd == static_cast<int>(100 + i))
-//      {
-//         return hypervisor->blocks [i]->read (buf, nbytes);
-//      }
-//   }
 
   cout << "Alert: reading from fileno " << fd << ", " << nbytes << " bytes" << endl;
   return -1;
@@ -336,7 +305,6 @@ static off_t glibc_lseek (int fd, off_t offset, int whence)
       return fs_lseek (fd-100, offset, whence);
    }
 
-//   cout << "lseek " << fd << endl;
    trace("!!! ALERT: glibc calling lseek() before file system support is enabled.\n");
    trace ("   fd: %d, offset: %d, whence: %d\n", fd, offset, whence);
    return -1;
@@ -350,11 +318,7 @@ static off64_t glibc_lseek64 (int fd, off64_t offset, int whence)
       {
       default:
       case SEEK_SET:
-//         break;
-
       case SEEK_CUR:
-//         break;
-
       case SEEK_END:
          break;
       }
@@ -362,22 +326,10 @@ static off64_t glibc_lseek64 (int fd, off64_t offset, int whence)
       return np_out.str().size();
    }
 
-   cout << "lseek64 " << fd << ", " << offset << ", " << whence << endl;
-
    if (fd >= 100)
    {
       return fs_lseek (fd-100, offset, whence);
    }
-
-//   Hypervisor *hypervisor = Hypervisor::get_instance ();
-//
-//   for (size_t i = 0; i < hypervisor->blocks.size (); i++)
-//   {
-//      if (fd == static_cast<int>(100 + i))
-//      {
-//         return hypervisor->blocks [i]->lseek64 (offset, whence);
-//      }
-//   }
 
    trace("!!! ALERT: glibc calling lseek64() before file system support is enabled.\n");
    return -1;
