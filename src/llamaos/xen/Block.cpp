@@ -127,23 +127,25 @@ Block::Block (const string &key)
 #endif
 
    // read them 1 sector at a time for now?
-   for (unsigned int i = 0; i < sectors; i++)
+   for (unsigned int i = 0; i < sectors; i += 8)
    {
       blkif_request_t *request = RING_GET_REQUEST(&_private, _private.req_prod_pvt++);
       request->operation = BLKIF_OP_READ;
       request->handle = vdev;
       request->id = 0;
-      request->nr_segments = 1;//sectors;
+      request->nr_segments = 8;//sectors;
       request->sector_number = i;//0;
       request->seg [0].gref = ref;
       request->seg [0].first_sect = 0;
-      request->seg [0].last_sect = 0;
+      request->seg [0].last_sect = 7;
 
       RING_PUSH_REQUESTS(&_private);
       Hypercall::event_channel_send (port);
 
 //      api::sleep (2);
-      api::sleep (1);
+//      api::sleep (1);
+      // spin unitl response
+      do { rmb(); } while (!RING_HAS_UNCONSUMED_RESPONSES(&_private));
 
       blkif_response_t *response = RING_GET_RESPONSE(&_private, _private.rsp_cons++);
    //   cout << "response->id: " << response->id << endl;
@@ -168,9 +170,9 @@ Block::Block (const string &key)
 
             ss << buffer [i];
 #else
-         for (unsigned int i = 0; i < 512; i++)
+         for (unsigned int j = 0; j < 4096; j++)
          {
-            data.push_back(buffer [i]);
+            data.push_back(buffer [j]);
 #endif
          }
    //      cout << "data: " << data << endl;
