@@ -142,7 +142,8 @@ Block::Block (const string &key)
       RING_PUSH_REQUESTS(&_private);
       Hypercall::event_channel_send (port);
 
-      api::sleep (2);
+//      api::sleep (2);
+      api::sleep (1);
 
       blkif_response_t *response = RING_GET_RESPONSE(&_private, _private.rsp_cons++);
    //   cout << "response->id: " << response->id << endl;
@@ -152,9 +153,9 @@ Block::Block (const string &key)
 
       if (response->status == BLKIF_RSP_OKAY)
       {
+#if defined SINGLE_FILE_HACK
          for (unsigned int i = 0; i < PAGE_SIZE; i++)
          {
-#if defined SINGLE_FILE_HACK
             if (   (   (buffer [i] < ' ')
                   || (buffer [i] > '~'))
                && (buffer [i] != 9)
@@ -167,6 +168,8 @@ Block::Block (const string &key)
 
             ss << buffer [i];
 #else
+         for (unsigned int i = 0; i < 512; i++)
+         {
             data.push_back(buffer [i]);
 #endif
          }
