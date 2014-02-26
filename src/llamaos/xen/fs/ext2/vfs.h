@@ -18,6 +18,53 @@
 #ifndef _CROCOS_FS_VFS_H
 #define _CROCOS_FS_VFS_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif  // __cplusplus
+
+/* initialize the file system: try to mount the disk partition on / */
+void fs_initialize ();
+
+/* open a file.
+ * flags: bitwise-or'd flags (O_RDONLY, O_WRONLY or O_RDWR)
+ * return -EACCES if the requested access is not allowed or if search
+ *        permission is denied for one of the directories.
+ * return -EISDIR if write access is requested on a directory.
+ * return -EIO if a low-level I/O error occured.
+ * return -EMFILE if the process reached the maximum number of files opened.
+ * return -ENAMETOOLONG if the path is too long.
+ * return -ENFILE if the system reached the maximum number of files opened.
+ * return -ENOENT if a component in the path is not found.
+ * return -ENOTDIR if a component in the path is not a directory.
+ * return a file descriptor otherwise (no error) */
+int fs_open (const char *path, int flags);
+
+/* close a file descriptor.
+ * return -EBADF if fd isn't a valid file descriptor.
+ * return 0 otherwise (no error). */
+int fs_close (int fd);
+
+/* reposition the offset of an opened file.
+ * return -EBADF if fd isn't a valid file descriptor.
+ * return -EINVAL if whence is not SEEK_SET, SEEK_CUR or SEEK_END.
+ * return -EPIPE if fd is associated with a pipe, socket or FIFO.
+ * return the resulting offset otherwise. */
+off_t fs_lseek (int fd, off_t offset, int whence);
+
+/* read bytes from an opened file into a buffer.
+ * return -EBADF if fd isn't a valid file descriptor.
+ * return -EFBIG if the file is too large for the implementation.
+ * return -EINVAL if fd is an object which can't be read.
+ * return -EISDIR if fd refers to a directory.
+ * return -EIO if a low-level I/O error occured.
+ * return the number of bytes read otherwise (no error). */
+ssize_t fs_read (int fd, void *buf, size_t count);
+
+#ifdef __cplusplus
+}
+#endif  // __cplusplus
+
+#if 0
 #include "direntry.h"
 #include "stat.h"
 #include <stddef.h>
@@ -82,6 +129,8 @@ ssize_t fs_read (int fd, void *buf, size_t count);
  * return -EBADF if fd isn't a valid file descriptor.
  * return -ENOTDIR if fd doesn't refer to a directory. */
 int fs_readdir (int fd, struct direntry *dir);
+
+#endif
 
 #endif /* _CROCOS_FS_VFS_H */
 

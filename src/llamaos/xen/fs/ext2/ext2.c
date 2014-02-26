@@ -112,7 +112,7 @@ struct direntry_t {
 };
 #define __sizeof_direntry (sizeof (struct direntry_t))
 
-ino_t ext2_root_ino = EXT2_ROOT_INO; /* root directory inode */
+static ino_t ext2_root_ino = EXT2_ROOT_INO; /* root directory inode */
 
 /* block size in bytes */
 #define __BLK_SIZE ((unsigned int)(1024 << superblk.s_log_block_size))

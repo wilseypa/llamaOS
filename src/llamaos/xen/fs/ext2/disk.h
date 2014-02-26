@@ -18,6 +18,10 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif  // __cplusplus
+
 /* open and copy the disk image file into memory */
 bool disk_initialize ();
 
@@ -25,6 +29,10 @@ bool disk_initialize ();
  * return false in case of IO error. */
 bool disk_read (uint64_t off, void *buf, size_t size);
 bool disk_write (uint64_t off, const void *buf, size_t size);
+
+#ifdef __cplusplus
+}
+#endif  // __cplusplus
 
 #endif /* _CROCOS_DEVICES_DISK_H */
 

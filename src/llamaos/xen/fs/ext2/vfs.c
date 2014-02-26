@@ -48,7 +48,7 @@ struct inode *free_inodes, *used_inodes;
 #define SEEK_CUR 1
 #define SEEK_END 2
 
-ino_t ext2_root_ino = EXT2_ROOT_INO;
+static ino_t ext2_root_ino = EXT2_ROOT_INO;
 
 /* find the inode number (ino) of the file/directory identified by 'path' in
  * the 'parent' directory.

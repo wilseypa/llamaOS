@@ -46,9 +46,10 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <llamaos/memory/Memory.h>
 #include <llamaos/xen/Export-glibc.h>
 #include <llamaos/xen/Hypervisor.h>
-#include <bits/stringfwd.h>
 #include <llamaos/llamaOS.h>
 #include <llamaos/Trace.h>
+
+#include <llamaos/xen/fs/ext2/vfs.h>
 
 using namespace std;
 using namespace llamaos;
@@ -213,15 +214,17 @@ static int glibc_libc_open (const char *file, int oflag)
    }
    else
    {
-      Hypervisor *hypervisor = Hypervisor::get_instance ();
+      return fs_open (file, oflag);
 
-      for (size_t i = 0; i < hypervisor->blocks.size (); i++)
-      {
-         if (strcmp (file, hypervisor->blocks [i]->get_name ().c_str ()) == 0)
-         {
-            return 100 + i;
-         }
-      }
+//      Hypervisor *hypervisor = Hypervisor::get_instance ();
+//
+//      for (size_t i = 0; i < hypervisor->blocks.size (); i++)
+//      {
+//         if (strcmp (file, hypervisor->blocks [i]->get_name ().c_str ()) == 0)
+//         {
+//            return 100 + i;
+//         }
+//      }
    }
 
 //   trace("!!! ALERT: glibc calling libc_open() before file system support is enabled.\n");
@@ -242,16 +245,18 @@ static int glibc_close (int fd)
    }
    else
    {
-      Hypervisor *hypervisor = Hypervisor::get_instance ();
+      return fs_close (fd);
 
-      for (size_t i = 0; i < hypervisor->blocks.size (); i++)
-      {
-         if (fd == static_cast<int>(100 + i))
-         {
-            // special close?
-            break;
-         }
-      }
+//      Hypervisor *hypervisor = Hypervisor::get_instance ();
+//
+//      for (size_t i = 0; i < hypervisor->blocks.size (); i++)
+//      {
+//         if (fd == static_cast<int>(100 + i))
+//         {
+//            // special close?
+//            break;
+//         }
+//      }
    }
 
    return 0;
@@ -259,18 +264,20 @@ static int glibc_close (int fd)
 
 static ssize_t glibc_read (int fd, void *buf, size_t nbytes)
 {
-   Hypervisor *hypervisor = Hypervisor::get_instance ();
+   return fs_read (fd, buf, nbytes);
 
-   for (size_t i = 0; i < hypervisor->blocks.size (); i++)
-   {
-      if (fd == static_cast<int>(100 + i))
-      {
-         return hypervisor->blocks [i]->read (buf, nbytes);
-      }
-   }
+//   Hypervisor *hypervisor = Hypervisor::get_instance ();
+//
+//   for (size_t i = 0; i < hypervisor->blocks.size (); i++)
+//   {
+//      if (fd == static_cast<int>(100 + i))
+//      {
+//         return hypervisor->blocks [i]->read (buf, nbytes);
+//      }
+//   }
 
-  cout << "Alert: reading from fileno " << fd << ", " << nbytes << " bytes" << endl;
-  return -1;
+//  cout << "Alert: reading from fileno " << fd << ", " << nbytes << " bytes" << endl;
+//  return -1;
 }
 
 static ssize_t glibc_write (int fd, const void *buf, size_t nbytes)
@@ -314,10 +321,12 @@ static off_t glibc_lseek (int fd, off_t offset, int whence)
       return offset;
    }
 
-   cout << "lseek " << fd << endl;
-   trace("!!! ALERT: glibc calling lseek() before file system support is enabled.\n");
-   trace ("   fd: %d, offset: %d, whence: %d\n", fd, offset, whence);
-   return -1;
+   return fs_lseek (fd, offset, whence);
+
+//   cout << "lseek " << fd << endl;
+//   trace("!!! ALERT: glibc calling lseek() before file system support is enabled.\n");
+//   trace ("   fd: %d, offset: %d, whence: %d\n", fd, offset, whence);
+//   return -1;
 }
 
 static off64_t glibc_lseek64 (int fd, off64_t offset, int whence)
@@ -461,6 +470,8 @@ void entry_llamaOS (start_info_t *start_info)
       {
          hypervisor->argv [i+1] = const_cast<char *>(args [i].c_str ());
       }
+
+      fs_initialize ();
 
       trace ("Before application main()...\n");
 

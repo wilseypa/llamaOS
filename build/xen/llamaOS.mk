@@ -66,6 +66,7 @@ C_SOURCES = \
   llamaos/xen/fs/ext2/vfs.c \
   llamaos/xen/fs/ext2/ext2.c \
   llamaos/xen/fs/ext2/fd.c \
+  llamaos/xen/fs/ext2/panic.c \
   llamaos/xen/Trace.c
 
 CPP_SOURCES = \
@@ -78,6 +79,7 @@ CPP_SOURCES = \
   llamaos/net/llamaNET.cpp \
   llamaos/xen/entry/gcc.cpp \
   llamaos/xen/entry/llamaOS.cpp \
+  llamaos/xen/fs/ext2/disk.cpp \
   llamaos/xen/Block.cpp \
   llamaos/xen/Console.cpp \
   llamaos/xen/Events.cpp \

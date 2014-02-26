@@ -9,20 +9,25 @@
 
 #include "config.h"
 #include "disk.h"
-#include <sys/syscall.h>
-#include "panic.h"
+// #include <sys/syscall.h>
+// #include "panic.h"
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
 
-extern int syscall (int number, ...);
+#include <llamaos/xen/Hypervisor.h>
 
-unsigned char img [CONFIG_DISK_SIZE]; /* disk image (copied in memory) */
+using namespace llamaos::xen;
+
+// extern int syscall (int number, ...);
+
+static unsigned char img [CONFIG_DISK_SIZE]; /* disk image (copied in memory) */
 
 #define init_error(format, ...) \
 ({  kwarning (format, ##__VA_ARGS__); return false; })
 bool disk_initialize () {
+#if 0
     int img_fd; /* disk image file descriptor */
     if ((img_fd = syscall (SYS_open, CONFIG_DISK_IMAGE, 02)) < 0)
         init_error ("can't open disk image file: " CONFIG_DISK_IMAGE);
@@ -31,7 +36,20 @@ bool disk_initialize () {
         init_error ("can't copy disk image file (" CONFIG_DISK_IMAGE
             ", %d bytes) in memory ", CONFIG_DISK_SIZE);
     syscall (SYS_close, img_fd);
-    return true;
+#endif
+
+   Hypervisor *hypervisor = Hypervisor::get_instance ();
+
+   for (size_t i = 0; i < hypervisor->blocks.size (); i++)
+   {
+      if (strcmp (CONFIG_DISK_IMAGE, hypervisor->blocks [i]->get_name ().c_str ()) == 0)
+      {
+         hypervisor->blocks [i]->read (img, CONFIG_DISK_SIZE);
+         return true;
+      }
+   }
+
+   return false;
 }
 
 bool disk_read (uint64_t off, void *buf, size_t size) {
