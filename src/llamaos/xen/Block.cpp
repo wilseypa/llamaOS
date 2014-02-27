@@ -134,7 +134,7 @@ ssize_t Block::read (void *buf, size_t nbytes)
       request->operation = BLKIF_OP_READ;
       request->handle = vdev;
       request->id = 0;
-      request->nr_segments = 8;
+      request->nr_segments = 1;
       request->sector_number = i;
       request->seg [0].gref = shared_buffer_ref;
       request->seg [0].first_sect = 0;
