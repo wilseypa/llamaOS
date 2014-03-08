@@ -106,6 +106,7 @@ static void glibc_exit (int status)
 
 static int glibc_gethostname (char *name, size_t len)
 {
+   cout << "calling gethostname...";
    stringstream ss;
    ss << Hypervisor::get_instance ()->name << "." << Hypervisor::get_instance ()->domid;
 
@@ -115,7 +116,9 @@ static int glibc_gethostname (char *name, size_t len)
       return -1;
    }
 
-   memcpy(name, ss.str().c_str(), len < ss.str().size() + 1);
+//   memcpy(name, ss.str().c_str(), len < ss.str().size() + 1);
+   strcpy(name, ss.str().c_str());
+   cout << name << endl;
    return 0;
 }
 
@@ -194,6 +197,8 @@ static stringstream np_out;
 
 static int glibc_libc_open (const char *file, int oflag)
 {
+//   errno = ENOENT;
+//   return -1;
    cout << "glibc_libc_open: " << file << ", " << oflag << endl;
    if (strcmp (file, "fort.6") == 0)
    {

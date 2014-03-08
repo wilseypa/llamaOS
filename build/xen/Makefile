@@ -56,6 +56,12 @@ all:
 	@$(MAKE) -f llamaOS.mk
 #	@$(MAKE) -f llamaMPI.mk
 #	@$(MAKE) -f llamaMPIF.mk
+	@$(MAKE) -f apps/mpich-$(MPICH_VERSION)/examples/f77/fpi.mk
+	@$(MAKE) -f apps/mpich-$(MPICH_VERSION)/examples/f77/hellow.mk
+	@$(MAKE) -f apps/mpich-$(MPICH_VERSION)/examples/f90/pi3f90.mk
+	@$(MAKE) -f apps/mpich-$(MPICH_VERSION)/examples/cpi.mk
+	@$(MAKE) -f apps/mpich-$(MPICH_VERSION)/examples/hellow.mk
+	@$(MAKE) -f apps/mpich-$(MPICH_VERSION)/examples/srtest.mk
 	@$(MAKE) -f apps/net/intel.mk
 	@$(MAKE) -f apps/netpipe-$(NETPIPE_VERSION)/llamaNET.mk
 	@$(MAKE) -f apps/netpipe-$(NETPIPE_VERSION)/memcpy.mk

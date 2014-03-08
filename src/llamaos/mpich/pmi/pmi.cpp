@@ -66,7 +66,7 @@ extern "C"
 int PMI_Get_size( int *size )
 {
    cout << "calling PMI_Get_size..." << endl;
-   *size = 2;
+   *size = 1;
 
    return PMI_SUCCESS;
 }
@@ -84,7 +84,7 @@ extern "C"
 int PMI_Get_universe_size( int *size )
 {
    cout << "calling PMI_Get_universe_size..." << endl;
-   *size = 2;
+   *size = 1;
 
    return PMI_SUCCESS;
 }
@@ -198,7 +198,8 @@ int PMI_KVS_Get( const char kvsname[], const char key[], char value[], int lengt
 
    if (0 == strcmp (key, "PMI_process_mapping"))
    {
-      strncpy(value, "(vector,(0,2,1),(1,2,1))", length);
+//      strncpy(value, "(vector,(0,2,1),(1,2,1))", length);
+      strncpy(value, "(vector,(0,1,1))", length);
       return PMI_SUCCESS;
    }
    else if (0 == strcmp (key, "sharedFilename[0]"))

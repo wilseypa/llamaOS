@@ -66,6 +66,12 @@ CPPFLAGS += \
 VPATH = $(SRCDIR)
 
 C_SOURCES = \
+  tools/mpich-$(MPICH_VERSION)/src/binding/f77/bcastf.c \
+  tools/mpich-$(MPICH_VERSION)/src/binding/f77/comm_rankf.c \
+  tools/mpich-$(MPICH_VERSION)/src/binding/f77/comm_sizef.c \
+  tools/mpich-$(MPICH_VERSION)/src/binding/f77/finalizef.c \
+  tools/mpich-$(MPICH_VERSION)/src/binding/f77/initf.c \
+  tools/mpich-$(MPICH_VERSION)/src/binding/f77/reducef.c \
   tools/mpich-$(MPICH_VERSION)/src/binding/f77/statusf2c.c \
   tools/mpich-$(MPICH_VERSION)/src/binding/f77.build/setbot.c \
   tools/mpich-$(MPICH_VERSION)/src/mpi/attr/attrutil.c \
@@ -316,6 +322,7 @@ C_SOURCES = \
   tools/mpich-$(MPICH_VERSION)/src/mpid/ch3/src/mpid_cancel_send.c \
   tools/mpich-$(MPICH_VERSION)/src/mpid/ch3/src/mpid_finalize.c \
   tools/mpich-$(MPICH_VERSION)/src/mpid/ch3/src/mpid_get_universe_size.c \
+  tools/mpich-$(MPICH_VERSION)/src/mpid/ch3/src/mpid_getpname.c \
   tools/mpich-$(MPICH_VERSION)/src/mpid/ch3/src/mpid_init.c \
   tools/mpich-$(MPICH_VERSION)/src/mpid/ch3/src/mpid_irecv.c \
   tools/mpich-$(MPICH_VERSION)/src/mpid/ch3/src/mpid_isend.c \
