@@ -33,14 +33,24 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <pmi.h>
 
 #include <iostream>
+
+#include <llamaos/xen/Hypervisor.h>
+#include <llamaos/mpi/mpi.h>
+
 using std::cout;
 using std::endl;
+
+using llamaos::xen::Hypervisor;
+
+static Hypervisor *hypervisor = nullptr;
 
 extern "C"
 int PMI_Init( int *spawned )
 {
    cout << "calling PMI_Init..." << endl;
    *spawned = 0;
+
+   hypervisor = Hypervisor::get_instance ();
 
    return PMI_SUCCESS;
 }
@@ -65,8 +75,11 @@ int PMI_Finalize( void )
 extern "C"
 int PMI_Get_size( int *size )
 {
-   cout << "calling PMI_Get_size..." << endl;
-   *size = 1;
+   cout << "calling PMI_Get_size...";
+
+   *size = atoi(hypervisor->argv [2]);
+
+   cout << *size << endl;
 
    return PMI_SUCCESS;
 }
@@ -74,8 +87,11 @@ int PMI_Get_size( int *size )
 extern "C"
 int PMI_Get_rank( int *rank )
 {
-   cout << "calling PMI_Get_rank..." << endl;
-   *rank = 0;
+   cout << "calling PMI_Get_rank...";
+
+   *rank = atoi(hypervisor->argv [1]) - 1;
+
+   cout << *rank << endl;
 
    return PMI_SUCCESS;
 }
@@ -83,8 +99,11 @@ int PMI_Get_rank( int *rank )
 extern "C"
 int PMI_Get_universe_size( int *size )
 {
-   cout << "calling PMI_Get_universe_size..." << endl;
-   *size = 1;
+   cout << "calling PMI_Get_universe_size...";
+
+   *size = atoi(hypervisor->argv [2]);
+
+   cout << *size << endl;
 
    return PMI_SUCCESS;
 }
@@ -199,7 +218,7 @@ int PMI_KVS_Get( const char kvsname[], const char key[], char value[], int lengt
    if (0 == strcmp (key, "PMI_process_mapping"))
    {
 //      strncpy(value, "(vector,(0,2,1),(1,2,1))", length);
-      strncpy(value, "(vector,(0,1,1))", length);
+      strncpy(value, "(vector,(0,1,2))", length);
       return PMI_SUCCESS;
    }
    else if (0 == strcmp (key, "sharedFilename[0]"))

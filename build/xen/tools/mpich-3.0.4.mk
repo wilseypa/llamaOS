@@ -60,6 +60,7 @@ CFLAGS += \
 CPPFLAGS += \
   -I $(SRCDIR)/tools/mpich-$(MPICH_VERSION)/src/include \
   -I $(INCDIR) \
+  -I $(SRCDIR) \
   -DUSE_DBG_LOGGING \
   -include $(SRCDIR)/llamaos/__thread.h
 

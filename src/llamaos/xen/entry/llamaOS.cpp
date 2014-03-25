@@ -45,6 +45,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <llamaos/api/sleep.h>
 #include <llamaos/memory/Memory.h>
 #include <llamaos/xen/Export-glibc.h>
+#include <llamaos/xen/Grant_map.h>
 #include <llamaos/xen/Hypervisor.h>
 #include <llamaos/llamaOS.h>
 #include <llamaos/Trace.h>
@@ -194,6 +195,7 @@ static unsigned int glibc_libc_sleep (unsigned int seconds)
 }
 
 static stringstream np_out;
+static char *pshmem = nullptr;
 
 static int glibc_libc_open (const char *file, int oflag)
 {
@@ -211,7 +213,7 @@ static int glibc_libc_open (const char *file, int oflag)
    }
    else if (strcmp (file, "shmem-mpich-0") == 0)
    {
-      return 20;
+      return 11;
    }
    else if (strncmp(file, "/dev/shm/mpich_shar_", 20) == 0)
    {
@@ -279,9 +281,9 @@ static ssize_t glibc_write (int fd, const void *buf, size_t nbytes)
          np_out << static_cast<const char *>(buf) [i];
       }
    }
-   else if (fd == 20)
+   else if ((fd == 11) || (fd == 12))
    {
-      cout << "glibc_write: " << fd << ", " << nbytes << endl;
+      memcpy(pshmem, buf, nbytes);
    }
    else
    {
@@ -342,18 +344,35 @@ static off64_t glibc_lseek64 (int fd, off64_t offset, int whence)
 
 static __ptr_t glibc_mmap (__ptr_t /* addr */, size_t len, int /* prot */, int /* flags */, int fd, off_t /* offset */)
 {
-   if (fd == 20) 
+   if (fd == 11)
    {
-      cout << "glibc_mmap: " << fd << ", " << len << endl;
-      return static_cast<__ptr_t>(new char [len]);
+      cout << "glibc_mmap: " << fd << ", " << len << ", " << hex << (uint64_t)pshmem << endl;
+      return static_cast<__ptr_t>(pshmem);
    }
    else if (fd == 12)
    {
-      cout << "glibc_mmap: " << fd << ", " << len << endl;
-      return static_cast<__ptr_t>(new char [len]);
+      cout << "glibc_mmap: " << fd << ", " << len <<  ", " << hex << (uint64_t)pshmem << endl;
+      return static_cast<__ptr_t>(pshmem);
    }
 
    return reinterpret_cast<__ptr_t>(-1);
+}
+
+static int glibc_unlink (const char *name)
+{
+   if (strncmp(name, "/dev/shm/mpich_shar_", 20) == 0)
+   {
+      cout << "glibc_unlink: " << name << endl;
+      return 0;
+   }
+
+   errno = ENOENT;
+   return -1;
+}
+
+static int glibc_munmap (__ptr_t addr, size_t len)
+{
+   return 0;
 }
 
 static void register_glibc_exports (void)
@@ -372,6 +391,8 @@ static void register_glibc_exports (void)
    register_llamaos_lseek (glibc_lseek);
    register_llamaos_lseek64 (glibc_lseek64);
    register_llamaos_mmap (glibc_mmap);
+   register_llamaos_unlink (glibc_unlink);
+   register_llamaos_munmap (glibc_munmap);
 }
 
 static vector<string> split (const string &input)
@@ -447,7 +468,16 @@ void entry_llamaOS (start_info_t *start_info)
          hypervisor->argv [i+1] = const_cast<char *>(args [i].c_str ());
       }
 
-      fs_initialize ();
+//      fs_initialize ();
+
+      int node = atoi(hypervisor->argv [1]);
+
+      if (node > 0)
+      {
+         node--;
+         Grant_map<char> shmem (hypervisor->domid-1-node, 16383 - (node * 2112), 2112);
+         pshmem = shmem.get_pointer ();
+      }
 
       trace ("Before application main()...\n");
 
