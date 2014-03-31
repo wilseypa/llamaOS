@@ -59,8 +59,9 @@ int main (int argc, char *argv [])
    cout << "self_id: " << self_id << endl;
 
 //   grant_ref_t ref;
+   int nodes = atoi(hypervisor->argv [2];
 
-   for (int i = 0; i < 4; i++)
+   for (int i = 0; i < nodes; i++)
    {
       for (int j = 0; j < 1024; j++)
       {
