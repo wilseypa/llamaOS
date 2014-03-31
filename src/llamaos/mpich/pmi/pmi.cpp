@@ -218,7 +218,8 @@ int PMI_KVS_Get( const char kvsname[], const char key[], char value[], int lengt
    if (0 == strcmp (key, "PMI_process_mapping"))
    {
 //      strncpy(value, "(vector,(0,2,1),(1,2,1))", length);
-      strncpy(value, "(vector,(0,1,2))", length);
+//      strncpy(value, "(vector,(0,1,2))", length);
+      snprintf(value, length, "(vector,(0,1,%d))", atoi(hypervisor->argv [2]));
       return PMI_SUCCESS;
    }
    else if (0 == strcmp (key, "sharedFilename[0]"))

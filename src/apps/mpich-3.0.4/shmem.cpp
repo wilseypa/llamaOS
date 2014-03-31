@@ -47,7 +47,7 @@ int main (int argc, char *argv [])
    cout << "starting mpich shared memory resources..." << endl;
 
    // create shared memory area
-   const unsigned int shmem_size = 2112 * PAGE_SIZE;
+   const unsigned int shmem_size = 1024 * PAGE_SIZE;
    char *shmem = static_cast<char *>(aligned_alloc (PAGE_SIZE, shmem_size));
 
    memset(static_cast<void *>(shmem), 0, shmem_size);
@@ -60,9 +60,9 @@ int main (int argc, char *argv [])
 
 //   grant_ref_t ref;
 
-   for (int i = 0; i < 2; i++)
+   for (int i = 0; i < 4; i++)
    {
-      for (int j = 0; j < 2112; j++)
+      for (int j = 0; j < 1024; j++)
       {
          hypervisor->grant_table.grant_access (self_id + 1 + i, &shmem [j * PAGE_SIZE]);
 //      ref = hypervisor->grant_table.grant_access (self_id + 1 + i, shmem);

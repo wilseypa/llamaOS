@@ -31,6 +31,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #ifndef llamaos_xen_grant_map_h_
 #define llamaos_xen_grant_map_h_
 
+#include <iostream>
 #include <vector>
 
 #include <xen/grant_table.h>
@@ -114,7 +115,7 @@ public:
          gnttab_map_grant_ref_t map_grant_ref;
 
          map_grant_ref.dom = domid;
-         map_grant_ref.ref = ref - i;
+         map_grant_ref.ref = ref;
          map_grant_ref.host_addr = address + (i * 4096);
 
          map_grant_ref.flags = (readonly) ? GNTMAP_host_map | GNTMAP_readonly
@@ -128,8 +129,11 @@ public:
          }
          else
          {
+            std::cout << "error mapping " << domid << ", " << ref << std::endl;
             trace ("error mapping %d, %d\n", domid, ref);
          }
+
+         --ref;
       }
    }
 

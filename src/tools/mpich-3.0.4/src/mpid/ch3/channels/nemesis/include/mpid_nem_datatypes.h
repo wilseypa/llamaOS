@@ -42,7 +42,8 @@
 #define MPID_NEM_OFFSETOF(struc, field) ((int)(&((struc *)0)->field))
 #define MPID_NEM_CACHE_LINE_LEN 64
 #define MPID_NEM_NUM_CELLS      64
-#define MPID_NEM_CELL_LEN       (64*1024)
+//#define MPID_NEM_CELL_LEN       (64*1024)
+#define MPID_NEM_CELL_LEN       (4*1024)       // !BAM
 
 /*
    The layout of the cell looks like this:

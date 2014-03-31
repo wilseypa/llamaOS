@@ -475,7 +475,7 @@ void entry_llamaOS (start_info_t *start_info)
       if (node > 0)
       {
          node--;
-         Grant_map<char> shmem (hypervisor->domid-1-node, 16383 - (node * 2112), 2112);
+         Grant_map<char> shmem (hypervisor->domid-1-node, 16383 - (node * 1024), 1024);
          pshmem = shmem.get_pointer ();
       }
 
