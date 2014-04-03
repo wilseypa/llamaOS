@@ -62,8 +62,8 @@ all:
 #	@$(MAKE) -f apps/mpich-$(MPICH_VERSION)/examples/cpi.mk
 	@$(MAKE) -f apps/mpich-$(MPICH_VERSION)/examples/hellow.mk
 #	@$(MAKE) -f apps/mpich-$(MPICH_VERSION)/examples/srtest.mk
-	@$(MAKE) -f apps/mpich-$(MPICH_VERSION)/shmem.mk
 #	@$(MAKE) -f apps/net/intel.mk
+	@$(MAKE) -f apps/net/shmem.mk
 #	@$(MAKE) -f apps/netpipe-$(NETPIPE_VERSION)/llamaNET.mk
 #	@$(MAKE) -f apps/netpipe-$(NETPIPE_VERSION)/memcpy.mk
 #	@$(MAKE) -f apps/netpipe-$(NETPIPE_VERSION)/nothing.mk
@@ -117,3 +117,7 @@ clean:
 	@rm -rf $(LIBDIR)
 	@echo removing: $(INCDIR)
 	@rm -rf $(INCDIR)
+
+.PHONY: check
+check:
+	@$(MAKE) -f llamaOS.mk check

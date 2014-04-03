@@ -34,7 +34,7 @@
 include common-vars.mk
 include common-flags.mk
 
-MAKEFILE_SOURCES += apps/mpich-$(MPICH_VERSION)/shmem.mk
+MAKEFILE_SOURCES += apps/net/shmem.mk
 
 CPPFLAGS += \
   -I $(INCDIR) \
@@ -44,7 +44,7 @@ CPPFLAGS += \
 VPATH = $(SRCDIR)
 
 SOURCES = \
-  apps/mpich-$(MPICH_VERSION)/shmem.cpp
+  apps/net/shmem.cpp
 
 OBJECTS = $(SOURCES:%.cpp=$(OBJDIR)/%.o)
 DEPENDS += $(OBJECTS:%.o=%.d)
@@ -55,7 +55,7 @@ LIBS = \
   $(LIBDIR)/sys/gcc.a \
   $(LIBDIR)/sys/glibc.a
 
-$(BINDIR)/apps/mpich-$(MPICH_VERSION)/shmem: $(OBJECTS) $(LIBS)
+$(BINDIR)/apps/net/shmem: $(OBJECTS) $(LIBS)
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
 	@$(LD) $(LDFLAGS) -T llamaOS.lds -o $@ $^
