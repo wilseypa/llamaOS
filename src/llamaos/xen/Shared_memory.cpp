@@ -51,13 +51,14 @@ using llamaos::xen::Shared_memory_user;
 
 static const int MAX_ENTRIES = 32;
 static const int MAX_NAME = 55;
-static const int MAX_ALIAS = 55;
+static const int MAX_ALIAS = 47;
 
 #pragma pack(1)
 typedef struct
 {
    uint8_t name [MAX_NAME+1];
    uint8_t alias [MAX_ALIAS+1];
+   uint64_t lock;
    uint64_t offset;
    uint64_t size;
 
@@ -117,15 +118,14 @@ int Shared_memory::open (const std::string &name) const
    for (int i = 0; i < MAX_ENTRIES; i++)
    {
       cout << "   [" << i << "] " << directory->entries [i].name << endl;
-      if (directory->entries [i].name [0] == '\0')
+      // if (directory->entries [i].name [0] == '\0')
+      if (__sync_lock_test_and_set(&directory->entries [i].lock, 1) == 0)
       {
          cout << "   writing to entry " << i << ", " << name.c_str () << endl;
          strncpy(reinterpret_cast<char *>(directory->entries [i].name), name.c_str (), MAX_NAME);
          wmb();
          return i + 200;
       }
-//      if (name.compare (reinterpret_cast<const char *>(directory->entries [i].name), MAX_NAME) == 0)
-
       cout << "   searching in entry " << i << endl;
       if (strncmp(name.c_str(), reinterpret_cast<const char *>(directory->entries [i].name), MAX_NAME) == 0)
       {
