@@ -113,6 +113,7 @@ Hypervisor::Hypervisor (const start_info_t *start_info)
       xenstore(machine_page_to_virtual_pointer<xenstore_domain_interface>(start_info->store_mfn), start_info->store_evtchn),
       name(xenstore.read_string ("name")),
       domid(xenstore.read<domid_t>("domid")),
+      shared_memory(nullptr),
       argc(0),
       blocks()
 {
@@ -122,7 +123,7 @@ Hypervisor::Hypervisor (const start_info_t *start_info)
 
 Hypervisor::~Hypervisor ()
 {
-
+   delete shared_memory;
 }
 
 void Hypervisor::initialize ()
@@ -137,10 +138,10 @@ void Hypervisor::initialize ()
 //   domid = xenstore.read<domid_t>("domid");
 //   trace ("Xenstore domid: %d\n", domid); 
 
-   trace ("float math: %f, %f, %f\n", 1.0f / 2638.0f, 25 / 43219.0f, 1 / 3.0f);
-   trace ("double math: %lf, %lf, %lf\n", 1.0 / 2638.0, 25 / 43219.0, 1 / 3.0);
+//   trace ("float math: %f, %f, %f\n", 1.0f / 2638.0f, 25 / 43219.0f, 1 / 3.0f);
+//   trace ("double math: %lf, %lf, %lf\n", 1.0 / 2638.0, 25 / 43219.0, 1 / 3.0);
 
-   trace ("binding to VIRQ_TIMER...\n");
+//   trace ("binding to VIRQ_TIMER...\n");
 //   events.bind_virq (VIRQ_TIMER, virq_timer_event, this);
 
 //   events.bind (console.port, console.event_handler, &console);
@@ -159,4 +160,6 @@ void Hypervisor::initialize ()
 //      cout << "keys [" << i << "]: " << keys [i] << endl;
       blocks.push_back(new Block(string("device/vbd/") + keys [i]));
    }
+
+   shared_memory = Shared_memory::create(name, domid);
 }

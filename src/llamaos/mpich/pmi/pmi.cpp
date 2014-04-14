@@ -33,16 +33,22 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <pmi.h>
 
 #include <iostream>
+#include <sstream>
+#include <string>
 
 #include <llamaos/xen/Hypervisor.h>
 #include <llamaos/mpi/mpi.h>
 
 using std::cout;
 using std::endl;
+using std::istringstream;
+using std::string;
 
 using llamaos::xen::Hypervisor;
 
 static Hypervisor *hypervisor = nullptr;
+static int init_rank = -1;
+static int init_size = -1;
 
 extern "C"
 int PMI_Init( int *spawned )
@@ -51,6 +57,18 @@ int PMI_Init( int *spawned )
    *spawned = 0;
 
    hypervisor = Hypervisor::get_instance ();
+
+   size_t pos = hypervisor->name.find("-");
+
+   if (pos != string::npos)
+   {
+      istringstream s(hypervisor->name.substr(pos+1));
+      char c;
+
+      s >> init_rank;
+      s >> c;
+      s >> init_size;
+   }
 
    return PMI_SUCCESS;
 }
@@ -77,7 +95,8 @@ int PMI_Get_size( int *size )
 {
    cout << "calling PMI_Get_size...";
 
-   *size = atoi(hypervisor->argv [2]);
+//   *size = atoi(hypervisor->argv [2]);
+   *size = init_size;
 
    cout << *size << endl;
 
@@ -89,7 +108,8 @@ int PMI_Get_rank( int *rank )
 {
    cout << "calling PMI_Get_rank...";
 
-   *rank = atoi(hypervisor->argv [1]) - 1;
+//   *rank = atoi(hypervisor->argv [1]) - 1;
+   *rank = init_rank;
 
    cout << *rank << endl;
 
@@ -101,7 +121,8 @@ int PMI_Get_universe_size( int *size )
 {
    cout << "calling PMI_Get_universe_size...";
 
-   *size = atoi(hypervisor->argv [2]);
+//   *size = atoi(hypervisor->argv [2]);
+   *size = init_size;
 
    cout << *size << endl;
 
@@ -196,6 +217,11 @@ int PMI_KVS_Put( const char kvsname[], const char key[], const char value[])
    cout << "  key: " << key << endl;
    cout << "  value: " << value << endl;
 
+   if (0 == strcmp (key, "sharedFilename[0]"))
+   {
+      hypervisor->shared_memory->put_alias(value, key);
+   }
+
    return PMI_SUCCESS;
 }
 
@@ -219,12 +245,14 @@ int PMI_KVS_Get( const char kvsname[], const char key[], char value[], int lengt
    {
 //      strncpy(value, "(vector,(0,2,1),(1,2,1))", length);
 //      strncpy(value, "(vector,(0,1,2))", length);
-      snprintf(value, length, "(vector,(0,1,%d))", atoi(hypervisor->argv [2]));
+      snprintf(value, length, "(vector,(0,1,%d))", init_size);//atoi(hypervisor->argv [2]));
+      cout << "  value: " << value << endl;
+
       return PMI_SUCCESS;
    }
    else if (0 == strcmp (key, "sharedFilename[0]"))
    {
-      strncpy(value, "shmem-mpich-0", length);
+      strncpy(value, hypervisor->shared_memory->get_name(key).c_str(), length);
       return PMI_SUCCESS;
    }
 

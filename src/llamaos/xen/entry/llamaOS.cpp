@@ -195,7 +195,6 @@ static unsigned int glibc_libc_sleep (unsigned int seconds)
 }
 
 static stringstream np_out;
-static char *pshmem = nullptr;
 
 static int glibc_libc_open (const char *file, int oflag)
 {
@@ -213,18 +212,20 @@ static int glibc_libc_open (const char *file, int oflag)
    }
    else if (strcmp (file, "shmem-mpich-0") == 0)
    {
-      return 11;
+      return Hypervisor::get_instance ()->shared_memory->open(file);
    }
    else if (strncmp(file, "/dev/shm/mpich_shar_", 20) == 0)
    {
-      return 12;
-   }
-   else
-   {
-      int fd = fs_open (file, oflag);
+      cout << "fd = " << Hypervisor::get_instance ()->shared_memory->open(file) << endl;
 
-      return (fd < 0) ? fd : fd+100;
+      return Hypervisor::get_instance ()->shared_memory->open(file);
    }
+//   else
+//   {
+//      int fd = fs_open (file, oflag);
+//
+//      return (fd < 0) ? fd : fd+100;
+//   }
 
 //   trace("!!! ALERT: glibc calling libc_open() before file system support is enabled.\n");
    trace (" opening file %s, %x\n", file, oflag);
@@ -242,7 +243,7 @@ static int glibc_close (int fd)
       cout << "np.out:" << endl;
       cout << np_out.str() << endl;
    }
-   else
+   else if (fd < 200)
    {
       if (fd >= 100)
       {
@@ -281,9 +282,11 @@ static ssize_t glibc_write (int fd, const void *buf, size_t nbytes)
          np_out << static_cast<const char *>(buf) [i];
       }
    }
-   else if ((fd == 11) || (fd == 12))
+   else if (fd >= 200)
    {
-      memcpy(pshmem, buf, nbytes);
+      cout << "Alert: writing to fileno " << fd << ", " << nbytes << " bytes" << endl;
+
+      memcpy(Hypervisor::get_instance ()->shared_memory->get(fd), buf, nbytes);
    }
    else
    {
@@ -344,15 +347,16 @@ static off64_t glibc_lseek64 (int fd, off64_t offset, int whence)
 
 static __ptr_t glibc_mmap (__ptr_t /* addr */, size_t len, int /* prot */, int /* flags */, int fd, off_t /* offset */)
 {
-   if (fd == 11)
+   if (fd >= 200)
    {
-      cout << "glibc_mmap: " << fd << ", " << len << ", " << hex << (uint64_t)pshmem << endl;
-      return static_cast<__ptr_t>(pshmem);
+      cout << "glibc_mmap: " << fd << ", " << len << endl;
+      return Hypervisor::get_instance ()->shared_memory->map(fd, len);
+//      return static_cast<__ptr_t>(pshmem);
    }
    else if (fd == 12)
    {
-      cout << "glibc_mmap: " << fd << ", " << len <<  ", " << hex << (uint64_t)pshmem << endl;
-      return static_cast<__ptr_t>(pshmem);
+//      cout << "glibc_mmap: " << fd << ", " << len <<  ", " << hex << (uint64_t)pshmem << endl;
+//      return static_cast<__ptr_t>(pshmem);
    }
 
    return reinterpret_cast<__ptr_t>(-1);
@@ -470,14 +474,15 @@ void entry_llamaOS (start_info_t *start_info)
 
 //      fs_initialize ();
 
-      int node = atoi(hypervisor->argv [1]);
+// static char *pshmem = nullptr;
+//      int node = atoi(hypervisor->argv [1]);
 
-      if (node > 0)
-      {
-         node--;
-         Grant_map<char> shmem (hypervisor->domid-1-node, 16383 - (node * 1024), 1024);
-         pshmem = shmem.get_pointer ();
-      }
+//      if (node > 0)
+//      {
+//         node--;
+//         Grant_map<char> shmem (hypervisor->domid-1-node, 16383 - (node * 1024), 1024);
+//         pshmem = shmem.get_pointer ();
+//      }
 
       trace ("Before application main()...\n");
 
@@ -488,6 +493,7 @@ void entry_llamaOS (start_info_t *start_info)
       fflush (stdout);
 
       trace ("After application main()...\n");
+      cout << "program break: " << memory::get_program_break () << endl;
       api::sleep(1);
 
       delete hypervisor;

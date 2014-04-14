@@ -30,7 +30,6 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 #include <malloc.h>
 
-#include <iostream>
 #include <stdexcept>
 
 #include <llamaos/memory/Memory.h>

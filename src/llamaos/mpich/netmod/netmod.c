@@ -72,7 +72,7 @@ static int nm_llamaNET_vc_terminate(MPIDI_VC_t *vc)
 
 static int nm_llamaNET_poll(int in_blocking_poll)
 {  
-   printf ("nm_llamaNET_poll\n");
+//   printf ("nm_llamaNET_poll\n");
    return MPI_SUCCESS;
 }
 

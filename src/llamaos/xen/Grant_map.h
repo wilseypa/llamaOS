@@ -31,7 +31,6 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #ifndef llamaos_xen_grant_map_h_
 #define llamaos_xen_grant_map_h_
 
-#include <iostream>
 #include <vector>
 
 #include <xen/grant_table.h>
@@ -129,7 +128,6 @@ public:
          }
          else
          {
-            std::cout << "error mapping " << domid << ", " << ref << std::endl;
             trace ("error mapping %d, %d\n", domid, ref);
          }
 

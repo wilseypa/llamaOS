@@ -33,49 +33,29 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 #include <iostream>
 
-#include <llamaos/memory/Memory.h>
+#include <llamaos/api/sleep.h>
+//#include <llamaos/memory/Memory.h>
 #include <llamaos/xen/Hypercall.h>
 #include <llamaos/xen/Hypervisor.h>
 #include <llamaos/llamaOS.h>
 
 using namespace std;
 using namespace llamaos;
-using namespace llamaos::memory;
 
 int main (int argc, char *argv [])
 {
    cout << "starting mpich shared memory resources..." << endl;
 
-   // create shared memory area
-   const unsigned int shmem_size = 1024 * PAGE_SIZE;
-   char *shmem = static_cast<char *>(aligned_alloc (PAGE_SIZE, shmem_size));
-
-   memset(static_cast<void *>(shmem), 0, shmem_size);
+   // cout << "sleep forever..." << endl;
 
    // allow access to the interface
    xen::Hypervisor *hypervisor = xen::Hypervisor::get_instance ();
 
-   domid_t self_id = hypervisor->domid;
-   cout << "self_id: " << self_id << endl;
-
-//   grant_ref_t ref;
-   int nodes = atoi(hypervisor->argv [2]);
-
-   for (int i = 0; i < nodes; i++)
-   {
-      for (int j = 0; j < 1024; j++)
-      {
-         hypervisor->grant_table.grant_access (self_id + 1 + i, &shmem [j * PAGE_SIZE]);
-//      ref = hypervisor->grant_table.grant_access (self_id + 1 + i, shmem);
-//      cout << "node " << self_id + 1 + i << " shmem ref: " << ref << endl;
-      }
-   }
-
-   cout << "sleep forever..." << endl;
-
    for (;;)
    {
-      xen::Hypercall::sched_op_yield();
+      cout << "shmem size: " << hypervisor->shared_memory->get_size() << endl;
+      api::sleep(2);
+//      xen::Hypercall::sched_op_yield();
    }
 
    return 0;

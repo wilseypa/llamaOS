@@ -89,6 +89,7 @@ CPP_SOURCES = \
   llamaos/xen/Hypervisor.cpp \
   llamaos/xen/Memory.cpp \
   llamaos/xen/PCI.cpp \
+  llamaos/xen/Shared_memory.cpp \
   llamaos/xen/Traps.cpp \
   llamaos/xen/Xenstore.cpp
 
