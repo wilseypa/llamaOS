@@ -55,10 +55,10 @@ public:
    virtual ~Shared_memory ();
 
    int open (const std::string &name) const;
-   void *map (int index, uint64_t size) const;
-   void unmap (int index) const;
+   void *map (int fd, uint64_t size) const;
+   void unmap (int fd) const;
 
-   void *get (int index) const;
+   void *get (int fd) const;
 
    int get_size () const;
    std::vector<std::string> get_names () const;

@@ -78,11 +78,11 @@ all:
 #	@$(MAKE) -f net/i82574.mk
 #	@$(MAKE) -f net/lspci.mk
 #	@$(MAKE) -f test/apps/hello-c.mk
-#	@$(MAKE) -f test/apps/hello-cpp.mk
+	@$(MAKE) -f test/apps/hello-cpp.mk
 #	@$(MAKE) -f test/apps/hello-f77.mk
 #	@$(MAKE) -f test/apps/hello-f90.mk
 	@$(MAKE) -f test/apps/memory.mk
-#	@$(MAKE) -f test/apps/mpich.mk
+	@$(MAKE) -f test/apps/mpich.mk
 #	@$(MAKE) -f test/apps/testMPI.mk
 #	@$(MAKE) -f test/apps/testMPIF.mk
 #	@$(MAKE) -f test/apps/tinyxml.mk

@@ -90,7 +90,5 @@ typedef union
 
 #endif	/* _G_config.h */
 
-
-
 #endif	// glibc_sysdeps_llamaos_g_config_h
 

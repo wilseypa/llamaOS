@@ -246,6 +246,7 @@ int PMI_KVS_Get( const char kvsname[], const char key[], char value[], int lengt
 //      strncpy(value, "(vector,(0,2,1),(1,2,1))", length);
 //      strncpy(value, "(vector,(0,1,2))", length);
       snprintf(value, length, "(vector,(0,1,%d))", init_size);//atoi(hypervisor->argv [2]));
+//      snprintf(value, length, "(vector,(0,4,1))");
       cout << "  value: " << value << endl;
 
       return PMI_SUCCESS;
