@@ -85,7 +85,7 @@ all:
 	@$(MAKE) -f test/apps/mpich.mk
 #	@$(MAKE) -f test/apps/testMPI.mk
 #	@$(MAKE) -f test/apps/testMPIF.mk
-#	@$(MAKE) -f test/apps/tinyxml.mk
+	@$(MAKE) -f test/apps/tinyxml.mk
 #	@$(MAKE) -f test/empty.mk
 #	@$(MAKE) -f test/memory.mk
 

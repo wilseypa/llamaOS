@@ -198,9 +198,7 @@ static stringstream np_out;
 
 static int glibc_libc_open (const char *file, int oflag)
 {
-//   errno = ENOENT;
-//   return -1;
-   cout << "glibc_libc_open: " << file << ", " << oflag << endl;
+//   cout << "glibc_libc_open: " << file << ", " << oflag << endl;
    if (strcmp (file, "fort.6") == 0)
    {
       return 6;
@@ -220,12 +218,12 @@ static int glibc_libc_open (const char *file, int oflag)
 
       return Hypervisor::get_instance ()->shared_memory->open(file);
    }
-//   else
-//   {
-//      int fd = fs_open (file, oflag);
-//
-//      return (fd < 0) ? fd : fd+100;
-//   }
+   else
+   {
+      int fd = fs_open (file, oflag);
+
+      return (fd < 0) ? fd : fd+100;
+   }
 
 //   trace("!!! ALERT: glibc calling libc_open() before file system support is enabled.\n");
    trace (" opening file %s, %x\n", file, oflag);
@@ -256,9 +254,12 @@ static int glibc_close (int fd)
 
 static ssize_t glibc_read (int fd, void *buf, size_t nbytes)
 {
-   if (fd >= 100)
+   if (fd < 200)
    {
-      return fs_read (fd-100, buf, nbytes);
+      if (fd >= 100)
+      {
+         return fs_read (fd-100, buf, nbytes);
+      }
    }
 
   cout << "Alert: reading from fileno " << fd << ", " << nbytes << " bytes" << endl;
@@ -288,6 +289,11 @@ static ssize_t glibc_write (int fd, const void *buf, size_t nbytes)
 
       memcpy(Hypervisor::get_instance ()->shared_memory->get(fd), buf, nbytes);
    }
+   else if (fd >= 100)
+   {
+      // put write call here
+      // return fs_write (fd-100, buf, nbytes);
+   }
    else
    {
       Hypervisor::get_instance ()->console.write (static_cast<const char *>(buf), nbytes);
@@ -310,9 +316,12 @@ static off_t glibc_lseek (int fd, off_t offset, int whence)
 
    cout << "lseek " << fd << ", " << offset << ", " << whence << endl;
 
-   if (fd >= 100)
+   if (fd < 200)
    {
-      return fs_lseek (fd-100, offset, whence);
+      if (fd >= 100)
+      {
+         return fs_lseek (fd-100, offset, whence);
+      }
    }
 
    trace("!!! ALERT: glibc calling lseek() before file system support is enabled.\n");
@@ -336,9 +345,12 @@ static off64_t glibc_lseek64 (int fd, off64_t offset, int whence)
       return np_out.str().size();
    }
 
-   if (fd >= 100)
+   if (fd < 200)
    {
-      return fs_lseek (fd-100, offset, whence);
+      if (fd >= 100)
+      {
+         return fs_lseek (fd-100, offset, whence);
+      }
    }
 
    trace("!!! ALERT: glibc calling lseek64() before file system support is enabled.\n");
@@ -374,7 +386,7 @@ static int glibc_unlink (const char *name)
    return -1;
 }
 
-static int glibc_munmap (__ptr_t addr, size_t len)
+static int glibc_munmap (__ptr_t /* addr */, size_t /* len */)
 {
    return 0;
 }
@@ -472,7 +484,7 @@ void entry_llamaOS (start_info_t *start_info)
          hypervisor->argv [i+1] = const_cast<char *>(args [i].c_str ());
       }
 
-//      fs_initialize ();
+      fs_initialize ();
 
 // static char *pshmem = nullptr;
 //      int node = atoi(hypervisor->argv [1]);
