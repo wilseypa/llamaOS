@@ -48,12 +48,12 @@ all:
 	@$(MAKE) -f sys/gfortran-$(GCC_VERSION).mk
 	@$(MAKE) -f sys/gcc-$(GCC_VERSION).mk
 	@$(MAKE) -f sys/xen-$(XEN_VERSION).mk
+	@$(MAKE) -f llamaOS.mk
 	@$(MAKE) -f tools/blas.mk
 	@$(MAKE) -f tools/cblas.mk
 	@$(MAKE) -f tools/gtest-$(GTEST_VERSION).mk
 	@$(MAKE) -f tools/tinyxml-$(TINYXML_VERSION).mk
 	@$(MAKE) -f tools/mpich-$(MPICH_VERSION).mk
-	@$(MAKE) -f llamaOS.mk
 #	@$(MAKE) -f llamaMPI.mk
 #	@$(MAKE) -f llamaMPIF.mk
 	@$(MAKE) -f apps/mpich-$(MPICH_VERSION)/examples/f77/fpi.mk
