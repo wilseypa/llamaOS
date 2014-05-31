@@ -38,8 +38,6 @@ MAKEFILE_SOURCES += sys/stdc++-$(GCC_VERSION).mk
 
 CFLAGS += \
   -Wno-error \
-  -U_FORTIFY_SOURCE \
-  -D__USE_FORTIFY_LEVEL=0 \
   -DIN_GLIBCPP_V3 \
   -DHAVE_CONFIG_H \
   -I $(SRCDIR)/sys/gcc-$(GCC_VERSION)/libstdc++-v3 \
@@ -58,8 +56,6 @@ CPPFLAGS += \
   -Wwrite-strings \
   -Wcast-qual \
   -Wabi \
-  -U_FORTIFY_SOURCE \
-  -D__USE_FORTIFY_LEVEL=0 \
   -D_GNU_SOURCE \
   -I $(SRCDIR)/sys/gcc-$(GCC_VERSION)/libgcc \
   -I $(SRCDIR)/sys/gcc-$(GCC_VERSION)/libstdc++-v3/include/backward \

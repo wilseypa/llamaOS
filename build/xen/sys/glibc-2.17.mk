@@ -82,8 +82,6 @@ INCLUDES_DIRS = \
   -I $(SRCDIR)
 
 ASMFLAGS += \
-  -U_FORTIFY_SOURCE \
-  -D__USE_FORTIFY_LEVEL=0 \
   -D_LIBC_REENTRANT \
   -DASSEMBLER \
   -Wa,--noexecstack \
@@ -112,8 +110,6 @@ CFLAGS += \
   -fmerge-all-constants \
   -frounding-math \
   -Wstrict-prototypes \
-  -U_FORTIFY_SOURCE \
-  -D__USE_FORTIFY_LEVEL=0 \
   -DLOCALEDIR='""' \
   -DLOCALE_ALIAS_PATH='""' \
   -D_LIBC_REENTRANT \

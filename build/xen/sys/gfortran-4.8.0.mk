@@ -38,8 +38,6 @@ MAKEFILE_SOURCES += sys/gfortran-$(GCC_VERSION).mk
 
 # -iquote/usr/src/gcc-4.8.0/libgfortran/io
 CFLAGS += \
-  -U_FORTIFY_SOURCE \
-  -D__USE_FORTIFY_LEVEL=0 \
   -DHAVE_CONFIG_H \
   -Wall \
   -Wstrict-prototypes \
