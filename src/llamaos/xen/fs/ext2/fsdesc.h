@@ -37,6 +37,10 @@ typedef int (*fsdesc_fill_stat) (ino_t ino, struct stat *buf);
 typedef ssize_t (*fsdesc_read) (struct inode *node, void *buf,
     off_t offset, size_t count);
 
+/* write len bytes to offset from a file. */
+typedef ssize_t (*fsdesc_write) (struct inode *node, const void *data_buf,
+				off_t offset, size_t len);
+
 /* read one directory entry at position 'offset' in a directory file */
 typedef ssize_t (*fsdesc_readdir) (struct inode *dirnode,
     struct direntry *dir, off_t offset);
@@ -48,6 +52,7 @@ struct fsdesc_t {
     fsdesc_lookup    lookup;    /* lookup function */
     fsdesc_fill_stat fill_stat; /* fill_inode function */
     fsdesc_read      read;      /* read function */
+    fsdesc_write     write;     /* write function */ 
     fsdesc_readdir   readdir;   /* readdir function */
 };
 

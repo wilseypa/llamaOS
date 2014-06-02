@@ -45,6 +45,12 @@ int ext2_fill_stat (ino_t ino, struct stat *buf);
  * return -EIO in case of low-level I/O error. */
 ssize_t ext2_read (struct inode *node, void *buf, off_t offset, size_t count);
 
+/* write bytes to offset from a file.
+ * return number of bytes written.
+ * return -EFBIG if the file size limit is reached.
+ * return -EIO in case of low-level I/O error. */
+ssize_t ext2_write (struct inode *node, const void *data_buf, off_t offset, size_t len);
+
 /* read the directory entry at position 'offset' in the directory file.
  * return number of bytes read in the directory file (0 if EOF) */
 ssize_t ext2_readdir (struct inode *dirnode, struct direntry *dir,

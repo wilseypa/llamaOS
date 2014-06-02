@@ -60,6 +60,16 @@ off_t fs_lseek (int fd, off_t offset, int whence);
  * return the number of bytes read otherwise (no error). */
 ssize_t fs_read (int fd, void *buf, size_t count);
 
+/* write bytes to an opened file from a buffer.
+ * return -EBADF if fd isn't a valid file descriptor.
+ * return -EFBIG if the the file size limit is reached.
+ * return -EINVAL if fd is an object which can't be written.
+ * return -EISDIR if fd refers to a directory.
+ * return -EIO if a low-level I/O error occured.
+ * return the number of bytes written otherwise (no error). */
+ssize_t fs_write (int fd, const void *buf, size_t count);
+
+
 #ifdef __cplusplus
 }
 #endif  // __cplusplus
@@ -122,6 +132,15 @@ off_t fs_lseek (int fd, off_t offset, int whence);
  * return -EIO if a low-level I/O error occured.
  * return the number of bytes read otherwise (no error). */
 ssize_t fs_read (int fd, void *buf, size_t count);
+
+/* write bytes to an opened file from a buffer.
+ * return -EBADF if fd isn't a valid file descriptor.
+ * return -EFBIG if the the file size limit is reached.
+ * return -EINVAL if fd is an object which can't be written.
+ * return -EISDIR if fd refers to a directory.
+ * return -EIO if a low-level I/O error occured.
+ * return the number of bytes written otherwise (no error). */
+ssize_t fs_write (int fd, const void *buf, size_t count);
 
 /* read one directory entry from an opened directory.
  * return 1 on success.

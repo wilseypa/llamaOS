@@ -296,6 +296,49 @@ ssize_t ext2_read (struct inode *node, void *buf, off_t offset, size_t count)
     return ((retval < 0) ? retval : (ssize_t)(bytes_read));
 }
 
+ssize_t ext2_write (struct inode *node, const void *data_buf, off_t offset, size_t len)
+{
+  struct inode_t inode;
+  uint32_t first_blk = offset2blk_n (offset);
+  uint32_t last_blk = offset2blk_n (offset + len - 1);
+  size_t blk_cnt = last_blk - first_blk + 1;
+  unsigned char temp_buf[__BLK_SIZE*2]; // buffer to store temporary block data
+  uint32_t blk;
+  int retval;
+  size_t to_write;
+  size_t written = 0;
+
+  // load inode
+  if ((retval = fill_inode (node->st.st_ino, &inode)) < 0) return retval;
+
+  // zero check
+  if ((len == 0) || (offset < 0))
+    return 0;
+
+  // perform lock to prevent other ops accessing inode
+  //lock(node->st.st_lock); // (this is just a dummy function right now and won't be needed until parallel)
+
+  // loop through blocks until all data is written
+  for (blk = first_blk; written < len; blk++){
+    offset = inode.i_size + written - (blk * __BLK_SIZE);
+    to_write = __BLK_SIZE - offset;
+    
+    if (len - written < to_write)
+      to_write = len - written;
+
+    // get block to write to 
+    // get_file_blk (&inode, blk); // this loads the block into cache unless I'm at EOF :/ I need it to add blocks if needed.
+    
+    // write data to block
+    // disk_write(offset, data_buf, to_write); //not the correct offset yet, needs to be re-calculated off of block that is grabbed from get_file_blk.
+    
+    // increment written
+
+  }
+  
+  return ((retval < 0) ? retval : (ssize_t)(written));
+}
+
 ssize_t ext2_readdir (struct inode *dirnode, struct direntry *dir,
     off_t offset) {
     struct inode_t dir_inode;

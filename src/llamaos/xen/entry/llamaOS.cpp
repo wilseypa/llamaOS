@@ -292,7 +292,7 @@ static ssize_t glibc_write (int fd, const void *buf, size_t nbytes)
    else if (fd >= 100)
    {
       // put write call here
-      // return fs_write (fd-100, buf, nbytes);
+      return fs_write (fd-100, buf, nbytes);
    }
    else
    {

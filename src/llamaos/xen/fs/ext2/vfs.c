@@ -208,6 +208,21 @@ ssize_t fs_read (int fd, void *buf, size_t count) {
     return retval;
 }
 
+ssize_t fs_write (int fd, const void *buf, size_t count) {
+  ssize_t retval;
+  mode_t mode;
+  struct fd *fdesc = fd_get (fd);
+  if (fdesc == NULL) return -EBADF;
+  if (!is_wr (fdesc->flags)) return -EINVAL;
+  mode = fdesc->inode->st.st_mode;
+  if (S_ISDIR (mode)) return -EISDIR;
+  if (S_ISCHR (mode) || S_ISBLK (mode) || S_ISFIFO (mode) || S_ISSOCK (mode)) return -EINVAL;
+  if (count == 0) return 0;
+  retval = ext2_write (fdesc->inode, buf, fdesc->offset, count);
+  if (retval > 0) fdesc->offset += retval;
+  return retval;
+}
+
 int fs_readdir (int fd, struct direntry *dir) {
     ssize_t retval;
     mode_t mode;

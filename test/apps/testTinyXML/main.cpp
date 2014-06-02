@@ -37,8 +37,8 @@ using namespace std;
 int main (int argc, char *argv [])
 {
    cout << endl << "hello llamaOS" << endl;
-   cout.flush ();
 
+   cout << endl << "Read Test" << endl;
    TiXmlDocument doc ("test.xml");
    doc.LoadFile();
    doc.Print ();
@@ -46,6 +46,9 @@ int main (int argc, char *argv [])
    TiXmlDocument doc2 ("/folder/test.xml");
    doc2.LoadFile();
    doc2.Print ();
+
+   cout << endl << "Write Test" << endl;
+   cout.flush ();
 
    return 0;
 }
