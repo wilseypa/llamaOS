@@ -83,6 +83,7 @@ all:
 #	@$(MAKE) -f test/apps/hello-f90.mk
 	@$(MAKE) -f test/apps/memory.mk
 	@$(MAKE) -f test/apps/mpich.mk
+	@$(MAKE) -f test/apps/testExt2.mk
 #	@$(MAKE) -f test/apps/testMPI.mk
 #	@$(MAKE) -f test/apps/testMPIF.mk
 	@$(MAKE) -f test/apps/tinyxml.mk

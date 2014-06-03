@@ -25,6 +25,9 @@ extern "C" {
 /* initialize the file system: try to mount the disk partition on / */
 void fs_initialize ();
 
+/* finalize the file system: try to unmount the disk partition on / */
+void fs_finalize ();
+
 /* open a file.
  * flags: bitwise-or'd flags (O_RDONLY, O_WRONLY or O_RDWR)
  * return -EACCES if the requested access is not allowed or if search

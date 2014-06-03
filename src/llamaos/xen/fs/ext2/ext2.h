@@ -25,6 +25,7 @@
 /* mount the disk device, considering that it contains a single partition
  * formated as an ext2 file system. */
 bool ext2_mount ();
+bool ext2_unmount ();
 
 /* find the inode number (ino) of the file/directory 'name' in the 'parent'
  * directory.

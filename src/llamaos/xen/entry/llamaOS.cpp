@@ -245,6 +245,7 @@ static int glibc_close (int fd)
    {
       if (fd >= 100)
       {
+         cout << "closing file " << fd << endl;
          return fs_close (fd-100);
       }
    }
@@ -258,6 +259,7 @@ static ssize_t glibc_read (int fd, void *buf, size_t nbytes)
    {
       if (fd >= 100)
       {
+         cout << "reading from file " << fd << endl;
          return fs_read (fd-100, buf, nbytes);
       }
    }
@@ -285,8 +287,6 @@ static ssize_t glibc_write (int fd, const void *buf, size_t nbytes)
    }
    else if (fd >= 200)
    {
-      cout << "Alert: writing to fileno " << fd << ", " << nbytes << " bytes" << endl;
-
       memcpy(Hypervisor::get_instance ()->shared_memory->get(fd), buf, nbytes);
    }
    else if (fd >= 100)
@@ -320,6 +320,7 @@ static off_t glibc_lseek (int fd, off_t offset, int whence)
    {
       if (fd >= 100)
       {
+         cout << "lseek on file " << fd << endl;
          return fs_lseek (fd-100, offset, whence);
       }
    }
@@ -349,6 +350,7 @@ static off64_t glibc_lseek64 (int fd, off64_t offset, int whence)
    {
       if (fd >= 100)
       {
+         cout << "lseek64 on file " << fd << endl;
          return fs_lseek (fd-100, offset, whence);
       }
    }
@@ -485,17 +487,6 @@ void entry_llamaOS (start_info_t *start_info)
       }
 
       fs_initialize ();
-
-// static char *pshmem = nullptr;
-//      int node = atoi(hypervisor->argv [1]);
-
-//      if (node > 0)
-//      {
-//         node--;
-//         Grant_map<char> shmem (hypervisor->domid-1-node, 16383 - (node * 1024), 1024);
-//         pshmem = shmem.get_pointer ();
-//      }
-
       trace ("Before application main()...\n");
 
       main (hypervisor->argc, hypervisor->argv);
@@ -505,6 +496,8 @@ void entry_llamaOS (start_info_t *start_info)
       fflush (stdout);
 
       trace ("After application main()...\n");
+      fs_finalize ();
+
       cout << "program break: " << memory::get_program_break () << endl;
       api::sleep(1);
 

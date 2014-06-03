@@ -97,6 +97,11 @@ void fs_initialize () {
     }
 }
 
+void fs_finalize ()
+{
+   ext2_unmount ();
+}
+
 int fs_stat (const char *path, struct stat *buf) {
     ino_t path_ino;
     int retval;

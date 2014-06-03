@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2013, William Magato
+Copyright (c) 2014, William Magato
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,61 +28,37 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#ifndef llamaos_xen_block_h_
-#define llamaos_xen_block_h_
+#include <cstdio>
+#include <iostream>
 
-#include <cstdint>
-#include <cstring>
-#include <sstream>
-#include <string>
-#include <vector>
+using namespace std;
 
-#include <xen/xen.h>
-#include <xen/event_channel.h>
-
-#include <xen/io/blkif.h>
-#include <xen/io/console.h>
-
-namespace llamaos {
-namespace xen {
-
-class Block
+int main (int argc, char *argv [])
 {
-public:
-   Block (const std::string &key);
-   virtual ~Block ();
+   cout << endl << "hello llamaOS" << endl;
+   cout << endl << "opening file test.txt" << endl;
 
-   ssize_t read (void *buf, size_t nbytes);
-   ssize_t write (const void *buf, size_t nbytes);
+   FILE *file = fopen ("test.txt", "r+");
 
-   const std::string frontend_key;
+   if (file == NULL)
+   {
+      cout << "failed to open file" << endl;
+   }
+   else
+   {
+      char buffer [64];
+      fread (buffer, 1, 64, file);
 
-   std::string get_name () const { return name; }
-   std::string get_dev () const { return dev; }
-   unsigned int get_size () const { return size; }
+      buffer [0] = 'X';
 
-private:
-   Block ();
-   Block (const Block &);
-   Block &operator= (const Block &);
+      fseek (file, 0, SEEK_SET);
+      fwrite (buffer, 1, 1, file);
+      fflush(file);
+      fclose (file);
+   }
 
-   blkif_sring_t *const shared_ring;
-   blkif_front_ring_t _private;
-   char *const shared_buffer;
+   cout << endl << "Write Test" << endl;
+   cout.flush ();
 
-   grant_ref_t shared_ring_ref;
-   grant_ref_t shared_buffer_ref;
-   evtchn_port_t port;
-
-   std::string name;
-   std::string dev;
-   blkif_vdev_t vdev;
-   unsigned int sector_size;
-   unsigned int sectors;
-   unsigned int size;
-
-};
-
-} }
-
-#endif  // llamaos_xen_block_h_
+   return 0;
+}

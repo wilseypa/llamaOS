@@ -64,8 +64,7 @@ Block::Block (const string &key)
       vdev(0),
       sector_size(0),
       sectors(0),
-      size(0),
-      position(0)
+      size(0)
 {
    Xenstore &xenstore = Hypervisor::get_instance ()->xenstore;
 
@@ -128,6 +127,8 @@ ssize_t Block::read (void *buf, size_t nbytes)
       return -1;
    }
 
+   unsigned int position = 0;;
+
    for (unsigned int i = 0; i < sectors; i += 8)
    {
       blkif_request_t *request = RING_GET_REQUEST(&_private, _private.req_prod_pvt++);
@@ -157,6 +158,53 @@ ssize_t Block::read (void *buf, size_t nbytes)
       else
       {
          cout << response->status << " error reading block device " << name << ", sector " << i << endl;
+         return -1;
+      }
+   }
+
+   return size;
+}
+
+ssize_t Block::write (const void *buf, size_t nbytes)
+{
+   if (nbytes < size)
+   {
+      cout << "buf passed to Block::write is too small." << endl;
+      return -1;
+   }
+
+   unsigned int position = 0;;
+
+   for (unsigned int i = 0; i < sectors; i += 8)
+   {
+      const char *char_buf = static_cast<const char *>(buf);
+      memcpy(shared_buffer, &char_buf[position], 4096);
+
+      blkif_request_t *request = RING_GET_REQUEST(&_private, _private.req_prod_pvt++);
+      request->operation = BLKIF_OP_WRITE;
+      request->handle = vdev;
+      request->id = 0;
+      request->nr_segments = 1;
+      request->sector_number = i;
+      request->seg [0].gref = shared_buffer_ref;
+      request->seg [0].first_sect = 0;
+      request->seg [0].last_sect = 7;
+
+      RING_PUSH_REQUESTS(&_private);
+      Hypercall::event_channel_send (port);
+
+      // spin unitl response
+      do { rmb(); } while (!RING_HAS_UNCONSUMED_RESPONSES(&_private));
+
+      blkif_response_t *response = RING_GET_RESPONSE(&_private, _private.rsp_cons++);
+
+      if (response->status == BLKIF_RSP_OKAY)
+      {
+         position += 4096;
+      }
+      else
+      {
+         cout << response->status << " error writing block device " << name << ", sector " << i << endl;
          return -1;
       }
    }

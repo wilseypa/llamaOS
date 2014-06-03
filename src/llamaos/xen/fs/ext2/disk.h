@@ -24,6 +24,7 @@ extern "C" {
 
 /* open and copy the disk image file into memory */
 bool disk_initialize ();
+bool disk_finalize ();
 
 /* read/write 'size' bytes from/to the disk image (offset 'off).
  * return false in case of IO error. */

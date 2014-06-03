@@ -44,19 +44,41 @@ bool disk_initialize () {
    {
       if (strcmp (CONFIG_DISK_IMAGE, hypervisor->blocks [i]->get_name ().c_str ()) == 0)
       {
-         hypervisor->blocks [i]->read (img, CONFIG_DISK_SIZE);
-         return true;
+         if (hypervisor->blocks [i]->read (img, CONFIG_DISK_SIZE) > 0)
+         {
+            return true;
+         }
       }
    }
 
    return false;
 }
 
+bool disk_finalize ()
+{
+   Hypervisor *hypervisor = Hypervisor::get_instance ();
+
+   for (size_t i = 0; i < hypervisor->blocks.size (); i++)
+   {
+      if (strcmp (CONFIG_DISK_IMAGE, hypervisor->blocks [i]->get_name ().c_str ()) == 0)
+      {
+         if (hypervisor->blocks [i]->write (img, CONFIG_DISK_SIZE) > 0)
+         {
+            return true;
+         }
+      }
+   }
+
+   return false;
+}
+
+#include <stdio.h>
 bool disk_read (uint64_t off, void *buf, size_t size) {
+    printf("disk_read: %ld, %c, %ld\n", off, *((char *)buf), size);
     memcpy (buf, img + off, size); return true;
 }
 
 bool disk_write (uint64_t off, const void *buf, size_t size) {
+    printf("disk_write: %ld, %c, %ld\n", off, *((char *)buf), size);
     memcpy (img + off, buf, size); return true;
 }
-

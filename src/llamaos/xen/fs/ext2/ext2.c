@@ -210,6 +210,13 @@ bool ext2_mount () {
     return true;
 }
 
+bool ext2_unmount () {
+
+   if (!disk_finalize ()) return false;
+
+    return true;
+}
+
 int ext2_lookup (ino_t parent, const char *name, int name_len, ino_t *ino) {
     struct inode_t parent_inode;
     int retval, blk = 0;
@@ -298,6 +305,17 @@ ssize_t ext2_read (struct inode *node, void *buf, off_t offset, size_t count)
 
 ssize_t ext2_write (struct inode *node, const void *data_buf, off_t offset, size_t len)
 {
+    struct inode_t inode;
+    int retval;
+
+    if ((retval = fill_inode (node->st.st_ino, &inode)) < 0) return retval;
+
+    /* read the inode entry */
+    if (!disk_write (blk2off (inode.i_block [0]), data_buf, len)) return -EIO;
+
+    return ((retval < 0) ? retval : (ssize_t)(len));
+
+#if 0
   struct inode_t inode;
   uint32_t first_blk = offset2blk_n (offset);
   uint32_t last_blk = offset2blk_n (offset + len - 1);
@@ -333,10 +351,7 @@ ssize_t ext2_write (struct inode *node, const void *data_buf, off_t offset, size
     // disk_write(offset, data_buf, to_write); //not the correct offset yet, needs to be re-calculated off of block that is grabbed from get_file_blk.
     
     // increment written
-
-  }
-  
-  return ((retval < 0) ? retval : (ssize_t)(written));
+#endif
 }
 
 ssize_t ext2_readdir (struct inode *dirnode, struct direntry *dir,
