@@ -46,19 +46,20 @@ int main (int argc, char *argv [])
    }
    else
    {
-      char buffer [64];
-      fread (buffer, 1, 64, file);
+      char buffer [513];
+      fread (buffer, 1, 512, file);
 
-      buffer [0] = 'X';
-
+      for (int i = 0; i < 513; i++)
+	buffer [i] = 'X';
+      
+      cout << endl << "Write Test" << endl;
       fseek (file, 0, SEEK_SET);
-      fwrite (buffer, 1, 1, file);
+      fwrite (buffer, 1, 513, file);
       fflush(file);
       fclose (file);
    }
 
-   cout << endl << "Write Test" << endl;
-   cout.flush ();
+   cout.flush ();   
 
    return 0;
 }

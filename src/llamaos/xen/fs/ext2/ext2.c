@@ -33,6 +33,8 @@
 #include <stdint.h>
 #include <string.h>
 
+#include <stdio.h>
+
 /* constants */
 #define EXT2_SUPER_MAGIC 0xef53
 
@@ -115,11 +117,11 @@ struct direntry_t {
 static ino_t ext2_root_ino = EXT2_ROOT_INO; /* root directory inode */
 
 /* block size in bytes */
-#define __BLK_SIZE ((unsigned int)(1024 << superblk.s_log_block_size))
+#define __BLK_SIZE ((unsigned int)(512 << superblk.s_log_block_size))
 
 /* cache for disk I/O (used to store one block: max block size = 4096) */
 #define __LOG_MAX_BLK_SIZE 2
-unsigned char cache [1024 << __LOG_MAX_BLK_SIZE];
+unsigned char cache [512 << __LOG_MAX_BLK_SIZE];
 
 /* convert a block number into an offset on the disk */
 #define blk2off(block) ((block) << (10 + superblk.s_log_block_size))
@@ -144,6 +146,18 @@ static int fill_inode (uint32_t ino, struct inode_t *inode) {
     return 0;
 }
 
+/* store an inode structure.
+ * return -EIO in case of low-level I/O error, 0 otherwise */
+static int update_inode (uint32_t ino, struct inode_t *inode) {
+  /* find the disk offset of the inode table entry */
+  uint32_t ino_tbl_blk = grp_tbl[ino2grp (ino)].bg_inode_table;
+  uint32_t ino_idx = ino2idx (ino);
+  uint64_t ino_off = blk2off (ino_tbl_blk) + (ino_idx * __sizeof_inode);
+  /* write the inode entry */
+  if (!disk_write (ino_off, inode, __sizeof_inode)) return -EIO;
+  return 0;
+}
+
 /* copy the n-th block of a file into the cache.
  * return __GET_FILE_BLK_OK if no error
  * return __GET_FILE_BLK_EOF if blk above the end of the file
@@ -151,24 +165,149 @@ static int fill_inode (uint32_t ino, struct inode_t *inode) {
  * return -EFBIG if the file is too big for this implementation */
 #define __GET_FILE_BLK_OK 0
 #define __GET_FILE_BLK_EOF 1
-#define __disk_blk_to_cache(blk)                                    \
+#define __disk_blk_to_cache(blk)				      \
 ({  if ((blk) == 0) return __GET_FILE_BLK_EOF;                      \
-    if (!disk_read (blk2off (blk), cache, __BLK_SIZE)) return -EIO; \
- })
-static int get_file_blk (struct inode_t *inode, uint32_t blk_n) {
+  if (!disk_read (blk2off (blk), cache, __BLK_SIZE)) return -EIO;   \
+})
+
+int ext2_find_free_blk (uint32_t ino){
+
+  int retval;
+  // check grp_tbl for free blocks
+  // -- first check inode's group
+  uint32_t blkgrp_count;
+  uint32_t group = ino2grp(ino);
+  bool group_found = 0;
+  blkgrp_count = ((superblk.s_blocks_count-1) / superblk.s_blocks_per_group) + 1;
+  if (grp_tbl[group].bg_free_blocks_count <= 0){
+    // if group is full find a group that isn't
+    for (group = 0; group < blkgrp_count; group++){
+      if (grp_tbl[group].bg_free_blocks_count > 0) {
+        group_found = 1;
+        break;
+      }
+    }
+    if (!group_found) return -EFBIG;
+  }
+
+  // find nearest free block
+  // -- load in block bitmap
+  uint32_t tbl_blk_bit = grp_tbl[group].bg_block_bitmap;
+  unsigned char *blk_bitmap;
+  uint32_t free_blk;
+  bool block_found = 0;
+  uint32_t map_index;
+  uint32_t bit_index;
+  unsigned char bits[8];
+  blk_bitmap = malloc(__BLK_SIZE);
+  if (!disk_read (blk2off (tbl_blk_bit), blk_bitmap, __BLK_SIZE)) return -EIO;
+
+  for (int i = 0; i < __BLK_SIZE; i++){
+    // if full skip
+    if((ssize_t)blk_bitmap[i] == 255) continue;
+    else {
+      //printf("%d\n", blk_bitmap[i]);
+      for (int j = 0; j < 8; j++){
+        bits[j] = (blk_bitmap[i] >> j) & 1;
+        if((!block_found) && (bits[j] == 0)){
+          map_index = i;
+          bit_index = j;
+          free_blk = (i*8)+j;
+          block_found = 1;
+        }
+      }
+      //printf("%d%d%d%d%d%d%d%d\n", bits[7], bits[6], bits[5], bits[4], bits[3], bits[2], bits[1], bits[0]);
+      if (block_found) break;
+    }
+  }
+
+  if (!block_found) return -EFBIG;
+
+  uint32_t block = group*superblk.s_blocks_per_group + free_blk + 1;
+  //printf("block: %d\n", block);
+
+  // mark block as used
+  bits[bit_index] = 1;
+  //printf("%d%d%d%d%d%d%d%d\n", bits[7], bits[6], bits[5], bits[4], bits[3], bits[2], bits[1], bits[0]);
+  unsigned int val = 0;
+  for (int i = 0; i < 8; i++){
+    val |= bits[i] << i;
+  }
+  blk_bitmap[map_index] = val;
+  if (!disk_write (blk2off (tbl_blk_bit), blk_bitmap, __BLK_SIZE)) return -EIO;
+
+  // update block group and superblock free and used block counts
+  superblk.s_free_blocks_count--;
+  grp_tbl[group].bg_free_blocks_count--;
+
+  return block;
+
+}
+
+/* allocate a free block to an inode */
+int ext2_blk_allocate (uint32_t ino, struct inode_t* inode, uint32_t blk_n) {
+
+  int retval;
+
+  // find free block
+  uint32_t block;
+  if ((block = ext2_find_free_blk(ino)) < 0) return block;
+  
+  // add block to inode array
+  if (blk_n < 12){
+    // direct
+    inode->i_block[blk_n] = block;
+    if ((retval = update_inode (ino, inode)) < 0) return retval;
+  }
+  else if (blk_n < 12 + (__BLK_SIZE >> 2)) {
+    // indirect
+    // -- check if indirect block has been assigned yet
+    if ((blk_n == 12) && (inode->i_block[12] == 0)){
+      // assign indirect block
+      inode->i_block[blk_n] = block;
+      // find new block to allocate data to
+      if ((block = ext2_find_free_blk(ino)) < 0) return block;
+      if ((retval = update_inode (ino, inode)) < 0) return retval;
+    }
+    __disk_blk_to_cache (inode->i_block [12]);
+    cache [blk_n - 12] = block;
+    if (!disk_read (blk2off (inode->i_block [12]), cache, __BLK_SIZE)) return -EIO;
+  }
+  
+  return 1;
+}
+
+/* Find next block for file */
+static int get_file_blk (struct inode_t* inode, uint32_t blk_n, uint32_t ino, int create) {
     if (blk_n < 12) { /* direct blocks */
         uint32_t disk_blk = inode->i_block [blk_n];
-        __disk_blk_to_cache (disk_blk);
+        // check if read or write
+	if (!create){
+	  __disk_blk_to_cache (disk_blk);
+	} else {
+	  //printf("disk_blk: %d\n", disk_blk);
+	  if ((disk_blk) == 0){
+	    //add block to inode
+	    if(!ext2_blk_allocate(ino, inode, blk_n)) return -EFBIG;
+	  }
+	}
         return __GET_FILE_BLK_OK;
     }
     else if (blk_n < 12 + (__BLK_SIZE >> 2)) { /* simple indirection */
         uint32_t disk_blk, ind_blk = inode->i_block [12];
-        __disk_blk_to_cache (ind_blk);
-        disk_blk = ((uint32_t *) (cache)) [blk_n - 12];
-        __disk_blk_to_cache (disk_blk);
+	__disk_blk_to_cache (ind_blk);
+	disk_blk = ((uint32_t *) (cache)) [blk_n - 12];
+        if (!create){
+	  __disk_blk_to_cache (disk_blk);
+	} else {
+	  if ((disk_blk) == 0){
+            //add block to inode
+	    if(!ext2_blk_allocate(ino, inode, blk_n)) return -EFBIG;
+          }
+        }
         return __GET_FILE_BLK_OK;
     }
-    return -EFBIG; /* double/triple indirection not supported */
+    return -EFBIG; /* double/triple indirection not supported yet */
 }
 
 #define mount_error(format, ...)    \
@@ -197,6 +336,7 @@ bool ext2_mount () {
     /* check the number of block groups */
     blkgrp_count =
         ((superblk.s_blocks_count-1) / superblk.s_blocks_per_group) + 1;
+    //printf("blkgrp_count: %d\n", blkgrp_count);
     if (blkgrp_count > CONFIG_EXT2_MAX_BLKGRP)
         mount_error ("ext2 partition has %u block groups (max = %u)",
             blkgrp_count, CONFIG_EXT2_MAX_BLKGRP);
@@ -211,10 +351,20 @@ bool ext2_mount () {
 }
 
 bool ext2_unmount () {
+  
+  uint32_t blkgrp_count = ((superblk.s_blocks_count-1) / superblk.s_blocks_per_group) + 1;
+  // update block group info on disk
+  if (!disk_write (blk2off (superblk.s_first_data_block+1),
+		  (void *)(grp_tbl), blkgrp_count * __sizeof_group_desc))
+    mount_error ("can't write block group table at block %u (%u blocks)",
+		 superblk.s_first_data_block+1, blkgrp_count);
+  // update superblock info on disk
+  if (!disk_write (1024, (void *)(&superblk), 1024))
+    mount_error ("can't write partition superblock");
+  // finalize disk
+  if (!disk_finalize ()) return false;
 
-   if (!disk_finalize ()) return false;
-
-    return true;
+  return true;
 }
 
 int ext2_lookup (ino_t parent, const char *name, int name_len, ino_t *ino) {
@@ -227,7 +377,7 @@ int ext2_lookup (ino_t parent, const char *name, int name_len, ino_t *ino) {
     if (!S_ISDIR (parent_inode.i_mode)) return -ENOTDIR;
 
     /* loop through the directory blocks */
-    while ((retval = get_file_blk (&parent_inode, blk++)) !=
+    while ((retval = get_file_blk (&parent_inode, blk++, parent, 0)) !=
         __GET_FILE_BLK_EOF) {
         uint16_t offset = 0;
         /* loop through the directory entries in that block */
@@ -251,7 +401,7 @@ int ext2_lookup (ino_t parent, const char *name, int name_len, ino_t *ino) {
 int ext2_fill_stat (ino_t ino, struct stat *buf) {
     struct inode_t inode;
     int retval; if ((retval = fill_inode (ino, &inode)) < 0) return retval;
-    buf->st_dev = 1; /* only one disk device is mounted in CROCOS */
+    buf->st_dev = 1; /* only one disk device is mounted */
     buf->st_ino = ino;
     buf->st_mode = inode.i_mode;
     buf->st_nlink = inode.i_links_count;
@@ -285,7 +435,7 @@ ssize_t ext2_read (struct inode *node, void *buf, off_t offset, size_t count)
     if ((retval = fill_inode (node->st.st_ino, &inode)) < 0) return retval;
 
     /* loop through the file blocks */
-    while ((retval = get_file_blk (&inode, blk)) != __GET_FILE_BLK_EOF) {
+    while ((retval = get_file_blk (&inode, blk, node->st.st_ino, 0)) != __GET_FILE_BLK_EOF) {
         /* begin/end offset to read for this block */
         off_t beg = (blk == first_blk) ? first_blk_beg_off : 0;
         off_t end = (blk == last_blk) ? last_blk_end_off : (off_t)__BLK_SIZE;
@@ -305,23 +455,18 @@ ssize_t ext2_read (struct inode *node, void *buf, off_t offset, size_t count)
 
 ssize_t ext2_write (struct inode *node, const void *data_buf, off_t offset, size_t len)
 {
-    struct inode_t inode;
-    int retval;
-
-    if ((retval = fill_inode (node->st.st_ino, &inode)) < 0) return retval;
-
-    /* read the inode entry */
-    if (!disk_write (blk2off (inode.i_block [0]), data_buf, len)) return -EIO;
-
-    return ((retval < 0) ? retval : (ssize_t)(len));
-
-#if 0
+#if 0    
   struct inode_t inode;
-  uint32_t first_blk = offset2blk_n (offset);
-  uint32_t last_blk = offset2blk_n (offset + len - 1);
-  size_t blk_cnt = last_blk - first_blk + 1;
-  unsigned char temp_buf[__BLK_SIZE*2]; // buffer to store temporary block data
-  uint32_t blk;
+  int retval;
+
+  if ((retval = fill_inode (node->st.st_ino, &inode)) < 0) return retval;
+
+  /* read the inode entry */
+  if (!disk_write (blk2off (inode.i_block [0]), data_buf, len)) return -EIO;
+  
+#endif
+  //#if 0
+  struct inode_t inode;
   int retval;
   size_t to_write;
   size_t written = 0;
@@ -337,21 +482,32 @@ ssize_t ext2_write (struct inode *node, const void *data_buf, off_t offset, size
   //lock(node->st.st_lock); // (this is just a dummy function right now and won't be needed until parallel)
 
   // loop through blocks until all data is written
-  for (blk = first_blk; written < len; blk++){
-    offset = inode.i_size + written - (blk * __BLK_SIZE);
-    to_write = __BLK_SIZE - offset;
+  for (uint32_t blk = 0; written < len; blk++){
     
-    if (len - written < to_write)
-      to_write = len - written;
+    to_write = len - written;
 
+    if((len-written) > __BLK_SIZE){
+      to_write = __BLK_SIZE;
+    }
+    
+    printf("to_write: %d len: %d written: %d blk_size: %d\n", to_write, len, written, __BLK_SIZE);
+    
     // get block to write to 
-    // get_file_blk (&inode, blk); // this loads the block into cache unless I'm at EOF :/ I need it to add blocks if needed.
-    
-    // write data to block
-    // disk_write(offset, data_buf, to_write); //not the correct offset yet, needs to be re-calculated off of block that is grabbed from get_file_blk.
-    
-    // increment written
-#endif
+    if((retval = get_file_blk (&inode, blk, node->st.st_ino, 1)) == __GET_FILE_BLK_OK){
+      // write data to block
+      //printf("writing block: %d at location: %d\n", blk, blk2off (inode.i_block [blk]));
+      if (!disk_write (blk2off (inode.i_block [blk]), data_buf, to_write)) return -EIO;
+      written += to_write;
+    } else {
+      return -EFBIG;
+    }
+  }
+
+  //unlock inode
+  //unlock(node->st.st_lock); // (this is just a dummy function right now and won't be needed until parallel)
+  //#endif
+  return ((retval < 0) ? retval : (ssize_t)(len));
+
 }
 
 ssize_t ext2_readdir (struct inode *dirnode, struct direntry *dir,
@@ -366,7 +522,7 @@ ssize_t ext2_readdir (struct inode *dirnode, struct direntry *dir,
     if ((retval = fill_inode (dirnode->st.st_ino, &dir_inode)) < 0)
         return retval;
     /* retrieve the directory block. if EOF, return 0 */
-    if ((retval = get_file_blk (&dir_inode, blk)) != __GET_FILE_BLK_OK)
+    if ((retval = get_file_blk (&dir_inode, blk, dirnode->st.st_ino, 0)) != __GET_FILE_BLK_OK)
         return (((retval < 0) && (retval != -EFBIG)) ? retval : 0);
 
     /* retrieve the current directory entry */
