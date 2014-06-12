@@ -47,14 +47,53 @@ int main (int argc, char *argv [])
    else
    {
       char buffer [513];
-      fread (buffer, 1, 512, file);
+      int size = 0;
+      int read = 0;
 
+      while (!feof(file)) {
+         read = fread (buffer, 1, 512, file);
+         buffer [read] = '\0';
+         cout << buffer;
+         size += read;
+      }
+//      int size = fread (buffer, 1, 512, file);
+//      buffer [size] = '\0';
+
+      cout << "size is " << size << endl;
+//      cout << "content is " << buffer << endl;
+
+      for (int i = 0; i < 40; i++)
+      {
+         fwrite ("123456789012345\n", 1, 16, file);
+      }
+
+      fclose (file);
+
+      file = fopen ("test.txt", "r+");
+      size = 0;
+
+      while (!feof(file)) {
+         read = fread (buffer, 1, 512, file);
+         buffer [read] = '\0';
+         cout << buffer;
+         size += read;
+      }
+
+//      size = fread (buffer, 1, 512, file);
+//      buffer [size] = '\0';
+
+      cout << "size is " << size << endl;
+//      cout << "content is " << buffer << endl;
+#if 0
       for (int i = 0; i < 513; i++)
-	buffer [i] = 'X';
-      
+      {
+         buffer [i] = 'X';
+      }
+
       cout << endl << "Write Test" << endl;
       fseek (file, 0, SEEK_SET);
       fwrite (buffer, 1, 513, file);
+#endif
       fflush(file);
       fclose (file);
    }

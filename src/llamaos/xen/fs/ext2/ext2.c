@@ -256,6 +256,7 @@ int ext2_blk_allocate (uint32_t ino, struct inode_t* inode, uint32_t blk_n) {
   // add block to inode array
   if (blk_n < 12){
     // direct
+    inode->i_blocks++;
     inode->i_block[blk_n] = block;
     if ((retval = update_inode (ino, inode)) < 0) return retval;
   }
@@ -434,6 +435,8 @@ ssize_t ext2_read (struct inode *node, void *buf, off_t offset, size_t count)
         return 0;
     if ((retval = fill_inode (node->st.st_ino, &inode)) < 0) return retval;
 
+    printf ("ext2_read offset: %d, len: %d\n", offset, count);
+
     /* loop through the file blocks */
     while ((retval = get_file_blk (&inode, blk, node->st.st_ino, 0)) != __GET_FILE_BLK_EOF) {
         /* begin/end offset to read for this block */
@@ -453,7 +456,8 @@ ssize_t ext2_read (struct inode *node, void *buf, off_t offset, size_t count)
     return ((retval < 0) ? retval : (ssize_t)(bytes_read));
 }
 
-ssize_t ext2_write (struct inode *node, const void *data_buf, off_t offset, size_t len)
+ssize_t ext2_write (struct inode *node, const void *data_buf,
+                    off_t offset, size_t len)
 {
 #if 0    
   struct inode_t inode;
@@ -478,32 +482,42 @@ ssize_t ext2_write (struct inode *node, const void *data_buf, off_t offset, size
   if ((len == 0) || (offset < 0))
     return 0;
 
+  printf ("ext2_write offset: %d, len: %d\n", offset, len);
   // perform lock to prevent other ops accessing inode
   //lock(node->st.st_lock); // (this is just a dummy function right now and won't be needed until parallel)
 
   // loop through blocks until all data is written
-  for (uint32_t blk = 0; written < len; blk++){
-    
+//  for (uint32_t blk = 0; written < len; blk++){
+   while (written < len) {
+    uint32_t blk = offset2blk_n (offset);
+
+    printf ("   blk: %d\n", blk);
+
     to_write = len - written;
 
     if((len-written) > __BLK_SIZE){
       to_write = __BLK_SIZE;
     }
     
-    printf("to_write: %d len: %d written: %d blk_size: %d\n", to_write, len, written, __BLK_SIZE);
+//    printf("to_write: %d len: %d written: %d blk_size: %d\n", to_write, len, written, __BLK_SIZE);
     
     // get block to write to 
     if((retval = get_file_blk (&inode, blk, node->st.st_ino, 1)) == __GET_FILE_BLK_OK){
       // write data to block
       //printf("writing block: %d at location: %d\n", blk, blk2off (inode.i_block [blk]));
-      if (!disk_write (blk2off (inode.i_block [blk]), data_buf, to_write)) return -EIO;
+      if (!disk_write (blk2off (inode.i_block [blk]) + (offset), data_buf, to_write)) return -EIO;
       written += to_write;
+
+      offset += to_write;
+      data_buf = (const char *)data_buf + to_write;
     } else {
       return -EFBIG;
     }
   }
 
-  //unlock inode
+  inode.i_size = (inode.i_size > (offset)) ? inode.i_size : (offset);
+   update_inode (node->st.st_ino, &inode);
+   //unlock inode
   //unlock(node->st.st_lock); // (this is just a dummy function right now and won't be needed until parallel)
   //#endif
   return ((retval < 0) ? retval : (ssize_t)(len));
