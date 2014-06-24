@@ -407,6 +407,12 @@ static long int glibc_syscall (long int callno)
    return -1;
 }
 
+static time_t glibc_time (time_t *time)
+{
+   trace("!!! ALERT: glibc calling time() before time support is enabled.\n");
+   return -1;
+}
+
 static int glibc_ttyname_r (int fd, char *buf, size_t buflen)
 {
    trace("!!! ALERT: glibc calling ttyname_r() before file system support is enabled.\n");
@@ -511,6 +517,7 @@ static void register_glibc_exports (void)
    register_llamaos_signal (glibc_signal);
    register_llamaos_sleep (glibc_sleep);
    register_llamaos_syscall (glibc_syscall);
+   register_llamaos_time (glibc_time);
    register_llamaos_ttyname_r (glibc_ttyname_r);
    register_llamaos_umask (glibc_umask);
    register_llamaos_unlink (glibc_unlink);

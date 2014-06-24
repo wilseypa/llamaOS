@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012, William Magato
+Copyright (c) 2014, William Magato
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,55 +28,20 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-// #include <sys/time.h>
+#include <stdint.h>
+#include <stdio.h>
 #include <time.h>
-// #include <sys/types.h>
 
-#include <iostream>
 
-#include <llamaos/memory/Memory.h>
-
-using namespace std;
-using namespace llamaos::memory;
-
-// simple guest instance should just output text to console
-int main (int argc, char *argv [])
+int main(void)
 {
-   cout << endl << "hello llamaOS" << endl;
-   cout.flush ();
-   cout << endl;
-
-   cout << "sizeof long " << sizeof(long) << endl;
-
-   cout << "program break: " << (pointer_to_address(get_program_break ()) / 1024.0) / 1024.0 << endl;
+time_t result;
 
 
-   cout << "argc: " << argc << endl;
-
-   for (int i = 0; i < argc; i++)
-   {
-      cout << "argv[" << i << "]: " << argv [i] << endl;
-   }
-
-   double third = (1.0 / 3.0);
-   cout << "print floats again: " << third << endl;
-#if 0
-      char data = 'a';
-      for (;;)
-      {
-         cout << data;
-         if (data == 'z')
-         {
-            data = 'a';
-         }
-         else
-         {
-            data++;
-         }
-      }
-#endif
-
-   cout << "time returns " << time((time_t *) NULL) << endl;
-
-   return 0;
+    result = time(NULL);
+    printf("%s%ju secs since the Epoch\n",
+//        asctime(localtime(&result)),
+        "x",
+            (uintmax_t)result);
+    return(0);
 }

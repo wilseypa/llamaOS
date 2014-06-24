@@ -49,7 +49,6 @@ all:
 	@$(MAKE) -f sys/gcc-$(GCC_VERSION).mk
 	@$(MAKE) -f sys/xen-$(XEN_VERSION).mk
 	@$(MAKE) -f llamaOS.mk
-	@$(MAKE) -f apps/bonnie/bonnie.mk
 	@$(MAKE) -f tools/blas.mk
 	@$(MAKE) -f tools/cblas.mk
 	@$(MAKE) -f tools/gtest-$(GTEST_VERSION).mk
@@ -57,6 +56,7 @@ all:
 	@$(MAKE) -f tools/mpich-$(MPICH_VERSION).mk
 #	@$(MAKE) -f llamaMPI.mk
 #	@$(MAKE) -f llamaMPIF.mk
+	@$(MAKE) -f apps/bonnie/bonnie.mk
 	@$(MAKE) -f apps/mpich-$(MPICH_VERSION)/examples/f77/fpi.mk
 	@$(MAKE) -f apps/mpich-$(MPICH_VERSION)/examples/f77/hellow.mk
 	@$(MAKE) -f apps/mpich-$(MPICH_VERSION)/examples/f90/pi3f90.mk
@@ -87,6 +87,7 @@ all:
 	@$(MAKE) -f test/apps/testExt2.mk
 #	@$(MAKE) -f test/apps/testMPI.mk
 #	@$(MAKE) -f test/apps/testMPIF.mk
+	@$(MAKE) -f test/apps/time.mk
 	@$(MAKE) -f test/apps/tinyxml.mk
 #	@$(MAKE) -f test/empty.mk
 #	@$(MAKE) -f test/memory.mk

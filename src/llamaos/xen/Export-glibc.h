@@ -234,6 +234,10 @@ EXTERN void register_llamaos_sleep (llamaos_sleep_t sleep);
 typedef long int (*llamaos_syscall_t) (long int);
 EXTERN void register_llamaos_syscall (llamaos_syscall_t syscall);
 
+// define function pointer
+typedef time_t (*llamaos_time_t) (time_t *);
+EXTERN void register_llamaos_time (llamaos_time_t time);
+
 typedef int (*llamaos_ttyname_r_t) (int, char *, size_t);
 EXTERN void register_llamaos_ttyname_r (llamaos_ttyname_r_t func);
 

@@ -133,6 +133,59 @@ static uid_t glibc_getuid ()
    return 0;
 }
 
+static time_t glibc_time (time_t *tloc)
+{
+   uint32_t wc_version = 0;
+   uint32_t wc_sec = 0;
+   uint32_t wc_nsec = 0;
+
+   uint32_t version = 0;
+   uint64_t tsc_timestamp = 0;
+   uint64_t system_time = 0;
+
+   shared_info_t *shared_info = Hypervisor::get_instance ()->shared_info;
+   vcpu_time_info_t *time_info = &shared_info->vcpu_info [0].time;
+
+   for (;;)
+   {
+      wc_version = shared_info->wc_version;
+      version = time_info->version;
+mb();
+      if (   !(wc_version & 1)
+          && !(version & 1))
+      {
+         wc_sec = shared_info->wc_sec;
+mb();
+
+         if (   (wc_version == shared_info->wc_version)
+             && (version == time_info->version))
+         {
+            break;
+         }
+      }
+   }
+
+   uint64_t tsc = rdtsc () - tsc_timestamp;
+   uint64_t nsec = tsc_to_ns (time_info, tsc);
+
+   nsec += system_time;
+
+   wc_sec += (nsec / 1000000000UL);
+   wc_nsec += (nsec % 1000000000UL);
+
+   if (wc_nsec > 1000000000UL)
+   {
+      wc_sec += 1;
+      wc_nsec -= 1000000000UL;
+   }
+
+   if (tloc != NULL)
+   {
+      *tloc = wc_sec;
+   }
+   return wc_sec;
+}
+
 static int glibc_gettimeofday (struct timeval *tv, struct timezone * /* tz */)
 {
    uint32_t wc_version = 0;
@@ -401,6 +454,7 @@ static void register_glibc_exports (void)
    register_llamaos_gethostname (glibc_gethostname);
    register_llamaos_getpid (glibc_getpid);
    register_llamaos_getuid (glibc_getuid);
+   register_llamaos_time (glibc_time);
    register_llamaos_gettimeofday (glibc_gettimeofday);
    register_llamaos_sleep (glibc_libc_sleep);
    register_llamaos_close (glibc_close);
@@ -487,7 +541,7 @@ void entry_llamaOS (start_info_t *start_info)
          hypervisor->argv [i+1] = const_cast<char *>(args [i].c_str ());
       }
 
-      fs_initialize ();
+//      fs_initialize ();
       trace ("Before application main()...\n");
 
       main (hypervisor->argc, hypervisor->argv);
@@ -497,7 +551,7 @@ void entry_llamaOS (start_info_t *start_info)
       fflush (stdout);
 
       trace ("After application main()...\n");
-      fs_finalize ();
+//      fs_finalize ();
 
       cout << "program break: " << memory::get_program_break () << endl;
       api::sleep(1);

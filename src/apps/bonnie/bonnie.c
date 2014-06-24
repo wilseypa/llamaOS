@@ -32,6 +32,8 @@
 #include <sys/time.h>
 #include <string.h>
 
+#include <time.h>       // for time function
+
 #if defined(SysV)
 #include <limits.h>
 #include <sys/times.h>
