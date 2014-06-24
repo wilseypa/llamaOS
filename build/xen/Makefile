@@ -49,6 +49,7 @@ all:
 	@$(MAKE) -f sys/gcc-$(GCC_VERSION).mk
 	@$(MAKE) -f sys/xen-$(XEN_VERSION).mk
 	@$(MAKE) -f llamaOS.mk
+	@$(MAKE) -f apps/bonnie/bonnie.mk
 	@$(MAKE) -f tools/blas.mk
 	@$(MAKE) -f tools/cblas.mk
 	@$(MAKE) -f tools/gtest-$(GTEST_VERSION).mk
