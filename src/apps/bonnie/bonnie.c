@@ -498,14 +498,20 @@ cpu_so_far()
     ((double) tms.tms_stime) / ((double) sysconf(_SC_CLK_TCK));
 
 #else
-  struct rusage rusage;
+//  struct rusage rusage;
 
-  getrusage(RUSAGE_SELF, &rusage);
-  return
-    ((double) rusage.ru_utime.tv_sec) +
-      (((double) rusage.ru_utime.tv_usec) / 1000000.0) +
-        ((double) rusage.ru_stime.tv_sec) +
-          (((double) rusage.ru_stime.tv_usec) / 1000000.0);
+// !BAM this will wind up being the same for this use case
+//  getrusage(RUSAGE_SELF, &rusage);
+//  return
+//    ((double) rusage.ru_utime.tv_sec) +
+//      (((double) rusage.ru_utime.tv_usec) / 1000000.0) +
+//        ((double) rusage.ru_stime.tv_sec) +
+//          (((double) rusage.ru_stime.tv_usec) / 1000000.0);
+  struct timeval tp;
+  if (gettimeofday(&tp, (struct timezone *) NULL) == -1)
+    io_error("gettimeofday");
+  return ((double) (tp.tv_sec - basetime)) +
+    (((double) tp.tv_usec) / 1000000.0);
 #endif
 }
 
