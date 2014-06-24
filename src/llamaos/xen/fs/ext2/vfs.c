@@ -23,6 +23,7 @@
 #include <errno.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdio.h>
 
 /* inodes table (used to keep inodes of opened files)
  * multiple processes opening the same file will share the inode by
@@ -36,6 +37,7 @@ struct inode *free_inodes, *used_inodes;
 #define O_RDONLY 00
 #define O_WRONLY 01
 #define O_RDWR   02
+#define O_CREAT  04
 
 #define RDWR_MASK 03
 #define is_rd(flags)    \
@@ -58,7 +60,7 @@ static ino_t ext2_root_ino = EXT2_ROOT_INO;
  * return -ENOENT if the file does not exist
  * return -ENOTDIR if a component of the path is not a directory
  * return -EIO if a low-level I/O error occured */
-static int lookup (ino_t parent, const char *path, ino_t *ino) {
+static int lookup (ino_t parent, const char *path, ino_t *ino, bool create) {
     struct stat pdir; /* parent directory stat info */
     const char *entry; /* directory or file name (without any "/") */
     int entry_len, retval;
@@ -78,12 +80,12 @@ static int lookup (ino_t parent, const char *path, ino_t *ino) {
     /* end of search ? last path character is a '/' => return parent inode */
     if (entry_len == 0) { *ino = parent; return 0; }
     /* look for the entry inode number */
-    if ((retval = ext2_lookup (parent, entry, entry_len, &entry_ino)) < 0)
+    if ((retval = ext2_lookup (parent, entry, entry_len, &entry_ino, create)) < 0)
         return retval;
     /* end of search ? return the entry inode just found */
     if (*path == 0) { *ino = entry_ino; return 0; }
     /* continue the search with the next entry */
-    return lookup (entry_ino, path, ino);
+    return lookup (entry_ino, path, ino, create);
 }
 
 static int mount_error = 0;
@@ -118,7 +120,7 @@ int fs_stat (const char *path, struct stat *buf) {
     ino_t path_ino;
     int retval;
     if (*path == 0) return -ENOENT; /* empty path */
-    if ((retval = lookup (ext2_root_ino, path, &path_ino)) < 0) return retval;
+    if ((retval = lookup (ext2_root_ino, path, &path_ino, false)) < 0) return retval;
     if ((retval = ext2_fill_stat (path_ino, buf)) < 0) return retval;
     return 0;
 }
@@ -128,11 +130,16 @@ int fs_open (const char *path, int flags) {
     ino_t path_ino;
     int retval, nb_ino;
     bool already_opened = false;
+    bool create = false;
 
     if (*path == 0) return -ENOENT; /* empty path */
 
+    printf("flags %d\n", flags);
+
+    if (flags & O_CREAT) create = true;
+
     /* retrieve the inode number and check if it is an already opened file */
-    if ((retval = lookup (ext2_root_ino, path, &path_ino)) < 0) return retval;
+    if ((retval = lookup (ext2_root_ino, path, &path_ino, create)) < 0) return retval;
     list_foreach_forward (used_inodes, node, nb_ino, used_prev, used_next) {
         if (node->st.st_ino == path_ino) break;
     }

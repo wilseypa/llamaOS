@@ -34,7 +34,7 @@ bool ext2_unmount ();
  * return -ENAMETOOLONG if 'name' is too long.
  * return -ENOENT if the file/directory doesn't exist.
  * return -ENOTDIR if 'parent' is not a directory. */
-int ext2_lookup (ino_t parent, const char *name, int name_len, ino_t *ino);
+int ext2_lookup (ino_t parent, const char *name, int name_len, ino_t *ino, bool create);
 
 /* fill a stat structure.
  * return -EIO in case of low-level I/O error, 0 otherwise */
