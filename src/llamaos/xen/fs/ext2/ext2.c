@@ -452,7 +452,7 @@ int ext2_inode_allocate (uint32_t p_ino) {
   if ((retval = fill_inode (ino, &inode)) < 0) return retval;
 
   // update inode data
-  //inode.i_mode = ;        /* file mode */
+  //inode.i_mode = 0777;        /* file mode */
   //inode.i_uid = ;         /* owner uid */
   inode.i_size = 0;        /* file size (bytes) */
   inode.i_atime = time(0);       /* time of last access */

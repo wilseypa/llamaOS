@@ -37,7 +37,7 @@ struct inode *free_inodes, *used_inodes;
 #define O_RDONLY 00
 #define O_WRONLY 01
 #define O_RDWR   02
-#define O_CREAT  04
+#define O_CREAT  0x0200
 
 #define RDWR_MASK 03
 #define is_rd(flags)    \

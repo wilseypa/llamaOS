@@ -70,8 +70,8 @@ static void   newfile(char * name, int * fd, FILE * * stream, int create);
 
 #if defined(SysV)
 /* System V wrappers for randomizers */
-//static long   random();
-//static void   srandom(int seed);
+static long   random();
+static void   srandom(int seed);
 #endif
 
 static void   report(char * machine, off_t size);
