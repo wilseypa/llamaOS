@@ -541,9 +541,8 @@ void entry_llamaOS (start_info_t *start_info)
          hypervisor->argv [i+1] = const_cast<char *>(args [i].c_str ());
       }
 
-//      fs_initialize ();
+      fs_initialize ();
       trace ("Before application main()...\n");
-
       main (hypervisor->argc, hypervisor->argv);
 
       // get rid of all leftover console buffer
@@ -551,7 +550,7 @@ void entry_llamaOS (start_info_t *start_info)
       fflush (stdout);
 
       trace ("After application main()...\n");
-//      fs_finalize ();
+      fs_finalize ();
 
       cout << "program break: " << memory::get_program_break () << endl;
       api::sleep(1);

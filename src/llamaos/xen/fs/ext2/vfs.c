@@ -86,20 +86,32 @@ static int lookup (ino_t parent, const char *path, ino_t *ino) {
     return lookup (entry_ino, path, ino);
 }
 
+static int mount_error = 0;
+
 void fs_initialize () {
     int ino;
-    if (!ext2_mount ()) kpanic ("can't mount root FS");
-    list_init (free_inodes, free_prev, free_next);
-    list_init (used_inodes, used_prev, used_next);
-    for (ino = 0; ino < CONFIG_FS_OPENED_INODE_N; ino++) {
-        list_add_tail (free_inodes, ino_tbl + ino, free_prev, free_next);
-        ino_tbl[ino].ref = 0;
+    if (!ext2_mount ())
+    {
+       kpanic ("can't mount root FS");
+       mount_error = 1;
+    }
+    else
+    {
+      list_init (free_inodes, free_prev, free_next);
+      list_init (used_inodes, used_prev, used_next);
+      for (ino = 0; ino < CONFIG_FS_OPENED_INODE_N; ino++) {
+         list_add_tail (free_inodes, ino_tbl + ino, free_prev, free_next);
+         ino_tbl[ino].ref = 0;
+      }
     }
 }
 
 void fs_finalize ()
 {
-   ext2_unmount ();
+   if (mount_error == 0)
+   {
+      ext2_unmount ();
+   }
 }
 
 int fs_stat (const char *path, struct stat *buf) {
