@@ -448,18 +448,20 @@ int ext2_inode_allocate (uint32_t p_ino) {
 
   // find free inode
   uint32_t ino;
+  printf("Find free inode.\n");
   if ((ino = ext2_find_free_inode(p_ino)) < 0) return ino;
+  printf("Fill new iniode.\n");
   if ((retval = fill_inode (ino, &inode)) < 0) return retval;
 
   // update inode data
-  //inode.i_mode = 0777;        /* file mode */
-  //inode.i_uid = ;         /* owner uid */
+  inode.i_mode = 0x81FF;        /* file mode (regular file 777)*/
+  inode.i_uid = 0;         /* owner uid (root)*/
   inode.i_size = 0;        /* file size (bytes) */
   inode.i_atime = time(0);       /* time of last access */
   inode.i_ctime = time(0);       /* time of creation */
   inode.i_mtime = time(0);       /* time of last modification */
   inode.i_dtime = time(0);       /* time of deletion */
-  inode.i_gid = ino2grp(ino);         /* group gid */
+  inode.i_gid = 0;         /* group gid (root)*/
   inode.i_links_count = 1; /* # hard links */
   //inode.i_flags = ;       /* implementation behaviour */
   inode.i_osd1 = 0;        /* OS dependent */
@@ -470,10 +472,12 @@ int ext2_inode_allocate (uint32_t p_ino) {
   //inode.i_osd2 [3];    /* OS dependent */
 
   // allocate data block for new inode
+  printf("Allocate a data block for inode. %d\n", inode.i_block[0]);
   if((retval = get_file_blk (&inode, 0, ino, 1)) != __GET_FILE_BLK_OK) return retval;
   inode.i_blocks = 1;      /* # blocks */
   
   // store new inode
+  printf("Store new inode.\n");
   update_inode (ino, &inode);
 
   return ino;
@@ -498,7 +502,7 @@ int ext2_lookup (ino_t parent, const char *name, int name_len, ino_t *ino, bool 
       uint16_t offset = 0;
       /* loop through the directory entries in that block */
       while (offset < __BLK_SIZE) {
-	printf("offset: %d blk: %d\n", offset, blk);
+	//printf("offset: %d blk: %d ", offset, blk);
 	struct direntry_t dir;
 	memcpy (&dir, cache + offset, __sizeof_direntry);
 	/* check that this entry is not corrupted */
@@ -509,13 +513,14 @@ int ext2_lookup (ino_t parent, const char *name, int name_len, ino_t *ino, bool 
 		      name_len) == 0)) {
 	  *ino = dir.inode; return 0;
 	}
-	printf("namelen: %d reclen: %d\n", dir.name_len, dir.rec_len);
+	//printf("namelen: %d reclen: %d\n", dir.name_len, dir.rec_len);
 
         true_size = __sizeof_direntry + dir.name_len;
 	if (true_size % 2) true_size++; // keep size even
 	if (true_size < 12) true_size = 12; // min direntry size
 
 	if (dir.rec_len > true_size){
+	  printf("Found space.\n");
 	  new_blk = blk - 1;
 	  new_off = offset + true_size;
 	  prev_blk = blk - 1;
@@ -526,23 +531,26 @@ int ext2_lookup (ino_t parent, const char *name, int name_len, ino_t *ino, bool 
 	}
 	offset += dir.rec_len;
       }
+      printf("End Block %d.\n", blk-1);
     }
     
     // create new file if requested
     if(create){
       
-      /*printf("NEW offset: %d blk: %d \n", new_off, new_blk);
-	printf("PREV offset: %d blk: %d size: %d\n", prev_off, prev_blk, true_size);*/
-      printf("CREATE NEW FILE HERE!\n");
-      /*struct direntry_t new_dir;
+      printf("NEW offset: %d blk: %d \n", new_off, new_blk);
+      printf("PREV offset: %d blk: %d size: %d\n", prev_off, prev_blk, true_size);
+      //printf("CREATE NEW FILE HERE!\n");
+      struct direntry_t new_dir;
       struct direntry_t prev_dir;
       uint32_t new_ino;
       
       // allocate new inode and length data
+      printf("Allocating inode.\n");
       if((new_ino = ext2_inode_allocate(parent)) < 0) return new_ino;
       
       if((!found) || ((new_off + name_len + __sizeof_direntry) > __BLK_SIZE)){
 	// allocate new block if needed
+	printf("Allocating new block.\n");
 	new_blk = blk - 1;
 	new_off = 0;
 	if((retval = get_file_blk (&parent_inode, new_blk, parent, 1)) != __GET_FILE_BLK_OK) return retval;	
@@ -562,14 +570,18 @@ int ext2_lookup (ino_t parent, const char *name, int name_len, ino_t *ino, bool 
       if (new_dir_size < 12) new_dir_size = 12;
 
       // write direntrys to disk
+      printf("Writing previous file update.\n");
       if (!disk_write (blk2off (parent_inode.i_block[prev_blk]) + (prev_off), &prev_dir, __sizeof_direntry))
 	return -EIO;
+      printf("Writing new file update.\n");
       if (!disk_write (blk2off (parent_inode.i_block[new_blk]) + (new_off), &new_dir, __sizeof_direntry))
 	return -EIO;
+      printf("Writing new file name.\n");
       if (!disk_write (blk2off (parent_inode.i_block[new_blk]) + (new_off) + __sizeof_direntry, name, name_len))
 	return -EIO;
       
       // update parent inode
+      printf("Updating parent inode.\n");
       parent_inode.i_size += new_dir_size;
       parent_inode.i_atime = time(0);
       parent_inode.i_mtime = time(0);
@@ -577,7 +589,7 @@ int ext2_lookup (ino_t parent, const char *name, int name_len, ino_t *ino, bool 
       
       *ino = new_ino;
 
-      return 0;*/
+      return 0;
     }
     
     return (((retval < 0) && (retval != -EFBIG)) ? retval : -ENOENT);

@@ -23,7 +23,7 @@
 #include <errno.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include <stdio.h>
+//#include <stdio.h>
 
 /* inodes table (used to keep inodes of opened files)
  * multiple processes opening the same file will share the inode by
@@ -134,7 +134,7 @@ int fs_open (const char *path, int flags) {
 
     if (*path == 0) return -ENOENT; /* empty path */
 
-    printf("flags %d\n", flags);
+    //printf("flags %d\n", flags);
 
     if (flags & O_CREAT) create = true;
 

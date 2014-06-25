@@ -30,19 +30,26 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 #include <cstdio>
 #include <iostream>
+#include <fcntl.h>
+#include <unistd.h>
 
 using namespace std;
 
 int main (int argc, char *argv [])
 {
    cout << endl << "hello llamaOS" << endl;
-   cout << endl << "opening file test.txt" << endl;
+   cout << endl << "creating file create_test.txt" << endl;
 
-   FILE *file = fopen ("test.txt", "r+");
+   int fd = open ("create_test.txt", O_RDWR | O_CREAT, 0777); 
+   //write( fd, "test\n", 5);
+   close (fd);
+   
+   cout << endl << "opening create_test.tct" << endl;
+   FILE *file = fopen ("create_test.txt", "r+");
 
    if (file == NULL)
    {
-      cout << "failed to open file" << endl;
+      cout << "failed to create file" << endl;
    }
    else
    {
@@ -51,10 +58,10 @@ int main (int argc, char *argv [])
       int read = 0;
 
       while (!feof(file)) {
-         read = fread (buffer, 1, 512, file);
-         buffer [read] = '\0';
-         cout << buffer;
-         size += read;
+	read = fread (buffer, 1, 512, file);
+	buffer [read] = '\0';
+	cout << buffer;
+	size += read;
       }
 //      int size = fread (buffer, 1, 512, file);
 //      buffer [size] = '\0';
@@ -64,12 +71,13 @@ int main (int argc, char *argv [])
 
       for (int i = 0; i < 40; i++)
       {
-         fwrite ("123456789012345\n", 1, 16, file);
+	fwrite ("123456789012345\n", 1, 16, file);
       }
-
+      
+      //close (fd);
       fclose (file);
 
-      file = fopen ("test.txt", "r+");
+      file = fopen ("create_test.txt", "r+");
       size = 0;
 
       while (!feof(file)) {
