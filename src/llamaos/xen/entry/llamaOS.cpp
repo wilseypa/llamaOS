@@ -456,8 +456,10 @@ static int glibc_unlink (const char *name)
       return 0;
    }
 
-   errno = ENOENT;
-   return -1;
+   return fs_unlink (name);
+
+//   errno = ENOENT;
+//   return -1;
 }
 
 static int glibc_munmap (__ptr_t /* addr */, size_t /* len */)

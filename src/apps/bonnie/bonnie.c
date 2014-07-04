@@ -149,7 +149,9 @@ int main(
   sprintf(name, "%s/Bonnie.%d", dir, getpid());
 
   /* size is in meg, rounded down to multiple of Chunk */
-  size *= (1024 * 1024);
+// !BAM
+//  size *= (1024 * 1024);
+  size *= (64);
   size = Chunk * (size / Chunk);
   fprintf(stderr, "File '%s', size: %ld\n", name, size);
 
@@ -259,7 +261,8 @@ int main(
   /* use the frequency count */
   for (words = 0; words < 256; words++)
     sprintf((char *) buf, "%d", chars[words]);
-
+// !BAM
+#if 0
   /*
    * Now test random seeks; first, set up for communicating with children.
    * The object of the game is to do "Seeks" lseek() calls as quickly
@@ -371,7 +374,7 @@ int main(
   } /* for each child */
   fprintf(stderr, "\n");
   delta[(int) Lseek][Elapsed] = last_stop - first_start;
-
+#endif
   if (html)
     write_html(machine, size);
   else

@@ -265,3 +265,8 @@ int fs_get_flags (int fd)
 
   return fdesc->flags | O_RDWR;
 }
+
+int fs_unlink (const char *path)
+{
+   return 0;//-1;
+}
