@@ -72,6 +72,7 @@ ssize_t fs_read (int fd, void *buf, size_t count);
  * return the number of bytes written otherwise (no error). */
 ssize_t fs_write (int fd, const void *buf, size_t count);
 
+int fs_get_flags (int fd);
 
 #ifdef __cplusplus
 }

@@ -247,6 +247,18 @@ static unsigned int glibc_libc_sleep (unsigned int seconds)
    return 0;
 }
 
+#include <fcntl.h>
+
+static int glibc_fcntl (int fd, int cmd)
+{
+   if (cmd == F_GETFL)
+   {
+      return fs_get_flags (fd);
+   }
+
+   return 0;
+}
+
 static stringstream np_out;
 
 static int glibc_libc_open (const char *file, int oflag)
@@ -400,6 +412,11 @@ static off64_t glibc_lseek64 (int fd, off64_t offset, int whence)
       return np_out.str().size();
    }
 
+   if (fd == 1)
+   {
+      return 0;
+   }
+
    if (fd < 200)
    {
       if (fd >= 100)
@@ -409,6 +426,7 @@ static off64_t glibc_lseek64 (int fd, off64_t offset, int whence)
       }
    }
 
+   cout << "lseek64 " << fd << ", " << offset << ", " << whence << endl;
    trace("!!! ALERT: glibc calling lseek64() before file system support is enabled.\n");
    return -1;
 }
@@ -458,6 +476,7 @@ static void register_glibc_exports (void)
    register_llamaos_gettimeofday (glibc_gettimeofday);
    register_llamaos_sleep (glibc_libc_sleep);
    register_llamaos_close (glibc_close);
+   register_llamaos_fcntl (glibc_fcntl);
    register_llamaos_libc_open (glibc_libc_open);
    register_llamaos_read (glibc_read);
    register_llamaos_write (glibc_write);

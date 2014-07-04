@@ -154,6 +154,14 @@ static void glibc_exit (int status)
    HYPERVISOR_sched_op(SCHEDOP_shutdown, &arg);
 }
 
+static int glibc_fcntl (int fd, int cmd)
+{
+   trace("!!! ALERT: glibc calling fcntl() before file system support is enabled.\n");
+
+   errno = EBADF;
+   return -1;
+}
+
 static int glibc_fork ()
 {
    trace("!!! ALERT: glibc calling fork() before process management is enabled.\n");
@@ -480,6 +488,7 @@ static void register_glibc_exports (void)
    register_llamaos_dup2 (glibc_dup2);
    register_llamaos_execve (glibc_execve);
    register_llamaos_exit (glibc_exit);
+   register_llamaos_fcntl (glibc_fcntl);
    register_llamaos_fork (glibc_fork);
    register_llamaos_ftruncate (glibc_ftruncate);
    register_llamaos_get_avphys_pages (glibc_get_avphys_pages);

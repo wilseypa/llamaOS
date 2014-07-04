@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012, William Magato
+Copyright (c) 2014, William Magato
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,72 +28,41 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
-#include <stdio.h>
-// #include <sys/time.h>
-#include <time.h>
-// #include <sys/types.h>
+#include <errno.h>
+#include <fcntl.h>
 
-#include <iostream>
+// define function pointer
+typedef int (*llamaos_fcntl_t) (int, int);
 
-#include <llamaos/memory/Memory.h>
+// function pointer variable
+static llamaos_fcntl_t llamaos_fcntl = 0;
 
-using namespace std;
-using namespace llamaos::memory;
-
-// simple guest instance should just output text to console
-int main (int argc, char *argv [])
+// function called by llamaOS to register pointer
+void register_llamaos_fcntl (llamaos_fcntl_t func)
 {
-   cout << endl << "hello llamaOS" << endl;
-   cout.flush ();
-   cout << endl;
-
-   cout << "sizeof long " << sizeof(long) << endl;
-
-   cout << "program break: " << (pointer_to_address(get_program_break ()) / 1024.0) / 1024.0 << endl;
-
-
-   cout << "argc: " << argc << endl;
-
-   for (int i = 0; i < argc; i++)
-   {
-      cout << "argv[" << i << "]: " << argv [i] << endl;
-   }
-
-   double third = (1.0 / 3.0);
-   cout << "print floats again: " << third << endl;
-#if 0
-      char data = 'a';
-      for (;;)
-      {
-         cout << data;
-         if (data == 'z')
-         {
-            data = 'a';
-         }
-         else
-         {
-            data++;
-         }
-      }
-#endif
-
-   cout << "time returns " << time((time_t *) NULL) << endl;
-
-   errno = 0;
-   perror ("test message");
-   perror ("test message");
-
-   errno = 0;
-   FILE *fp = fdopen (1, "w");
-
-   if (fp == NULL)
-   {
-      perror ("fdopen failed");
-   }
-   else
-   {
-      perror ("fdopen success");
-   }
-
-   return 0;
+   llamaos_fcntl = func;
 }
+
+/* Perform file control operations on FD.  */
+int
+__fcntl (fd, cmd)
+     int fd;
+     int cmd;
+{
+   if (fd < 0)
+   {
+      __set_errno (EBADF);
+      return -1;
+   }
+
+   if (0 != llamaos_fcntl)
+   {
+      return llamaos_fcntl (fd, cmd);
+   }
+
+   __set_errno (ENOSYS);
+   return -1;
+}
+
+libc_hidden_def (__fcntl)
+weak_alias (__fcntl, fcntl)

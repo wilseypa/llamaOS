@@ -389,7 +389,6 @@ C_SOURCES = \
   sys/glibc-$(GLIBC_VERSION)/intl/plural-exp.c \
   sys/glibc-$(GLIBC_VERSION)/intl/plural.c \
   sys/glibc-$(GLIBC_VERSION)/intl/textdomain.c \
-  sys/glibc-$(GLIBC_VERSION)/io/fcntl.c \
   sys/glibc-$(GLIBC_VERSION)/io/fxstat.c \
   sys/glibc-$(GLIBC_VERSION)/io/fxstat64.c \
   sys/glibc-$(GLIBC_VERSION)/io/fxstatat.c \
@@ -1134,6 +1133,7 @@ C_SOURCES = \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/dup.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/dup2.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/execve.c \
+  sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/fcntl.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/fork.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/ftruncate.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/get_avphys_pages.c \
@@ -1370,6 +1370,7 @@ C_SOURCES = \
 #  sys/glibc-$(GLIBC_VERSION)/io/close.c
 #  sys/glibc-$(GLIBC_VERSION)/io/dup.c
 #  sys/glibc-$(GLIBC_VERSION)/io/dup2.c
+#  sys/glibc-$(GLIBC_VERSION)/io/fcntl.c \
 #  sys/glibc-$(GLIBC_VERSION)/io/getcwd.c
 #  sys/glibc-$(GLIBC_VERSION)/io/isatty.c
 #  sys/glibc-$(GLIBC_VERSION)/io/lseek.c

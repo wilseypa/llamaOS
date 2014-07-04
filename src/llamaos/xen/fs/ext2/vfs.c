@@ -259,3 +259,9 @@ int fs_readdir (int fd, struct direntry *dir) {
     return (retval > 0) ? 1 : 0;
 }
 
+int fs_get_flags (int fd)
+{
+  struct fd *fdesc = fd_get (fd);
+
+  return fdesc->flags | O_RDWR;
+}

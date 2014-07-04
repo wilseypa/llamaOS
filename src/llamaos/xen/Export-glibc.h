@@ -94,6 +94,9 @@ EXTERN void register_llamaos_execve (llamaos_execve_t func);
 typedef void (*llamaos_exit_t) (int);
 EXTERN void register_llamaos_exit (llamaos_exit_t exit);
 
+typedef int (*llamaos_fcntl_t) (int, int);
+EXTERN void register_llamaos_fcntl (llamaos_fcntl_t func);
+
 typedef int (*llamaos_fork_t) ();
 EXTERN void register_llamaos_fork (llamaos_fork_t func);
 

@@ -45,9 +45,9 @@ extern int *__errno_location (void) __THROW __attribute__ ((__const__));
 #undef	__need_Emath
 #define	__Emath_defined	1
 
-# define EDOM		0	// XXX	<--- fill in what is actually needed
-# define EILSEQ		1	// XXX	<--- fill in what is actually needed
-# define ERANGE		2	// XXX	<--- fill in what is actually needed
+# define EDOM		1	// XXX	<--- fill in what is actually needed
+# define EILSEQ		2	// XXX	<--- fill in what is actually needed
+# define ERANGE		3	// XXX	<--- fill in what is actually needed
 #endif
 
 #ifdef	_ERRNO_H
@@ -55,81 +55,81 @@ extern int *__errno_location (void) __THROW __attribute__ ((__const__));
 // # error "must match the numbers of the kernel."
 //# define Exxxx	XXX
 
-# define EBADF			3
-# define E2BIG			4
-# define EINVAL			5
-# define EINTR			6
-# define ENOMSG			7
-# define ENOENT			8
-# define ENAMETOOLONG		9
-# define ELOOP			10
-# define ENOTDIR		11
-# define ENOSYS			12
-# define EBUSY			13
-# define EEXIST			14
-# define ENOSPC			15
-# define EOVERFLOW		16
-# define ESPIPE			17
-# define EAGAIN			18
-# define ENOMEM			19
-# define EACCES			20
-# define EPROTOTYPE		21
-# define EISDIR			22
-# define EFAULT			23
-# define EROFS			24
-# define EAFNOSUPPORT		25
-# define EADDRINUSE		26
-# define EADDRNOTAVAIL		27
-# define EISCONN		28
-# define EBADMSG		29
-# define EPIPE			30
-# define ECONNABORTED		31
-# define EALREADY		32
-# define ECONNREFUSED		33
-# define ECONNRESET		34
-# define EXDEV			35
-# define EDESTADDRREQ		36
-# define ENOTEMPTY		37
-# define ENOEXEC		38
-# define EFBIG			39
-# define EHOSTUNREACH		40
-# define EIDRM			41
-# define ENOTTY			42
-# define EIO			43
-# define EMSGSIZE		44
-# define ENETDOWN		45
-# define ENETRESET		46
-# define ENETUNREACH		47
-# define ENOBUFS		48
-# define ECHILD			49
-# define ENOLINK		50
-# define ENOLCK			51
-# define ENODATA		52
-# define ENOPROTOOPT		53
-# define ENOSR			54
-# define ENXIO			55
-# define ENODEV			56
-# define ESRCH			57
-# define ENOTSOCK		58
-# define ENOSTR			59
-# define ENOTCONN		60
-# define ENOTSUP		61
-# define ECANCELED		62
-# define EINPROGRESS		63
-# define EPERM			64
-# define EOPNOTSUPP		65
-# define EWOULDBLOCK		66
-# define EOWNERDEAD		67
-# define EPROTONOSUPPORT	68
-# define EDEADLK		69
-# define ENOTRECOVERABLE	70
-# define ETIME			71
-# define ETXTBSY		72
-# define ETIMEDOUT		73
-# define ENFILE			74
-# define EMFILE			75
-# define EMLINK			76
-# define EPROTO			77
+# define EBADF			4
+# define E2BIG			5
+# define EINVAL			6
+# define EINTR			7
+# define ENOMSG			8
+# define ENOENT			9
+# define ENAMETOOLONG		10
+# define ELOOP			11
+# define ENOTDIR		12
+# define ENOSYS			13
+# define EBUSY			14
+# define EEXIST			15
+# define ENOSPC			16
+# define EOVERFLOW		17
+# define ESPIPE			18
+# define EAGAIN			19
+# define ENOMEM			20
+# define EACCES			21
+# define EPROTOTYPE		22
+# define EISDIR			23
+# define EFAULT			24
+# define EROFS			25
+# define EAFNOSUPPORT		26
+# define EADDRINUSE		27
+# define EADDRNOTAVAIL		28
+# define EISCONN		29
+# define EBADMSG		30
+# define EPIPE			31
+# define ECONNABORTED		32
+# define EALREADY		33
+# define ECONNREFUSED		34
+# define ECONNRESET		35
+# define EXDEV			36
+# define EDESTADDRREQ		37
+# define ENOTEMPTY		38
+# define ENOEXEC		39
+# define EFBIG			40
+# define EHOSTUNREACH		41
+# define EIDRM			42
+# define ENOTTY			43
+# define EIO			44
+# define EMSGSIZE		45
+# define ENETDOWN		46
+# define ENETRESET		47
+# define ENETUNREACH		48
+# define ENOBUFS		49
+# define ECHILD			50
+# define ENOLINK		51
+# define ENOLCK			52
+# define ENODATA		53
+# define ENOPROTOOPT		54
+# define ENOSR			55
+# define ENXIO			56
+# define ENODEV			57
+# define ESRCH			58
+# define ENOTSOCK		59
+# define ENOSTR			60
+# define ENOTCONN		61
+# define ENOTSUP		62
+# define ECANCELED		63
+# define EINPROGRESS		64
+# define EPERM			65
+# define EOPNOTSUPP		66
+# define EWOULDBLOCK		67
+# define EOWNERDEAD		68
+# define EPROTONOSUPPORT	69
+# define EDEADLK		70
+# define ENOTRECOVERABLE	71
+# define ETIME			72
+# define ETXTBSY		73
+# define ETIMEDOUT		74
+# define ENFILE			75
+# define EMFILE			76
+# define EMLINK			77
+# define EPROTO			78
 
 
 #endif
