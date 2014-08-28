@@ -38,9 +38,9 @@ include common-flags.mk
 MAKEFILE_SOURCES += llamaMPI.mk
 
 CPPFLAGS += \
+  -I $(SRCDIR)/llamaos/mpi \
   -I $(INCDIR) \
   -I $(SRCDIR) \
-  -I $(SRCDIR)/llamaos/mpi \
   -include $(SRCDIR)/llamaos/__thread.h \
   -D__XEN_INTERFACE_VERSION__=0x00030205
 
