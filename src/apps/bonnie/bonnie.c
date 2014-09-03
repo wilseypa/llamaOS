@@ -119,7 +119,9 @@ int main(
 
   fd = -1;
   basetime = (int) time((time_t *) NULL);
-  size = 100;
+  // BAM!
+  //size = 100;
+  size = 64;
   dir = ".";
   machine = "";
 
@@ -150,9 +152,10 @@ int main(
 
   /* size is in meg, rounded down to multiple of Chunk */
 // !BAM
+// Change so filesize is only 64KB
 //  size *= (1024 * 1024);
-  size *= (64);
-  size = Chunk * (size / Chunk);
+//  size *= (64);
+//  size = Chunk * (size / Chunk);
   fprintf(stderr, "File '%s', size: %ld\n", name, size);
 
   /* Fill up a file, writing it a char at a time with the stdio putc() call */
@@ -160,7 +163,9 @@ int main(
   newfile(name, &fd, &stream, 1);
   timestamp();
   for (words = 0; words < size; words++)
-    if (putc(words & 0x7f, stream) == EOF)
+    // BAM!
+    //if (putc(words & 0x7f, stream) == EOF)
+    if (putc(words, stream) == EOF)
       io_error("putc");
   
   /*
@@ -423,7 +428,9 @@ report(
   printf("K/sec %%CPU K/sec %%CPU K/sec %%CPU K/sec %%CPU K/sec ");
   printf("%%CPU  /sec %%CPU\n");
 
-  printf("%-8.8s %4d ", machine, size / (1024 * 1024));
+  // BAM!
+  //printf("%-8.8s %4d ", machine, size / (1024 * 1024));
+  printf("%-8.8s %4d ", machine, size / (64));
   printf("%5d %4.1f %5d %4.1f %5d %4.1f ",
     (int) (((double) size) / (delta[(int) Putc][Elapsed] * 1024.0)),
     delta[(int) Putc][CPU] / delta[(int) Putc][Elapsed] * 100.0,
