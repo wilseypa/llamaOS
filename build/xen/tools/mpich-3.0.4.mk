@@ -325,6 +325,7 @@ C_SOURCES = \
   tools/mpich-$(MPICH_VERSION)/src/mpid/ch3/src/mpid_get_universe_size.c \
   tools/mpich-$(MPICH_VERSION)/src/mpid/ch3/src/mpid_getpname.c \
   tools/mpich-$(MPICH_VERSION)/src/mpid/ch3/src/mpid_init.c \
+  tools/mpich-$(MPICH_VERSION)/src/mpid/ch3/src/mpid_iprobe.c \
   tools/mpich-$(MPICH_VERSION)/src/mpid/ch3/src/mpid_irecv.c \
   tools/mpich-$(MPICH_VERSION)/src/mpid/ch3/src/mpid_isend.c \
   tools/mpich-$(MPICH_VERSION)/src/mpid/ch3/src/mpid_issend.c \
