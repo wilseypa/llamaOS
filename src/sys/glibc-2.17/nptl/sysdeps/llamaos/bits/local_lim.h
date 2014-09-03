@@ -34,6 +34,11 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #define PTHREAD_STACK_MIN      16384
 #define PTHREAD_KEYS_MAX       1024
 
+/* Controlling the iterations of destructors for thread-specific data.  */
+#define _POSIX_THREAD_DESTRUCTOR_ITERATIONS     4
+/* Number of iterations this implementation does.  */
+#define PTHREAD_DESTRUCTOR_ITERATIONS   _POSIX_THREAD_DESTRUCTOR_ITERATIONS
+
 #include_next <bits/local_lim.h>
 
 #endif	// glibc_nptl_sysdeps_llamaos_bits_local_lim_h

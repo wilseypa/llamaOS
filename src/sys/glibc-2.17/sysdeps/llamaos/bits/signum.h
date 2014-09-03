@@ -32,6 +32,8 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #define glibc_sysdeps_llamaos_bits_signum_h
 
 // #include_next <bits/signum.h>
+#define __SIGRTMIN     32
+
 /* Signal number constants.  Generic version.
    Copyright (C) 1991-2012 Free Software Foundation, Inc.
    This file is part of the GNU C Library.

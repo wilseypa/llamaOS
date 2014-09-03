@@ -41,6 +41,7 @@ INCLUDES_DIRS = \
   -I $(SRCDIR)/sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/x86_64/64/nptl \
   -I $(SRCDIR)/sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/x86_64/64 \
   -I $(SRCDIR)/sys/glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaos/x86_64 \
+  -I $(SRCDIR)/sys/glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaos/i386 \
   -I $(SRCDIR)/sys/glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaos/x86 \
   -I $(SRCDIR)/sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/x86_64 \
   -I $(SRCDIR)/sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/x86 \
@@ -73,6 +74,7 @@ INCLUDES_DIRS = \
   -I $(SRCDIR)/sys/glibc-$(GLIBC_VERSION)/libio \
   -I $(SRCDIR)/sys/glibc-$(GLIBC_VERSION)/locale \
   -I $(SRCDIR)/sys/glibc-$(GLIBC_VERSION)/math \
+  -I $(SRCDIR)/sys/glibc-$(GLIBC_VERSION)/resolv \
   -I $(SRCDIR)/sys/glibc-$(GLIBC_VERSION)/stdio-common \
   -I $(SRCDIR)/sys/glibc-$(GLIBC_VERSION)/stdlib \
   -I $(SRCDIR)/sys/glibc-$(GLIBC_VERSION)/wcsmbs \
@@ -125,6 +127,7 @@ CFLAGS += \
   -D__ASSUME_SET_ROBUST_LIST \
   $(INCLUDES_DIRS) \
   -include  $(SRCDIR)/sys/glibc-$(GLIBC_VERSION)/include/libc-symbols.h \
+  -D__NR_exit=0 \
   -include $(SRCDIR)/llamaos/__thread.h
 
 #  -fexceptions \
@@ -222,6 +225,9 @@ ASM_SOURCES = \
 # these have TLS conflicts
 #  sys/glibc-$(GLIBC_VERSION)/sysdeps/x86_64/strcasecmp_l.S \
 #  sys/glibc-$(GLIBC_VERSION)/sysdeps/x86_64/strncase_l.S \
+
+#  sys/glibc-$(GLIBC_VERSION)/nss/nsswitch.c \
+#  sys/glibc-$(GLIBC_VERSION)/nptl/pthread_create.c \
 
 C_SOURCES = \
   sys/glibc-$(GLIBC_VERSION)/assert/__assert.c \
@@ -734,23 +740,45 @@ C_SOURCES = \
   sys/glibc-$(GLIBC_VERSION)/misc/mprotect.c \
   sys/glibc-$(GLIBC_VERSION)/misc/sbrk.c \
   sys/glibc-$(GLIBC_VERSION)/misc/tsearch.c \
+  sys/glibc-$(GLIBC_VERSION)/nptl/cancellation.c \
+  sys/glibc-$(GLIBC_VERSION)/nptl/cleanup_compat.c \
   sys/glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaos/flockfile.c \
   sys/glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaos/funlockfile.c \
   sys/glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaos/jmp-unwind.c \
   sys/glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaos/pthread.c \
+  sys/glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaos/pthread_cond_signal.c \
+  sys/glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaos/pthread_create.c \
+  sys/glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaos/pthread_join.c \
+  sys/glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaos/pthread_mutex_cond_lock.c \
+  sys/glibc-$(GLIBC_VERSION)/nptl/sysdeps/llamaos/pthread_yield.c \
   sys/glibc-$(GLIBC_VERSION)/nptl/sysdeps/pthread/flockfile.c \
   sys/glibc-$(GLIBC_VERSION)/nptl/sysdeps/pthread/ftrylockfile.c \
   sys/glibc-$(GLIBC_VERSION)/nptl/sysdeps/pthread/funlockfile.c \
   sys/glibc-$(GLIBC_VERSION)/nptl/alloca_cutoff.c \
   sys/glibc-$(GLIBC_VERSION)/nptl/pthread_attr_destroy.c \
   sys/glibc-$(GLIBC_VERSION)/nptl/pthread_attr_init.c \
+  sys/glibc-$(GLIBC_VERSION)/nptl/pthread_cond_init.c \
+  sys/glibc-$(GLIBC_VERSION)/nptl/pthread_cond_wait.c \
+  sys/glibc-$(GLIBC_VERSION)/nptl/pthread_exit.c \
+  sys/glibc-$(GLIBC_VERSION)/nptl/pthread_getspecific.c \
+  sys/glibc-$(GLIBC_VERSION)/nptl/pthread_key_create.c \
+  sys/glibc-$(GLIBC_VERSION)/nptl/pthread_key_delete.c \
   sys/glibc-$(GLIBC_VERSION)/nptl/pthread_mutex_destroy.c \
   sys/glibc-$(GLIBC_VERSION)/nptl/pthread_mutex_init.c \
+  sys/glibc-$(GLIBC_VERSION)/nptl/pthread_mutex_lock.c \
+  sys/glibc-$(GLIBC_VERSION)/nptl/pthread_mutex_unlock.c \
   sys/glibc-$(GLIBC_VERSION)/nptl/pthread_mutexattr_destroy.c \
   sys/glibc-$(GLIBC_VERSION)/nptl/pthread_mutexattr_init.c \
   sys/glibc-$(GLIBC_VERSION)/nptl/pthread_mutexattr_setpshared.c \
+  sys/glibc-$(GLIBC_VERSION)/nptl/pthread_rwlock_init.c \
+  sys/glibc-$(GLIBC_VERSION)/nptl/pthread_setspecific.c \
+  sys/glibc-$(GLIBC_VERSION)/nptl/pthread_spin_init.c \
+  sys/glibc-$(GLIBC_VERSION)/nptl/pthread_spin_lock.c \
+  sys/glibc-$(GLIBC_VERSION)/nptl/pthread_spin_unlock.c \
   sys/glibc-$(GLIBC_VERSION)/nptl/tpp.c \
+  sys/glibc-$(GLIBC_VERSION)/nptl/vars.c \
   sys/glibc-$(GLIBC_VERSION)/posix/environ.c \
+  sys/glibc-$(GLIBC_VERSION)/posix/execv.c \
   sys/glibc-$(GLIBC_VERSION)/posix/fpathconf.c \
   sys/glibc-$(GLIBC_VERSION)/posix/getegid.c \
   sys/glibc-$(GLIBC_VERSION)/posix/geteuid.c \
@@ -760,6 +788,8 @@ C_SOURCES = \
   sys/glibc-$(GLIBC_VERSION)/posix/sched_getp.c \
   sys/glibc-$(GLIBC_VERSION)/posix/sched_gets.c \
   sys/glibc-$(GLIBC_VERSION)/posix/sched_sets.c \
+  sys/glibc-$(GLIBC_VERSION)/pwd/getpwuid.c \
+  sys/glibc-$(GLIBC_VERSION)/pwd/getpwuid_r.c \
   sys/glibc-$(GLIBC_VERSION)/setjmp/longjmp.c \
   sys/glibc-$(GLIBC_VERSION)/setjmp/sigjmp.c \
   sys/glibc-$(GLIBC_VERSION)/signal/sigaction.c \
@@ -1164,6 +1194,7 @@ C_SOURCES = \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/readlink.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/remove.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/rename.c \
+  sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/rmdir.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/sched_primax.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/sched_primin.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/signal.c \
@@ -1181,17 +1212,25 @@ C_SOURCES = \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/writev.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/xstat.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/export/xstat64.c \
+  sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/wordsize-64/getdents.c \
+  sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/wordsize-64/openat.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/dlerror.c \
+  sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/gethnamaddr.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/gcc_personality_v0.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/mremap.c \
+  sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/nsswitch.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/powidf2.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/register-atfork.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/sigaddset.c \
+  sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/socket.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/sysconf.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/syslog.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/llamaos/system.c \
+  sys/glibc-$(GLIBC_VERSION)/sysdeps/posix/closedir.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/posix/ctermid.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/posix/cuserid.c \
+  sys/glibc-$(GLIBC_VERSION)/sysdeps/posix/opendir.c \
+  sys/glibc-$(GLIBC_VERSION)/sysdeps/posix/readdir.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/posix/tempname.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/wordsize-64/labs.c \
   sys/glibc-$(GLIBC_VERSION)/sysdeps/wordsize-64/ldiv.c \
@@ -1288,6 +1327,7 @@ C_SOURCES = \
   sys/glibc-$(GLIBC_VERSION)/time/tzset.c \
   sys/glibc-$(GLIBC_VERSION)/time/wcsftime.c \
   sys/glibc-$(GLIBC_VERSION)/time/wcsftime_l.c \
+  sys/glibc-$(GLIBC_VERSION)/resource/getrusage.c \
   sys/glibc-$(GLIBC_VERSION)/wcsmbs/btowc.c \
   sys/glibc-$(GLIBC_VERSION)/wcsmbs/c16rtomb.c \
   sys/glibc-$(GLIBC_VERSION)/wcsmbs/isoc99_fwscanf.c \
@@ -1417,6 +1457,7 @@ HEADERS = \
   $(INCDIR)/bits/byteswap-16.h \
   $(INCDIR)/bits/cmathcalls.h \
   $(INCDIR)/bits/confname.h \
+  $(INCDIR)/bits/dirent.h \
   $(INCDIR)/bits/endian.h \
   $(INCDIR)/bits/environments.h \
   $(INCDIR)/bits/errno.h \
@@ -1429,15 +1470,18 @@ HEADERS = \
   $(INCDIR)/bits/inf.h \
   $(INCDIR)/bits/ioctl-types.h \
   $(INCDIR)/bits/ioctls.h \
+  $(INCDIR)/bits/local_lim.h \
   $(INCDIR)/bits/locale.h \
   $(INCDIR)/bits/mathcalls.h \
   $(INCDIR)/bits/mathdef.h \
   $(INCDIR)/bits/mathinline.h \
   $(INCDIR)/bits/mman.h \
   $(INCDIR)/bits/nan.h \
+  $(INCDIR)/bits/netdb.h \
   $(INCDIR)/bits/param.h \
   $(INCDIR)/bits/poll.h \
   $(INCDIR)/bits/poll2.h \
+  $(INCDIR)/bits/posix1_lim.h \
   $(INCDIR)/bits/posix_opt.h \
   $(INCDIR)/bits/pthreadtypes.h \
   $(INCDIR)/bits/resource.h \
@@ -1479,6 +1523,7 @@ HEADERS = \
   $(INCDIR)/gnu/stubs.h \
   $(INCDIR)/netinet/in.h \
   $(INCDIR)/netinet/tcp.h \
+  $(INCDIR)/rpc/netdb.h \
   $(INCDIR)/sys/bitypes.h \
   $(INCDIR)/sys/cdefs.h \
   $(INCDIR)/sys/ioctl.h \
@@ -1505,6 +1550,7 @@ HEADERS = \
   $(INCDIR)/assert.h \
   $(INCDIR)/complex.h \
   $(INCDIR)/ctype.h \
+  $(INCDIR)/dirent.h \
   $(INCDIR)/endian.h \
   $(INCDIR)/errno.h \
   $(INCDIR)/fcntl.h \
@@ -1630,6 +1676,11 @@ $(INCDIR)/% : $(SRCDIR)/sys/glibc-$(GLIBC_VERSION)/ctype/%
 	@echo copying: $@ from $<
 	cp $< $@
 
+$(INCDIR)/% : $(SRCDIR)/sys/glibc-$(GLIBC_VERSION)/dirent/%
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo copying: $@ from $<
+	cp $< $@
+
 $(INCDIR)/% : $(SRCDIR)/sys/glibc-$(GLIBC_VERSION)/inet/%
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo copying: $@ from $<
@@ -1711,6 +1762,11 @@ $(INCDIR)/% : $(SRCDIR)/sys/glibc-$(GLIBC_VERSION)/stdlib/%
 	cp $< $@
 
 $(INCDIR)/% : $(SRCDIR)/sys/glibc-$(GLIBC_VERSION)/string/%
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo copying: $@ from $<
+	cp $< $@
+
+$(INCDIR)/% : $(SRCDIR)/sys/glibc-$(GLIBC_VERSION)/sunrpc/%
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo copying: $@ from $<
 	cp $< $@

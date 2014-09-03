@@ -75,3 +75,5 @@ libc_hidden_def (__libc_write)
 
 weak_alias (__libc_write, __write)
 weak_alias (__libc_write, write)
+
+weak_alias (__libc_write, __write_nocancel)

@@ -41,6 +41,7 @@ strong_alias (__pthread_mutex_lock, pthread_mutex_lock)
 hidden_def (__pthread_mutex_lock)
 #endif
 
+#if 0
 int __pthread_mutex_unlock (pthread_mutex_t *__mutex);
 
 int
@@ -51,6 +52,7 @@ __pthread_mutex_unlock (mutex)
 }
 strong_alias (__pthread_mutex_unlock, pthread_mutex_unlock)
 hidden_def (__pthread_mutex_unlock)
+#endif
 
 extern int __pthread_once (pthread_once_t *once_control,
 			   void (*init_routine) (void));

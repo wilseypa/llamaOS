@@ -61,3 +61,5 @@ int __close (int fd)
 libc_hidden_def (__close)
 
 weak_alias (__close, close)
+
+weak_alias (__close, __close_nocancel)

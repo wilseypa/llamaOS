@@ -37,7 +37,59 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <bp-sym.h>
 
 # define INTERNAL_SYSCALL_DECL(err) do { } while (0)
-# define INTERNAL_SYSCALL(name, err, nr, args...) do { } while (0)
+# undef INTERNAL_SYSCALL
+# define INTERNAL_SYSCALL(name, err, nr, args...) (0)
+
+# undef INTERNAL_SYSCALL_DECL
+# define INTERNAL_SYSCALL_DECL(err) do { } while (0)
+
+# define INTERNAL_SYSCALL_NCS(name, err, nr, args...) (0)
+//  ({                                                                          \
+    unsigned long int resultvar;                                              \
+    LOAD_ARGS_##nr (args)                                                     \
+    LOAD_REGS_##nr                                                            \
+    asm volatile (                                                            \
+    "syscall\n\t"                                                             \
+    : "=a" (resultvar)                                                        \
+    : "0" (name) ASM_ARGS_##nr : "memory", "cc", "r11", "cx");                \
+    (long int) resultvar; })
+# undef INTERNAL_SYSCALL
+# define INTERNAL_SYSCALL(name, err, nr, args...) \
+  INTERNAL_SYSCALL_NCS (__NR_##name, err, nr, ##args)
+
+# define INTERNAL_SYSCALL_NCS_TYPES(name, err, nr, args...) (0)
+//  ({                                                                          \
+    unsigned long int resultvar;                                              \
+    LOAD_ARGS_TYPES_##nr (args)                                               \
+    LOAD_REGS_TYPES_##nr (args)                                               \
+    asm volatile (                                                            \
+    "syscall\n\t"                                                             \
+    : "=a" (resultvar)                                                        \
+    : "0" (name) ASM_ARGS_##nr : "memory", "cc", "r11", "cx");                \
+    (long int) resultvar; })
+# undef INTERNAL_SYSCALL_TYPES
+# define INTERNAL_SYSCALL_TYPES(name, err, nr, args...) \
+  INTERNAL_SYSCALL_NCS_TYPES (__NR_##name, err, nr, ##args)
+
+# undef INTERNAL_SYSCALL_ERROR_P
+# define INTERNAL_SYSCALL_ERROR_P(val, err) \
+  ((unsigned long int) (long int) (val) >= -4095L)
+
+  # undef INTERNAL_SYSCALL_ERRNO
+# define INTERNAL_SYSCALL_ERRNO(val, err)       (-(val))
+
+/* Define a macro which expands inline into the wrapper code for a system
+   call.  */
+# undef INLINE_SYSCALL
+# define INLINE_SYSCALL(name, nr, args...) \
+  ({                                                                          \
+    unsigned long int resultvar = INTERNAL_SYSCALL (name, , nr, args);        \
+    if (__builtin_expect (INTERNAL_SYSCALL_ERROR_P (resultvar, ), 0))         \
+      {                                                                       \
+        __set_errno (INTERNAL_SYSCALL_ERRNO (resultvar, ));                   \
+        resultvar = (unsigned long int) -1;                                   \
+      }                                                                       \
+    (long int) resultvar; })
 
 #include_next <sysdep.h>
 

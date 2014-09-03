@@ -70,11 +70,53 @@ struct pthread_mutexattr
   int mutexkind;
 };
 
-/* Compatibility type for old conditional variable interfaces.  */
-typedef struct
+
+/* Conditional variable attribute data structure.  */
+struct pthread_condattr
 {
-  pthread_cond_t *cond;
-} pthread_cond_2_0_t;
+  /* Combination of values:
+
+     Bit 0  : flag whether coditional variable will be shareable between
+              processes.
+
+     Bit 1-7: clock ID.  */
+  int value;
+};
+
+
+/* The __NWAITERS field is used as a counter and to house the number
+   of bits for other purposes.  COND_CLOCK_BITS is the number
+   of bits needed to represent the ID of the clock.  COND_NWAITERS_SHIFT
+   is the number of bits reserved for other purposes like the clock.  */
+#define COND_CLOCK_BITS         1
+#define COND_NWAITERS_SHIFT     1
+
+
+/* Read-write lock variable attribute data structure.  */
+struct pthread_rwlockattr
+{
+  int lockkind;
+  int pshared;
+};
+
+
+/* Barrier data structure.  */
+struct pthread_barrier
+{
+  unsigned int curr_event;
+  int lock;
+  unsigned int left;
+  unsigned int init_count;
+  int private;
+};
+
+
+/* Barrier variable attribute data structure.  */
+struct pthread_barrierattr
+{
+  int pshared;
+};
+
 
 /* Thread-local data handling.  */
 struct pthread_key_struct
@@ -88,6 +130,42 @@ struct pthread_key_struct
   /* Destructor for the data.  */
   void (*destr) (void *);
 };
+
+/* Check whether an entry is unused.  */
+#define KEY_UNUSED(p) (((p) & 1) == 0)
+/* Check whether a key is usable.  We cannot reuse an allocated key if
+   the sequence counter would overflow after the next destroy call.
+   This would mean that we potentially free memory for a key with the
+   same sequence.  This is *very* unlikely to happen, A program would
+   have to create and destroy a key 2^31 times (on 32-bit platforms,
+   on 64-bit platforms that would be 2^63).  If it should happen we
+   simply don't use this specific key anymore.  */
+#define KEY_USABLE(p) (((uintptr_t) (p)) < ((uintptr_t) ((p) + 2)))
+
+
+/* Handling of read-write lock data.  */
+// XXX For now there is only one flag.  Maybe more in future.
+#define RWLOCK_RECURSIVE(rwlock) ((rwlock)->__data.__flags != 0)
+
+
+/* Semaphore variable structure.  */
+struct new_sem
+{
+  unsigned int value;
+  int private;
+  unsigned long int nwaiters;
+};
+
+struct old_sem
+{
+  unsigned int value;
+};
+
+/* Compatibility type for old conditional variable interfaces.  */
+typedef struct
+{
+  pthread_cond_t *cond;
+} pthread_cond_2_0_t;
 
 // #include_next <internaltypes.h>
 

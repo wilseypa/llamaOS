@@ -31,7 +31,10 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #ifndef glibc_sysdeps_llamaos_bits_local_lim_h
 #define glibc_sysdeps_llamaos_bits_local_lim_h
 
-#include_next <bits/local_lim.h>
+// #include_next <bits/local_lim.h>
+/* This file should define the implementation-specific limits described
+   in posix[12]_lim.h.  If there are no useful values to give a limit,
+   don't define it.  */
 
 #endif	// glibc_sysdeps_llamaos_bits_local_lim_h
 
