@@ -60,9 +60,9 @@ PING_PONG_OBJECTS = $(PING_PONG_SOURCES:%.cpp=$(OBJDIR)/%.o)
 PING_PONG_DEPENDS = $(PING_PONG_OBJECTS:%.o=%.d)
 
 .PHONY: all
-all : $(BINDIR)/apps/warped-models/ping_ping
+all : $(BINDIR)/apps/warped-models/pingpong
 
-$(BINDIR)/apps/warped-models/ping_ping: $(PING_PONG_OBJECTS) $(LIBDIR)/apps/warped/warped.a $(LIBDIR)/tools/mpich.a $(LIBDIR)/llamaOS.a $(LIBDIR)/sys/stdc++.a $(LIBDIR)/sys/gcc.a $(LIBDIR)/sys/glibc.a
+$(BINDIR)/apps/warped-models/pingpong: $(PING_PONG_OBJECTS) $(LIBDIR)/apps/warped/warped.a $(LIBDIR)/tools/mpich.a $(LIBDIR)/llamaOS.a $(LIBDIR)/sys/stdc++.a $(LIBDIR)/sys/gcc.a $(LIBDIR)/sys/glibc.a
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
 	@$(LD) $(LDFLAGS) -T llamaOS.lds -o $@ $^
