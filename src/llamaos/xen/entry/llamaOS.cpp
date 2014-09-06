@@ -328,6 +328,10 @@ static ssize_t glibc_read (int fd, void *buf, size_t nbytes)
          return fs_read (fd-100, buf, nbytes);
       }
    }
+   else if (fd >= 200)
+   {
+      memcpy(buf, Hypervisor::get_instance ()->shared_memory->get(fd), nbytes);
+   }
 
   cout << "Alert: reading from fileno " << fd << ", " << nbytes << " bytes" << endl;
   return -1;
@@ -390,6 +394,10 @@ static off_t glibc_lseek (int fd, off_t offset, int whence)
          return fs_lseek (fd-100, offset, whence);
       }
    }
+   else
+   {
+      return offset;
+   }
 
    trace("!!! ALERT: glibc calling lseek() before file system support is enabled.\n");
    trace ("   fd: %d, offset: %d, whence: %d\n", fd, offset, whence);
@@ -424,6 +432,10 @@ static off64_t glibc_lseek64 (int fd, off64_t offset, int whence)
          cout << "lseek64 on file " << fd << endl;
          return fs_lseek (fd-100, offset, whence);
       }
+   }
+   else
+   {
+      return offset;
    }
 
    cout << "lseek64 " << fd << ", " << offset << ", " << whence << endl;
