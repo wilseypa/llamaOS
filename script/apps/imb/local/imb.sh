@@ -9,5 +9,5 @@ sudo xl create imb.config name=\"imb-1.4\"
 sudo xl create imb.config name=\"imb-2.4\"
 sudo xl create imb.config name=\"imb-3.4\"
 sudo xl console imb-0.4
-sleep 10
+sleep 60
 sudo xl destroy imb-r.4
