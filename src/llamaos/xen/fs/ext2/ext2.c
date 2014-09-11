@@ -118,11 +118,13 @@ struct direntry_t {
 static ino_t ext2_root_ino = EXT2_ROOT_INO; /* root directory inode */
 
 /* block size in bytes */
-#define __BLK_SIZE ((unsigned int)(512 << superblk.s_log_block_size))
+// #define __BLK_SIZE ((unsigned int)(512 << superblk.s_log_block_size))
+#define __BLK_SIZE ((unsigned int)(1024 << superblk.s_log_block_size))
 
 /* cache for disk I/O (used to store one block: max block size = 4096) */
 #define __LOG_MAX_BLK_SIZE 2
-unsigned char cache [512 << __LOG_MAX_BLK_SIZE];
+// unsigned char cache [512 << __LOG_MAX_BLK_SIZE];
+unsigned char cache [1024 << __LOG_MAX_BLK_SIZE];
 
 /* convert a block number into an offset on the disk */
 #define blk2off(block) ((block) << (10 + superblk.s_log_block_size))

@@ -324,7 +324,7 @@ static ssize_t glibc_read (int fd, void *buf, size_t nbytes)
    {
       if (fd >= 100)
       {
-         cout << "reading from file " << fd << endl;
+         cout << "reading from file " << fd << ", " << nbytes << endl;
          return fs_read (fd-100, buf, nbytes);
       }
    }
