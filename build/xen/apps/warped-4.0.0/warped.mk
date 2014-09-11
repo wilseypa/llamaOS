@@ -49,6 +49,7 @@ CFLAGS += \
   -I $(WARPED_DIR)/thirdparty/metis/include \
   -I $(WARPED_DIR)/thirdparty/metis/libmetis \
   -fexceptions \
+  -DJSON_USE_EXCEPTION=0 \
   -include $(SRCDIR)/llamaos/__thread.h
 
 CPPFLAGS += \
@@ -58,6 +59,7 @@ CPPFLAGS += \
   -I $(WARPED_DIR)/thirdparty \
   -I $(WARPED_DIR)/thirdparty/metis/include \
   -fexceptions \
+  -DJSON_USE_EXCEPTION=0 \
   -include $(SRCDIR)/llamaos/__thread.h
 
 VPATH = $(WARPED_DIR)/src:$(WARPED_DIR)/thirdparty
