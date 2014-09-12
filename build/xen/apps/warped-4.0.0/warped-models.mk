@@ -34,11 +34,12 @@
 include common-vars.mk
 include common-flags.mk
 
-WARPED_VERSION = 4.0.0
-WARPED_MODELS_DIR = /home/wmagato/phd/warped-models
+# WARPED_VERSION should be defined in custom-vars.mk
+# WARPED_MODELS_DIR should be defined in custom-vars.mk
+
 OBJDIR = obj/apps/warped-$(WARPED_VERSION)
 
-MAKEFILE_SOURCES += apps/warped-$(WARPED_VERSION)/warped.mk
+MAKEFILE_SOURCES += apps/warped-$(WARPED_VERSION)/warped-models.mk
 
 CPPFLAGS += \
   -I $(INCDIR) \
@@ -50,19 +51,43 @@ CPPFLAGS += \
 
 VPATH = $(WARPED_MODELS_DIR)/src
 
-PING_PONG_SOURCES = \
+PINGPONG_SOURCES = \
   pingPong/PingEvent.cpp \
   pingPong/PingObject.cpp \
   pingPong/PingPongApplication.cpp \
   pingPong/main.cpp
 
-PING_PONG_OBJECTS = $(PING_PONG_SOURCES:%.cpp=$(OBJDIR)/%.o)
-PING_PONG_DEPENDS = $(PING_PONG_OBJECTS:%.o=%.d)
+PINGPONG_OBJECTS = $(PINGPONG_SOURCES:%.cpp=$(OBJDIR)/%.o)
+PINGPONG_DEPENDS = $(PINGPONG_OBJECTS:%.o=%.d)
+
+EPIDEMICSIM_SOURCES = \
+  epidemic/EpidemicApplication.cpp \
+  epidemic/EpidemicMain.cpp \
+  epidemic/EpidemicPartitioner.cpp \
+  epidemic/LocationObject.cpp \
+  epidemic/tinyxml2.cpp
+
+EPIDEMICSIM_OBJECTS = $(EPIDEMICSIM_SOURCES:%.cpp=$(OBJDIR)/%.o)
+EPIDEMICSIM_DEPENDS = $(EPIDEMICSIM_OBJECTS:%.o=%.d)
 
 .PHONY: all
-all : $(BINDIR)/apps/warped-models/pingpong
+all: pingpong epidemicsim
 
-$(BINDIR)/apps/warped-models/pingpong: $(PING_PONG_OBJECTS) $(LIBDIR)/apps/warped/warped.a $(LIBDIR)/tools/mpich.a $(LIBDIR)/llamaOS.a $(LIBDIR)/sys/stdc++.a $(LIBDIR)/sys/gcc.a $(LIBDIR)/sys/glibc.a
+.PHONY: pingpong
+pingpong: $(BINDIR)/apps/warped-models/pingpong
+
+$(BINDIR)/apps/warped-models/pingpong: $(PINGPONG_OBJECTS) $(LIBDIR)/apps/warped/warped.a $(LIBDIR)/tools/mpich.a $(LIBDIR)/llamaOS.a $(LIBDIR)/sys/stdc++.a $(LIBDIR)/sys/gcc.a $(LIBDIR)/sys/glibc.a
+	@[ -d $(@D) ] || (mkdir -p $(@D))
+	@echo linking: $@
+	@$(LD) $(LDFLAGS) -T llamaOS.lds -o $@ $^
+	@gzip -c -f --best $@ >$@.gz
+	@echo successfully built: $@
+	@echo
+
+.PHONY: epidemicsim
+epidemicsim: $(BINDIR)/apps/warped-models/epidemicSim
+
+$(BINDIR)/apps/warped-models/epidemicSim: $(EPIDEMICSIM_OBJECTS) $(LIBDIR)/apps/warped/warped.a $(LIBDIR)/tools/mpich.a $(LIBDIR)/llamaOS.a $(LIBDIR)/sys/stdc++.a $(LIBDIR)/sys/gcc.a $(LIBDIR)/sys/glibc.a
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
 	@$(LD) $(LDFLAGS) -T llamaOS.lds -o $@ $^
@@ -73,6 +98,5 @@ $(BINDIR)/apps/warped-models/pingpong: $(PING_PONG_OBJECTS) $(LIBDIR)/apps/warpe
 include rules.mk
 
 # include auto-generated dependencies
--include $(PING_PONG_DEPENDS)
-
-
+-include $(PINGPONG_DEPENDS)
+-include $(EPIDEMICSIM_DEPENDS)

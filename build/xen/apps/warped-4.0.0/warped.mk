@@ -34,8 +34,9 @@
 include common-vars.mk
 include common-flags.mk
 
-WARPED_VERSION = 4.0.0
-WARPED_DIR = /home/wmagato/phd/warped
+# WARPED_VERSION should be defined in custom-vars.mk
+# WARPED_DIR should be defined in custom-vars.mk
+
 OBJDIR = obj/apps/warped-$(WARPED_VERSION)
 
 MAKEFILE_SOURCES += apps/warped-$(WARPED_VERSION)/warped.mk

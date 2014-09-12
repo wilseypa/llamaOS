@@ -94,8 +94,8 @@ all:
 
 #	@$(MAKE) -f apps/NAS/NAS.mk
 #	@$(MAKE) -f apps/WARPED/WARPED.mk
-	@$(MAKE) -f apps/warped-4.0.0/warped.mk
-	@$(MAKE) -f apps/warped-4.0.0/warped-models.mk
+	@[ -z $(WARPED_VERSION) -a -z $(WARPED_DIR) ] || ($(MAKE) -f apps/warped-$(WARPED_VERSION)/warped.mk)
+	@[ -z $(WARPED_VERSION) -a -z $(WARPED_MODELS_DIR) ] || ($(MAKE) -f apps/warped-$(WARPED_VERSION)/warped-models.mk)
 
 .PHONY: install
 install:
