@@ -122,7 +122,8 @@ static ino_t ext2_root_ino = EXT2_ROOT_INO; /* root directory inode */
 #define __BLK_SIZE ((unsigned int)(1024 << superblk.s_log_block_size))
 
 /* cache for disk I/O (used to store one block: max block size = 4096) */
-#define __LOG_MAX_BLK_SIZE 2
+// #define __LOG_MAX_BLK_SIZE 2
+#define __LOG_MAX_BLK_SIZE 4
 // unsigned char cache [512 << __LOG_MAX_BLK_SIZE];
 unsigned char cache [1024 << __LOG_MAX_BLK_SIZE];
 
@@ -259,7 +260,9 @@ int ext2_blk_allocate (uint32_t ino, struct inode_t* inode, uint32_t blk_n) {
   // add block to inode array
   if (blk_n < 12){
     // direct
-    inode->i_blocks++;
+    // !BAM
+    // inode->i_blocks++;
+    inode->i_blocks += 2;
     inode->i_block[blk_n] = block;
     if ((retval = update_inode (ino, inode)) < 0) return retval;
   }
@@ -302,6 +305,7 @@ static int get_file_blk (struct inode_t* inode, uint32_t blk_n, uint32_t ino, in
 	__disk_blk_to_cache (ind_blk);
 	disk_blk = ((uint32_t *) (cache)) [blk_n - 12];
         if (!create){
+           printf("reading indirect block %d\n", disk_blk);
 	  __disk_blk_to_cache (disk_blk);
 	} else {
 	  if ((disk_blk) == 0){
@@ -332,7 +336,7 @@ bool ext2_mount () {
     if (superblk.s_rev_level != 0)
         mount_error ("revision %d of ext2 is not supported",
             superblk.s_rev_level);
-
+printf("s_log_block_size = %d\n", superblk.s_log_block_size);
     /* check that the block size is supported */
     if (superblk.s_log_block_size > __LOG_MAX_BLK_SIZE)
         mount_error ("block size too big: %u bytes", __BLK_SIZE);
@@ -474,9 +478,12 @@ int ext2_inode_allocate (uint32_t p_ino) {
   //inode.i_osd2 [3];    /* OS dependent */
 
   // allocate data block for new inode
-  printf("Allocate a data block for inode. %d\n", inode.i_block[0]);
+  printf("Allocate a data block for inode. %d, %d\n", inode.i_blocks, inode.i_block[0]);
   if((retval = get_file_blk (&inode, 0, ino, 1)) != __GET_FILE_BLK_OK) return retval;
-  inode.i_blocks = 1;      /* # blocks */
+  printf("Allocate a data block for inode. %d, %d\n", inode.i_blocks, inode.i_block[0]);
+  // !BAM
+  // inode.i_blocks = 1;      /* # blocks */
+  // inode.i_blocks = 2;      /* # blocks */
   
   // store new inode
   printf("Store new inode.\n");
@@ -485,7 +492,139 @@ int ext2_inode_allocate (uint32_t p_ino) {
   return ino;
 }
 
-int ext2_lookup (ino_t parent, const char *name, int name_len, ino_t *ino, bool create) {
+int ext2_lookup (ino_t parent, const char *name, int name_len, ino_t *ino, bool create)
+{
+   struct inode_t parent_inode;
+   int retval;
+   int blk = 0;
+   uint16_t offset = 0;
+   struct direntry_t dir;
+   int last_entry_size = 0;
+   int new_entry_size = 0;
+   int space = 0;
+   uint32_t new_ino;
+   uint32_t new_rec_len;
+
+   if (name_len > MAX_FILE_NAME_SIZE)
+   {
+      return -ENAMETOOLONG;
+   }
+
+   /* retrieve the parent inode and check that it is a directory */
+   if ((retval = fill_inode (parent, &parent_inode)) < 0)
+   {
+      return retval;
+   }
+
+   if (!S_ISDIR (parent_inode.i_mode))
+   {
+      return -ENOTDIR;
+   }
+
+   /* loop through the directory blocks */
+   while ((retval = get_file_blk (&parent_inode, blk++, parent, 0)) != __GET_FILE_BLK_EOF)
+   {
+      offset = 0;
+
+      /* loop through the directory entries in that block */
+      while (offset < __BLK_SIZE)
+      {
+         memcpy (&dir, cache + offset, __sizeof_direntry);
+
+         printf("dir entry\n");
+         printf("     inode: %d\n", dir.inode);
+         printf("   rec_len: %d\n", dir.rec_len);
+         printf("  name_len: %d\n", dir.name_len);
+         printf("      name: ");
+         for (int i = 0; i < dir.name_len; i++)
+         {
+            printf("%c", *(cache + offset + __sizeof_direntry + i));
+         }
+         printf("\n");
+
+         /* check that this entry is not corrupted */
+         if (offset + dir.name_len > __BLK_SIZE)
+         {
+            return -ENOENT;
+         }
+
+         /* check if this entry has the file name we look for */
+         if ((dir.name_len == (uint16_t)name_len) && (strncmp ((char *)(cache + offset + __sizeof_direntry), name, name_len) == 0))
+         {
+            *ino = dir.inode;
+            return 0;
+         }
+
+         if (create)
+         {
+            last_entry_size = __sizeof_direntry + dir.name_len;
+            if (last_entry_size % 4)
+            {
+               last_entry_size += (4 - (last_entry_size % 4));
+            }
+
+            space = (dir.rec_len - last_entry_size);
+
+            new_entry_size = __sizeof_direntry + name_len;
+            if (new_entry_size % 4)
+            {
+               new_entry_size += (4 - (new_entry_size % 4));
+            }
+
+            if (space > new_entry_size)
+            {
+               new_rec_len = dir.rec_len - last_entry_size;
+               dir.rec_len = last_entry_size;
+
+               printf("Writing previous file update.\n");
+               if (!disk_write (blk2off (parent_inode.i_block[blk - 1]) + (offset), &dir, __sizeof_direntry))
+               {
+                  return -EIO;
+               }
+
+               offset += dir.rec_len;
+
+               // allocate new inode and length data
+               printf("Allocating inode.\n");
+               if((new_ino = ext2_inode_allocate(parent)) < 0)
+               {
+                  return new_ino;
+               }
+
+               dir.inode = new_ino;
+               dir.rec_len = new_rec_len;
+               dir.name_len = name_len;
+               memcpy (cache + offset, &dir, __sizeof_direntry);
+
+               printf("Writing new file update.\n");
+               if (!disk_write (blk2off (parent_inode.i_block[blk - 1]) + (offset), &dir, __sizeof_direntry))
+               {
+                  return -EIO;
+               }
+
+               printf("Writing new file name.\n");
+               if (!disk_write (blk2off (parent_inode.i_block[blk - 1]) + (offset) + __sizeof_direntry, name, name_len))
+               {
+                  return -EIO;
+               }
+
+               // update parent inode
+               printf("Updating parent inode %d.\n", parent_inode.i_size);
+               parent_inode.i_atime = time(0);
+               parent_inode.i_mtime = time(0);
+               update_inode (parent, &parent_inode);
+
+               *ino = new_ino;
+               return 0;
+            }
+         }
+
+         offset += dir.rec_len;
+      }
+   }
+
+   return -ENOENT;
+#if 0
     struct inode_t parent_inode;
     int retval, blk;
     int new_blk, new_off;
@@ -515,10 +654,14 @@ int ext2_lookup (ino_t parent, const char *name, int name_len, ino_t *ino, bool 
 		      name_len) == 0)) {
 	  *ino = dir.inode; return 0;
 	}
-	//printf("namelen: %d reclen: %d\n", dir.name_len, dir.rec_len);
+	// printf("namelen: %d reclen: %d\n", dir.name_len, dir.rec_len);
 
+// !BAM
+#if 0
+//        true_size = __sizeof_direntry + dir.name_len;
         true_size = __sizeof_direntry + dir.name_len;
-	if (true_size % 2) true_size++; // keep size even
+//	if (true_size % 2) true_size++; // keep size even
+        true_size += (true_size % 4); // keep size even
 	if (true_size < 12) true_size = 12; // min direntry size
 
 	if (dir.rec_len > true_size){
@@ -531,13 +674,48 @@ int ext2_lookup (ino_t parent, const char *name, int name_len, ino_t *ino, bool 
 	  prev_name = dir.name_len;
 	  found = true;
 	}
+#endif
+        if (dir.rec_len == 0)
+        {
+            true_size = __sizeof_direntry + name_len;
+            true_size += (true_size % 4); // keep size aligned
+
+            if ((offset + true_size) < __BLK_SIZE)
+            {
+          printf("Found space.\n");
+          new_blk = blk - 1;
+          new_off = offset + dir.rec_len;
+          prev_blk = blk - 1;
+          prev_off = offset;
+          prev_ino = dir.inode;
+          prev_name = dir.name_len;
+          found = true;
+            }
+        }
+        else
+        {
+           printf("dir entry\n");
+           printf("     inode: %d\n", dir.inode);
+           printf("   rec_len: %d\n", dir.rec_len);
+           printf("  name_len: %d\n", dir.name_len);
+           printf("      name: ");
+           for (int i = 0; i < dir.name_len; i++)
+           {
+               printf("%c", cache + offset + __sizeof_direntry + i);
+           }
+           printf("\n");
+        }
+      
 	offset += dir.rec_len;
       }
       printf("End Block %d.\n", blk-1);
     }
-    
+
     // create new file if requested
     if(create){
+printf("looping...");
+fflush(stdout);
+for (;;);    
       
       printf("NEW offset: %d blk: %d \n", new_off, new_blk);
       printf("PREV offset: %d blk: %d size: %d\n", prev_off, prev_blk, true_size);
@@ -556,7 +734,9 @@ int ext2_lookup (ino_t parent, const char *name, int name_len, ino_t *ino, bool 
 	new_blk = blk - 1;
 	new_off = 0;
 	if((retval = get_file_blk (&parent_inode, new_blk, parent, 1)) != __GET_FILE_BLK_OK) return retval;	
-	parent_inode.i_blocks++;
+        // !BAM
+        // parent_inode.i_blocks++;
+        parent_inode.i_blocks += 2;
       }
       
       // set new values
@@ -568,7 +748,9 @@ int ext2_lookup (ino_t parent, const char *name, int name_len, ino_t *ino, bool 
       new_dir.rec_len = __BLK_SIZE - new_off;
       
       int new_dir_size = new_dir.name_len + __sizeof_direntry;
-      if (new_dir_size % 2) new_dir_size++;
+// !BAM
+//      if (new_dir_size % 2) new_dir_size++;
+      new_dir_size += (new_dir_size % 4);
       if (new_dir_size < 12) new_dir_size = 12;
 
       // write direntrys to disk
@@ -583,8 +765,11 @@ int ext2_lookup (ino_t parent, const char *name, int name_len, ino_t *ino, bool 
 	return -EIO;
       
       // update parent inode
-      printf("Updating parent inode.\n");
-      parent_inode.i_size += new_dir_size;
+      printf("Updating parent inode %d.\n", parent_inode.i_size);
+// !BAM
+//      parent_inode.i_size += new_dir_size;
+// mounting in linux complains of dir not being "chunk size"
+// What happens if directory needs more blocks?
       parent_inode.i_atime = time(0);
       parent_inode.i_mtime = time(0);
       update_inode (parent, &parent_inode);
@@ -595,6 +780,7 @@ int ext2_lookup (ino_t parent, const char *name, int name_len, ino_t *ino, bool 
     }
     
     return (((retval < 0) && (retval != -EFBIG)) ? retval : -ENOENT);
+#endif
 }
 
 int ext2_fill_stat (ino_t ino, struct stat *buf) {

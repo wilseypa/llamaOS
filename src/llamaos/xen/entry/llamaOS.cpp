@@ -286,6 +286,7 @@ static int glibc_libc_open (const char *file, int oflag)
    else
    {
       int fd = fs_open (file, oflag);
+      cout << "opening " << file << ", " << fd << endl;
 
       return (fd < 0) ? fd : fd+100;
    }
@@ -362,6 +363,11 @@ static ssize_t glibc_write (int fd, const void *buf, size_t nbytes)
    {
       // put write call here
       cout << "glibc_write " << nbytes << endl;
+      for (int i = 0; i < nbytes; i++)
+      {
+         cout << ((char *)buf)[i];
+      }
+      cout << endl;
       return fs_write (fd-100, buf, nbytes);
    }
    else
@@ -574,6 +580,7 @@ void entry_llamaOS (start_info_t *start_info)
          hypervisor->argv [i+1] = const_cast<char *>(args [i].c_str ());
       }
 
+      cout << "fs_initialize..." << endl;
       fs_initialize ();
       trace ("Before application main()...\n");
       main (hypervisor->argc, hypervisor->argv);
@@ -583,6 +590,7 @@ void entry_llamaOS (start_info_t *start_info)
       fflush (stdout);
 
       trace ("After application main()...\n");
+      cout << "fs_finalize..." << endl;
       fs_finalize ();
 
       cout << "program break: " << memory::get_program_break () << endl;

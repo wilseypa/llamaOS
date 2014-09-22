@@ -43,8 +43,9 @@ int main (int argc, char *argv [])
    int fd = open ("create_test.txt", O_RDWR | O_CREAT, 0777); 
    //write( fd, "test\n", 5);
    close (fd);
+   return 0;
    
-   cout << endl << "opening create_test.tct" << endl;
+   cout << endl << "opening create_test.txt" << endl;
    FILE *file = fopen ("create_test.txt", "r+");
 
    if (file == NULL)

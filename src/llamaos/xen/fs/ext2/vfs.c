@@ -51,7 +51,7 @@ struct inode *free_inodes, *used_inodes;
 #define SEEK_END 2
 
 static ino_t ext2_root_ino = EXT2_ROOT_INO;
-
+#include <stdio.h>
 /* find the inode number (ino) of the file/directory identified by 'path' in
  * the 'parent' directory.
  * return 0 if the file/directory is found
@@ -65,7 +65,7 @@ static int lookup (ino_t parent, const char *path, ino_t *ino, bool create) {
     const char *entry; /* directory or file name (without any "/") */
     int entry_len, retval;
     ino_t entry_ino;
-
+printf("lookup 1\n");
     /* check that parent is a directory with search permission */
     if ((retval = ext2_fill_stat (parent, &pdir)) < 0) return retval;
     if (!S_ISDIR (pdir.st_mode)) return -ENOTDIR;
@@ -80,11 +80,14 @@ static int lookup (ino_t parent, const char *path, ino_t *ino, bool create) {
     /* end of search ? last path character is a '/' => return parent inode */
     if (entry_len == 0) { *ino = parent; return 0; }
     /* look for the entry inode number */
+printf("lookup 2\n");
     if ((retval = ext2_lookup (parent, entry, entry_len, &entry_ino, create)) < 0)
         return retval;
+printf("lookup 3\n");
     /* end of search ? return the entry inode just found */
     if (*path == 0) { *ino = entry_ino; return 0; }
     /* continue the search with the next entry */
+printf("lookup 4\n");
     return lookup (entry_ino, path, ino, create);
 }
 
@@ -140,17 +143,23 @@ int fs_open (const char *path, int flags) {
 
     /* retrieve the inode number and check if it is an already opened file */
     if ((retval = lookup (ext2_root_ino, path, &path_ino, create)) < 0) return retval;
+printf("fs_open A\n");
     list_foreach_forward (used_inodes, node, nb_ino, used_prev, used_next) {
         if (node->st.st_ino == path_ino) break;
     }
+printf("fs_open B\n");
     if (!list_foreach_f_early_break (used_inodes, node, nb_ino, used_prev,
         used_next)) { /* file not already opened */
+printf("fs_open C\n");
         if (list_is_empty (free_inodes, free_prev, free_next)) return -ENFILE;
+printf("fs_open D\n");
         node = list_get_head (free_inodes, free_prev, free_next);
+printf("fs_open E\n");
         if ((retval = ext2_fill_stat (path_ino, &(node->st))) < 0)
             return retval;
     }
     else already_opened = true;
+printf("fs_open F\n");
 
     /* check open flags */
     mode_t mode = node->st.st_mode;
@@ -158,6 +167,7 @@ int fs_open (const char *path, int flags) {
     if ((!(mode & S_IRUSR)) && is_rd (flags)) return -EACCES;
     if ((!(mode & S_IWUSR)) && is_wr (flags)) return -EACCES;
 
+printf("fs_open G\n");
     /* allocate a file descriptor for the running process */
     if ((retval = fd_allocate (node, flags)) < 0)
         return retval;
@@ -167,10 +177,13 @@ int fs_open (const char *path, int flags) {
     /* if the file was not yet opened, move the inode from the free to the
      * used list */
     if (!already_opened) {
+printf("fs_open H\n");
         list_pop_head (free_inodes, free_prev, free_next);
+printf("fs_open I\n");
         list_add_tail (used_inodes, node, used_prev, used_next);
     }
 
+printf("fs_open J\n");
     return retval;
 }
 
