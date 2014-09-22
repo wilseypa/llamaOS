@@ -305,7 +305,7 @@ static int get_file_blk (struct inode_t* inode, uint32_t blk_n, uint32_t ino, in
 	__disk_blk_to_cache (ind_blk);
 	disk_blk = ((uint32_t *) (cache)) [blk_n - 12];
         if (!create){
-           printf("reading indirect block %d\n", disk_blk);
+//           printf("reading indirect block %d\n", disk_blk);
 	  __disk_blk_to_cache (disk_blk);
 	} else {
 	  if ((disk_blk) == 0){
@@ -319,15 +319,15 @@ static int get_file_blk (struct inode_t* inode, uint32_t blk_n, uint32_t ino, in
         uint32_t disk_blk;
         uint32_t double_ind_blk2;
         uint32_t double_ind_blk1 = inode->i_block [13];
-        printf("reading double_ind_blk1 %d\n", double_ind_blk1);
+//        printf("reading double_ind_blk1 %d\n", double_ind_blk1);
         __disk_blk_to_cache (double_ind_blk1);
         blk_n -= (12 + (__BLK_SIZE >> 2));
         double_ind_blk2 = ((uint32_t *) (cache)) [blk_n / (__BLK_SIZE >> 2)];
-        printf("reading double_ind_blk2 %d\n", double_ind_blk2);
+//        printf("reading double_ind_blk2 %d\n", double_ind_blk2);
         __disk_blk_to_cache (double_ind_blk2);
         disk_blk = ((uint32_t *) (cache)) [blk_n % (__BLK_SIZE >> 2)];
         if (!create){
-           printf("reading disk_blk %d\n", disk_blk);
+//           printf("reading disk_blk %d\n", disk_blk);
           __disk_blk_to_cache (disk_blk);
         } else {
           if ((disk_blk) == 0){
@@ -552,7 +552,7 @@ int ext2_lookup (ino_t parent, const char *name, int name_len, ino_t *ino, bool 
       while (offset < __BLK_SIZE)
       {
          memcpy (&dir, cache + offset, __sizeof_direntry);
-
+#if 0
          printf("dir entry\n");
          printf("     inode: %d\n", dir.inode);
          printf("   rec_len: %d\n", dir.rec_len);
@@ -563,7 +563,7 @@ int ext2_lookup (ino_t parent, const char *name, int name_len, ino_t *ino, bool 
             printf("%c", *(cache + offset + __sizeof_direntry + i));
          }
          printf("\n");
-
+#endif
          /* check that this entry is not corrupted */
          if (offset + dir.name_len > __BLK_SIZE)
          {

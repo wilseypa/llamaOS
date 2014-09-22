@@ -74,7 +74,7 @@ bool disk_finalize ()
 
 #include <stdio.h>
 bool disk_read (uint64_t off, void *buf, size_t size) {
-    printf("disk_read: %ld, %ld\n", off, size);
+//    printf("disk_read: %ld, %ld\n", off, size);
     memcpy (buf, img + off, size); return true;
 }
 

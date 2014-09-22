@@ -362,12 +362,6 @@ static ssize_t glibc_write (int fd, const void *buf, size_t nbytes)
    else if (fd >= 100)
    {
       // put write call here
-      cout << "glibc_write " << nbytes << endl;
-      for (int i = 0; i < nbytes; i++)
-      {
-         cout << ((char *)buf)[i];
-      }
-      cout << endl;
       return fs_write (fd-100, buf, nbytes);
    }
    else
