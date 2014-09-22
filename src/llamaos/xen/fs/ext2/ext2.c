@@ -315,6 +315,28 @@ static int get_file_blk (struct inode_t* inode, uint32_t blk_n, uint32_t ino, in
         }
         return __GET_FILE_BLK_OK;
     }
+    else if (blk_n < (12 + (__BLK_SIZE >> 2) + ((__BLK_SIZE >> 2) * (__BLK_SIZE >> 2)))) { /* double indirection */
+        uint32_t disk_blk;
+        uint32_t double_ind_blk2;
+        uint32_t double_ind_blk1 = inode->i_block [13];
+        printf("reading double_ind_blk1 %d\n", double_ind_blk1);
+        __disk_blk_to_cache (double_ind_blk1);
+        blk_n -= (12 + (__BLK_SIZE >> 2));
+        double_ind_blk2 = ((uint32_t *) (cache)) [blk_n / (__BLK_SIZE >> 2)];
+        printf("reading double_ind_blk2 %d\n", double_ind_blk2);
+        __disk_blk_to_cache (double_ind_blk2);
+        disk_blk = ((uint32_t *) (cache)) [blk_n % (__BLK_SIZE >> 2)];
+        if (!create){
+           printf("reading disk_blk %d\n", disk_blk);
+          __disk_blk_to_cache (disk_blk);
+        } else {
+          if ((disk_blk) == 0){
+            //add block to inode
+            if(!ext2_blk_allocate(ino, inode, blk_n)) return -EFBIG;
+          }
+        }
+        return __GET_FILE_BLK_OK;
+    }
     return -EFBIG; /* double/triple indirection not supported yet */
 }
 
