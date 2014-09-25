@@ -29,7 +29,7 @@
 #define CONFIG_DISK_IMAGE "disk.img"
 // #define CONFIG_DISK_SIZE (10 << 20)
 // #define CONFIG_DISK_SIZE (64*1024)
-#define CONFIG_DISK_SIZE (32*1024*1024)
+#define CONFIG_DISK_SIZE (40*1024*1024)
 
 /* for ext2 file system, maximum number of block groups.
  * the size of the block groups table is 32 times this value (in bytes).
