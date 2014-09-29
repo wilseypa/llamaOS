@@ -57,12 +57,12 @@ all:
 #	@$(MAKE) -f llamaMPI.mk
 #	@$(MAKE) -f llamaMPIF.mk
 	@$(MAKE) -f apps/bonnie/bonnie.mk
-	@$(MAKE) -f apps/mpich-$(MPICH_VERSION)/examples/f77/fpi.mk
-	@$(MAKE) -f apps/mpich-$(MPICH_VERSION)/examples/f77/hellow.mk
-	@$(MAKE) -f apps/mpich-$(MPICH_VERSION)/examples/f90/pi3f90.mk
-	@$(MAKE) -f apps/mpich-$(MPICH_VERSION)/examples/cpi.mk
-	@$(MAKE) -f apps/mpich-$(MPICH_VERSION)/examples/hellow.mk
-	@$(MAKE) -f apps/mpich-$(MPICH_VERSION)/examples/srtest.mk
+#	@$(MAKE) -f apps/mpich-$(MPICH_VERSION)/examples/f77/fpi.mk
+#	@$(MAKE) -f apps/mpich-$(MPICH_VERSION)/examples/f77/hellow.mk
+#	@$(MAKE) -f apps/mpich-$(MPICH_VERSION)/examples/f90/pi3f90.mk
+#	@$(MAKE) -f apps/mpich-$(MPICH_VERSION)/examples/cpi.mk
+#	@$(MAKE) -f apps/mpich-$(MPICH_VERSION)/examples/hellow.mk
+#	@$(MAKE) -f apps/mpich-$(MPICH_VERSION)/examples/srtest.mk
 #	@$(MAKE) -f apps/net/intel.mk
 	@$(MAKE) -f apps/net/shmem.mk
 #	@$(MAKE) -f apps/netpipe-$(NETPIPE_VERSION)/llamaNET.mk
@@ -72,26 +72,25 @@ all:
 #	@$(MAKE) -f apps/unixbench-5.1.3/syscall.mk
 #	@$(MAKE) -f apps/unixbench-5.1.3/whetstone.mk
 #	@$(MAKE) -f apps/hpcc-$(HPCC_VERSION).mk
-	@$(MAKE) -f apps/imb-$(IMB_VERSION)/imb.mk
+#	@$(MAKE) -f apps/imb-$(IMB_VERSION)/imb.mk
 #	@$(MAKE) -f apps/latency-MPI.mk
 #	@$(MAKE) -f apps/latency-llamaNET.mk
 #	@$(MAKE) -f apps/pingPongNB-MPI.mk
 #	@$(MAKE) -f net/i82574.mk
 #	@$(MAKE) -f net/lspci.mk
-#	@$(MAKE) -f test/apps/hello-c.mk
+	@$(MAKE) -f test/apps/hello-c.mk
 	@$(MAKE) -f test/apps/hello-cpp.mk
 #	@$(MAKE) -f test/apps/hello-f77.mk
 #	@$(MAKE) -f test/apps/hello-f90.mk
-	@$(MAKE) -f test/apps/memory.mk
-	@$(MAKE) -f test/apps/mpich.mk
+#	@$(MAKE) -f test/apps/memory.mk
+#	@$(MAKE) -f test/apps/mpich.mk
 	@$(MAKE) -f test/apps/testExt2.mk
 #	@$(MAKE) -f test/apps/testMPI.mk
 #	@$(MAKE) -f test/apps/testMPIF.mk
-	@$(MAKE) -f test/apps/time.mk
-	@$(MAKE) -f test/apps/tinyxml.mk
+#	@$(MAKE) -f test/apps/time.mk
+#	@$(MAKE) -f test/apps/tinyxml.mk
 #	@$(MAKE) -f test/empty.mk
 #	@$(MAKE) -f test/memory.mk
-
 #	@$(MAKE) -f apps/NAS/NAS.mk
 #	@$(MAKE) -f apps/WARPED/WARPED.mk
 	@[ -z $(WARPED_VERSION) -a -z $(WARPED_DIR) ] || ($(MAKE) -f apps/warped-$(WARPED_VERSION)/warped.mk)

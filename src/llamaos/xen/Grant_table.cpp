@@ -45,6 +45,7 @@ using namespace llamaos::memory;
 using namespace llamaos::xen;
 
 #define FRAME_LIST_SIZE 32
+// #define FRAME_LIST_SIZE 64
 
 // for now just map a single page for the table
 Grant_table::Grant_table ()
