@@ -50,6 +50,7 @@ using namespace llamaos::xen;
 
 #define FRAME_LIST_SIZE 32
 // #define FRAME_LIST_SIZE 64
+// #define FRAME_LIST_SIZE 128
 
 // for now just map a single page for the table
 Grant_table::Grant_table ()
@@ -69,6 +70,8 @@ Grant_table::Grant_table ()
    {
       trace ("failed to create grant table\n");
 //      throw runtime_error ("failed to create grant table");
+      cout << "ERROR: failed to create grant table" << endl;
+      exit(-1);
    }
 
    for (int i = 0; i < FRAME_LIST_SIZE; i++)
@@ -78,6 +81,8 @@ Grant_table::Grant_table ()
       {
          trace("failed to map grant table\n");
 //         throw runtime_error ("failed to map grant table");
+         cout << "ERROR: failed to map grant table " << i << endl;
+         exit(-1);
       }
       trace ("calling update_va_mapping returned.\n");
    }
