@@ -30,6 +30,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 #include <malloc.h>
 
+#include <iostream>
 #include <stdexcept>
 
 #include <llamaos/memory/Memory.h>
@@ -38,6 +39,9 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <llamaos/xen/Hypercall.h>
 #include <llamaos/llamaOS.h>
 #include <llamaos/Trace.h>
+
+using std::cout;
+using std::endl;
 
 using namespace std;
 using namespace llamaos;
@@ -93,6 +97,14 @@ Grant_table::~Grant_table ()
 
 grant_ref_t Grant_table::grant_access (domid_t domid, void *address)
 {
+   if (avail.empty())
+   {
+      // trace ("all grant ref allocated.\n");
+      // throw exception
+      cout << "ERROR: all grant ref allocated" << endl;
+      exit(-1);
+   }
+
    grant_ref_t ref = avail.back ();
    avail.pop_back ();
    inuse.push_back (ref);
