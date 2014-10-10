@@ -321,7 +321,7 @@ bool Hypercall::grant_table_setup_table (unsigned int pages, unsigned long *fram
    return true;
 }
 
-bool Hypercall::grant_table_query_size (uint32_t &frames, uint32_t &max_frames, int16_t &status)
+bool Hypercall::grant_table_query_size (uint32_t &frames, uint32_t &max_frames)
 {
    gnttab_query_size_t query_size;
    query_size.dom = DOMID_SELF;
@@ -335,10 +335,14 @@ bool Hypercall::grant_table_query_size (uint32_t &frames, uint32_t &max_frames, 
       trace ("   error code: %d\n", result);
       return false;
    }
+   else if (query_size.status != GNTST_okay)
+   {
+      trace ("HYPERVISOR_grant_table_op (GNTTABOP_query_size) FAILED (status: %d)\n", query_size.status);
+      return false;
+   }
 
    frames = query_size.nr_frames;
    max_frames = query_size.max_nr_frames;
-   status = query_size.status;
    return true;
 }
 

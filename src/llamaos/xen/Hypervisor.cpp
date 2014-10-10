@@ -36,6 +36,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <llamaos/memory/Memory.h>
 #include <llamaos/xen/Hypercall.h>
 #include <llamaos/xen/Hypervisor.h>
+#include <llamaos/llamaOS.h>
 #include <llamaos/Trace.h>
 
 using namespace std;
@@ -146,6 +147,14 @@ void Hypervisor::initialize ()
 
 //   events.bind (console.port, console.event_handler, &console);
 
+   if (grant_table.max_frames < FRAME_LIST_SIZE)
+   {
+      cout << "ERROR: Grant table max frames " << grant_table.max_frames
+           << " is less than llamaOS configuration "<< FRAME_LIST_SIZE << endl;
+      cout << "increase max frames with Xen command line parameter: gnttab_max_nr_frames" << endl;
+      exit(-100);
+   }
+
    for (int i = 0; i < 64; i++)
    {
       argv [i] = '\0';
@@ -162,4 +171,5 @@ void Hypervisor::initialize ()
    }
 
    shared_memory = Shared_memory::create(name, domid);
+
 }

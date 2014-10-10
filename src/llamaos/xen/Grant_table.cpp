@@ -42,19 +42,31 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 using std::cout;
 using std::endl;
+using std::min;
 
-using namespace std;
 using namespace llamaos;
 using namespace llamaos::memory;
 using namespace llamaos::xen;
 
-#define FRAME_LIST_SIZE 32
-// #define FRAME_LIST_SIZE 64
-// #define FRAME_LIST_SIZE 128
+static uint32_t query_max_frames ()
+{
+   uint32_t frames;
+   uint32_t max_frames;
 
-// for now just map a single page for the table
+   trace ("calling grant_table_query_size...\n");
+   if (!Hypercall::grant_table_query_size(frames, max_frames))
+   {
+      trace ("failed to query grant table size\n");
+//      throw runtime_error ("failed to query grant table size");
+   }
+
+   return max_frames;
+}
+
 Grant_table::Grant_table ()
-   :  size((FRAME_LIST_SIZE * PAGE_SIZE) / sizeof(grant_entry_v1_t)),
+   :  max_frames(query_max_frames()),
+      frames(min(FRAME_LIST_SIZE, max_frames)),
+      size((frames * PAGE_SIZE) / sizeof(grant_entry_v1_t)),
       entries(address_to_pointer<grant_entry_v1_t> (get_reserved_virtual_address (FRAME_LIST_SIZE))),
       avail(),
       inuse()
@@ -66,23 +78,19 @@ Grant_table::Grant_table ()
    unsigned long frame_list [FRAME_LIST_SIZE] = { 0 };
 
    trace ("calling grant_table_setup_table...\n");
-   if (!Hypercall::grant_table_setup_table (FRAME_LIST_SIZE, frame_list))
+   if (!Hypercall::grant_table_setup_table (frames, frame_list))
    {
       trace ("failed to create grant table\n");
 //      throw runtime_error ("failed to create grant table");
-      cout << "ERROR: failed to create grant table" << endl;
-      exit(-1);
    }
 
-   for (int i = 0; i < FRAME_LIST_SIZE; i++)
+   for (uint32_t i = 0; i < frames; i++)
    {
       trace ("calling update_va_mapping...\n");
       if (!Hypercall::update_va_mapping (pointer_to_address(entries) + (i * PAGE_SIZE), page_to_address (frame_list [i])))
       {
          trace("failed to map grant table\n");
 //         throw runtime_error ("failed to map grant table");
-         cout << "ERROR: failed to map grant table " << i << endl;
-         exit(-1);
       }
       trace ("calling update_va_mapping returned.\n");
    }
