@@ -314,7 +314,8 @@ uint8_t *Shared_memory_creator::get_pointer () const
 }
 
 Shared_memory_user::Shared_memory_user (domid_t domid, int node)
-   : grant_map(domid-1-node, 16383 - (node * SHARED_PAGES), SHARED_PAGES)
+   : grant_map(domid-1-node, 32767 - (node * SHARED_PAGES), SHARED_PAGES)
+//   : grant_map(domid-1-node, 16383 - (node * SHARED_PAGES), SHARED_PAGES)
 {
 
 }

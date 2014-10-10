@@ -68,6 +68,7 @@ static void initialize_mmu (start_info_t *start_info)
 // !BAM
 // need way more reserved pages for enormous grant tables for llamaNET
    memory::initialize (start_info->pt_base, start_info->nr_pages, 4096+64);
+//   memory::initialize (start_info->pt_base, start_info->nr_pages, 8192);
 //   memory::initialize (start_info->pt_base, start_info->nr_pages, 16384);
 }
 

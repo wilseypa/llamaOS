@@ -110,7 +110,7 @@ Grant_table::~Grant_table ()
 
 grant_ref_t Grant_table::grant_access (domid_t domid, void *address)
 {
-   if (avail.empty())
+   if (avail.size() < (GNTTAB_NR_RESERVED_ENTRIES + 4))
    {
       // trace ("all grant ref allocated.\n");
       // throw exception

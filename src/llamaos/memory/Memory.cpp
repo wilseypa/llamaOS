@@ -28,6 +28,8 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder(s) or contributors.
 */
 
+#include <iostream>
+
 #include <llamaos/memory/Memory.h>
 
 #include <llamaos/memory/Entry.h>
@@ -58,7 +60,8 @@ static uint64_t end_virtual_address = 0UL;
 
 static uint64_t start_reserved_virtual_address = 0UL;
 static uint64_t next_reserved_virtual_address = 0UL;
-static uint64_t reserved_pages = 0UL;
+static uint64_t max_reserved_pages = 0UL;
+static uint64_t used_reserved_pages = 0UL;
 
 static void *program_break = nullptr;
 
@@ -234,7 +237,7 @@ bool initialize (uint64_t CR3_virtual_address, uint64_t total_pages, uint64_t re
 
    memory::start_reserved_virtual_address = memory::end_virtual_address;
    memory::next_reserved_virtual_address = memory::end_virtual_address;
-   memory::reserved_pages = reserved_pages;
+   memory::max_reserved_pages = reserved_pages;
 
    program_break = address_to_pointer<void>(start_virtual_address);
 
@@ -250,6 +253,14 @@ bool initialize (uint64_t CR3_virtual_address, uint64_t total_pages, uint64_t re
 
 uint64_t get_reserved_virtual_address (uint64_t pages)
 {
+   used_reserved_pages += pages;
+
+   if (used_reserved_pages > max_reserved_pages)
+   {
+      std::cout << "get_reserved_virtual_address has reached max reserved pages" << std::endl;
+      for(;;);
+   }
+
    uint64_t next_address = memory::next_reserved_virtual_address;
    memory::next_reserved_virtual_address += (pages * PAGE_SIZE);
 
@@ -259,7 +270,7 @@ uint64_t get_reserved_virtual_address (uint64_t pages)
 
 uint64_t get_reserved_size ()
 {
-   return memory::reserved_pages * PAGE_SIZE;
+   return memory::max_reserved_pages * PAGE_SIZE;
 }
 
 void *get_program_break ()
