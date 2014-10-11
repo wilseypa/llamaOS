@@ -237,13 +237,7 @@ int Shared_memory::get_size () const
       {
          if (!directory->entries [i].lock)
          {
-            break;
-         }
-
-         while (directory->entries [i].name [0] == '\0')
-         {
-            cout << "   get_size waiting for entry to be written..." << i << endl;
-            mb();
+            return i;
          }
       }
 
@@ -347,7 +341,7 @@ string Shared_memory::get_name (const string &alias) const
       }
    }
 
-   return "";
+   return "name not found";
 }
 
 void Shared_memory::barrier (bool root)
