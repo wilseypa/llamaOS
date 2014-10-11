@@ -48,7 +48,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 #define LLAMAOS_PAGE_SIZE      0x1000  // 4KB
 
-#define LLAMAOS_FRAME_LIST_SIZE (64)
+#define LLAMAOS_FRAME_LIST_SIZE (96)
 
 #ifdef __cplusplus
 

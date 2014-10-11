@@ -66,6 +66,8 @@ public:
    void put_alias (const std::string &name, const std::string &alias) const;
    std::string get_name (const std::string &alias) const;
 
+   void barrier (bool root);
+
 protected:
    virtual uint8_t *get_pointer () const = 0;
 

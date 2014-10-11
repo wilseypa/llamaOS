@@ -257,6 +257,7 @@ int PMI_KVS_Get( const char kvsname[], const char key[], char value[], int lengt
       return PMI_SUCCESS;
    }
 
+   cout << "PMI_ERR_INVALID_KEY: " << key << endl;
    return PMI_ERR_INVALID_KEY;
 }
 

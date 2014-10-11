@@ -49,10 +49,12 @@ using llamaos::xen::Shared_memory;
 using llamaos::xen::Shared_memory_creator;
 using llamaos::xen::Shared_memory_user;
 
-static const int SHARED_PAGES = 4096;
+static const int SHARED_PAGES = 6080;
+// static const int SHARED_PAGES = 4096;
 // static const int SHARED_PAGES = 2048;
 
-static const int MAX_ENTRIES = 32;
+// static const int MAX_ENTRIES = 31; // NEED MORE !!!!
+static const int MAX_ENTRIES = 48; // NEED MORE !!!!
 static const int MAX_NAME = 55;
 static const int MAX_ALIAS = 47;
 
@@ -62,6 +64,7 @@ typedef struct
    uint8_t name [MAX_NAME+1];
    uint8_t alias [MAX_ALIAS+1];
    uint64_t lock;
+   uint64_t lock2;
    uint64_t offset;
    uint64_t size;
 
@@ -69,6 +72,12 @@ typedef struct
 
 typedef struct
 {
+   uint64_t nodes;
+   uint64_t barrier_target;
+   uint64_t barrier;
+
+   uint64_t next_offset;
+
    directory_entry_t entries [MAX_ENTRIES];
 
 } directory_t;
@@ -118,23 +127,32 @@ int Shared_memory::open (const std::string &name) const
 
    if (directory != nullptr)
    {
-      cout << "opening " << name << endl;
+//      cout << "opening " << name << endl;
 
       for (int i = 0; i < MAX_ENTRIES; i++)
       {
-         cout << "   [" << i << "] " << directory->entries [i].name << endl;
-         // if (directory->entries [i].name [0] == '\0')
-         if (__sync_lock_test_and_set(&directory->entries [i].lock, 1) == 0)
+//         cout << "   [" << i << "] " << directory->entries [i].name << endl;
+
+         // if (__sync_lock_test_and_set(&directory->entries [i].lock, 1) == 0)
+         if (__sync_fetch_and_add(&directory->entries [i].lock, 1) == 0)
          {
             cout << "   writing to entry " << i << ", " << name.c_str () << endl;
             strncpy(reinterpret_cast<char *>(directory->entries [i].name), name.c_str (), MAX_NAME);
             wmb();
             return i + 200;
          }
-         cout << "   searching in entry " << i << endl;
+
+//         cout << "   searching in entry " << i << endl;
+
+         while (directory->entries [i].name [0] == '\0')
+         {
+            cout << "   open waiting for entry name to be written: " << i << endl;
+            mb();
+         }
+
          if (strncmp(name.c_str(), reinterpret_cast<const char *>(directory->entries [i].name), MAX_NAME) == 0)
          {
-            cout << "   found in entry " << i << endl;
+//            cout << "   found in entry " << i << endl;
             return i + 200;
          }
       }
@@ -152,23 +170,40 @@ void *Shared_memory::map (int fd, uint64_t size) const
    {
       cout << "mapping fd " << fd << ", size " << size << endl;
       int index = fd - 200;
-      uint64_t offset = PAGE_SIZE;
+      // uint64_t offset = PAGE_SIZE;
 
-      for (int i = 0; i < index; i++)
+      if (__sync_fetch_and_add(&directory->entries [index].lock2, 1) == 0)
       {
-         offset += directory->entries [i].size;
+         uint64_t offset = __sync_fetch_and_add(&directory->next_offset, size);
+
+         directory->entries [index].offset = offset;
+         directory->entries [index].size = size;
+         wmb();
       }
 
-      directory->entries [index].offset = offset;
-      directory->entries [index].size = size;
+      while (directory->entries [index].offset == 0)
+      {
+         cout << "   map waiting for entry offset to be written..." << index << endl;
+         mb();
+      }
 
-      if ((offset + size) > (SHARED_PAGES * PAGE_SIZE))
+      // for (int i = 0; i < index; i++)
+      // {
+      //    offset += directory->entries [i].size;
+      // }
+
+      // directory->entries [index].offset = offset;
+
+      if ((directory->entries [index].offset + size) > (SHARED_PAGES * PAGE_SIZE))
       {
          cout << "exceeded shared memory space!!!!!" << endl;
+         // throw
+         for (;;);
          return nullptr;
       }
 
-      return pointer + offset;
+      cout << "     mapped to offset " << directory->entries [index].offset << endl;
+      return pointer + directory->entries [index].offset;
    }
 
    return nullptr;
@@ -186,7 +221,7 @@ void *Shared_memory::get (int fd) const
 
    if (directory != nullptr)
    {
-      return pointer + PAGE_SIZE + directory->entries [fd - 200].offset;
+      return pointer + directory->entries [fd - 200].offset;
    }
 
    return nullptr;
@@ -200,9 +235,15 @@ int Shared_memory::get_size () const
    {
       for (int i = 0; i < MAX_ENTRIES; i++)
       {
-         if (directory->entries [i].name [0] == '\0')
+         if (!directory->entries [i].lock)
          {
-            return i;
+            break;
+         }
+
+         while (directory->entries [i].name [0] == '\0')
+         {
+            cout << "   get_size waiting for entry to be written..." << i << endl;
+            mb();
          }
       }
 
@@ -221,9 +262,20 @@ vector<string> Shared_memory::get_names () const
    {
       for (int i = 0; i < MAX_ENTRIES; i++)
       {
-         if (directory->entries [i].name [0] == '\0')
+//         if (directory->entries [i].name [0] == '\0')
+//         {
+//            break;
+//         }
+
+         if (!directory->entries [i].lock)
          {
             break;
+         }
+
+         while (directory->entries [i].name [0] == '\0')
+         {
+            cout << "   get_names waiting for entry to be written..." << i << endl;
+            mb();
          }
 
          names.push_back (reinterpret_cast<const char *>(directory->entries [i].name));
@@ -241,9 +293,19 @@ void Shared_memory::put_alias (const string &name, const string &alias) const
    {
       for (int i = 0; i < MAX_ENTRIES; i++)
       {
-         if (directory->entries [i].name [0] == '\0')
+//         if (directory->entries [i].name [0] == '\0')
+//         {
+//            break;
+//         }
+         if (!directory->entries [i].lock)
          {
             break;
+         }
+
+         while (directory->entries [i].name [0] == '\0')
+         {
+            cout << "   put_alias waiting for entry name to be written..." << i << endl;
+            mb();
          }
 
          if (strncmp(name.c_str(), reinterpret_cast<const char *>(directory->entries [i].name), MAX_NAME) == 0)
@@ -263,9 +325,19 @@ string Shared_memory::get_name (const string &alias) const
    {
       for (int i = 0; i < MAX_ENTRIES; i++)
       {
-         if (directory->entries [i].name [0] == '\0')
+//         if (directory->entries [i].name [0] == '\0')
+//         {
+//            break;
+//         }
+         if (!directory->entries [i].lock)
          {
             break;
+         }
+
+         while (directory->entries [i].alias [0] == '\0')
+         {
+            cout << "   get_name waiting for entry alias to be written..." << i << endl;
+            mb();
          }
 
          if (strncmp(alias.c_str(), reinterpret_cast<const char *>(directory->entries [i].alias), MAX_ALIAS) == 0)
@@ -276,6 +348,15 @@ string Shared_memory::get_name (const string &alias) const
    }
 
    return "";
+}
+
+void Shared_memory::barrier (bool root)
+{
+   directory_t *directory = reinterpret_cast<directory_t *>(get_pointer ());
+
+   __sync_add_and_fetch (&directory->barrier, 1);
+
+   
 }
 
 static uint8_t *create_pointer (domid_t domid, int nodes)
@@ -293,6 +374,13 @@ static uint8_t *create_pointer (domid_t domid, int nodes)
          hypervisor->grant_table.grant_access (domid + 1 + i, &pointer [j * PAGE_SIZE]);
       }
    }
+
+   directory_t *directory = reinterpret_cast<directory_t *>(pointer);
+   directory->nodes = nodes;
+   directory->barrier_target = nodes;
+   directory->barrier = 0;
+
+   directory->next_offset = 2 * PAGE_SIZE;
 
    return pointer;
 }
@@ -314,7 +402,8 @@ uint8_t *Shared_memory_creator::get_pointer () const
 }
 
 Shared_memory_user::Shared_memory_user (domid_t domid, int node)
-   : grant_map(domid-1-node, 32767 - (node * SHARED_PAGES), SHARED_PAGES)
+   : grant_map(domid-1-node, 49151 - (node * SHARED_PAGES), SHARED_PAGES)
+//   : grant_map(domid-1-node, 32767 - (node * SHARED_PAGES), SHARED_PAGES)
 //   : grant_map(domid-1-node, 16383 - (node * SHARED_PAGES), SHARED_PAGES)
 {
 
