@@ -33,7 +33,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 #include <cstdint>
 
-#include <list>
+// #include <list>
 
 #include <xen/xen.h>
 #include <xen/grant_table.h>
@@ -61,8 +61,10 @@ private:
 
    grant_entry_v1_t *const entries;
 
-   std::list<grant_ref_t> avail;
-   std::list<grant_ref_t> inuse;
+   unsigned int next_ref;
+
+//   std::list<grant_ref_t> avail;
+//   std::list<grant_ref_t> inuse;
 
 };
 

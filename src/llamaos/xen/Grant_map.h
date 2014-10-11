@@ -38,6 +38,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 #include <llamaos/memory/Memory.h>
 #include <llamaos/xen/Hypercall.h>
+#include <llamaos/llamaOS.h>
 #include <llamaos/Trace.h>
 
 namespace llamaos {
@@ -51,6 +52,8 @@ public:
       :  address(memory::get_reserved_virtual_address (1)),
          handle(0)
    {
+      ref += GNTTAB_NR_RESERVED_ENTRIES;
+
       gnttab_map_grant_ref_t map_grant_ref;
 
       map_grant_ref.dom = domid;
@@ -109,13 +112,15 @@ public:
       :  address(memory::get_reserved_virtual_address (pages)),
          handles()
    {
+      ref += GNTTAB_NR_RESERVED_ENTRIES;
+
       for (int i = 0; i < pages; i++)
       {
          gnttab_map_grant_ref_t map_grant_ref;
 
          map_grant_ref.dom = domid;
          map_grant_ref.ref = ref;
-         map_grant_ref.host_addr = address + (i * 4096);
+         map_grant_ref.host_addr = address + (i * PAGE_SIZE);
 
          map_grant_ref.flags = (readonly) ? GNTMAP_host_map | GNTMAP_readonly
                                           : GNTMAP_host_map;
@@ -131,7 +136,7 @@ public:
             trace ("error mapping %d, %d\n", domid, ref);
          }
 
-         --ref;
+         ++ref;
       }
    }
 
@@ -141,7 +146,7 @@ public:
       {
          gnttab_unmap_grant_ref unmap_grant_ref;
 
-         unmap_grant_ref.host_addr = address + (i * 4096);
+         unmap_grant_ref.host_addr = address + (i * PAGE_SIZE);
          unmap_grant_ref.handle = handles [i];
 
          Hypercall::grant_table_unmap_grant_ref (unmap_grant_ref);

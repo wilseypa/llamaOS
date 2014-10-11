@@ -68,8 +68,9 @@ Grant_table::Grant_table ()
       frames(min(FRAME_LIST_SIZE, max_frames)),
       size((frames * PAGE_SIZE) / sizeof(grant_entry_v1_t)),
       entries(address_to_pointer<grant_entry_v1_t> (get_reserved_virtual_address (FRAME_LIST_SIZE))),
-      avail(),
-      inuse()
+      next_ref(GNTTAB_NR_RESERVED_ENTRIES)
+//      avail(),
+//      inuse()
 {
    trace ("Grant_table constructor...\n");
    trace (" size: %x\n", size);
@@ -95,10 +96,10 @@ Grant_table::Grant_table ()
       trace ("calling update_va_mapping returned.\n");
    }
 
-   for (grant_ref_t i = 0; i < size; i++)
-   {
-      avail.push_back(i);
-   }
+//   for (grant_ref_t i = 0; i < size; i++)
+//   {
+//      avail.push_back(i);
+//   }
 
    trace ("Grant_table constructor ended.\n");
 }
@@ -110,7 +111,8 @@ Grant_table::~Grant_table ()
 
 grant_ref_t Grant_table::grant_access (domid_t domid, void *address)
 {
-   if (avail.size() < (GNTTAB_NR_RESERVED_ENTRIES + 4))
+//   if (avail.size() < (GNTTAB_NR_RESERVED_ENTRIES + 4))
+   if (next_ref >= size)
    {
       // trace ("all grant ref allocated.\n");
       // throw exception
@@ -118,9 +120,10 @@ grant_ref_t Grant_table::grant_access (domid_t domid, void *address)
       exit(-1);
    }
 
-   grant_ref_t ref = avail.back ();
-   avail.pop_back ();
-   inuse.push_back (ref);
+//   grant_ref_t ref = avail.back ();
+   grant_ref_t ref = next_ref++;
+//   avail.pop_back ();
+//   inuse.push_back (ref);
    entries [ref].domid = domid;
    entries [ref].frame = virtual_pointer_to_machine_page(address);
 
