@@ -163,6 +163,9 @@ extern "C"
 int PMI_Barrier( void )
 {
    cout << "calling PMI_Barrier..." << endl;
+
+   hypervisor->shared_memory->barrier ();
+
    return PMI_SUCCESS;
 }
 

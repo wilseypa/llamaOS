@@ -73,8 +73,8 @@ typedef struct
 typedef struct
 {
    uint64_t nodes;
-   uint64_t barrier_target;
-   uint64_t barrier;
+   uint64_t barrier_count;
+   bool barrier_sense;
 
    uint64_t next_offset;
 
@@ -112,6 +112,7 @@ Shared_memory *Shared_memory::create (const std::string &name, domid_t domid)
 }
 
 Shared_memory::Shared_memory ()
+   :  barrier_sense(false)
 {
    
 }
@@ -127,6 +128,7 @@ int Shared_memory::open (const std::string &name) const
 
    if (directory != nullptr)
    {
+   cout << "nodes: " << directory->nodes << endl;
 //      cout << "opening " << name << endl;
 
       for (int i = 0; i < MAX_ENTRIES; i++)
@@ -168,6 +170,7 @@ void *Shared_memory::map (int fd, uint64_t size) const
 
    if (directory != nullptr)
    {
+   cout << "nodes: " << directory->nodes << endl;
       cout << "mapping fd " << fd << ", size " << size << endl;
       int index = fd - 200;
       // uint64_t offset = PAGE_SIZE;
@@ -221,6 +224,7 @@ void *Shared_memory::get (int fd) const
 
    if (directory != nullptr)
    {
+   cout << "nodes: " << directory->nodes << endl;
       return pointer + directory->entries [fd - 200].offset;
    }
 
@@ -233,6 +237,7 @@ int Shared_memory::get_size () const
 
    if (directory != nullptr)
    {
+   cout << "nodes: " << directory->nodes << endl;
       for (int i = 0; i < MAX_ENTRIES; i++)
       {
          if (!directory->entries [i].lock)
@@ -254,6 +259,7 @@ vector<string> Shared_memory::get_names () const
 
    if (directory != nullptr)
    {
+   cout << "nodes: " << directory->nodes << endl;
       for (int i = 0; i < MAX_ENTRIES; i++)
       {
 //         if (directory->entries [i].name [0] == '\0')
@@ -285,6 +291,7 @@ void Shared_memory::put_alias (const string &name, const string &alias) const
 
    if (directory != nullptr)
    {
+   cout << "nodes: " << directory->nodes << endl;
       for (int i = 0; i < MAX_ENTRIES; i++)
       {
 //         if (directory->entries [i].name [0] == '\0')
@@ -317,6 +324,7 @@ string Shared_memory::get_name (const string &alias) const
 
    if (directory != nullptr)
    {
+   cout << "nodes: " << directory->nodes << endl;
       for (int i = 0; i < MAX_ENTRIES; i++)
       {
 //         if (directory->entries [i].name [0] == '\0')
@@ -344,13 +352,45 @@ string Shared_memory::get_name (const string &alias) const
    return "name not found";
 }
 
-void Shared_memory::barrier (bool root)
+void Shared_memory::barrier ()
 {
    directory_t *directory = reinterpret_cast<directory_t *>(get_pointer ());
+   cout << "nodes: " << directory->nodes << endl;
 
-   __sync_add_and_fetch (&directory->barrier, 1);
+   barrier_sense ^= true;
 
-   
+   if (__sync_sub_and_fetch (&directory->barrier_count, 1) == 0)
+   {
+      cout << "resetting barrier..." << endl;
+         cout << "barrier: " << directory->barrier_count
+              << ", " << directory->barrier_sense
+              << ", " << barrier_sense << endl;
+   cout << "nodes: " << directory->nodes << endl;
+
+      directory->barrier_count = directory->nodes;
+      wmb();
+
+      directory->barrier_sense = barrier_sense;
+         cout << "barrier: " << directory->barrier_count
+              << ", " << directory->barrier_sense
+              << ", " << barrier_sense << endl;
+   cout << "nodes: " << directory->nodes << endl;
+   }
+   else
+   {
+         cout << "barrier: " << directory->barrier_count
+              << ", " << directory->barrier_sense
+              << ", " << barrier_sense << endl;
+   cout << "nodes: " << directory->nodes << endl;
+      while (barrier_sense != directory->barrier_sense)
+      {
+         mb();
+      }
+         cout << "barrier: " << directory->barrier_count
+              << ", " << directory->barrier_sense
+              << ", " << barrier_sense << endl;
+   cout << "nodes: " << directory->nodes << endl;
+   }
 }
 
 static uint8_t *create_pointer (domid_t domid, int nodes)
@@ -369,20 +409,21 @@ static uint8_t *create_pointer (domid_t domid, int nodes)
       }
    }
 
-   directory_t *directory = reinterpret_cast<directory_t *>(pointer);
-   directory->nodes = nodes;
-   directory->barrier_target = nodes;
-   directory->barrier = 0;
-
-   directory->next_offset = 2 * PAGE_SIZE;
-
    return pointer;
 }
 
 Shared_memory_creator::Shared_memory_creator (domid_t domid, int nodes)
    : pointer(create_pointer(domid, nodes))
 {
+   directory_t *directory = reinterpret_cast<directory_t *>(pointer);
 
+   directory->nodes = nodes;
+   directory->barrier_count = nodes;
+   directory->barrier_sense = false;
+
+   directory->next_offset = 2 * PAGE_SIZE;
+
+   cout << "nodes: " << directory->nodes << endl;
 }
 
 Shared_memory_creator::~Shared_memory_creator ()
@@ -401,7 +442,9 @@ Shared_memory_user::Shared_memory_user (domid_t domid, int node)
 //   : grant_map(domid-1-node, 32767 - (node * SHARED_PAGES), SHARED_PAGES)
 //   : grant_map(domid-1-node, 16383 - (node * SHARED_PAGES), SHARED_PAGES)
 {
+   directory_t *directory = reinterpret_cast<directory_t *>(get_pointer ());
 
+   cout << "nodes: " << directory->nodes << endl;
 }
 
 uint8_t *Shared_memory_user::get_pointer () const

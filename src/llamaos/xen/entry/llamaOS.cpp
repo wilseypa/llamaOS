@@ -357,7 +357,14 @@ static ssize_t glibc_write (int fd, const void *buf, size_t nbytes)
    }
    else if (fd >= 200)
    {
-      memcpy(Hypervisor::get_instance ()->shared_memory->get(fd), buf, nbytes);
+      cout << "writing to shared memory fd: " << fd << endl;
+      for (size_t i = 0; i < nbytes; i++)
+      {
+         cout << " " << static_cast<unsigned int>(*static_cast<const char *>(buf));
+      }
+      cout << endl;
+
+      // memcpy(Hypervisor::get_instance ()->shared_memory->get(fd), buf, nbytes);
    }
    else if (fd >= 100)
    {

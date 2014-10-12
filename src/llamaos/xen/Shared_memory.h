@@ -66,7 +66,7 @@ public:
    void put_alias (const std::string &name, const std::string &alias) const;
    std::string get_name (const std::string &alias) const;
 
-   void barrier (bool root);
+   void barrier ();
 
 protected:
    virtual uint8_t *get_pointer () const = 0;
@@ -74,6 +74,8 @@ protected:
 private:
    Shared_memory (const Shared_memory &);
    Shared_memory &operator= (const Shared_memory &);
+
+   bool barrier_sense;
 
 };
 
