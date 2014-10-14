@@ -54,7 +54,14 @@ OBJECTS  = $(OBJDIR)/apps/netpipe-$(NETPIPE_VERSION)/src/netpipe-mpi.o
 OBJECTS += $(SOURCES:%.c=$(OBJDIR)/%.o)
 DEPENDS  = $(OBJECTS:%.o=%.d)
 
-$(BINDIR)/apps/netpipe-$(NETPIPE_VERSION)/mpi: $(OBJECTS) $(LIBDIR)/llamaMPI.a $(LIBDIR)/llamaOS.a $(LIBDIR)/sys/stdc++.a $(LIBDIR)/sys/gcc.a $(LIBDIR)/sys/glibc.a
+LINKS = \
+  $(LIBDIR)/tools/mpich.a \
+  $(LIBDIR)/llamaOS.a \
+  $(LIBDIR)/sys/stdc++.a \
+  $(LIBDIR)/sys/gcc.a \
+  $(LIBDIR)/sys/glibc.a
+
+$(BINDIR)/apps/netpipe-$(NETPIPE_VERSION)/mpi: $(OBJECTS) $(LINKS)
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
 	@$(LD) $(LDFLAGS) -T llamaOS.lds -o $@ $^

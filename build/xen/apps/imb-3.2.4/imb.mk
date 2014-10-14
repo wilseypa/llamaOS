@@ -74,8 +74,14 @@ SOURCES = \
 OBJECTS = $(SOURCES:%.c=$(OBJDIR)/%.o)
 DEPENDS = $(OBJECTS:%.o=%.d)
 
-# the entry object must be the first object listed here or the guest will crash!
-$(BINDIR)/apps/imb-$(IMB_VERSION)/imb: $(OBJECTS) $(LIBDIR)/tools/mpich.a $(LIBDIR)/llamaOS.a $(LIBDIR)/sys/stdc++.a $(LIBDIR)/sys/gcc.a $(LIBDIR)/sys/glibc.a
+LINKS = \
+  $(LIBDIR)/tools/mpich.a \
+  $(LIBDIR)/llamaOS.a \
+  $(LIBDIR)/sys/stdc++.a \
+  $(LIBDIR)/sys/gcc.a \
+  $(LIBDIR)/sys/glibc.a
+
+$(BINDIR)/apps/imb-$(IMB_VERSION)/imb: $(OBJECTS) $(LINKS)
 	@[ -d $(@D) ] || (mkdir -p $(@D))
 	@echo linking: $@
 	@$(LD) $(LDFLAGS) -T llamaOS.lds -o $@ $^
