@@ -1,7 +1,7 @@
 #!/bin/bash
 cd ../../net
 konsole --hold -e sudo xl create -c shmem.config name=\"epidemic-r.4\"
-sleep 3
+sleep 5
 cd ../warped-4.0.0/local
 konsole --hold -e sudo xl create -c epidemic_w.config name=\"epidemic-0.4\"
 sleep 3
