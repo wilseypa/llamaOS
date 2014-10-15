@@ -49,12 +49,13 @@ using llamaos::xen::Shared_memory;
 using llamaos::xen::Shared_memory_creator;
 using llamaos::xen::Shared_memory_user;
 
-static const int SHARED_PAGES = 6080;
+// static const int SHARED_PAGES = 6080;
 // static const int SHARED_PAGES = 4096;
-// static const int SHARED_PAGES = 2048;
+static const int SHARED_PAGES = 2048;
 
 // static const int MAX_ENTRIES = 31; // NEED MORE !!!!
-static const int MAX_ENTRIES = 48;
+static const int MAX_ENTRIES = 28;
+// static const int MAX_ENTRIES = 48;
 static const int MAX_NAME = 55;
 static const int MAX_ALIAS = 47;
 
@@ -128,7 +129,7 @@ int Shared_memory::open (const std::string &name) const
 
    if (directory != nullptr)
    {
-   cout << "nodes: " << directory->nodes << endl;
+//   cout << "nodes: " << directory->nodes << endl;
 //      cout << "opening " << name << endl;
 
       for (int i = 0; i < MAX_ENTRIES; i++)
@@ -170,7 +171,7 @@ void *Shared_memory::map (int fd, uint64_t size) const
 
    if (directory != nullptr)
    {
-   cout << "nodes: " << directory->nodes << endl;
+//   cout << "nodes: " << directory->nodes << endl;
       cout << "mapping fd " << fd << ", size " << size << endl;
       int index = fd - 200;
       // uint64_t offset = PAGE_SIZE;
@@ -224,7 +225,7 @@ void *Shared_memory::get (int fd) const
 
    if (directory != nullptr)
    {
-   cout << "nodes: " << directory->nodes << endl;
+//   cout << "nodes: " << directory->nodes << endl;
       return pointer + directory->entries [fd - 200].offset;
    }
 
@@ -237,7 +238,7 @@ int Shared_memory::get_size () const
 
    if (directory != nullptr)
    {
-   cout << "nodes: " << directory->nodes << endl;
+//   cout << "nodes: " << directory->nodes << endl;
       for (int i = 0; i < MAX_ENTRIES; i++)
       {
          if (!directory->entries [i].lock)
@@ -259,7 +260,7 @@ vector<string> Shared_memory::get_names () const
 
    if (directory != nullptr)
    {
-   cout << "nodes: " << directory->nodes << endl;
+//   cout << "nodes: " << directory->nodes << endl;
       for (int i = 0; i < MAX_ENTRIES; i++)
       {
 //         if (directory->entries [i].name [0] == '\0')
@@ -291,7 +292,7 @@ void Shared_memory::put_alias (const string &name, const string &alias) const
 
    if (directory != nullptr)
    {
-   cout << "nodes: " << directory->nodes << endl;
+//   cout << "nodes: " << directory->nodes << endl;
       for (int i = 0; i < MAX_ENTRIES; i++)
       {
 //         if (directory->entries [i].name [0] == '\0')
@@ -324,7 +325,7 @@ string Shared_memory::get_name (const string &alias) const
 
    if (directory != nullptr)
    {
-   cout << "nodes: " << directory->nodes << endl;
+//   cout << "nodes: " << directory->nodes << endl;
       for (int i = 0; i < MAX_ENTRIES; i++)
       {
 //         if (directory->entries [i].name [0] == '\0')
@@ -355,7 +356,7 @@ string Shared_memory::get_name (const string &alias) const
 void Shared_memory::barrier ()
 {
    directory_t *directory = reinterpret_cast<directory_t *>(get_pointer ());
-   cout << "nodes: " << directory->nodes << endl;
+//   cout << "nodes: " << directory->nodes << endl;
 
    barrier_sense ^= true;
 
@@ -423,7 +424,7 @@ Shared_memory_creator::Shared_memory_creator (domid_t domid, int nodes)
 
    directory->next_offset = 2 * PAGE_SIZE;
 
-   cout << "nodes: " << directory->nodes << endl;
+//   cout << "nodes: " << directory->nodes << endl;
 }
 
 Shared_memory_creator::~Shared_memory_creator ()
