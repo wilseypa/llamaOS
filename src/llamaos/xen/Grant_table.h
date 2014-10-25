@@ -51,9 +51,10 @@ public:
 
    grant_ref_t grant_access (domid_t domid, void *address);
 
-   const uint32_t max_frames;
-   const uint32_t frames;
-   const unsigned int size;
+   const uint32_t frame_list_max;
+   const uint32_t frame_list_size;
+
+   const unsigned int memory_pages;
 
 private:
    Grant_table (const Grant_table &);
@@ -62,9 +63,6 @@ private:
    grant_entry_v1_t *const entries;
 
    unsigned int next_ref;
-
-//   std::list<grant_ref_t> avail;
-//   std::list<grant_ref_t> inuse;
 
 };
 

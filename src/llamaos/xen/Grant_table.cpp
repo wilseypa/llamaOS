@@ -48,7 +48,7 @@ using namespace llamaos;
 using namespace llamaos::memory;
 using namespace llamaos::xen;
 
-static uint32_t query_max_frames ()
+static uint32_t query_size ()
 {
    uint32_t frames;
    uint32_t max_frames;
@@ -64,28 +64,26 @@ static uint32_t query_max_frames ()
 }
 
 Grant_table::Grant_table ()
-   :  max_frames(query_max_frames()),
-      frames(min(FRAME_LIST_SIZE, max_frames)),
-      size((frames * PAGE_SIZE) / sizeof(grant_entry_v1_t)),
-      entries(address_to_pointer<grant_entry_v1_t> (get_reserved_virtual_address (FRAME_LIST_SIZE))),
+   :  frame_list_max(query_size()),
+      frame_list_size(min(FRAME_LIST_SIZE, frame_list_max)),
+      memory_pages((frame_list_size * PAGE_SIZE) / sizeof(grant_entry_v1_t)),
+      entries(address_to_pointer<grant_entry_v1_t> (get_reserved_virtual_address (frame_list_size))),
       next_ref(GNTTAB_NR_RESERVED_ENTRIES)
-//      avail(),
-//      inuse()
 {
    trace ("Grant_table constructor...\n");
-   trace (" size: %x\n", size);
+   trace (" size: %x\n", memory_pages);
    trace (" entries: %lx\n", entries);
 
    unsigned long frame_list [FRAME_LIST_SIZE] = { 0 };
 
    trace ("calling grant_table_setup_table...\n");
-   if (!Hypercall::grant_table_setup_table (frames, frame_list))
+   if (!Hypercall::grant_table_setup_table (frame_list_size, frame_list))
    {
       trace ("failed to create grant table\n");
 //      throw runtime_error ("failed to create grant table");
    }
 
-   for (uint32_t i = 0; i < frames; i++)
+   for (uint32_t i = 0; i < frame_list_size; i++)
    {
       trace ("calling update_va_mapping...\n");
       if (!Hypercall::update_va_mapping (pointer_to_address(entries) + (i * PAGE_SIZE), page_to_address (frame_list [i])))
@@ -95,11 +93,6 @@ Grant_table::Grant_table ()
       }
       trace ("calling update_va_mapping returned.\n");
    }
-
-//   for (grant_ref_t i = 0; i < size; i++)
-//   {
-//      avail.push_back(i);
-//   }
 
    trace ("Grant_table constructor ended.\n");
 }
@@ -111,8 +104,7 @@ Grant_table::~Grant_table ()
 
 grant_ref_t Grant_table::grant_access (domid_t domid, void *address)
 {
-//   if (avail.size() < (GNTTAB_NR_RESERVED_ENTRIES + 4))
-   if (next_ref >= size)
+   if (next_ref >= frame_list_size)
    {
       // trace ("all grant ref allocated.\n");
       // throw exception
@@ -120,10 +112,7 @@ grant_ref_t Grant_table::grant_access (domid_t domid, void *address)
       exit(-1);
    }
 
-//   grant_ref_t ref = avail.back ();
    grant_ref_t ref = next_ref++;
-//   avail.pop_back ();
-//   inuse.push_back (ref);
    entries [ref].domid = domid;
    entries [ref].frame = virtual_pointer_to_machine_page(address);
 

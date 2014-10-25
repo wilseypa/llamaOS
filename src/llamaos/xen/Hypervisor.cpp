@@ -147,13 +147,13 @@ void Hypervisor::initialize ()
 
 //   events.bind (console.port, console.event_handler, &console);
 
-   if (grant_table.max_frames < FRAME_LIST_SIZE)
-   {
-      cout << "ERROR: Grant table max frames " << grant_table.max_frames
-           << " is less than llamaOS configuration "<< FRAME_LIST_SIZE << endl;
-      cout << "increase max frames with Xen command line parameter: gnttab_max_nr_frames" << endl;
-      exit(-100);
-   }
+//   if (grant_table.max_frames < FRAME_LIST_SIZE)
+//   {
+//      cout << "ERROR: Grant table max frames " << grant_table.max_frames
+//           << " is less than llamaOS configuration "<< FRAME_LIST_SIZE << endl;
+//      cout << "increase max frames with Xen command line parameter: gnttab_max_nr_frames" << endl;
+//      exit(-100);
+//   }
 
    for (int i = 0; i < 64; i++)
    {
