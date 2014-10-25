@@ -49,13 +49,14 @@ using llamaos::xen::Shared_memory;
 using llamaos::xen::Shared_memory_creator;
 using llamaos::xen::Shared_memory_user;
 
-// static const int SHARED_PAGES = 6080;
+// !BAM TEMP - this will not work on default xen config
+static const int SHARED_PAGES = 6080;
 // static const int SHARED_PAGES = 4096;
-static const int SHARED_PAGES = 2048;
+// static const int SHARED_PAGES = 2048;
 
 // static const int MAX_ENTRIES = 31; // NEED MORE !!!!
-static const int MAX_ENTRIES = 28;
-// static const int MAX_ENTRIES = 48;
+// static const int MAX_ENTRIES = 28;
+static const int MAX_ENTRIES = 48;
 static const int MAX_NAME = 55;
 static const int MAX_ALIAS = 47;
 
