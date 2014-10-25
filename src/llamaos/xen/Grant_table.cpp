@@ -104,7 +104,7 @@ Grant_table::~Grant_table ()
 
 grant_ref_t Grant_table::grant_access (domid_t domid, void *address)
 {
-   if (next_ref >= frame_list_size)
+   if (next_ref >= memory_pages)
    {
       // trace ("all grant ref allocated.\n");
       // throw exception
