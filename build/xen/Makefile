@@ -42,7 +42,9 @@ INSTALL_DIR = ~
 INSTALL_FOLDER = $(INSTALL_DIR)/llamaOS-$(LLAMAOS_VERSION)
 
 .PHONY: all
-all: sys llamaOS tools apps-imb apps-net apps-netpipe apps-warped
+all: sys llamaOS tools apps-imb apps-net apps-netpipe
+
+# apps-warped
 
 .PHONY: sys
 sys:
