@@ -66,12 +66,12 @@ static uint32_t query_size ()
 Grant_table::Grant_table ()
    :  frame_list_max(query_size()),
       frame_list_size(min(FRAME_LIST_SIZE, frame_list_max)),
-      memory_pages((frame_list_size * PAGE_SIZE) / sizeof(grant_entry_v1_t)),
+      grant_ref_max((frame_list_size * PAGE_SIZE) / sizeof(grant_entry_v1_t)),
       entries(address_to_pointer<grant_entry_v1_t> (get_reserved_virtual_address (frame_list_size))),
       next_ref(GNTTAB_NR_RESERVED_ENTRIES)
 {
    trace ("Grant_table constructor...\n");
-   trace (" size: %x\n", memory_pages);
+   trace (" size: %x\n", grant_ref_max);
    trace (" entries: %lx\n", entries);
 
    unsigned long frame_list [FRAME_LIST_SIZE] = { 0 };
@@ -104,7 +104,7 @@ Grant_table::~Grant_table ()
 
 grant_ref_t Grant_table::grant_access (domid_t domid, void *address)
 {
-   if (next_ref >= memory_pages)
+   if (next_ref >= grant_ref_max)
    {
       // trace ("all grant ref allocated.\n");
       // throw exception
@@ -121,4 +121,9 @@ grant_ref_t Grant_table::grant_access (domid_t domid, void *address)
    entries [ref].flags = GTF_permit_access | GTF_reading | GTF_writing;
 
    return ref;
+}
+
+unsigned int Grant_table::grant_ref_size () const
+{
+   return grant_ref_max - next_ref;
 }

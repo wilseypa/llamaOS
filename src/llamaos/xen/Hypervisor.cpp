@@ -170,6 +170,7 @@ void Hypervisor::initialize ()
       blocks.push_back(new Block(string("device/vbd/") + keys [i]));
    }
 
+   cout << "calling Shared_memory::create..." << endl;
    shared_memory = Shared_memory::create(name, domid);
 
 }

@@ -51,7 +51,6 @@ class Shared_memory
 public:
    static Shared_memory *create (const std::string &name, domid_t domid);
 
-   Shared_memory ();
    virtual ~Shared_memory ();
 
    int open (const std::string &name) const;
@@ -68,7 +67,11 @@ public:
 
    void barrier ();
 
+   const unsigned int shared_pages;
+
 protected:
+   Shared_memory (unsigned int shared_pages);
+
    virtual uint8_t *get_pointer () const = 0;
 
 private:
@@ -82,7 +85,7 @@ private:
 class Shared_memory_creator : public Shared_memory
 {
 public:
-   Shared_memory_creator (domid_t domid, int nodes);
+   Shared_memory_creator (domid_t domid, int nodes, unsigned int shared_pages);
    virtual ~Shared_memory_creator ();
 
 protected:
@@ -100,7 +103,7 @@ private:
 class Shared_memory_user : public Shared_memory
 {
 public:
-   Shared_memory_user (domid_t domid, int node);
+   Shared_memory_user (domid_t domid, int node, unsigned int shared_pages);
 
 protected:
    virtual uint8_t *get_pointer () const;

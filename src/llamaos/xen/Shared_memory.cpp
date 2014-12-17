@@ -50,13 +50,15 @@ using llamaos::xen::Shared_memory_creator;
 using llamaos::xen::Shared_memory_user;
 
 // !BAM TEMP - this will not work on default xen config
-static const int SHARED_PAGES = 6080;
+// static const int SHARED_PAGES = 6080;
+
 // static const int SHARED_PAGES = 4096;
 // static const int SHARED_PAGES = 2048;
 
 // static const int MAX_ENTRIES = 31; // NEED MORE !!!!
 // static const int MAX_ENTRIES = 28;
 static const int MAX_ENTRIES = 48;
+
 static const int MAX_NAME = 55;
 static const int MAX_ALIAS = 47;
 
@@ -67,6 +69,7 @@ typedef struct
    uint8_t alias [MAX_ALIAS+1];
    uint64_t lock;
    uint64_t lock2;
+
    uint64_t offset;
    uint64_t size;
 
@@ -87,16 +90,20 @@ typedef struct
 
 Shared_memory *Shared_memory::create (const std::string &name, domid_t domid)
 {
+cout << "Shared_memory::create: " << name << endl;
    // check if resource node
    size_t pos = name.find("-r.");
 
    if (pos != string::npos)
    {
       istringstream s(name.substr(pos+3));
-      int nodes;
+      int nodes = 0;
       s >> nodes;
 
-      return new Shared_memory_creator (domid, nodes); 
+      Hypervisor *hypervisor = Hypervisor::get_instance ();
+      unsigned int shared_pages = (hypervisor->grant_table.grant_ref_size () / nodes);
+cout << "nodes = " << nodes << ", shared_pages = " << shared_pages << endl;
+      return new Shared_memory_creator (domid, nodes, shared_pages); 
    }
 
    pos = name.find("-");
@@ -107,14 +114,34 @@ Shared_memory *Shared_memory::create (const std::string &name, domid_t domid)
       int node;
       s >> node;
 
-      return new Shared_memory_user (domid, node); 
+      pos = name.find(".");
+
+      if (pos != string::npos)
+      {
+         istringstream s(name.substr(pos+1));
+         int nodes;
+         s >> nodes;
+
+ cout << "nodes = " << nodes << ", node = " << node << endl;
+         if (node < nodes)
+         {
+            Hypervisor *hypervisor = Hypervisor::get_instance ();
+            unsigned int shared_pages = (hypervisor->grant_table.grant_ref_size () / nodes);
+
+            return new Shared_memory_user (domid, node, shared_pages);
+         }
+      }
    }
 
+   cout << "Shared_memory::create failed!!!" << endl;
+   // throw
+   for (;;);
    return nullptr;
 }
 
-Shared_memory::Shared_memory ()
-   :  barrier_sense(false)
+Shared_memory::Shared_memory (unsigned int shared_pages)
+   :  shared_pages(shared_pages),
+      barrier_sense(false)
 {
    
 }
@@ -130,33 +157,38 @@ int Shared_memory::open (const std::string &name) const
 
    if (directory != nullptr)
    {
-//   cout << "nodes: " << directory->nodes << endl;
-//      cout << "opening " << name << endl;
+   cout << "nodes: " << directory->nodes << endl;
+      cout << "opening " << name << endl;
+   for (;;);
 
       for (int i = 0; i < MAX_ENTRIES; i++)
       {
-//         cout << "   [" << i << "] " << directory->entries [i].name << endl;
+         cout << "   [" << i << "] " << directory->entries [i].name << endl;
 
          // if (__sync_lock_test_and_set(&directory->entries [i].lock, 1) == 0)
          if (__sync_fetch_and_add(&directory->entries [i].lock, 1) == 0)
          {
-            cout << "   writing to entry " << i << ", " << name.c_str () << endl;
-            strncpy(reinterpret_cast<char *>(directory->entries [i].name), name.c_str (), MAX_NAME);
+            cout << "  writing to entry " << i << ", " << name.c_str () << endl;
+            strncpy(reinterpret_cast<char *>(directory->entries [i].name),
+                    name.c_str (),
+                    MAX_NAME);
             wmb();
             return i + 200;
          }
 
-//         cout << "   searching in entry " << i << endl;
+         cout << "   searching in entry " << i << endl;
 
          while (directory->entries [i].name [0] == '\0')
          {
-            cout << "   open waiting for entry name to be written: " << i << endl;
+            cout << "  open waiting for entry name to be written: " << i << endl;
             mb();
          }
 
-         if (strncmp(name.c_str(), reinterpret_cast<const char *>(directory->entries [i].name), MAX_NAME) == 0)
+         if (strncmp (name.c_str(),
+                      reinterpret_cast<const char *>(directory->entries [i].name),
+                      MAX_NAME) == 0)
          {
-//            cout << "   found in entry " << i << endl;
+            cout << "   found in entry " << i << endl;
             return i + 200;
          }
       }
@@ -199,7 +231,7 @@ void *Shared_memory::map (int fd, uint64_t size) const
 
       // directory->entries [index].offset = offset;
 
-      if ((directory->entries [index].offset + size) > (SHARED_PAGES * PAGE_SIZE))
+      if ((directory->entries [index].offset + size) > (shared_pages * PAGE_SIZE))
       {
          cout << "exceeded shared memory space!!!!!" << endl;
          // throw
@@ -264,11 +296,6 @@ vector<string> Shared_memory::get_names () const
 //   cout << "nodes: " << directory->nodes << endl;
       for (int i = 0; i < MAX_ENTRIES; i++)
       {
-//         if (directory->entries [i].name [0] == '\0')
-//         {
-//            break;
-//         }
-
          if (!directory->entries [i].lock)
          {
             break;
@@ -296,10 +323,6 @@ void Shared_memory::put_alias (const string &name, const string &alias) const
 //   cout << "nodes: " << directory->nodes << endl;
       for (int i = 0; i < MAX_ENTRIES; i++)
       {
-//         if (directory->entries [i].name [0] == '\0')
-//         {
-//            break;
-//         }
          if (!directory->entries [i].lock)
          {
             break;
@@ -329,10 +352,6 @@ string Shared_memory::get_name (const string &alias) const
 //   cout << "nodes: " << directory->nodes << endl;
       for (int i = 0; i < MAX_ENTRIES; i++)
       {
-//         if (directory->entries [i].name [0] == '\0')
-//         {
-//            break;
-//         }
          if (!directory->entries [i].lock)
          {
             break;
@@ -395,17 +414,17 @@ void Shared_memory::barrier ()
    }
 }
 
-static uint8_t *create_pointer (domid_t domid, int nodes)
+static uint8_t *create_pointer (domid_t domid, int nodes, unsigned int shared_pages)
 {
    Hypervisor *hypervisor = Hypervisor::get_instance ();
 
-   const unsigned int size = SHARED_PAGES * PAGE_SIZE;
+   const unsigned int size = shared_pages * PAGE_SIZE;
    uint8_t *pointer = static_cast<uint8_t *>(aligned_alloc (PAGE_SIZE, size));
    memset(static_cast<void *>(pointer), 0, size);
 
    for (int i = 0; i < nodes; i++)
    {
-      for (int j = 0; j < SHARED_PAGES; j++)
+      for (unsigned int j = 0; j < shared_pages; j++)
       {
          hypervisor->grant_table.grant_access (domid + 1 + i, &pointer [j * PAGE_SIZE]);
       }
@@ -414,8 +433,9 @@ static uint8_t *create_pointer (domid_t domid, int nodes)
    return pointer;
 }
 
-Shared_memory_creator::Shared_memory_creator (domid_t domid, int nodes)
-   : pointer(create_pointer(domid, nodes))
+Shared_memory_creator::Shared_memory_creator (domid_t domid, int nodes, unsigned int shared_pages)
+   : Shared_memory(shared_pages),
+     pointer(create_pointer(domid, nodes, shared_pages))
 {
    directory_t *directory = reinterpret_cast<directory_t *>(pointer);
 
@@ -438,8 +458,9 @@ uint8_t *Shared_memory_creator::get_pointer () const
    return pointer;
 }
 
-Shared_memory_user::Shared_memory_user (domid_t domid, int node)
-   : grant_map(domid-1-node, (node * SHARED_PAGES), SHARED_PAGES)
+Shared_memory_user::Shared_memory_user (domid_t domid, int node, unsigned int shared_pages)
+   : Shared_memory(shared_pages),
+     grant_map(domid-1-node, (node * shared_pages), shared_pages)
 //   : grant_map(domid-1-node, 49151 - (node * SHARED_PAGES), SHARED_PAGES)
 //   : grant_map(domid-1-node, 32767 - (node * SHARED_PAGES), SHARED_PAGES)
 //   : grant_map(domid-1-node, 16383 - (node * SHARED_PAGES), SHARED_PAGES)
