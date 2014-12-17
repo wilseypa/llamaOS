@@ -1,0 +1,304 @@
+% 
+% Copyright (c) 2013, William Magato
+% All rights reserved.
+% 
+% Redistribution and use in source and binary forms, with or without
+% modification, are permitted provided that the following conditions are met:
+% 
+%    1. Redistributions of source code must retain the above copyright notice,
+%       this list of conditions and the following disclaimer.
+% 
+%    2. Redistributions in binary form must reproduce the above copyright
+%       notice, this list of conditions and the following disclaimer in the 
+%       documentation and/or other materials provided with the distribution.
+% 
+% THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER(S) AND CONTRIBUTORS 
+% ''AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED 
+% TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR 
+% PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER(S) OR 
+% CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
+% EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
+% PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; 
+% OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, 
+% WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR 
+% OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
+% ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+% 
+% The views and conclusions contained in the software and documentation are 
+% those of the authors and should not be interpreted as representing official 
+% policies, either expressed or implied, of the copyright holder(s) or 
+% contributors.
+% 
+
+\documentclass[draft]{article}
+
+\usepackage[draft=false,colorlinks=true]{hyperref}
+\usepackage{parskip}
+
+\begin{document}
+
+\pagenumbering{alph}
+
+\begin{titlepage}
+\raggedleft
+{\huge{Developer Guide}\\[1.0in]}
+{\Huge{\textbf{llamaOS}}\\[0.125in]}
+{\Large{\input{version}}}
+\vfill
+\itshape
+Experimental Computing Laboratory\\
+University of Cincinnati\\[0.125in]
+\today
+\end{titlepage}
+
+\pagenumbering{roman}
+
+\tableofcontents
+\clearpage
+
+\pagenumbering{arabic}
+
+\section{Introduction}\label{introduction}
+
+When working with llamaOS, computer resources need to be thought of as either 
+\emph{development} or \emph{runtime} systems.  A development system is used for 
+developing the llamaOS source code and building binary images to be executed on 
+a runtime system.  A single system can be used for both development and runtime 
+execution provided it fulfills the requirements for both use cases.  This can 
+be a convenient way to develop new features and quickly test applications.  A 
+cluster of capable runtime systems is necessary for true performance 
+benchmarking though.
+
+\subsection{Development System}
+
+The requirements for a development system are:
+
+\begin{itemize}
+  \item Version control
+    \subitem GitHub compatible Git client
+    \subitem GitHub compatible web browser
+    \subitem SSH client
+  \item Compiler/build tools
+    \subitem GNU GCC 4.7.1 or greater (languages: C, C++, Fortran)
+    \subitem GNU Make
+    \subitem GNU Binutils
+    \subitem GNU zip
+  \item Code analysis (optional)
+    \subitem Cppcheck
+  \item Documentation (optional)
+    \subitem Doxygen
+    \subitem \LaTeX
+\end{itemize}
+
+\subsubsection{Version Control}
+
+The source code for the llamaOS project is maintained with the 
+\href{http://git-scm.com/}{Git}\footnote{\url{http://git-scm.com/}} 
+distributed version control system.  The repository is hosted on 
+\href{https://github.com/wilseypa/llamaOS}{GutHub}\footnote{\url{
+https://github.com/wilseypa/llamaOS}}, a web-based service with some basic 
+project management features.  Refer to the GitHub documentation for details on 
+Git client and we browser minimum requirements.
+
+An SSH client is needed to clone and remotely administer the llamaOS Git 
+repository.  Most modern Linux distributions arrive with an SSH client 
+pre-installed.  If not, refer to the distribution's package management for 
+instructions on installing and configuring a client.
+
+\subsubsection{Compiler/Build Tools}
+
+The llamaOS build system is currently designed to compile source code using 
+the \href{http://gcc.gnu.org/}{GNU Compiler 
+Collection}\footnote{\url{http://gcc.gnu.org/}}, 
+\href{http://www.gnu.org/software/make/}{Make}\footnote{\url{
+http://www.gnu.org/software/make/}} and various
+\href{http://www.gnu.org/software/binutils/}{binary 
+tools}\footnote{\url{http://www.gnu.org/software/binutils/}}.  Similar to the 
+SSH client, all of these tools are usually pre-installed for most modern Linux 
+distributions.  However, the distribution may not have the necessary versions 
+available.  llamaOS takes advantage of recent features of GCC and C++11 that 
+require version 4.7.1 or greater.  If the desired development platform does not 
+support recent versions of GCC, it can be downloaded and installed along side 
+the systems native build system.
+
+\href{http://www.gzip.org/}{GNU zip}\footnote{\url{http://www.gzip.org/}} is a 
+compression tool used to compress the final binary llamaOS executable image. 
+The binary image is compressed to save stoarge space and time when transmitting 
+the file to the runtime system(s).
+
+\subsubsection{Code Analysis}
+
+To adhere to software engineering best practices, code analysis and automated 
+testing is integrated into the llamaOS build system.  At this time, 
+\href{http://cppcheck.sourceforge.net/}{ccpcheck}\footnote{\url{
+http://cppcheck.sourceforge.net/}} is used for static analysis of all C/C++ 
+files written by the llamaOS contributors.  The 
+\href{https://code.google.com/p/googletest/}{Google C++ Testing 
+Framework}\footnote{\url{https://code.google.com/p/googletest/}} provides unit 
+testing capabilities to the project.  Both code analysis and automated testing 
+procedures are still under heavy construction.  Additional tools will be 
+evaluated  and incorporated into the llamaOS build system as warranted.  
+
+\subsubsection{Documentation}
+
+In-line source code documentation of llamaOS is produced and distributed using 
+\href{http://www.stack.nl/~dimitri/doxygen/}{Doxygen}\footnote{\url{
+http://www.stack.nl/~dimitri/doxygen/}}.  The general rule is to document all 
+aspects of llamaOS that are publicly accessible from application logic.  System 
+level documentation files, such as this manual, are typeset and distributed as 
+PDF files using \LaTeX.
+
+\subsection{Runtime System}
+
+The requirements for a runtime system are:
+
+\begin{itemize}
+  \item Hypervisor
+    \subitem Xen 4.2.0 or greater
+  \item Network Hardware (optional, but required for llamaNET)
+    \subitem Intel PCI/PCIe NIC (82574 or 80003es2lan chipset)
+\end{itemize}
+
+\subsubsection{Hypervisor}
+
+Presently, llamaOS requires 
+\href{http://www.xenproject.org/}{Xen}\footnote{\url{http://www.xenproject.org/}
+} version 4.2.0 or greater installed on a 64-bit x86 PC based system.  Future 
+plans include support for alternative hypervisor technologies and hardware 
+architectures but nothing has been implemented at this time.  Users of llamaOS 
+must also have system permissions to create and administer Xen virtual 
+machines.  This requirement normally implies that the users need to have 
+\emph{sudo} rights.  This is a side-effect of using Xen, and has nothing to do 
+with llamaOS.
+
+\subsubsection{Network Hardware}
+
+Although llamaOS is capable of executing applications on a single virtual 
+machine, it is designed for fine grained, message passing, parallel 
+applications.  Virtual machines communicate with each other using a high 
+performance data transfer framework called llamaNET.  This framework provides 
+communication between virtual machines executing on different physical systems 
+using commodity Ethernet adapters.  A llamaNET driver must be written for 
+physical hardware components to interact with the llamaNET framework from 
+within a llamaOS virtual machine.  Software exists to support Intel PCIe 
+network adapters, specifically for the 82574/80003es2lan chipset, already.  
+Support for additional hardware can be added at a later time as needed.
+
+\section{Getting and Building the Source}
+
+Once the items specified in section \ref{introduction} are installed on a 
+development system, a user can get the source and build the binaries needed 
+for application development and execution.
+
+\subsection{GitHub}
+
+Get the llamaOS source code by cloning the Git repository.
+
+\begin{quote}
+ \texttt{\$ git clone git@github.com:wilseypa/llamaOS.git}
+\end{quote}
+
+After execting this command on a development system, a folder named 
+\emph{llamaOS} containing all of the source files under version control will 
+appear in the current directory.  Refer to the 
+\href{http://git-scm.com/documentation}{Git 
+documentation}\footnote{\url{http://git-scm.com/documentation}} and/or 
+\emph{man} pages for information pertaining to working with the Git client.  
+Also, the Git client provides some documentation by passing \emph{help} as the 
+program parameter.
+
+\begin{quote}
+ \texttt{\$ git help clone}
+\end{quote}
+
+The URL passed to the \emph{clone} command, shown above, can be found on the 
+right side of the llamaOS GutHub project page.  llamaOS contributors will need 
+to setup a personal GitHub account and request that the llamaOS administer add 
+them to the project.  Cloning the repository for the first time will likely 
+produce a permissions error concerning SSH keys.  A public key must be uploaded 
+into the personal account page of each user.  GitHub has a 
+\href{https://help.github.com/articles/generating-ssh-keys}{link}\footnote{\url{
+https://help.github.com/articles/generating-ssh-keys }} at the top of the SSH 
+settings page with instructions on how to accomplish this task.
+
+Git has many advanced features that make it an extremely usefull development 
+tool.  llamaOS contributors should be familiar with basic branching and remote 
+repository management at a minimum.  A branching model policy similar to 
+\href{http://nvie.com/posts/a-successful-git-branching-model/}{this}
+\footnote { \url { http://nvie.com/posts/a-successful-git-branching-model/}} 
+may be adopted in the future.
+
+\subsection{Makefiles}
+
+Building the llamaOS project can be as simple as typing \emph{make} at the 
+project's root directory.
+
+\begin{quote}
+\texttt{llamaOS \$ make}
+\end{quote}
+
+All of the llamaOS makefiles reside in the \emph{build} folder/subfolders.  
+Typing \emph{make} from the project root launches a series of recursive make 
+processes that systematically build all of the project binaries and generates a 
+distrubition package.  
+
+\begin{quote}
+level 0 \hspace{0.5in}build root\\
+host platforms\\
+libraries \& applications
+\end{quote}
+
+
+
+The system of llamaOS makefiles in the \emph{build} folder attempt to determine 
+what tools are available on the development system and avoid building 
+components that can not be supported.  The development system must provide 
+support for building the core libraries though.  A common source of error is 
+when the system's native compiler does not meet the poject's minimum 
+requirements.  For example, the following compiler error message may appear on 
+some systems.
+
+\begin{quote}
+\texttt{error: unrecognized command line option '-std=gnu++11'}
+\end{quote}
+
+This message indicates that the compiler does not support features of C++11.  
+Fortunately, multiple versions of GCC can coexist on a development system.  
+Installing an alternative version will allow for llamaOS development at 
+minimal risk of causing system configuration issues.  To this this, download 
+the source of a version of GCC that meets the minimum requirements for building 
+llamaOS descibed in section \ref{introduction}.  Follow the provided 
+instructions for building GCC while using the following configuration 
+parameters.
+
+\begin{quote}
+\texttt{--prefix=/opt/gcc-4.8.0 --enable-languages=c,c++,fortran}
+\end{quote}
+
+Replace the \emph{prefix} value with something more appropriate of course.  
+Next, add references to the alternative compiler tools to the 
+\emph{custom-vars.mk} file.
+
+\begin{quote}
+CC = /opt/gcc-4.8.0/bin/gcc\newline
+CXX = /opt/gcc-4.8.0/bin/g++\newline
+F77 = /opt/gcc-4.8.0/bin/gfortran\newline
+F90 = /opt/gcc-4.8.0/bin/gfortran
+\end{quote}
+
+
+\section{System Libraries}
+
+\subsection{glibc}
+\subsection{gcc}
+\subsection{xen}
+
+\section{llamaOS API}
+
+\section{Network/Device Drivers}
+
+\section{Communication Libraries}
+
+\section{Benchmark/Test Applications}
+
+\end{document}

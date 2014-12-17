@@ -39,6 +39,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <llamaos/xen/Console.h>
 #include <llamaos/xen/Events.h>
 #include <llamaos/xen/Grant_table.h>
+#include <llamaos/xen/Shared_memory.h>
 #include <llamaos/xen/Traps.h>
 #include <llamaos/xen/Xenstore.h>
 
@@ -97,6 +98,8 @@ public:
 
    const std::string name;
    const int domid;
+
+   Shared_memory *shared_memory;
 
    int argc;
    char *argv [64];

@@ -76,7 +76,7 @@ int main (int argc, char *argv [])
 
       if (!should_leak)
       {
-         delete[] (void *)ptrs[i];
+         delete (char *)ptrs[i];
       }
    }
 

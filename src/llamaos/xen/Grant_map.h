@@ -31,11 +31,14 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #ifndef llamaos_xen_grant_map_h_
 #define llamaos_xen_grant_map_h_
 
+#include <vector>
+
 #include <xen/grant_table.h>
 #include <xen/xen.h>
 
 #include <llamaos/memory/Memory.h>
 #include <llamaos/xen/Hypercall.h>
+#include <llamaos/llamaOS.h>
 #include <llamaos/Trace.h>
 
 namespace llamaos {
@@ -49,6 +52,8 @@ public:
       :  address(memory::get_reserved_virtual_address (1)),
          handle(0)
    {
+      ref += GNTTAB_NR_RESERVED_ENTRIES;
+
       gnttab_map_grant_ref_t map_grant_ref;
 
       map_grant_ref.dom = domid;
@@ -96,6 +101,74 @@ private:
    Grant_map &operator= (const Grant_map &);
 
    grant_handle_t handle;
+
+};
+
+template <>
+class Grant_map<char>
+{
+public:
+   Grant_map (domid_t domid, grant_ref_t ref, int pages, bool readonly = false)
+      :  address(memory::get_reserved_virtual_address (pages)),
+         handles()
+   {
+      ref += GNTTAB_NR_RESERVED_ENTRIES;
+
+      for (int i = 0; i < pages; i++)
+      {
+         gnttab_map_grant_ref_t map_grant_ref;
+
+         map_grant_ref.dom = domid;
+         map_grant_ref.ref = ref;
+         map_grant_ref.host_addr = address + (i * PAGE_SIZE);
+
+         map_grant_ref.flags = (readonly) ? GNTMAP_host_map | GNTMAP_readonly
+                                          : GNTMAP_host_map;
+
+         Hypercall::grant_table_map_grant_ref (map_grant_ref);
+
+         if (map_grant_ref.status == GNTST_okay)
+         {
+            handles.push_back (map_grant_ref.handle);
+         }
+         else
+         {
+            trace ("error mapping %d, %d\n", domid, ref);
+         }
+
+         ++ref;
+      }
+   }
+
+   virtual ~Grant_map ()
+   {
+      for (size_t i = 0; i < handles.size(); i++)
+      {
+         gnttab_unmap_grant_ref unmap_grant_ref;
+
+         unmap_grant_ref.host_addr = address + (i * PAGE_SIZE);
+         unmap_grant_ref.handle = handles [i];
+
+         Hypercall::grant_table_unmap_grant_ref (unmap_grant_ref);
+      }
+   }
+
+   const uint64_t address;
+
+   // dereference operator when pointer
+   char *get_pointer () const { return memory::address_to_pointer<char>(address); }
+
+   // dereference operator when pointer
+   char *operator-> () const { return memory::address_to_pointer<char>(address); }
+
+   // index operator when array
+   char &operator[] (int index) const { return memory::address_to_pointer<char>(address) [index]; }
+
+private:
+   Grant_map (const Grant_map &);
+   Grant_map &operator= (const Grant_map &);
+
+   std::vector<grant_handle_t> handles;
 
 };
 

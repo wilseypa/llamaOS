@@ -48,6 +48,9 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 #define LLAMAOS_PAGE_SIZE      0x1000  // 4KB
 
+// #define LLAMAOS_FRAME_LIST_SIZE (32)
+#define LLAMAOS_FRAME_LIST_SIZE (96)
+
 #ifdef __cplusplus
 
 namespace llamaos {
@@ -89,6 +92,12 @@ static const unsigned long IRQ_STACK_SIZE = LLAMAOS_IRQ_STACK_SIZE;
  *
  */
 static const unsigned long PAGE_SIZE = LLAMAOS_PAGE_SIZE;
+
+/**
+ * @brief Number of grant frames.
+ *
+ */
+static const uint32_t FRAME_LIST_SIZE = LLAMAOS_FRAME_LIST_SIZE;
 
 }
 

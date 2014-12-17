@@ -1,4 +1,16 @@
 
+llamaOS: 1.1
+ * glibc: 2.17
+ * gcc: 4.8.0
+ * gtest: 1.6.0
+ * xen: 4.3.0
+
+llamaOS: 1.0
+ * glibc: 2.17
+ * gcc: 4.7.1
+ * gtest: 1.6.0
+ * xen: 4.2.1
+
 llamaOS: 0.1
  * glibc: 2.14.1
  * gcc: 4.6.2

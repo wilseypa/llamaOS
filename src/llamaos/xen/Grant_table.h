@@ -33,7 +33,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 
 #include <cstdint>
 
-#include <list>
+// #include <list>
 
 #include <xen/xen.h>
 #include <xen/grant_table.h>
@@ -51,15 +51,20 @@ public:
 
    grant_ref_t grant_access (domid_t domid, void *address);
 
+   grant_ref_t grant_ref_size () const;
+
+   const uint32_t frame_list_max;
+   const uint32_t frame_list_size;
+
+   const grant_ref_t grant_ref_max;
+
 private:
    Grant_table (const Grant_table &);
    Grant_table &operator= (const Grant_table &);
 
-   const unsigned int size;
    grant_entry_v1_t *const entries;
 
-   std::list<grant_ref_t> avail;
-   std::list<grant_ref_t> inuse;
+   grant_ref_t next_ref;
 
 };
 

@@ -315,7 +315,7 @@ enum communication_types {
      char read_type;   /* c-char  d-double  s-stream */
   };
 
-#elif defined(LLAMANET)
+#elif defined(LLAMANET) || defined(NOTHING)
   typedef struct protocolstruct ProtocolStruct;
   struct protocolstruct {
      int nothing;

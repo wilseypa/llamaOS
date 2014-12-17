@@ -48,24 +48,24 @@ class iGroup;
 class iComm;
 class iRequest;
 
-//#define MPI_COUT_EVERY_MESSAGE
+#define MPI_COUT_EVERY_MESSAGE
 //#define MPI_COUT_NB_MESSAGES
 #define MPI_COUT_INITIALIZATION
-//#define MPI_COUT_COLLECTIVE_FUNCTIONS
+#define MPI_COUT_COLLECTIVE_FUNCTIONS
 #define MPI_COUT_TAB "    "
 //#define MPI_SLOW_SENDS
 //#define MPI_BARRIER_ALL_COLLECTIVE
 //#define MPI_RX_BEFORE_TX
 //#define MPI_USE_BCAST_HARDWARE
-#define MPI_WATCHDOG_TIME 5
+//#define MPI_WATCHDOG_TIME 5
 
 // #define MAX_MESS_SIZE 3950
 
 // 1500 - 64
-// #define MAX_MESS_SIZE 1436
+#define MAX_MESS_SIZE 1436
 
 // 4096 - 64
-#define MAX_MESS_SIZE 4032
+// #define MAX_MESS_SIZE 4032
 
 typedef char MPI_CHAR_T;
 typedef unsigned char MPI_BYTE_T;		

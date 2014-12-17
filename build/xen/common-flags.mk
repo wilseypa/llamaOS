@@ -41,7 +41,9 @@ ASMFLAGS = \
   -Wa,--fatal-warnings \
   -fno-exceptions \
   -fno-omit-frame-pointer \
-  -U__EXCEPTIONS
+  -U__EXCEPTIONS \
+  -U_FORTIFY_SOURCE \
+  -D__USE_FORTIFY_LEVEL=0
 
 CFLAGS = \
   -m64 \
@@ -53,7 +55,9 @@ CFLAGS = \
   -nostdinc \
   -fno-exceptions \
   -fno-omit-frame-pointer \
-  -U__EXCEPTIONS
+  -U__EXCEPTIONS \
+  -U_FORTIFY_SOURCE \
+  -D__USE_FORTIFY_LEVEL=0
 
 CPPFLAGS = \
   -m64 \
@@ -66,7 +70,9 @@ CPPFLAGS = \
   -nostdinc++ \
   -fno-exceptions \
   -fno-omit-frame-pointer \
-  -U__EXCEPTIONS
+  -U__EXCEPTIONS \
+  -U_FORTIFY_SOURCE \
+  -D__USE_FORTIFY_LEVEL=0
 
 F90FLAGS = \
   -m64 \
@@ -75,7 +81,9 @@ F90FLAGS = \
   -nostdinc \
   -fno-exceptions \
   -fno-omit-frame-pointer \
-  -U__EXCEPTIONS
+  -U__EXCEPTIONS \
+  -U_FORTIFY_SOURCE \
+  -D__USE_FORTIFY_LEVEL=0
 
 LDFLAGS = \
  -nostdlib \

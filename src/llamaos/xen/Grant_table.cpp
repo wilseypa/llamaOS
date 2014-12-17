@@ -40,34 +40,50 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <llamaos/llamaOS.h>
 #include <llamaos/Trace.h>
 
-using namespace std;
+using std::cout;
+using std::endl;
+using std::min;
+
 using namespace llamaos;
 using namespace llamaos::memory;
 using namespace llamaos::xen;
 
-#define FRAME_LIST_SIZE 32
+static uint32_t query_size ()
+{
+   uint32_t frames;
+   uint32_t max_frames;
 
-// for now just map a single page for the table
+   trace ("calling grant_table_query_size...\n");
+   if (!Hypercall::grant_table_query_size(frames, max_frames))
+   {
+      trace ("failed to query grant table size\n");
+//      throw runtime_error ("failed to query grant table size");
+   }
+
+   return max_frames;
+}
+
 Grant_table::Grant_table ()
-   :  size((FRAME_LIST_SIZE * PAGE_SIZE) / sizeof(grant_entry_v1_t)),
-      entries(address_to_pointer<grant_entry_v1_t> (get_reserved_virtual_address (FRAME_LIST_SIZE))),
-      avail(),
-      inuse()
+   :  frame_list_max(query_size()),
+      frame_list_size(min(FRAME_LIST_SIZE, frame_list_max)),
+      grant_ref_max((frame_list_size * PAGE_SIZE) / sizeof(grant_entry_v1_t)),
+      entries(address_to_pointer<grant_entry_v1_t> (get_reserved_virtual_address (frame_list_size))),
+      next_ref(GNTTAB_NR_RESERVED_ENTRIES)
 {
    trace ("Grant_table constructor...\n");
-   trace (" size: %x\n", size);
+   trace (" size: %x\n", grant_ref_max);
    trace (" entries: %lx\n", entries);
 
    unsigned long frame_list [FRAME_LIST_SIZE] = { 0 };
 
    trace ("calling grant_table_setup_table...\n");
-   if (!Hypercall::grant_table_setup_table (FRAME_LIST_SIZE, frame_list))
+   if (!Hypercall::grant_table_setup_table (frame_list_size, frame_list))
    {
       trace ("failed to create grant table\n");
 //      throw runtime_error ("failed to create grant table");
    }
 
-   for (int i = 0; i < FRAME_LIST_SIZE; i++)
+   for (uint32_t i = 0; i < frame_list_size; i++)
    {
       trace ("calling update_va_mapping...\n");
       if (!Hypercall::update_va_mapping (pointer_to_address(entries) + (i * PAGE_SIZE), page_to_address (frame_list [i])))
@@ -76,11 +92,6 @@ Grant_table::Grant_table ()
 //         throw runtime_error ("failed to map grant table");
       }
       trace ("calling update_va_mapping returned.\n");
-   }
-
-   for (grant_ref_t i = 0; i < size; i++)
-   {
-      avail.push_back(i);
    }
 
    trace ("Grant_table constructor ended.\n");
@@ -93,9 +104,15 @@ Grant_table::~Grant_table ()
 
 grant_ref_t Grant_table::grant_access (domid_t domid, void *address)
 {
-   grant_ref_t ref = avail.back ();
-   avail.pop_back ();
-   inuse.push_back (ref);
+   if (next_ref >= grant_ref_max)
+   {
+      // trace ("all grant ref allocated.\n");
+      // throw exception
+      cout << "ERROR: all grant ref allocated" << endl;
+      exit(-1);
+   }
+
+   grant_ref_t ref = next_ref++;
    entries [ref].domid = domid;
    entries [ref].frame = virtual_pointer_to_machine_page(address);
 
@@ -104,4 +121,9 @@ grant_ref_t Grant_table::grant_access (domid_t domid, void *address)
    entries [ref].flags = GTF_permit_access | GTF_reading | GTF_writing;
 
    return ref;
+}
+
+unsigned int Grant_table::grant_ref_size () const
+{
+   return grant_ref_max - next_ref;
 }

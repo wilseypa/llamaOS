@@ -585,7 +585,7 @@ int main (int /* argc */, char ** /* argv [] */)
    unsigned int rx_count = 0;
    unsigned int tx_tail2 = 0;
 
-   int stat_delay = 10000;
+//   int stat_delay = 10000;
 
    for (;;)
    {

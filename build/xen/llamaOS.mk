@@ -59,10 +59,14 @@ CPPFLAGS += \
 VPATH = $(SRCDIR)
 
 ASM_SOURCES = \
-  llamaos/xen/Entry.S
+  llamaos/xen/entry/start.S
 
 C_SOURCES = \
-  llamaos/xen/Entry-glibc.c \
+  llamaos/xen/entry/glibc.c \
+  llamaos/xen/fs/ext2/vfs.c \
+  llamaos/xen/fs/ext2/ext2.c \
+  llamaos/xen/fs/ext2/fd.c \
+  llamaos/xen/fs/ext2/panic.c \
   llamaos/xen/Trace.c
 
 CPP_SOURCES = \
@@ -73,10 +77,11 @@ CPP_SOURCES = \
   llamaos/memory/Entry.cpp \
   llamaos/memory/Memory.cpp \
   llamaos/net/llamaNET.cpp \
+  llamaos/xen/entry/gcc.cpp \
+  llamaos/xen/entry/llamaOS.cpp \
+  llamaos/xen/fs/ext2/disk.cpp \
   llamaos/xen/Block.cpp \
   llamaos/xen/Console.cpp \
-  llamaos/xen/Entry-gcc.cpp \
-  llamaos/xen/Entry-llamaOS.cpp \
   llamaos/xen/Events.cpp \
   llamaos/xen/Grant_map.cpp \
   llamaos/xen/Grant_table.cpp \
@@ -84,6 +89,7 @@ CPP_SOURCES = \
   llamaos/xen/Hypervisor.cpp \
   llamaos/xen/Memory.cpp \
   llamaos/xen/PCI.cpp \
+  llamaos/xen/Shared_memory.cpp \
   llamaos/xen/Traps.cpp \
   llamaos/xen/Xenstore.cpp
 

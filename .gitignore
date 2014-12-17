@@ -5,12 +5,10 @@ build/linux/bin/
 build/linux/include/
 build/linux/lib/
 build/linux/obj/
-build/linux/test/
 build/xen/bin/
 build/xen/include/
 build/xen/lib/
 build/xen/obj/
-build/xen/test/
 bin/
 lib/
 obj/
@@ -34,12 +32,22 @@ build/xen/util/NAS/mg/npbparams.h
 build/xen/util/NAS/sp/npbparams.h
 build/xen/util/NAS/setparams
 
+# LaTeX files #
+# ########### #
+doc/*.log
+doc/*.aux
+doc/*.toc
+doc/*.out
+doc/*.pdf
+doc/*.backup
+
 # KDevelop files #
 # ############## #
 .kdev4/
 .kdev_include_paths
 .directory
 .*-swp
+*.kdev4
 
 
 

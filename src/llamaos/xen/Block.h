@@ -35,6 +35,7 @@ either expressed or implied, of the copyright holder(s) or contributors.
 #include <cstring>
 #include <sstream>
 #include <string>
+#include <vector>
 
 #include <xen/xen.h>
 #include <xen/event_channel.h>
@@ -52,7 +53,7 @@ public:
    virtual ~Block ();
 
    ssize_t read (void *buf, size_t nbytes);
-   off64_t lseek64 (off64_t offset, int whence);
+   ssize_t write (const void *buf, size_t nbytes);
 
    const std::string frontend_key;
 
@@ -65,17 +66,20 @@ private:
    Block (const Block &);
    Block &operator= (const Block &);
 
-   blkif_sring_t *const shared;
+   blkif_sring_t *const shared_ring;
+   blkif_front_ring_t _private;
+   char *const shared_buffer;
 
+   grant_ref_t shared_ring_ref;
+   grant_ref_t shared_buffer_ref;
    evtchn_port_t port;
 
    std::string name;
    std::string dev;
+   blkif_vdev_t vdev;
+   unsigned int sector_size;
+   unsigned int sectors;
    unsigned int size;
-
-   unsigned int position;
-
-   std::string data;
 
 };
 
